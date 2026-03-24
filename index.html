@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Neon Drift - Livre de regles</title>
+    <title>The Hub - Livre de regles</title>
     <meta
       name="description"
       content="Livre de regles cyberpunk pour jeu de role papier, lisible sur mobile et hebergeable sur GitHub Pages."
@@ -26,7 +26,7 @@
           <a class="brand" href="#accueil">
             <span class="brand-mark" aria-hidden="true"></span>
             <span>
-              <strong>Neon Drift</strong>
+              <strong>The Hub</strong>
               <small>Regles de jeu</small>
             </span>
           </a>
@@ -41,6 +41,7 @@
           </button>
 
           <div class="topbar-links" id="menu-principal">
+            <a href="#accueil">Accueil</a>
             <a href="#univers">Univers</a>
             <a href="#creation">Creation</a>
             <a href="#systeme">Systeme</a>
@@ -48,49 +49,12 @@
             <a href="#mj">MJ</a>
           </div>
         </nav>
-
-        <section class="hero" id="accueil">
-          <div class="hero-copy panel">
-            <p class="eyebrow">Livre de regles navigable</p>
-            <h1>Un manuel cyberpunk lisible, partageable et responsive.</h1>
-            <p class="hero-text">
-              Cette base contient une mise en page prete pour accueillir les regles de ton jeu.
-              Le contenu ci-dessous utilise des exemples et placeholders que tu pourras remplacer
-              progressivement sans toucher a la structure generale du site.
-            </p>
-            <div class="hero-actions">
-              <a class="button button-primary" href="#systeme">Lire les mecanismes</a>
-              <a class="button button-secondary" href="#annexes">Voir les annexes</a>
-            </div>
-          </div>
-
-          <aside class="hero-aside panel">
-            <p class="panel-title">Signal de session</p>
-            <ul class="stat-list">
-              <li>
-                <span>Cadre</span>
-                <strong>Megapole en ruine</strong>
-              </li>
-              <li>
-                <span>Tonalite</span>
-                <strong>Cyberpunk lisible</strong>
-              </li>
-              <li>
-                <span>Mode de jeu</span>
-                <strong>JDR papier</strong>
-              </li>
-              <li>
-                <span>Etat</span>
-                <strong>Placeholder remplacable</strong>
-              </li>
-            </ul>
-          </aside>
-        </section>
       </header>
 
       <div class="content-grid">
         <aside class="toc panel" aria-label="Sommaire du livre">
           <p class="panel-title">Sommaire</p>
+          <p class="toc-note">Navigation par ancres: une seule section est visible a la fois.</p>
           <nav>
             <a href="#accueil">Accueil</a>
             <a href="#univers">Univers</a>
@@ -103,8 +67,48 @@
           </nav>
         </aside>
 
-        <main id="contenu" class="content-flow">
-          <section class="rule-section panel" id="univers" data-section>
+        <main id="contenu" class="content-flow" aria-live="polite">
+          <section class="page-section panel is-active" id="accueil" data-section>
+            <div class="hero-layout">
+              <div class="hero-copy">
+                <p class="eyebrow">Livre de regles navigable</p>
+                <h1>The Hub</h1>
+                <p class="hero-text">
+                  Une base de manuel cyberpunk en une seule page, avec navigation par ancres et
+                  affichage chapitre par chapitre. Chaque section fonctionne comme une page dediee,
+                  sans quitter le HTML principal.
+                </p>
+                <div class="hero-actions">
+                  <a class="button button-primary" href="#systeme">Lire les mecanismes</a>
+                  <a class="button button-secondary" href="#univers">Entrer dans l'univers</a>
+                </div>
+              </div>
+
+              <aside class="hero-aside info-block">
+                <p class="panel-title">Signal de session</p>
+                <ul class="stat-list">
+                  <li>
+                    <span>Cadre</span>
+                    <strong>Megapole en ruine</strong>
+                  </li>
+                  <li>
+                    <span>Palette</span>
+                    <strong>Noir, vert neon, violet</strong>
+                  </li>
+                  <li>
+                    <span>Format</span>
+                    <strong>Une section visible</strong>
+                  </li>
+                  <li>
+                    <span>Etat</span>
+                    <strong>Base editable</strong>
+                  </li>
+                </ul>
+              </aside>
+            </div>
+          </section>
+
+          <section class="page-section panel" id="univers" data-section>
             <div class="section-heading">
               <p class="section-kicker">01</p>
               <div>
@@ -134,7 +138,7 @@
             </div>
           </section>
 
-          <section class="rule-section panel" id="creation" data-section>
+          <section class="page-section panel" id="creation" data-section>
             <div class="section-heading">
               <p class="section-kicker">02</p>
               <div>
@@ -180,7 +184,7 @@
             </div>
           </section>
 
-          <section class="rule-section panel" id="systeme" data-section>
+          <section class="page-section panel" id="systeme" data-section>
             <div class="section-heading">
               <p class="section-kicker">03</p>
               <div>
@@ -207,7 +211,7 @@
               </article>
             </div>
             <div class="callout accent">
-              <strong>Regle example</strong>
+              <strong>Regle exemple</strong>
               <p>
                 Placeholder: si un implant est sollicite sous stress, le joueur peut gagner un bonus
                 temporaire en acceptant une trace, une surchauffe ou une dette technique.
@@ -215,7 +219,7 @@
             </div>
           </section>
 
-          <section class="rule-section panel" id="combat" data-section>
+          <section class="page-section panel" id="combat" data-section>
             <div class="section-heading">
               <p class="section-kicker">04</p>
               <div>
@@ -263,7 +267,7 @@
             </div>
           </section>
 
-          <section class="rule-section panel" id="equipement" data-section>
+          <section class="page-section panel" id="equipement" data-section>
             <div class="section-heading">
               <p class="section-kicker">05</p>
               <div>
@@ -291,7 +295,7 @@
             </div>
           </section>
 
-          <section class="rule-section panel" id="mj" data-section>
+          <section class="page-section panel" id="mj" data-section>
             <div class="section-heading">
               <p class="section-kicker">06</p>
               <div>
@@ -307,7 +311,7 @@
               <strong>Principes de cadrage</strong>
               <p>Commencer au bord du probleme, rappeler les enjeux personnels, conclure chaque scene sur une pression claire.</p>
             </div>
-            <div class="card-grid">
+            <div class="card-grid two-up">
               <article class="info-card">
                 <h3>Questions a poser</h3>
                 <p>Qui vous doit quelque chose ? Quel implant fait peur ? Qui observe depuis plus longtemps ?</p>
@@ -319,7 +323,7 @@
             </div>
           </section>
 
-          <section class="rule-section panel" id="annexes" data-section>
+          <section class="page-section panel" id="annexes" data-section>
             <div class="section-heading">
               <p class="section-kicker">07</p>
               <div>

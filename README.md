@@ -1,4 +1,4 @@
-# Neon Drift - Site statique de regles JDR
+# The Hub - Site statique de regles JDR
 
 Base de site statique responsive en francais pour publier les regles d'un jeu de role papier avec une direction visuelle cyberpunk lisible.
 
@@ -6,7 +6,7 @@ Base de site statique responsive en francais pour publier les regles d'un jeu de
 
 - `index.html` contient la page unique et les sections du livre de regles.
 - `styles.css` gere le theme, la mise en page responsive et les composants visuels.
-- `script.js` ajoute le menu mobile, le sommaire actif et la copie des ancres.
+- `script.js` simule une navigation par pages via les ancres et n'affiche qu'une section a la fois.
 - `assets/` est prevu pour les images, PDF, feuilles de personnage ou icones supplementaires.
 - `.nojekyll` force GitHub Pages a servir le site comme contenu statique simple.
 
@@ -28,4 +28,4 @@ Base de site statique responsive en francais pour publier les regles d'un jeu de
 ## Notes
 
 - Les chemins sont relatifs, donc le site fonctionne directement sur GitHub Pages.
-- Le site reste lisible meme si `script.js` ne charge pas.
+- Sans JavaScript, tout reste charge dans la page mais la navigation par section visible ne sera pas active.
