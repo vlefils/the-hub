@@ -1,65 +1,89 @@
 const menuToggle = document.querySelector(".menu-toggle");
-const menu = document.querySelector("#menu-principal");
-const menuLinks = menu ? [...menu.querySelectorAll("a")] : [];
-const tocLinks = [...document.querySelectorAll(".toc a")];
-const navLinks = [...menuLinks, ...tocLinks];
+const categoryMenu = document.querySelector("#menu-categories");
+const categoryLinks = [...document.querySelectorAll("[data-category-link]")];
+const sidebarTitle = document.querySelector("[data-sidebar-title]");
+const sidebarNavs = [...document.querySelectorAll("[data-sidebar-nav]")];
+const sidebarLinks = [...document.querySelectorAll(".sidebar a")];
 const sections = [...document.querySelectorAll("[data-section]")];
 const anchorLinks = [...document.querySelectorAll(".anchor-link")];
 
 const closeMenu = () => {
-  if (!menuToggle || !menu) {
+  if (!menuToggle || !categoryMenu) {
     return;
   }
 
-  menu.classList.remove("is-open");
+  categoryMenu.classList.remove("is-open");
   menuToggle.setAttribute("aria-expanded", "false");
 };
 
-if (menuToggle && menu) {
+if (menuToggle && categoryMenu) {
   menuToggle.addEventListener("click", () => {
-    const isOpen = menu.classList.toggle("is-open");
+    const isOpen = categoryMenu.classList.toggle("is-open");
     menuToggle.setAttribute("aria-expanded", String(isOpen));
   });
 }
 
-const showSection = (id) => {
-  const targetId = sections.some((section) => section.id === id) ? id : "accueil";
+const labels = {
+  news: "News",
+  lore: "Lore",
+  regles: "Regles",
+  personnage: "Personnage",
+  outils: "Outils",
+};
 
-  sections.forEach((section) => {
-    const isActive = section.id === targetId;
-    section.classList.toggle("is-active", isActive);
-    section.toggleAttribute("hidden", !isActive);
-    if (isActive) {
-      section.removeAttribute("aria-hidden");
-    } else {
-      section.setAttribute("aria-hidden", "true");
-    }
-  });
-
-  navLinks.forEach((link) => {
-    const isActive = link.getAttribute("href") === `#${targetId}`;
-    link.classList.toggle("active", isActive);
-    if (isActive) {
+const activateCategory = (category) => {
+  categoryLinks.forEach((link) => {
+    const active = link.dataset.categoryLink === category;
+    link.classList.toggle("active", active);
+    if (active) {
       link.setAttribute("aria-current", "page");
     } else {
       link.removeAttribute("aria-current");
     }
   });
 
+  sidebarNavs.forEach((nav) => {
+    nav.hidden = nav.dataset.sidebarNav !== category;
+  });
+
+  if (sidebarTitle) {
+    sidebarTitle.textContent = labels[category] || "Navigation";
+  }
+};
+
+const activateSidebarLink = (id) => {
+  sidebarLinks.forEach((link) => {
+    const active = link.getAttribute("href") === `#${id}`;
+    link.classList.toggle("active", active);
+    if (active) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+};
+
+const showSection = (id) => {
+  const fallback = sections[0];
+  const target = sections.find((section) => section.id === id) || fallback;
+
+  sections.forEach((section) => {
+    const active = section === target;
+    section.classList.toggle("is-active", active);
+    section.toggleAttribute("hidden", !active);
+    section.setAttribute("aria-hidden", String(!active));
+  });
+
+  activateCategory(target.dataset.category || "news");
+  activateSidebarLink(target.id);
   closeMenu();
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const syncFromHash = () => {
-  const currentId = window.location.hash.replace("#", "") || "accueil";
-  showSection(currentId);
+  const id = window.location.hash.replace("#", "") || "news-overview";
+  showSection(id);
 };
-
-navLinks.forEach((link) => {
-  link.addEventListener("click", () => {
-    window.setTimeout(syncFromHash, 0);
-  });
-});
 
 window.addEventListener("hashchange", syncFromHash);
 
@@ -91,7 +115,7 @@ anchorLinks.forEach((link) => {
 });
 
 if (!window.location.hash) {
-  history.replaceState(null, "", "#accueil");
+  history.replaceState(null, "", "#news-overview");
 }
 
 syncFromHash();

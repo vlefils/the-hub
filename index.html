@@ -23,7 +23,7 @@
     <div class="page-shell">
       <header class="site-header" id="top">
         <nav class="topbar" aria-label="Navigation principale">
-          <a class="brand" href="#accueil">
+          <a class="brand" href="#news-overview">
             <span class="brand-mark" aria-hidden="true"></span>
             <span>
               <strong>The Hub</strong>
@@ -35,323 +35,239 @@
             class="menu-toggle"
             type="button"
             aria-expanded="false"
-            aria-controls="menu-principal"
+            aria-controls="menu-categories"
           >
-            Menu
+            Categories
           </button>
 
-          <div class="topbar-links" id="menu-principal">
-            <a href="#accueil">Accueil</a>
-            <a href="#univers">Univers</a>
-            <a href="#creation">Creation</a>
-            <a href="#systeme">Systeme</a>
-            <a href="#combat">Combat</a>
-            <a href="#mj">MJ</a>
+          <div class="topbar-links" id="menu-categories">
+            <a href="#news-overview" data-category-link="news">News</a>
+            <a href="#lore-overview" data-category-link="lore">Lore</a>
+            <a href="#regles-overview" data-category-link="regles">Regles</a>
+            <a href="#personnage-overview" data-category-link="personnage">Personnage</a>
+            <a href="#outils-overview" data-category-link="outils">Outils</a>
           </div>
         </nav>
       </header>
 
       <div class="content-grid">
-        <aside class="toc panel" aria-label="Sommaire du livre">
-          <p class="panel-title">Sommaire</p>
-          <p class="toc-note">Navigation par ancres: une seule section est visible a la fois.</p>
-          <nav>
-            <a href="#accueil">Accueil</a>
-            <a href="#univers">Univers</a>
-            <a href="#creation">Creation de personnage</a>
-            <a href="#systeme">Systeme de jeu</a>
-            <a href="#combat">Combat</a>
-            <a href="#equipement">Equipement</a>
-            <a href="#mj">Conseils MJ</a>
-            <a href="#annexes">Annexes</a>
+        <aside class="sidebar panel" aria-label="Navigation secondaire">
+          <div class="sidebar-head">
+            <p class="panel-title">Navigation</p>
+            <p class="sidebar-current" data-sidebar-title>News</p>
+          </div>
+
+          <nav class="sidebar-nav" data-sidebar-nav="news">
+            <a href="#news-overview">Vue d'ensemble</a>
+            <a href="#news-journal">Journal de bord</a>
+            <a href="#news-roadmap">Roadmap</a>
+          </nav>
+
+          <nav class="sidebar-nav" data-sidebar-nav="lore" hidden>
+            <a href="#lore-overview">Vue d'ensemble</a>
+            <a href="#lore-factions">Factions</a>
+            <a href="#lore-zones">Zones</a>
+            <a href="#lore-ton">Tonalite</a>
+          </nav>
+
+          <nav class="sidebar-nav" data-sidebar-nav="regles" hidden>
+            <a href="#regles-overview">Vue d'ensemble</a>
+            <a href="#regles-systeme">Systeme</a>
+            <a href="#regles-combat">Combat</a>
+            <a href="#regles-equipement">Equipement</a>
+          </nav>
+
+          <nav class="sidebar-nav" data-sidebar-nav="personnage" hidden>
+            <a href="#personnage-overview">Vue d'ensemble</a>
+            <a href="#personnage-origines">Origines</a>
+            <div class="sidebar-group">
+              <p>Classes</p>
+              <a href="#personnage-classe-casseur">Casseur</a>
+              <a href="#personnage-classe-gachette">Gachette</a>
+              <a href="#personnage-classe-ferailleur">Ferailleur</a>
+            </div>
+            <div class="sidebar-group">
+              <p>Le Hub</p>
+              <a href="#personnage-hub-armes">Armes</a>
+              <a href="#personnage-hub-gadgets">Gadgets</a>
+              <a href="#personnage-hub-implants">Implants</a>
+              <a href="#personnage-hub-mutations">Mutations</a>
+            </div>
+          </nav>
+
+          <nav class="sidebar-nav" data-sidebar-nav="outils" hidden>
+            <a href="#outils-overview">Vue d'ensemble</a>
+            <a href="#outils-fiche">Fiche PJ</a>
+            <a href="#outils-tables">Tables rapides</a>
+            <a href="#outils-mj">Aides MJ</a>
           </nav>
         </aside>
 
         <main id="contenu" class="content-flow" aria-live="polite">
-          <section class="page-section panel is-active" id="accueil" data-section>
-            <div class="hero-layout">
-              <div class="hero-copy">
-                <p class="eyebrow">Livre de regles navigable</p>
-                <h1>The Hub</h1>
-                <p class="hero-text">
-                  Une base de manuel cyberpunk en une seule page, avec navigation par ancres et
-                  affichage chapitre par chapitre. Chaque section fonctionne comme une page dediee,
-                  sans quitter le HTML principal.
-                </p>
-                <div class="hero-actions">
-                  <a class="button button-primary" href="#systeme">Lire les mecanismes</a>
-                  <a class="button button-secondary" href="#univers">Entrer dans l'univers</a>
-                </div>
-              </div>
-
-              <aside class="hero-aside info-block">
-                <p class="panel-title">Signal de session</p>
-                <ul class="stat-list">
-                  <li>
-                    <span>Cadre</span>
-                    <strong>Megapole en ruine</strong>
-                  </li>
-                  <li>
-                    <span>Palette</span>
-                    <strong>Noir, vert neon, violet</strong>
-                  </li>
-                  <li>
-                    <span>Format</span>
-                    <strong>Une section visible</strong>
-                  </li>
-                  <li>
-                    <span>Etat</span>
-                    <strong>Base editable</strong>
-                  </li>
-                </ul>
-              </aside>
+          <section class="page-section panel is-active" id="news-overview" data-section data-category="news">
+            <p class="eyebrow">News</p>
+            <h1>The Hub</h1>
+            <p class="hero-text">
+              Le site devient un hub de consultation plus propre: categories en haut, sous-categories a gauche,
+              et une seule page visible a la fois pour garder la lecture claire meme quand le contenu grossit.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#personnage-overview">Explorer personnage</a>
+              <a class="button button-secondary" href="#regles-overview">Voir les regles</a>
             </div>
           </section>
 
-          <section class="page-section panel" id="univers" data-section>
+          <section class="page-section panel" id="news-journal" data-section data-category="news">
             <div class="section-heading">
-              <p class="section-kicker">01</p>
+              <p class="section-kicker">News</p>
               <div>
-                <h2>Univers</h2>
-                <a class="anchor-link" href="#univers">Lien direct</a>
+                <h2>Journal de bord</h2>
+                <a class="anchor-link" href="#news-journal">Lien direct</a>
               </div>
             </div>
-            <p>
-              Placeholder: la cite de Verre-Sud survit entre pluies acides, tours publicitaires
-              et zones franches hors controle. Les personnages evoluent entre corporations,
-              syndicats de rues, intelligences emergentes et survivants qui bricolent leur propre
-              avenir.
-            </p>
-            <div class="card-grid">
-              <article class="info-card">
-                <h3>Factions</h3>
-                <p>Placeholder: trois a cinq factions majeures avec objectifs clairs et tensions ouvertes.</p>
-              </article>
-              <article class="info-card">
-                <h3>Technologie</h3>
-                <p>Placeholder: implants, drones, reseaux fermes et dettes numeriques structurent le quotidien.</p>
-              </article>
-              <article class="info-card">
-                <h3>Ambiance</h3>
-                <p>Placeholder: pression constante, solidarites fragiles, style fort et violence rapide.</p>
-              </article>
+            <p>Placeholder: espace pour les notes de version, les changements de systeme et les nouvelles publications.</p>
+            <div class="callout"><strong>Suggestion</strong><p>Utilise cette page pour indiquer les mises a jour importantes du jeu et du site.</p></div>
+          </section>
+
+          <section class="page-section panel" id="news-roadmap" data-section data-category="news">
+            <div class="section-heading">
+              <p class="section-kicker">News</p>
+              <div>
+                <h2>Roadmap</h2>
+                <a class="anchor-link" href="#news-roadmap">Lien direct</a>
+              </div>
+            </div>
+            <p>Placeholder: prochaines classes, nouveaux arcs de lore, outils de MJ et supplements a venir.</p>
+          </section>
+
+          <section class="page-section panel" id="lore-overview" data-section data-category="lore">
+            <div class="section-heading">
+              <p class="section-kicker">Lore</p>
+              <div>
+                <h2>Vue d'ensemble</h2>
+                <a class="anchor-link" href="#lore-overview">Lien direct</a>
+              </div>
+            </div>
+            <p>La ville est une membrane instable entre la dette, la technologie et des territoires que personne ne controle vraiment.</p>
+            <div class="card-grid three-up">
+              <article class="info-card"><h3>Ambiance</h3><p>Pression continue, survie brillante, violence rapide.</p></article>
+              <article class="info-card"><h3>Pouvoir</h3><p>Corporations, syndicats locaux, IA opportunistes.</p></article>
+              <article class="info-card"><h3>Style</h3><p>Noir urbain, vert neon, violet toxique.</p></article>
             </div>
           </section>
 
-          <section class="page-section panel" id="creation" data-section>
-            <div class="section-heading">
-              <p class="section-kicker">02</p>
-              <div>
-                <h2>Creation de personnage</h2>
-                <a class="anchor-link" href="#creation">Lien direct</a>
-              </div>
-            </div>
-            <p>
-              Placeholder: chaque personnage combine un archetype, une origine et une dette.
-              Le but est de generer vite un profil competent avec un probleme narratif immediat.
-            </p>
-            <div class="callout">
-              <strong>Procedure rapide</strong>
-              <p>Choisir un concept, attribuer les scores, noter un contact, un manque et un objectif court terme.</p>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Etape</th>
-                    <th>Choix</th>
-                    <th>Exemple</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Archetype</td>
-                    <td>Operateur, Ghost, Mediateur</td>
-                    <td>Ghost specialise en infiltration</td>
-                  </tr>
-                  <tr>
-                    <td>Origine</td>
-                    <td>Quartier, labo, zone franche</td>
-                    <td>Enfant des docks inondes</td>
-                  </tr>
-                  <tr>
-                    <td>Dette</td>
-                    <td>Corporation, gang, famille</td>
-                    <td>Credits dus a une clinique noire</td>
-                  </tr>
-                </tbody>
-              </table>
+          <section class="page-section panel" id="lore-factions" data-section data-category="lore">
+            <div class="section-heading"><p class="section-kicker">Lore</p><div><h2>Factions</h2><a class="anchor-link" href="#lore-factions">Lien direct</a></div></div>
+            <p>Placeholder: trois a cinq blocs de pouvoir avec objectifs, ressources et fractures internes.</p>
+          </section>
+
+          <section class="page-section panel" id="lore-zones" data-section data-category="lore">
+            <div class="section-heading"><p class="section-kicker">Lore</p><div><h2>Zones</h2><a class="anchor-link" href="#lore-zones">Lien direct</a></div></div>
+            <p>Placeholder: docks noyes, tours de diffusion, marche noir clinique, ceinture industrielle et zones franches.</p>
+          </section>
+
+          <section class="page-section panel" id="lore-ton" data-section data-category="lore">
+            <div class="section-heading"><p class="section-kicker">Lore</p><div><h2>Tonalite</h2><a class="anchor-link" href="#lore-ton">Lien direct</a></div></div>
+            <p>Placeholder: fais respirer le style, mais garde toujours une consequence humaine derriere chaque choix technologique.</p>
+          </section>
+
+          <section class="page-section panel" id="regles-overview" data-section data-category="regles">
+            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Vue d'ensemble</h2><a class="anchor-link" href="#regles-overview">Lien direct</a></div></div>
+            <p>Le systeme cherche des resolutions courtes, fictionnelles et facilement lisibles en cours de partie.</p>
+            <div class="callout accent"><strong>Principe</strong><p>Une page par mecanique importante pour eviter l'effet mur de texte.</p></div>
+          </section>
+
+          <section class="page-section panel" id="regles-systeme" data-section data-category="regles">
+            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Systeme</h2><a class="anchor-link" href="#regles-systeme">Lien direct</a></div></div>
+            <p>Placeholder: quand une action est risquee, lance 2d6 et ajoute l'attribut approprie.</p>
+            <div class="card-grid three-up">
+              <article class="info-card"><h3>6 ou moins</h3><p>Le monde frappe en retour.</p></article>
+              <article class="info-card"><h3>7 a 9</h3><p>Succes partiel avec cout ou compromis.</p></article>
+              <article class="info-card"><h3>10 et plus</h3><p>Succes net et position favorable.</p></article>
             </div>
           </section>
 
-          <section class="page-section panel" id="systeme" data-section>
-            <div class="section-heading">
-              <p class="section-kicker">03</p>
-              <div>
-                <h2>Systeme de jeu</h2>
-                <a class="anchor-link" href="#systeme">Lien direct</a>
-              </div>
-            </div>
-            <p>
-              Placeholder: quand une action est risquee, lance 2d6 et ajoute l'attribut approprie.
-              Le MJ fixe une difficulte ou oppose le resultat a une force adverse.
-            </p>
-            <div class="card-grid">
-              <article class="info-card">
-                <h3>6 ou moins</h3>
-                <p>Echec ou succes couteux. Le monde frappe en retour.</p>
-              </article>
-              <article class="info-card">
-                <h3>7 a 9</h3>
-                <p>Succes partiel, compromis, exposition, usure ou choix difficile.</p>
-              </article>
-              <article class="info-card">
-                <h3>10 et plus</h3>
-                <p>Succes net avec avantage narratif ou position favorable.</p>
-              </article>
-            </div>
-            <div class="callout accent">
-              <strong>Regle exemple</strong>
-              <p>
-                Placeholder: si un implant est sollicite sous stress, le joueur peut gagner un bonus
-                temporaire en acceptant une trace, une surchauffe ou une dette technique.
-              </p>
-            </div>
+          <section class="page-section panel" id="regles-combat" data-section data-category="regles">
+            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Combat</h2><a class="anchor-link" href="#regles-combat">Lien direct</a></div></div>
+            <p>Placeholder: combat court, brutal, guide par la fiction plus que par l'initiative abstraite.</p>
           </section>
 
-          <section class="page-section panel" id="combat" data-section>
-            <div class="section-heading">
-              <p class="section-kicker">04</p>
-              <div>
-                <h2>Combat</h2>
-                <a class="anchor-link" href="#combat">Lien direct</a>
-              </div>
-            </div>
-            <p>
-              Placeholder: le combat reste court, brutal et fictionnel. Les positions, la couverture
-              et l'initiative fictionnelle importent plus qu'une suite de tours rigides.
-            </p>
-            <ol class="sequence-list">
-              <li>Le MJ clarifie la situation et les menaces immediates.</li>
-              <li>Les joueurs annoncent leurs priorites: fuir, neutraliser, proteger, tenir.</li>
-              <li>Les jets resolvent les moments critiques, pas chaque mouvement mineur.</li>
-              <li>Les degats, la panique ou les ruptures d'equipement changent la fiction.</li>
-            </ol>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Etat</th>
-                    <th>Effet</th>
-                    <th>Recuperation</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Sonne</td>
-                    <td>Desavantage sur la prochaine action offensive</td>
-                    <td>Mettre a couvert ou recevoir de l'aide</td>
-                  </tr>
-                  <tr>
-                    <td>Brule</td>
-                    <td>Perte progressive de ressources</td>
-                    <td>Couper la source ou sacrifier du materiel</td>
-                  </tr>
-                  <tr>
-                    <td>Traque</td>
-                    <td>Votre position est compromise</td>
-                    <td>Changer de route ou saturer les capteurs</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <section class="page-section panel" id="regles-equipement" data-section data-category="regles">
+            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Equipement</h2><a class="anchor-link" href="#regles-equipement">Lien direct</a></div></div>
+            <p>Placeholder: armes, outils, protection et materiel de survie urbaine.</p>
           </section>
 
-          <section class="page-section panel" id="equipement" data-section>
-            <div class="section-heading">
-              <p class="section-kicker">05</p>
-              <div>
-                <h2>Equipement</h2>
-                <a class="anchor-link" href="#equipement">Lien direct</a>
-              </div>
-            </div>
-            <p>
-              Placeholder: l'equipement definit autant le style que les possibilites tactiques. Les
-              listes restent courtes et evocatrices pour favoriser l'appropriation rapide en jeu.
-            </p>
-            <div class="card-grid">
-              <article class="info-card">
-                <h3>Armes</h3>
-                <p>Pistolet compact, lame monofil, fusil maison, arme improvisee.</p>
-              </article>
-              <article class="info-card">
-                <h3>Outils</h3>
-                <p>Drone de repere, decryptage flash, seringues med, brouilleur local.</p>
-              </article>
-              <article class="info-card">
-                <h3>Protection</h3>
-                <p>Manteau tisse, coque urbaine, masque filtrant, faux papiers actifs.</p>
-              </article>
-            </div>
+          <section class="page-section panel" id="personnage-overview" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Personnage</p><div><h2>Vue d'ensemble</h2><a class="anchor-link" href="#personnage-overview">Lien direct</a></div></div>
+            <p>Cette categorie rassemble la creation, les identites, les classes et tout ce qui equipe ou transforme un personnage.</p>
+            <div class="callout"><strong>Structure</strong><p>Le menu lateral montre maintenant uniquement les entrees liees au personnage, avec groupes pour les classes et pour le Hub.</p></div>
           </section>
 
-          <section class="page-section panel" id="mj" data-section>
-            <div class="section-heading">
-              <p class="section-kicker">06</p>
-              <div>
-                <h2>Conseils MJ</h2>
-                <a class="anchor-link" href="#mj">Lien direct</a>
-              </div>
-            </div>
-            <p>
-              Placeholder: mene la ville comme une machine qui promet tout et prend toujours plus.
-              Mets en avant les consequences, les opportunites salees et les alliances fragiles.
-            </p>
-            <div class="callout">
-              <strong>Principes de cadrage</strong>
-              <p>Commencer au bord du probleme, rappeler les enjeux personnels, conclure chaque scene sur une pression claire.</p>
-            </div>
-            <div class="card-grid two-up">
-              <article class="info-card">
-                <h3>Questions a poser</h3>
-                <p>Qui vous doit quelque chose ? Quel implant fait peur ? Qui observe depuis plus longtemps ?</p>
-              </article>
-              <article class="info-card">
-                <h3>Menaces typiques</h3>
-                <p>Escouades de recouvrement, intelligences opportunistes, panne de quartier, fuite de donnees.</p>
-              </article>
-            </div>
+          <section class="page-section panel" id="personnage-origines" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Personnage</p><div><h2>Origines</h2><a class="anchor-link" href="#personnage-origines">Lien direct</a></div></div>
+            <p>Placeholder: quartier, labo, zone franche, dette familiale, formation de rue ou extraction corporative.</p>
           </section>
 
-          <section class="page-section panel" id="annexes" data-section>
-            <div class="section-heading">
-              <p class="section-kicker">07</p>
-              <div>
-                <h2>Annexes</h2>
-                <a class="anchor-link" href="#annexes">Lien direct</a>
-              </div>
-            </div>
-            <p>
-              Zone prevue pour ajouter une feuille de personnage resumee, des tables aleatoires,
-              un lexique et les references rapides pour le meneur de jeu.
-            </p>
-            <ul class="tag-list">
-              <li>Reference rapide</li>
-              <li>Feuille PJ</li>
-              <li>Tables d'ambiance</li>
-              <li>PNJ express</li>
-              <li>Glossaire</li>
-            </ul>
+          <section class="page-section panel" id="personnage-classe-casseur" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Casseur</h2><a class="anchor-link" href="#personnage-classe-casseur">Lien direct</a></div></div>
+            <p>Placeholder: force d'entree, pression physique, intimidation et tenue de ligne.</p>
+          </section>
+
+          <section class="page-section panel" id="personnage-classe-gachette" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Gachette</h2><a class="anchor-link" href="#personnage-classe-gachette">Lien direct</a></div></div>
+            <p>Placeholder: precision, angles de tir, couverture mobile et elimination rapide.</p>
+          </section>
+
+          <section class="page-section panel" id="personnage-classe-ferailleur" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Ferailleur</h2><a class="anchor-link" href="#personnage-classe-ferailleur">Lien direct</a></div></div>
+            <p>Placeholder: recuperation, bricolage, adaptation de terrain et detournement de materiel.</p>
+          </section>
+
+          <section class="page-section panel" id="personnage-hub-armes" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Armes</h2><a class="anchor-link" href="#personnage-hub-armes">Lien direct</a></div></div>
+            <p>Placeholder: armurerie, signatures de combat, profils d'armes et raretes.</p>
+          </section>
+
+          <section class="page-section panel" id="personnage-hub-gadgets" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Gadgets</h2><a class="anchor-link" href="#personnage-hub-gadgets">Lien direct</a></div></div>
+            <p>Placeholder: outils d'infiltration, capteurs, brouilleurs et consommables tactiques.</p>
+          </section>
+
+          <section class="page-section panel" id="personnage-hub-implants" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Implants</h2><a class="anchor-link" href="#personnage-hub-implants">Lien direct</a></div></div>
+            <p>Placeholder: augmentations, couts, traces et surchauffes systemiques.</p>
+          </section>
+
+          <section class="page-section panel" id="personnage-hub-mutations" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Mutations</h2><a class="anchor-link" href="#personnage-hub-mutations">Lien direct</a></div></div>
+            <p>Placeholder: anomalies, asymetries biologiques, dons risques et effets secondaires.</p>
+          </section>
+
+          <section class="page-section panel" id="outils-overview" data-section data-category="outils">
+            <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Vue d'ensemble</h2><a class="anchor-link" href="#outils-overview">Lien direct</a></div></div>
+            <p>Reference rapide, fiches, aides de meneur et tables utilitaires pour fluidifier la partie.</p>
+          </section>
+
+          <section class="page-section panel" id="outils-fiche" data-section data-category="outils">
+            <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Fiche PJ</h2><a class="anchor-link" href="#outils-fiche">Lien direct</a></div></div>
+            <p>Placeholder: version imprimee et resumee de la feuille de personnage.</p>
+          </section>
+
+          <section class="page-section panel" id="outils-tables" data-section data-category="outils">
+            <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Tables rapides</h2><a class="anchor-link" href="#outils-tables">Lien direct</a></div></div>
+            <p>Placeholder: noms, incidents, contrats, complications et ambiances express.</p>
+          </section>
+
+          <section class="page-section panel" id="outils-mj" data-section data-category="outils">
+            <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Aides MJ</h2><a class="anchor-link" href="#outils-mj">Lien direct</a></div></div>
+            <p>Placeholder: fronts, horloges, rappels de rythme et generateur de pression.</p>
           </section>
         </main>
       </div>
 
       <footer class="site-footer panel">
-        <p>
-          Base statique prete pour GitHub Pages. Remplace les placeholders par tes vraies regles et
-          publie directement le dossier.
-        </p>
-        <a class="button button-secondary" href="#top">Retour en haut</a>
+        <p>Navigation par categories et sous-categories contextuelles, prete pour accueillir tes vraies pages de regles.</p>
+        <a class="button button-secondary" href="#news-overview">Retour au debut</a>
       </footer>
     </div>
   </body>
