@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Drift - Livre de regles</title>
+    <meta
+      name="description"
+      content="Livre de regles cyberpunk pour jeu de role papier, lisible sur mobile et hebergeable sur GitHub Pages."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <div class="page-shell">
+      <header class="site-header" id="top">
+        <nav class="topbar" aria-label="Navigation principale">
+          <a class="brand" href="#accueil">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span>
+              <strong>Neon Drift</strong>
+              <small>Regles de jeu</small>
+            </span>
+          </a>
+
+          <button
+            class="menu-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="menu-principal"
+          >
+            Menu
+          </button>
+
+          <div class="topbar-links" id="menu-principal">
+            <a href="#univers">Univers</a>
+            <a href="#creation">Creation</a>
+            <a href="#systeme">Systeme</a>
+            <a href="#combat">Combat</a>
+            <a href="#mj">MJ</a>
+          </div>
+        </nav>
+
+        <section class="hero" id="accueil">
+          <div class="hero-copy panel">
+            <p class="eyebrow">Livre de regles navigable</p>
+            <h1>Un manuel cyberpunk lisible, partageable et responsive.</h1>
+            <p class="hero-text">
+              Cette base contient une mise en page prete pour accueillir les regles de ton jeu.
+              Le contenu ci-dessous utilise des exemples et placeholders que tu pourras remplacer
+              progressivement sans toucher a la structure generale du site.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#systeme">Lire les mecanismes</a>
+              <a class="button button-secondary" href="#annexes">Voir les annexes</a>
+            </div>
+          </div>
+
+          <aside class="hero-aside panel">
+            <p class="panel-title">Signal de session</p>
+            <ul class="stat-list">
+              <li>
+                <span>Cadre</span>
+                <strong>Megapole en ruine</strong>
+              </li>
+              <li>
+                <span>Tonalite</span>
+                <strong>Cyberpunk lisible</strong>
+              </li>
+              <li>
+                <span>Mode de jeu</span>
+                <strong>JDR papier</strong>
+              </li>
+              <li>
+                <span>Etat</span>
+                <strong>Placeholder remplacable</strong>
+              </li>
+            </ul>
+          </aside>
+        </section>
+      </header>
+
+      <div class="content-grid">
+        <aside class="toc panel" aria-label="Sommaire du livre">
+          <p class="panel-title">Sommaire</p>
+          <nav>
+            <a href="#accueil">Accueil</a>
+            <a href="#univers">Univers</a>
+            <a href="#creation">Creation de personnage</a>
+            <a href="#systeme">Systeme de jeu</a>
+            <a href="#combat">Combat</a>
+            <a href="#equipement">Equipement</a>
+            <a href="#mj">Conseils MJ</a>
+            <a href="#annexes">Annexes</a>
+          </nav>
+        </aside>
+
+        <main id="contenu" class="content-flow">
+          <section class="rule-section panel" id="univers" data-section>
+            <div class="section-heading">
+              <p class="section-kicker">01</p>
+              <div>
+                <h2>Univers</h2>
+                <a class="anchor-link" href="#univers">Lien direct</a>
+              </div>
+            </div>
+            <p>
+              Placeholder: la cite de Verre-Sud survit entre pluies acides, tours publicitaires
+              et zones franches hors controle. Les personnages evoluent entre corporations,
+              syndicats de rues, intelligences emergentes et survivants qui bricolent leur propre
+              avenir.
+            </p>
+            <div class="card-grid">
+              <article class="info-card">
+                <h3>Factions</h3>
+                <p>Placeholder: trois a cinq factions majeures avec objectifs clairs et tensions ouvertes.</p>
+              </article>
+              <article class="info-card">
+                <h3>Technologie</h3>
+                <p>Placeholder: implants, drones, reseaux fermes et dettes numeriques structurent le quotidien.</p>
+              </article>
+              <article class="info-card">
+                <h3>Ambiance</h3>
+                <p>Placeholder: pression constante, solidarites fragiles, style fort et violence rapide.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="rule-section panel" id="creation" data-section>
+            <div class="section-heading">
+              <p class="section-kicker">02</p>
+              <div>
+                <h2>Creation de personnage</h2>
+                <a class="anchor-link" href="#creation">Lien direct</a>
+              </div>
+            </div>
+            <p>
+              Placeholder: chaque personnage combine un archetype, une origine et une dette.
+              Le but est de generer vite un profil competent avec un probleme narratif immediat.
+            </p>
+            <div class="callout">
+              <strong>Procedure rapide</strong>
+              <p>Choisir un concept, attribuer les scores, noter un contact, un manque et un objectif court terme.</p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Etape</th>
+                    <th>Choix</th>
+                    <th>Exemple</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Archetype</td>
+                    <td>Operateur, Ghost, Mediateur</td>
+                    <td>Ghost specialise en infiltration</td>
+                  </tr>
+                  <tr>
+                    <td>Origine</td>
+                    <td>Quartier, labo, zone franche</td>
+                    <td>Enfant des docks inondes</td>
+                  </tr>
+                  <tr>
+                    <td>Dette</td>
+                    <td>Corporation, gang, famille</td>
+                    <td>Credits dus a une clinique noire</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="rule-section panel" id="systeme" data-section>
+            <div class="section-heading">
+              <p class="section-kicker">03</p>
+              <div>
+                <h2>Systeme de jeu</h2>
+                <a class="anchor-link" href="#systeme">Lien direct</a>
+              </div>
+            </div>
+            <p>
+              Placeholder: quand une action est risquee, lance 2d6 et ajoute l'attribut approprie.
+              Le MJ fixe une difficulte ou oppose le resultat a une force adverse.
+            </p>
+            <div class="card-grid">
+              <article class="info-card">
+                <h3>6 ou moins</h3>
+                <p>Echec ou succes couteux. Le monde frappe en retour.</p>
+              </article>
+              <article class="info-card">
+                <h3>7 a 9</h3>
+                <p>Succes partiel, compromis, exposition, usure ou choix difficile.</p>
+              </article>
+              <article class="info-card">
+                <h3>10 et plus</h3>
+                <p>Succes net avec avantage narratif ou position favorable.</p>
+              </article>
+            </div>
+            <div class="callout accent">
+              <strong>Regle example</strong>
+              <p>
+                Placeholder: si un implant est sollicite sous stress, le joueur peut gagner un bonus
+                temporaire en acceptant une trace, une surchauffe ou une dette technique.
+              </p>
+            </div>
+          </section>
+
+          <section class="rule-section panel" id="combat" data-section>
+            <div class="section-heading">
+              <p class="section-kicker">04</p>
+              <div>
+                <h2>Combat</h2>
+                <a class="anchor-link" href="#combat">Lien direct</a>
+              </div>
+            </div>
+            <p>
+              Placeholder: le combat reste court, brutal et fictionnel. Les positions, la couverture
+              et l'initiative fictionnelle importent plus qu'une suite de tours rigides.
+            </p>
+            <ol class="sequence-list">
+              <li>Le MJ clarifie la situation et les menaces immediates.</li>
+              <li>Les joueurs annoncent leurs priorites: fuir, neutraliser, proteger, tenir.</li>
+              <li>Les jets resolvent les moments critiques, pas chaque mouvement mineur.</li>
+              <li>Les degats, la panique ou les ruptures d'equipement changent la fiction.</li>
+            </ol>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Etat</th>
+                    <th>Effet</th>
+                    <th>Recuperation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Sonne</td>
+                    <td>Desavantage sur la prochaine action offensive</td>
+                    <td>Mettre a couvert ou recevoir de l'aide</td>
+                  </tr>
+                  <tr>
+                    <td>Brule</td>
+                    <td>Perte progressive de ressources</td>
+                    <td>Couper la source ou sacrifier du materiel</td>
+                  </tr>
+                  <tr>
+                    <td>Traque</td>
+                    <td>Votre position est compromise</td>
+                    <td>Changer de route ou saturer les capteurs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="rule-section panel" id="equipement" data-section>
+            <div class="section-heading">
+              <p class="section-kicker">05</p>
+              <div>
+                <h2>Equipement</h2>
+                <a class="anchor-link" href="#equipement">Lien direct</a>
+              </div>
+            </div>
+            <p>
+              Placeholder: l'equipement definit autant le style que les possibilites tactiques. Les
+              listes restent courtes et evocatrices pour favoriser l'appropriation rapide en jeu.
+            </p>
+            <div class="card-grid">
+              <article class="info-card">
+                <h3>Armes</h3>
+                <p>Pistolet compact, lame monofil, fusil maison, arme improvisee.</p>
+              </article>
+              <article class="info-card">
+                <h3>Outils</h3>
+                <p>Drone de repere, decryptage flash, seringues med, brouilleur local.</p>
+              </article>
+              <article class="info-card">
+                <h3>Protection</h3>
+                <p>Manteau tisse, coque urbaine, masque filtrant, faux papiers actifs.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="rule-section panel" id="mj" data-section>
+            <div class="section-heading">
+              <p class="section-kicker">06</p>
+              <div>
+                <h2>Conseils MJ</h2>
+                <a class="anchor-link" href="#mj">Lien direct</a>
+              </div>
+            </div>
+            <p>
+              Placeholder: mene la ville comme une machine qui promet tout et prend toujours plus.
+              Mets en avant les consequences, les opportunites salees et les alliances fragiles.
+            </p>
+            <div class="callout">
+              <strong>Principes de cadrage</strong>
+              <p>Commencer au bord du probleme, rappeler les enjeux personnels, conclure chaque scene sur une pression claire.</p>
+            </div>
+            <div class="card-grid">
+              <article class="info-card">
+                <h3>Questions a poser</h3>
+                <p>Qui vous doit quelque chose ? Quel implant fait peur ? Qui observe depuis plus longtemps ?</p>
+              </article>
+              <article class="info-card">
+                <h3>Menaces typiques</h3>
+                <p>Escouades de recouvrement, intelligences opportunistes, panne de quartier, fuite de donnees.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="rule-section panel" id="annexes" data-section>
+            <div class="section-heading">
+              <p class="section-kicker">07</p>
+              <div>
+                <h2>Annexes</h2>
+                <a class="anchor-link" href="#annexes">Lien direct</a>
+              </div>
+            </div>
+            <p>
+              Zone prevue pour ajouter une feuille de personnage resumee, des tables aleatoires,
+              un lexique et les references rapides pour le meneur de jeu.
+            </p>
+            <ul class="tag-list">
+              <li>Reference rapide</li>
+              <li>Feuille PJ</li>
+              <li>Tables d'ambiance</li>
+              <li>PNJ express</li>
+              <li>Glossaire</li>
+            </ul>
+          </section>
+        </main>
+      </div>
+
+      <footer class="site-footer panel">
+        <p>
+          Base statique prete pour GitHub Pages. Remplace les placeholders par tes vraies regles et
+          publie directement le dossier.
+        </p>
+        <a class="button button-secondary" href="#top">Retour en haut</a>
+      </footer>
+    </div>
+  </body>
+</html>
