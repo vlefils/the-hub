@@ -6,6 +6,13 @@ const sidebarNavs = [...document.querySelectorAll("[data-sidebar-nav]")];
 const sidebarLinks = [...document.querySelectorAll(".sidebar a")];
 const sections = [...document.querySelectorAll("[data-section]")];
 const anchorLinks = [...document.querySelectorAll(".anchor-link")];
+const subtabs = [...document.querySelectorAll("[data-subtabs]")];
+const sidebarSubgroups = [...document.querySelectorAll(".sidebar-subgroup")];
+const defaultSection = sections.find((section) => section.id === "lore-overview") || sections[0];
+const subtabParentSections = new Map();
+const subtabActivators = new Map();
+const sectionSubtabActivators = new Map();
+const sectionDefaultSubtabs = new Map();
 
 const closeMenu = () => {
   if (!menuToggle || !categoryMenu) {
@@ -52,10 +59,17 @@ const activateCategory = (category) => {
 };
 
 const activateSidebarLink = (id) => {
+  const parentSectionId = subtabParentSections.get(id);
+
   sidebarLinks.forEach((link) => {
-    const active = link.getAttribute("href") === `#${id}`;
-    link.classList.toggle("active", active);
-    if (active) {
+    const href = link.getAttribute("href");
+    const exact = href === `#${id}`;
+    const parent = !exact && parentSectionId && href === `#${parentSectionId}`;
+
+    link.classList.toggle("active", exact);
+    link.classList.toggle("active-parent", Boolean(parent));
+
+    if (exact || parent) {
       link.setAttribute("aria-current", "page");
     } else {
       link.removeAttribute("aria-current");
@@ -63,9 +77,36 @@ const activateSidebarLink = (id) => {
   });
 };
 
+const syncSidebarSubgroups = (id) => {
+  const contextualParentId = subtabParentSections.get(id) || id;
+
+  sidebarSubgroups.forEach((group) => {
+    group.hidden = group.dataset.contextParent !== contextualParentId;
+  });
+};
+
+const resolveSectionTarget = (id) => {
+  const parentSectionId = subtabParentSections.get(id);
+
+  if (parentSectionId) {
+    return {
+      target: sections.find((section) => section.id === parentSectionId) || defaultSection,
+      activeNavId: id,
+      subtabId: id,
+    };
+  }
+
+  const target = sections.find((section) => section.id === id) || defaultSection;
+
+  return {
+    target,
+    activeNavId: target.id,
+    subtabId: null,
+  };
+};
+
 const showSection = (id) => {
-  const fallback = sections[0];
-  const target = sections.find((section) => section.id === id) || fallback;
+  const { target, activeNavId, subtabId } = resolveSectionTarget(id);
 
   sections.forEach((section) => {
     const active = section === target;
@@ -74,14 +115,21 @@ const showSection = (id) => {
     section.setAttribute("aria-hidden", String(!active));
   });
 
+  if (subtabId && subtabActivators.has(subtabId)) {
+    subtabActivators.get(subtabId)(subtabId);
+  } else if (sectionDefaultSubtabs.has(target.id) && sectionSubtabActivators.has(target.id)) {
+    sectionSubtabActivators.get(target.id)(sectionDefaultSubtabs.get(target.id));
+  }
+
   activateCategory(target.dataset.category || "news");
-  activateSidebarLink(target.id);
+  activateSidebarLink(activeNavId);
+  syncSidebarSubgroups(activeNavId);
   closeMenu();
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const syncFromHash = () => {
-  const id = window.location.hash.replace("#", "") || "news-overview";
+  const id = window.location.hash.replace("#", "") || "lore-overview";
   showSection(id);
 };
 
@@ -114,8 +162,81 @@ anchorLinks.forEach((link) => {
   });
 });
 
+subtabs.forEach((subtabRoot) => {
+  const buttons = [...subtabRoot.querySelectorAll("[data-subtab-target]")];
+  const panels = [...subtabRoot.querySelectorAll("[data-subtab-panel]")];
+  const parentSection = subtabRoot.closest("[data-section]");
+
+  const activateSubtab = (targetId) => {
+    buttons.forEach((button) => {
+      const active = button.dataset.subtabTarget === targetId;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", String(active));
+      button.tabIndex = active ? 0 : -1;
+    });
+
+    panels.forEach((panel) => {
+      const active = panel.id === targetId;
+      panel.classList.toggle("is-active", active);
+      panel.hidden = !active;
+    });
+  };
+
+  panels.forEach((panel) => {
+    if (!parentSection) {
+      return;
+    }
+
+    subtabParentSections.set(panel.id, parentSection.id);
+    subtabActivators.set(panel.id, activateSubtab);
+  });
+
+  if (parentSection && buttons[0]) {
+    sectionSubtabActivators.set(parentSection.id, activateSubtab);
+    sectionDefaultSubtabs.set(parentSection.id, buttons[0].dataset.subtabTarget);
+  }
+
+  buttons.forEach((button, index) => {
+    button.tabIndex = index === 0 ? 0 : -1;
+
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.subtabTarget;
+      activateSubtab(targetId);
+      history.replaceState(null, "", `#${targetId}`);
+      activateSidebarLink(targetId);
+    });
+
+    button.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft" && event.key !== "Home" && event.key !== "End") {
+        return;
+      }
+
+      event.preventDefault();
+
+      let nextIndex = index;
+
+      if (event.key === "ArrowRight") {
+        nextIndex = (index + 1) % buttons.length;
+      } else if (event.key === "ArrowLeft") {
+        nextIndex = (index - 1 + buttons.length) % buttons.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = buttons.length - 1;
+      }
+
+      const nextButton = buttons[nextIndex];
+      const targetId = nextButton.dataset.subtabTarget;
+      activateSubtab(targetId);
+      history.replaceState(null, "", `#${targetId}`);
+      activateSidebarLink(targetId);
+      nextButton.focus();
+    });
+  });
+});
+
 if (!window.location.hash) {
-  history.replaceState(null, "", "#news-overview");
+  history.replaceState(null, "", "#lore-overview");
 }
 
 syncFromHash();

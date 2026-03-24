@@ -51,13 +51,12 @@
 
     <div class="page-shell">
       <header class="site-header" id="top">
-        <a class="brand brand-hero" href="#news-overview" aria-label="The Hub">
+        <a class="brand brand-hero" href="#lore-overview" aria-label="The Hub">
           <img class="brand-logo" src="assets/logo.png" alt="The Hub" />
         </a>
 
         <nav class="topbar" aria-label="Navigation principale">
           <div class="topbar-links" id="menu-categories">
-            <a href="#news-overview" data-category-link="news">News</a>
             <a href="#lore-overview" data-category-link="lore">Lore</a>
             <a href="#regles-overview" data-category-link="regles">Regles</a>
             <a href="#personnage-overview" data-category-link="personnage">Personnage</a>
@@ -70,37 +69,63 @@
         <aside class="sidebar panel" aria-label="Navigation secondaire">
           <div class="sidebar-head">
             <p class="panel-title">Navigation</p>
-            <p class="sidebar-current" data-sidebar-title>News</p>
+            <p class="sidebar-current" data-sidebar-title>Lore</p>
           </div>
 
-          <nav class="sidebar-nav" data-sidebar-nav="news">
-            <a href="#news-overview">Vue d'ensemble</a>
+          <nav class="sidebar-nav" data-sidebar-nav="news" hidden>
             <a href="#news-journal">Journal de bord</a>
             <a href="#news-roadmap">Roadmap</a>
           </nav>
 
           <nav class="sidebar-nav" data-sidebar-nav="lore" hidden>
-            <a href="#lore-overview">Vue d'ensemble</a>
             <a href="#lore-factions">Factions</a>
             <a href="#lore-zones">Zones</a>
             <a href="#lore-ton">Tonalite</a>
           </nav>
 
           <nav class="sidebar-nav" data-sidebar-nav="regles" hidden>
-            <a href="#regles-overview">Vue d'ensemble</a>
+            <a href="#regles-overview">Principes</a>
+            <div class="sidebar-group sidebar-subgroup" data-context-parent="regles-overview" hidden>
+              <a href="#regles-principes-resolution">Resolution</a>
+              <a href="#regles-principes-personnage">Personnage en jeu</a>
+              <a href="#regles-principes-rythme">Rythme de partie</a>
+              <a href="#regles-principes-progression">Progression</a>
+            </div>
             <a href="#regles-systeme">Systeme</a>
+            <div class="sidebar-group sidebar-subgroup" data-context-parent="regles-systeme" hidden>
+              <a href="#regles-systeme-tests">Tests</a>
+              <a href="#regles-systeme-sauvegardes">Sauvegardes</a>
+              <a href="#regles-systeme-avantage">Avantage</a>
+              <a href="#regles-systeme-fiction">Etat de la fiction</a>
+            </div>
             <a href="#regles-combat">Combat</a>
+            <div class="sidebar-group sidebar-subgroup" data-context-parent="regles-combat" hidden>
+              <a href="#regles-combat-initiative">Initiative et tour</a>
+              <a href="#regles-combat-actions">Actions</a>
+              <a href="#regles-combat-degats">Attaques et degats</a>
+              <a href="#regles-combat-survie">0 PV et survie</a>
+              <a href="#regles-combat-conditions">Conditions</a>
+            </div>
             <a href="#regles-equipement">Equipement</a>
+            <div class="sidebar-group sidebar-subgroup" data-context-parent="regles-equipement" hidden>
+              <a href="#regles-equipement-armures">Armures</a>
+              <a href="#regles-equipement-armes">Armes</a>
+              <a href="#regles-equipement-materiel">Materiel</a>
+              <a href="#regles-equipement-charge">Charge et ressources</a>
+              <a href="#regles-equipement-transport">Vehicules et transport</a>
+            </div>
           </nav>
 
           <nav class="sidebar-nav" data-sidebar-nav="personnage" hidden>
-            <a href="#personnage-overview">Vue d'ensemble</a>
             <a href="#personnage-origines">Origines</a>
             <div class="sidebar-group">
               <p>Classes</p>
-              <a href="#personnage-classe-casseur">Casseur</a>
+              <a href="#personnage-classe-brute">Brute</a>
               <a href="#personnage-classe-gachette">Gachette</a>
               <a href="#personnage-classe-ferailleur">Ferailleur</a>
+              <a href="#personnage-classe-dopeur">Dopeur</a>
+              <a href="#personnage-classe-runner">Runner</a>
+              <a href="#personnage-classe-neuro">Neuro</a>
             </div>
             <div class="sidebar-group">
               <p>Le Hub</p>
@@ -112,7 +137,6 @@
           </nav>
 
           <nav class="sidebar-nav" data-sidebar-nav="outils" hidden>
-            <a href="#outils-overview">Vue d'ensemble</a>
             <a href="#outils-fiche">Fiche PJ</a>
             <a href="#outils-tables">Tables rapides</a>
             <a href="#outils-mj">Aides MJ</a>
@@ -188,29 +212,466 @@
           </section>
 
           <section class="page-section panel" id="regles-overview" data-section data-category="regles">
-            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Vue d'ensemble</h2><a class="anchor-link" href="#regles-overview">Lien direct</a></div></div>
-            <p>Le systeme cherche des resolutions courtes, fictionnelles et facilement lisibles en cours de partie.</p>
-            <div class="callout accent"><strong>Principe</strong><p>Une page par mecanique importante pour eviter l'effet mur de texte.</p></div>
+            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Principes</h2><a class="anchor-link" href="#regles-overview">Lien direct</a></div></div>
+            <p>Le socle de The Hub suit la logique de D&amp;D 5e 2014 : on lance un d20 quand la situation est incertaine, on additionne les bons modificateurs, puis on laisse la fiction encaisser le resultat. Le ton change, pas l&rsquo;ossature.</p>
+            <div class="callout accent">
+              <strong>Cadre de cette reference</strong>
+              <p>Cette passe couvre le coeur des regles de terrain : resolution, progression, affrontement, survie et equipement. Pas de magie dans cette version, pas de pseudo-pouvoirs rajoutes pour combler le vide.</p>
+            </div>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Principes de jeu">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="regles-principes-resolution" id="tab-regles-principes-resolution" data-subtab-target="regles-principes-resolution">Resolution</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-principes-personnage" id="tab-regles-principes-personnage" data-subtab-target="regles-principes-personnage">Personnage en jeu</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-principes-rythme" id="tab-regles-principes-rythme" data-subtab-target="regles-principes-rythme">Rythme de partie</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-principes-progression" id="tab-regles-principes-progression" data-subtab-target="regles-principes-progression">Progression</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="regles-principes-resolution" role="tabpanel" aria-labelledby="tab-regles-principes-resolution" data-subtab-panel>
+                <div class="callout">
+                  <strong>Quand lancer</strong>
+                  <p>On ne lance pas pour remplir le silence. On lance quand l&rsquo;action est incertaine, risquee, et que l&rsquo;issue peut vraiment faire bouger la scene. Franchir un grillage banal n&rsquo;a pas besoin de jet. Forcer un volet sous camera, avec une patrouille qui tourne au coin de la rue, oui.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Jet de base</h3><p>1d20 + modificateur de caracteristique + bonus de maitrise si le personnage est forme dans ce qu&rsquo;il fait.</p></article>
+                  <article class="info-card"><h3>DD</h3><p>Le resultat doit atteindre ou depasser une difficulte fixee par le meneur pour que l&rsquo;action aboutisse.</p></article>
+                  <article class="info-card"><h3>CA</h3><p>En combat, une attaque doit atteindre ou depasser la classe d&rsquo;armure de la cible pour toucher.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Echelle rapide de difficulte</strong>
+                  <p>DD 10 pour quelque chose de faisable sous pression. DD 15 quand la situation devient serieuse. DD 20 pour une operation difficile, sale, sans marge. DD 25 ou plus pour les coups que l&rsquo;on tente quand tout part de travers.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-principes-personnage" role="tabpanel" aria-labelledby="tab-regles-principes-personnage" data-subtab-panel hidden>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Caracteristiques</h3><p>Le systeme repose sur 5 caracteristiques : Force, Dexterite, Constitution, Esprit et Charisme.</p></article>
+                  <article class="info-card"><h3>Competences</h3><p>Une competence se greffe sur une caracteristique. Elle dit comment le personnage applique son potentiel sur le terrain.</p></article>
+                  <article class="info-card"><h3>Maitrise</h3><p>Le bonus de maitrise s&rsquo;ajoute seulement si une regle dit que le personnage est entraine dans l&rsquo;outil, l&rsquo;arme, la competence ou le jet demande.</p></article>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Caracteristique</th>
+                        <th>Lecture en jeu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Force</td><td>Puissance brute, traction, percussion, domination physique, capacite a forcer le passage.</td></tr>
+                      <tr><td>Dexterite</td><td>Precision, reflexes, equilibre, infiltration, gestes propres, controle du mouvement.</td></tr>
+                      <tr><td>Constitution</td><td>Endurance, resistance a la douleur, fatigue, toxines, stress physiologique et degats internes.</td></tr>
+                      <tr><td>Esprit</td><td>Observation, analyse, memoire, comprehension technique, intuition tactique, lecture du monde.</td></tr>
+                      <tr><td>Charisme</td><td>Presence, pression sociale, mensonge, influence, intimidation, mise en scene de soi.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Caracteristique</th>
+                        <th>Competences associees</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Force</td><td>Athletisme, Lutte</td></tr>
+                      <tr><td>Dexterite</td><td>Discretion, Acrobaties, Escamotage, Pilotage</td></tr>
+                      <tr><td>Constitution</td><td>Aucune competence de base attachee ; elle sert surtout aux sauvegardes, a l&rsquo;endurance et a la tenue sous pression.</td></tr>
+                      <tr><td>Esprit</td><td>Perception, Investigation, Techno, Medecine, References, Contacts</td></tr>
+                      <tr><td>Charisme</td><td>Influence, Intimidation, Tromperie, Representation</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="callout">
+                  <strong>Reference rapide des competences</strong>
+                  <p>Les competences ci-dessous servent de langage commun a la table. Elles indiquent le type d&rsquo;actions qu&rsquo;un personnage sait gerer proprement quand la pression monte.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card">
+                    <h3>Force</h3>
+                    <p><strong>Athletisme.</strong> Courir, grimper, sauter, nager, soulever, franchir un obstacle par la force ou l&rsquo;endurance physique.</p>
+                    <p><strong>Lutte.</strong> Saisir, maintenir, plaquer, projeter ou controler quelqu&rsquo;un au corps a corps.</p>
+                  </article>
+                  <article class="info-card">
+                    <h3>Dexterite</h3>
+                    <p><strong>Discretion.</strong> Se cacher, se deplacer sans bruit, rester inapercu, eviter l&rsquo;attention.</p>
+                    <p><strong>Acrobaties.</strong> Garder l&rsquo;equilibre, se receptionner, franchir un passage difficile avec agilite, bouger dans un espace instable.</p>
+                    <p><strong>Escamotage.</strong> Voler, planquer, subtiliser ou manipuler discretement un objet.</p>
+                    <p><strong>Pilotage.</strong> Conduire ou man&oelig;uvrer un vehicule, surtout dans des situations tendues ou techniques.</p>
+                  </article>
+                  <article class="info-card">
+                    <h3>Constitution</h3>
+                    <p>La Constitution n&rsquo;a pas de competence attachee par defaut. Elle sert surtout pour les sauvegardes, la resistance a la douleur, la fatigue, les toxines et la tenue sous pression.</p>
+                  </article>
+                  <article class="info-card">
+                    <h3>Esprit</h3>
+                    <p><strong>Perception.</strong> Reperer un detail, entendre un bruit suspect, voir une menace, remarquer ce que d&rsquo;autres ratent.</p>
+                    <p><strong>Investigation.</strong> Fouiller, recouper des indices, reconstruire une scene, comprendre ce qui s&rsquo;est passe.</p>
+                    <p><strong>Techno.</strong> Comprendre, utiliser, reparer, detourner ou saboter une technologie, un appareil ou un systeme.</p>
+                    <p><strong>Medecine.</strong> Diagnostiquer, stabiliser, soigner, reconnaitre une blessure, une maladie, une toxine ou un etat physique.</p>
+                    <p><strong>References.</strong> Connaitre les codes, les factions, les marques, les reputations, les symboles et les tendances du monde actuel.</p>
+                    <p><strong>Contacts.</strong> Savoir a qui s&rsquo;adresser pour obtenir une info, un acces, un objet, un service ou un intermediaire utile.</p>
+                  </article>
+                  <article class="info-card">
+                    <h3>Charisme</h3>
+                    <p><strong>Influence.</strong> Convaincre, negocier, obtenir un service, seduire, rallier quelqu&rsquo;un a sa cause.</p>
+                    <p><strong>Intimidation.</strong> Faire pression, menacer, imposer sa presence ou forcer quelqu&rsquo;un a reculer.</p>
+                    <p><strong>Tromperie.</strong> Mentir, bluffer, masquer ses intentions, manipuler par la parole ou l&rsquo;attitude.</p>
+                    <p><strong>Representation.</strong> Jouer un role, faire le show, captiver un public, soigner son image ou se mettre en scene.</p>
+                  </article>
+                </div>
+                <div class="callout">
+                  <strong>Jets de sauvegarde et lecture passive</strong>
+                  <p>Un jet de sauvegarde sert a tenir bon quand le danger vient vers vous : explosion, chute, poison, stress neurologique, flash aveuglant. La perception passive sert a savoir ce qu&rsquo;un personnage capte sans se mettre activement a fouiller une scene.</p>
+                </div>
+                <div class="callout">
+                  <strong>Expertise et specialisation</strong>
+                  <p>Si une classe, une origine ou une regle donne une forme d&rsquo;expertise, elle double le bonus de maitrise sur le domaine cible. Cela represente un vrai specialiste, pas juste quelqu&rsquo;un de vaguement forme.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-principes-rythme" role="tabpanel" aria-labelledby="tab-regles-principes-rythme" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Trois vitesses de jeu</strong>
+                  <p>La partie alterne entre scene libre, exploration sous pression et combat. En scene libre, les echanges sont souples. En exploration, chaque choix de trajet, de temps et de bruit compte. En combat, le temps se decoupe en rounds et chaque decision devient une man&oelig;uvre.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Repos court</h3><p>Pause d&rsquo;environ une heure pour souffler, se rafistoler, se recaler et depenser des des de vie si les regles de la table les utilisent.</p></article>
+                  <article class="info-card"><h3>Repos long</h3><p>Bloc d&rsquo;environ huit heures, dont du vrai sommeil ou une recuperation equivalente, pour remettre a plat l&rsquo;essentiel des ressources.</p></article>
+                  <article class="info-card"><h3>Usure</h3><p>Le rythme de The Hub gagne en tension quand les blessures, la fatigue, les munitions et les erreurs d&rsquo;approche s&rsquo;accumulent.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Temps et consequences</strong>
+                  <p>Le meneur n&rsquo;a pas besoin de compter chaque minute, mais il doit faire sentir le prix du temps perdu : une ronde qui revient, un contact qui raccroche, un site qui se verrouille, une piste qui refroidit.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-principes-progression" role="tabpanel" aria-labelledby="tab-regles-principes-progression" data-subtab-panel hidden>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Niveaux</h3><p>Le niveau mesure la capacite a survivre a des missions plus dures, a encaisser plus, et a deployer des options de plus en plus tranchees.</p></article>
+                  <article class="info-card"><h3>Bonus de maitrise</h3><p>Le bonus de maitrise monte lentement avec le niveau. Il marque la difference entre un amateur et quelqu&rsquo;un qui a deja tenu la ligne.</p></article>
+                  <article class="info-card"><h3>Points de vie</h3><p>Les PV ne sont pas que de la chair. Ils representent aussi l&rsquo;elan, le sang-froid, la chance immediate et la capacite a rester debout quand l&rsquo;impact arrive.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Monter en niveau</strong>
+                  <p>La progression ne doit pas etre lue comme une suite de bonus abstraits, mais comme un changement de stature. Plus on monte, plus on peut imposer le tempo, survivre a la casse et forcer des solutions que les debutants n&rsquo;oseraient pas tenter.</p>
+                </div>
+                <div class="callout">
+                  <strong>Logique 5e, habillage The Hub</strong>
+                  <p>Les classes et aptitudes peuvent etre reth&eacute;matis&eacute;es, mais la base reste la meme : amelioration du bonus de maitrise, points de vie qui montent, options de classe plus nombreuses et seuils de difficulte plus hauts a affronter.</p>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="page-section panel" id="regles-systeme" data-section data-category="regles">
             <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Systeme</h2><a class="anchor-link" href="#regles-systeme">Lien direct</a></div></div>
-            <p>Placeholder: quand une action est risquee, lance 2d6 et ajoute l'attribut approprie.</p>
-            <div class="card-grid three-up">
-              <article class="info-card"><h3>6 ou moins</h3><p>Le monde frappe en retour.</p></article>
-              <article class="info-card"><h3>7 a 9</h3><p>Succes partiel avec cout ou compromis.</p></article>
-              <article class="info-card"><h3>10 et plus</h3><p>Succes net et position favorable.</p></article>
+            <p>Cette page sert de mode d&rsquo;emploi des regles generales. Elle explique comment trancher une action, quand faire un jet, comment lire l&rsquo;avantage, et comment la fiction concrete de The Hub influence les chiffres.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Systeme de jeu">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="regles-systeme-tests" id="tab-regles-systeme-tests" data-subtab-target="regles-systeme-tests">Tests</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-systeme-sauvegardes" id="tab-regles-systeme-sauvegardes" data-subtab-target="regles-systeme-sauvegardes">Sauvegardes</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-systeme-avantage" id="tab-regles-systeme-avantage" data-subtab-target="regles-systeme-avantage">Avantage</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-systeme-fiction" id="tab-regles-systeme-fiction" data-subtab-target="regles-systeme-fiction">Etat de la fiction</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="regles-systeme-tests" role="tabpanel" aria-labelledby="tab-regles-systeme-tests" data-subtab-panel>
+                <div class="callout">
+                  <strong>Faire un test</strong>
+                  <p>Le meneur choisit d&rsquo;abord la caracteristique qui porte l&rsquo;action. Ensuite, il decide si une competence pertinente s&rsquo;applique. Le joueur lance 1d20 et additionne le tout. Si le resultat atteint la DD, l&rsquo;action passe.</p>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Caracteristique</th>
+                        <th>Quand l&rsquo;utiliser</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Force</td><td>Enfoncer, hisser, retenir, pousser, arracher, briser, plaquer quelqu&rsquo;un ou forcer un passage.</td></tr>
+                      <tr><td>Dexterite</td><td>Se faufiler, viser, equilibrer, agir en finesse, piloter proprement, glisser hors d&rsquo;un angle mort.</td></tr>
+                      <tr><td>Constitution</td><td>Tenir la duree, encaisser une epreuve, marcher charge, rester lucide malgre fatigue, douleur ou environnement hostile.</td></tr>
+                      <tr><td>Esprit</td><td>Observer, enqueter, analyser, se reperer, lire une scene, bricoler une solution technique, recouper des infos.</td></tr>
+                      <tr><td>Charisme</td><td>Negocier, imposer sa presence, manipuler, intimider, jouer un role, arracher une reaction utile.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="callout">
+                  <strong>Quand ne pas demander de jet</strong>
+                  <p>Si l&rsquo;action est triviale, si personne ne s&rsquo;y oppose, ou si un echec ne produirait rien d&rsquo;interessant, mieux vaut laisser la fiction avancer sans d20. Le jet existe pour faire pression, pas pour ralentir la table.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-systeme-sauvegardes" role="tabpanel" aria-labelledby="tab-regles-systeme-sauvegardes" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Resister au danger</strong>
+                  <p>Un jet de sauvegarde intervient quand le monde vous tombe dessus : chute, collision, fumee toxique, panique, charge electrique, onde de choc, contrainte neurologique. Ce n&rsquo;est pas une action volontaire, c&rsquo;est une tentative de tenir.</p>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Sauvegarde</th>
+                        <th>Usage typique</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Force</td><td>Eviter d&rsquo;etre pousse, traine, plaque ou desequilibre par un impact ou une contrainte physique.</td></tr>
+                      <tr><td>Dexterite</td><td>Esquiver un eclat, se jeter hors d&rsquo;une zone de feu, passer entre deux angles de danger.</td></tr>
+                      <tr><td>Constitution</td><td>Encaisser poison, fatigue, douleur, choc interne, chaleur, froid ou contamination de terrain.</td></tr>
+                      <tr><td>Esprit</td><td>Resister a la panique, a la confusion, a la surcharge sensorielle, a une perte de repere ou a une rupture de lucidite.</td></tr>
+                      <tr><td>Charisme</td><td>Tenir son aplomb, resister a une emprise mentale, sociale ou identitaire qui cherche a casser votre volonte.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="callout">
+                  <strong>Difference avec un test</strong>
+                  <p>Un test cherche a faire quelque chose. Une sauvegarde cherche a ne pas subir quelque chose. Cette difference guide beaucoup de decisions de meneur quand la scene devient sale ou confuse.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-systeme-avantage" role="tabpanel" aria-labelledby="tab-regles-systeme-avantage" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Le levier le plus simple du jeu</strong>
+                  <p>Avec avantage, lancez 2d20 et gardez le meilleur. Avec desavantage, gardez le moins bon. Si les deux existent en meme temps, ils s&rsquo;annulent et on revient a un seul d20.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Avantage typique</h3><p>Angle favorable, aide concrete, bonne preparation, cible exposee, info precise, outils adaptes.</p></article>
+                  <article class="info-card"><h3>Desavantage typique</h3><p>Pluie, fumee, stress, obscurite, couverture, tir precipite, blessure, surface instable ou manque d&rsquo;espace.</p></article>
+                  <article class="info-card"><h3>Ne pas empiler</h3><p>Deux bonnes raisons de donner l&rsquo;avantage ne font pas 3d20. Le systeme reste volontairement brut et rapide.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Usage de meneur</strong>
+                  <p>Avant d&rsquo;inventer un bonus numerique, demandez-vous si avantage ou desavantage suffit. Dans The Hub, c&rsquo;est souvent le meilleur outil pour faire sentir la brutalite d&rsquo;une situation sans transformer la table en calculatrice.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-systeme-fiction" role="tabpanel" aria-labelledby="tab-regles-systeme-fiction" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Les chiffres suivent la scene</strong>
+                  <p>Le systeme reste simple tant que la fiction reste prioritaire. Etre dans le noir, avoir un appui instable, manquer de souffle, agir sous camera, subir le vacarme d&rsquo;un couloir industriel : tout cela doit influencer la lecture des regles.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Vision et lumiere</h3><p>Une scene mal eclairee change ce que l&rsquo;on peut viser, voir, lire ou anticiper. Le meneur peut appliquer desavantage ou refuser certaines actions sans ligne claire.</p></article>
+                  <article class="info-card"><h3>Aide et opposition</h3><p>Un alli&eacute; qui agit vraiment peut donner de l&rsquo;aide. Un ennemi bien place peut forcer un jet plus dur, couper un angle ou annuler une tentative.</p></article>
+                  <article class="info-card"><h3>Terrain et entraves</h3><p>Gravier, flotte, passerelles, detritus, gaines, fumee, foule, portes coupe-feu : le terrain doit exister autrement que comme decor.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Resolution au plus simple</strong>
+                  <p>Quand plusieurs regles pourraient s&rsquo;appliquer, choisissez la lecture la plus claire, la plus rapide et la plus severe pour la situation. L&rsquo;important n&rsquo;est pas de simuler chaque centimetre, mais de garder la pression concrete et lisible.</p>
+                </div>
+              </div>
             </div>
           </section>
 
           <section class="page-section panel" id="regles-combat" data-section data-category="regles">
             <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Combat</h2><a class="anchor-link" href="#regles-combat">Lien direct</a></div></div>
-            <p>Placeholder: combat court, brutal, guide par la fiction plus que par l'initiative abstraite.</p>
+            <p>Le combat de The Hub reste base sur la charpente 5e : rounds de 6 secondes, initiative, tours distincts et economie d&rsquo;actions stricte. Ce qui change, c&rsquo;est la texture : bruit, angles, couloirs, portes, couvertures et fatigue de terrain.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Regles de combat">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="regles-combat-initiative" id="tab-regles-combat-initiative" data-subtab-target="regles-combat-initiative">Initiative et tour</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-combat-actions" id="tab-regles-combat-actions" data-subtab-target="regles-combat-actions">Actions</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-combat-degats" id="tab-regles-combat-degats" data-subtab-target="regles-combat-degats">Attaques et degats</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-combat-survie" id="tab-regles-combat-survie" data-subtab-target="regles-combat-survie">0 PV et survie</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-combat-conditions" id="tab-regles-combat-conditions" data-subtab-target="regles-combat-conditions">Conditions</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="regles-combat-initiative" role="tabpanel" aria-labelledby="tab-regles-combat-initiative" data-subtab-panel>
+                <div class="callout">
+                  <strong>Declenchement</strong>
+                  <p>Des qu&rsquo;il devient important de savoir qui agit avant qui, on passe en initiative. Chaque participant lance en general 1d20 + Dexterite. L&rsquo;ordre obtenu structure les tours jusqu&rsquo;a la fin de la scene.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Mouvement</h3><p>Vous pouvez bouger jusqu&rsquo;a votre vitesse, avant, apres ou autour de votre action, tant que le total reste dans votre limite.</p></article>
+                  <article class="info-card"><h3>Action</h3><p>Votre gros geste du tour : attaquer, aider, foncer, fouiller, se cacher, esquiver, utiliser un objet ou preparer une reponse.</p></article>
+                  <article class="info-card"><h3>Reaction</h3><p>Une seule reaction par round, prise hors de votre tour quand un declencheur l&rsquo;autorise.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Action bonus</strong>
+                  <p>Vous n&rsquo;en avez que si une aptitude, une arme ou une regle specifique vous en donne une. Ce n&rsquo;est pas un second tour gratuit.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-combat-actions" role="tabpanel" aria-labelledby="tab-regles-combat-actions" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Le menu d&rsquo;actions utile</strong>
+                  <p>Dans The Hub, le combat gagne a rester lisible. Les actions de base couvrent deja la plupart des situations si l&rsquo;on pense concretement : tirer, charger, se plaquer, couvrir un angle, sortir un allie d&rsquo;une ligne de feu, forcer une porte, verrouiller un passage.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Attaquer</h3><p>Faire un jet d&rsquo;attaque contre la CA d&rsquo;une cible avec une arme, un coup non arme ou un autre moyen offensif prevu par les regles.</p></article>
+                  <article class="info-card"><h3>Foncer / Se desengager / Esquiver</h3><p>Foncer pour doubler le mouvement. Se desengager pour sortir d&rsquo;une melee sans attaque d&rsquo;opportunite. Esquiver pour devenir plus dur a toucher.</p></article>
+                  <article class="info-card"><h3>Aider / Se cacher / Chercher</h3><p>Creer une ouverture pour un allie, disparaitre d&rsquo;une ligne de vue ou trouver vite ce qui compte dans une scene.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Preparer une action</strong>
+                  <p>Vous declarez un declencheur et la reponse associee. Si le declencheur se produit avant votre prochain tour, vous utilisez votre reaction pour executer ce que vous aviez annonce.</p>
+                </div>
+                <div class="callout">
+                  <strong>Utiliser un objet</strong>
+                  <p>Sortir une lampe, injecter un stimulant, deployer un cable, fracasser une vitre de secours, refermer une vanne ou actionner un verrou peuvent passer par l&rsquo;interaction simple ou par l&rsquo;action Utiliser un objet selon la complexite et l&rsquo;enjeu.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-combat-degats" role="tabpanel" aria-labelledby="tab-regles-combat-degats" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Toucher et faire mal</strong>
+                  <p>Une attaque touche si le resultat egale ou depasse la CA de la cible. En cas de touche, on jette les des de degats puis on ajoute le modificateur approprie si la regle de l&rsquo;arme le permet.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Coup critique</h3><p>Un 20 naturel sur le d20 d&rsquo;attaque touche automatiquement et double les des de degats de l&rsquo;attaque.</p></article>
+                  <article class="info-card"><h3>Couverture</h3><p>Un angle de tir sale, une carcasse de voiture, un pilier ou une porte blindee peuvent augmenter la protection de la cible.</p></article>
+                  <article class="info-card"><h3>Melee et distance</h3><p>Le contact impose de tenir l&rsquo;espace. Le tir exige un angle, une ligne de vue et assez de calme pour envoyer la munition au bon endroit.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Degats, resistances et vulnerabilites</strong>
+                  <p>Si une creature resiste a un type de degats, elle en subit la moitie. Si elle y est vulnerable, elle en subit le double. Ces cas doivent rester rares, lisibles et justifies par la fiction ou le profil de la cible.</p>
+                </div>
+                <div class="callout">
+                  <strong>Non arme, improvise, opportunite</strong>
+                  <p>Un coup non arme reste possible meme sans equipement. Une arme improvisee fonctionne si la situation l&rsquo;impose. Une attaque d&rsquo;opportunite se declenche en general quand un ennemi quitte votre allongee sans se desengager.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-combat-survie" role="tabpanel" aria-labelledby="tab-regles-combat-survie" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Tomber a 0 PV</strong>
+                  <p>Quand une creature atteint 0 point de vie, elle s&rsquo;effondre, devient inconsciente et commence a jouer sa survie sur des jets contre la mort, sauf exception tres claire.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Jets contre la mort</h3><p>A chaque tour, lancez 1d20. Trois reussites stabilisent. Trois echecs tuent.</p></article>
+                  <article class="info-card"><h3>Stabiliser</h3><p>Un allie peut vous stabiliser avec les bons gestes, du materiel ou un test adapte si la table le demande.</p></article>
+                  <article class="info-card"><h3>Soigner</h3><p>Des soins vous ramennent en general au-dessus de 0 et vous remettent dans la scene, meme si vous restez fragile.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Mort instantanee</strong>
+                  <p>Si une attaque fait tomber la cible a 0 point de vie et que le surplus de degats egale ou depasse son maximum de PV, la mort peut etre immediate. C&rsquo;est la version la plus seche du systeme : trop d&rsquo;impact, plus de marge.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-combat-conditions" role="tabpanel" aria-labelledby="tab-regles-combat-conditions" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Conditions a garder en tete</strong>
+                  <p>Plutot que de memoriser toute l&rsquo;encyclopedie, retenez les etats qui reviennent le plus souvent a la table. Ils suffisent a faire tenir la majorite des scenes tactiques.</p>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Condition</th>
+                        <th>Effet essentiel</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>A terre</td><td>Se relever coute du mouvement. Plus facile a frapper au contact, plus difficile a toucher de loin.</td></tr>
+                      <tr><td>Agrippe</td><td>La vitesse tombe a 0 tant que l&rsquo;entrave tient.</td></tr>
+                      <tr><td>Entrave</td><td>Vitesse a 0, attaques de la cible moins propres, attaques contre elle plus simples.</td></tr>
+                      <tr><td>Aveugle</td><td>Impossible de voir, attaques moins precises, attaques recues plus dangereuses.</td></tr>
+                      <tr><td>Assourdi</td><td>Impossible d&rsquo;entendre clairement, ce qui peut casser coordination et alerte.</td></tr>
+                      <tr><td>Empoisonne</td><td>Desavantage general sur attaques et tests tant que l&rsquo;effet dure.</td></tr>
+                      <tr><td>Effraye</td><td>Difficulte a s&rsquo;approcher de la source de peur et desavantage tant qu&rsquo;elle domine la scene.</td></tr>
+                      <tr><td>Incapacite</td><td>Pas d&rsquo;action ni de reaction.</td></tr>
+                      <tr><td>Etourdi</td><td>La cible peine a agir, devient plus simple a frapper, et ses sauvegardes physiques souffrent.</td></tr>
+                      <tr><td>Inconscient</td><td>A terre, sans action, sans reaction, et totalement vulnerable si personne ne la couvre.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="page-section panel" id="regles-equipement" data-section data-category="regles">
             <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Equipement</h2><a class="anchor-link" href="#regles-equipement">Lien direct</a></div></div>
-            <p>Placeholder: armes, outils, protection et materiel de survie urbaine.</p>
+            <p>L&rsquo;equipement n&rsquo;est pas un decor de fiche. Dans The Hub, il conditionne l&rsquo;angle de tir, la discretion, la fatigue, la vitesse de progression et les options disponibles quand un plan se degrade.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Equipement">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="regles-equipement-armures" id="tab-regles-equipement-armures" data-subtab-target="regles-equipement-armures">Armures</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-equipement-armes" id="tab-regles-equipement-armes" data-subtab-target="regles-equipement-armes">Armes</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-equipement-materiel" id="tab-regles-equipement-materiel" data-subtab-target="regles-equipement-materiel">Materiel</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-equipement-charge" id="tab-regles-equipement-charge" data-subtab-target="regles-equipement-charge">Charge et ressources</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="regles-equipement-transport" id="tab-regles-equipement-transport" data-subtab-target="regles-equipement-transport">Vehicules et transport</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="regles-equipement-armures" role="tabpanel" aria-labelledby="tab-regles-equipement-armures" data-subtab-panel>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Legeres</h3><p>Laissent parler la Dexterite. Bon choix pour les profils mobiles, infiltrateurs et tireurs qui vivent au mouvement.</p></article>
+                  <article class="info-card"><h3>Intermediaires</h3><p>Compromis entre protection et mobilite. Elles encaissent mieux sans transformer le porteur en cible lourde.</p></article>
+                  <article class="info-card"><h3>Lourdes</h3><p>Protection plus stable mais port exigeant, discretions compliquees, et parfois un vrai prix en deplacement ou en profil sonore.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Calcul de CA</strong>
+                  <p>La classe d&rsquo;armure depend de l&rsquo;armure portee. Certaines ajoutent tout ou partie du modificateur de Dexterite, d&rsquo;autres fixent une valeur de base plus rude. Un bouclier s&rsquo;ajoute ensuite si la configuration le permet.</p>
+                </div>
+                <div class="callout">
+                  <strong>Maitrise et port</strong>
+                  <p>Porter une armure sans maitrise est une mauvaise idee : gestes moins propres, actions plus difficiles, fatigue plus lourde. Si une armure lourde exige une Force minimale, ne pas l&rsquo;atteindre peut ralentir le personnage.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-equipement-armes" role="tabpanel" aria-labelledby="tab-regles-equipement-armes" data-subtab-panel hidden>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Melee</h3><p>Souvent basees sur la Force. Elles dominent les espaces et imposent la menace immediate.</p></article>
+                  <article class="info-card"><h3>Distance</h3><p>Generalement liees a la Dexterite. Elles dependent davantage de la ligne de vue, de la couverture et du calme de tir.</p></article>
+                  <article class="info-card"><h3>Finesse et lancer</h3><p>Certaines armes permettent de choisir la Dexterite, d&rsquo;autres se lancent, certaines demandent deux mains ou acceptent plusieurs usages.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Proprietes d&rsquo;armes utiles</strong>
+                  <p>Les proprietes importantes a retenir sont surtout finesse, lourde, leger, allongee, deux mains, lancer, munitions et recharge. Ce sont elles qui changent la maniere de jouer une arme bien plus que son simple de de degats.</p>
+                </div>
+                <div class="callout">
+                  <strong>Munitions, armes improvisees, coups non armes</strong>
+                  <p>Les armes a distance demandent des munitions utilisables. Une arme improvisee reste possible avec le bon support fictionnel. Un coup non arme existe toujours, meme dans le pire couloir, meme quand tout le reste a ete perdu ou saisi.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-equipement-materiel" role="tabpanel" aria-labelledby="tab-regles-equipement-materiel" data-subtab-panel hidden>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Terrain</h3><p>Corde, grappin, leviers, pinces, outillage, lampes, marqueurs, batteries, sacs et attaches changent l&rsquo;allure d&rsquo;une mission.</p></article>
+                  <article class="info-card"><h3>Soin et survie</h3><p>Trousse, bandages, eau, rations, couverture, filtres, protections et accessoires de repos gardent une equipe en etat de continuer.</p></article>
+                  <article class="info-card"><h3>Outils</h3><p>Les kits et outils ne sont utiles que si la fiction leur laisse une vraie place. Le bon outil peut eviter un jet ou au moins rendre l&rsquo;operation moins sale.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Bon sens d&rsquo;equipement</strong>
+                  <p>Si le personnage transporte l&rsquo;objet logique pour la scene, le meneur doit en tenir compte. Un bon plan de terrain vaut souvent mieux qu&rsquo;un profil optimise sur le papier.</p>
+                </div>
+                <div class="callout">
+                  <strong>Lumiere et presence</strong>
+                  <p>Une source lumineuse permet de voir, mais elle signale aussi votre presence. Le materiel d&rsquo;eclairage doit toujours etre pense comme un echange entre lisibilite et discretion.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-equipement-charge" role="tabpanel" aria-labelledby="tab-regles-equipement-charge" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Porter du poids</strong>
+                  <p>Le port compte quand la mission veut faire sentir l&rsquo;usure. La regle de base 5e donne une capacite de charge simple. La table peut rester souple tant que personne n&rsquo;abuse, puis devenir stricte des qu&rsquo;une operation d&rsquo;extraction ou de fuite le justifie.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>Charge normale</h3><p>Un personnage peut transporter une masse raisonnable avant que cela devienne un sujet de scene.</p></article>
+                  <article class="info-card"><h3>Charge lourde</h3><p>Si l&rsquo;on force trop, le deplacement ralentit, les manoeuvres deviennent plus moches et la fuite moins credible.</p></article>
+                  <article class="info-card"><h3>Ressources</h3><p>Argent, munitions, soins, nourriture, piles et outils d&rsquo;ouverture sont souvent les vraies ressources de tension.</p></article>
+                </div>
+                <div class="callout">
+                  <strong>Richesse et conversion The Hub</strong>
+                  <p>La logique economique de D&amp;D peut etre gardee telle quelle ou renommee en credits, bons, scrip ou dettes locales. Ce qui importe, c&rsquo;est la rarete relative des objets, pas le nom exact de la devise.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="regles-equipement-transport" role="tabpanel" aria-labelledby="tab-regles-equipement-transport" data-subtab-panel hidden>
+                <div class="callout">
+                  <strong>Cadre court</strong>
+                  <p>Les regles de base n&rsquo;ont pas besoin d&rsquo;un systeme complet de vehicules pour fonctionner. Un vehicule sert surtout a changer l&rsquo;echelle de la scene : arriver plus vite, transporter plus, fuir mieux, ou attirer plus d&rsquo;attention.</p>
+                </div>
+                <div class="card-grid three-up">
+                  <article class="info-card"><h3>A pied</h3><p>Mode le plus discret, le plus lent, et souvent le plus adaptable dans les environnements serres.</p></article>
+                  <article class="info-card"><h3>Transport leger</h3><p>Moto, petit utilitaire, navette locale ou plate-forme mobile : peu de regles, mais un gros impact narratif.</p></article>
+                  <article class="info-card"><h3>Extraction</h3><p>Le transport devient critique quand il faut evacuer un bless&eacute;, sortir une caisse lourde ou fuir une zone qui se verrouille.</p></article>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="page-section panel" id="personnage-overview" data-section data-category="personnage">
@@ -224,19 +685,523 @@
             <p>Placeholder: quartier, labo, zone franche, dette familiale, formation de rue ou extraction corporative.</p>
           </section>
 
-          <section class="page-section panel" id="personnage-classe-casseur" data-section data-category="personnage">
-            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Casseur</h2><a class="anchor-link" href="#personnage-classe-casseur">Lien direct</a></div></div>
-            <p>Placeholder: force d'entree, pression physique, intimidation et tenue de ligne.</p>
+          <section class="page-section panel" id="personnage-classe-brute" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Brute</h2><a class="anchor-link" href="#personnage-classe-brute">Lien direct</a></div></div>
+            <p>Quand la situation d&eacute;g&eacute;n&egrave;re, on envoie une Brute.</p>
+            <p>La Brute est un combattant de premi&egrave;re ligne qui attire l&rsquo;attention, encaisse l&rsquo;essentiel du choc et transforme sa douleur en violence. L&agrave; o&ugrave; d&rsquo;autres cherchent &agrave; &eacute;viter le feu, la Brute s&rsquo;y expose volontairement pour ouvrir de l&rsquo;espace &agrave; son &eacute;quipe. Qu&rsquo;elle combatte &agrave; mains nues, &agrave; la lame ou au fusil &agrave; pompe, sa logique reste la m&ecirc;me : avancer, tenir, briser.</p>
+
+            <div class="card-grid three-up">
+              <article class="info-card">
+                <strong>Points de vie</strong>
+                <p><strong>D&eacute; de vie :</strong> 1d12 par niveau de Brute</p>
+                <p><strong>Niveau 1 :</strong> 12 + votre modificateur de Constitution</p>
+                <p><strong>Niveaux sup&eacute;rieurs :</strong> 1d12 (ou 7) + votre modificateur de Constitution par niveau de Brute apr&egrave;s le niveau 1</p>
+              </article>
+              <article class="info-card">
+                <strong>Ma&icirc;trises</strong>
+                <p><strong>Armures :</strong> armures l&eacute;g&egrave;res, interm&eacute;diaires, lourdes, boucliers</p>
+                <p><strong>Armes :</strong> armes simples, armes de guerre</p>
+                <p><strong>Jets de sauvegarde :</strong> Force, Constitution</p>
+                <p><strong>Comp&eacute;tences :</strong> choisissez 2 parmi Athl&eacute;tisme, Intimidation, Perception, Intuition, Survie</p>
+              </article>
+              <article class="info-card">
+                <strong>&Eacute;quipement de d&eacute;part</strong>
+                <p>Vous commencez avec l&rsquo;&eacute;quipement suivant, en plus de celui accord&eacute; par votre historique :</p>
+                <ul>
+                  <li>une arme de guerre ou deux armes simples</li>
+                  <li>une armure adapt&eacute;e &agrave; votre profil</li>
+                  <li>une arme secondaire</li>
+                  <li>un kit de terrain</li>
+                  <li>un pack de munitions ou d&rsquo;entretien selon votre &eacute;quipement</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Niveau</th>
+                    <th>Bonus de ma&icirc;trise</th>
+                    <th>Aptitudes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>+2</td><td>Hurlement mena&ccedil;ant, Dur au mal</td></tr>
+                  <tr><td>2</td><td>+2</td><td>Voie de Brute</td></tr>
+                  <tr><td>3</td><td>+2</td><td>Am&eacute;lioration de caract&eacute;ristique</td></tr>
+                  <tr><td>4</td><td>+3</td><td>D&eacute;molisseur</td></tr>
+                  <tr><td>5</td><td>+3</td><td>Aptitude de voie</td></tr>
+                  <tr><td>6</td><td>+3</td><td>Am&eacute;lioration de caract&eacute;ristique</td></tr>
+                  <tr><td>7</td><td>+4</td><td>Plus dur, plus fort</td></tr>
+                  <tr><td>8</td><td>+4</td><td>Aptitude de voie</td></tr>
+                  <tr><td>9</td><td>+4</td><td>Am&eacute;lioration de caract&eacute;ristique</td></tr>
+                  <tr><td>10</td><td>+5</td><td>Jusqu&rsquo;&agrave; l&rsquo;os</td></tr>
+                  <tr><td>11</td><td>+5</td><td>Aptitude de voie</td></tr>
+                  <tr><td>12</td><td>+5</td><td>Am&eacute;lioration de caract&eacute;ristique</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Aptitudes de la Brute">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="brute-base" id="tab-brute-base" data-subtab-target="brute-base">Base</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="brute-chair" id="tab-brute-chair" data-subtab-target="brute-chair">Voie de la chair</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="brute-acier" id="tab-brute-acier" data-subtab-target="brute-acier">Voie de l'acier</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="brute-plomb" id="tab-brute-plomb" data-subtab-target="brute-plomb">Voie du plomb</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="brute-base" role="tabpanel" aria-labelledby="tab-brute-base" data-subtab-panel>
+                <div class="subtab-hero">
+                  <div class="callout">
+                    <p>Le socle de la Brute repose sur l&rsquo;Adr&eacute;naline, la pression psychologique et une capacit&eacute; &agrave; tenir la ligne quand les autres plient.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/brute_base.png" alt="Illustration de la Brute, onglet Base" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 1</div>
+                  <div class="callout">
+                    <strong>Adr&eacute;naline</strong>
+                    <p>D&egrave;s le niveau 1, vous disposez d&rsquo;une r&eacute;serve d&rsquo;Adr&eacute;naline, ou Adr&eacute;, qui repr&eacute;sente votre capacit&eacute; &agrave; ignorer la douleur, forcer votre corps et alimenter vos techniques.</p>
+                    <p>Votre r&eacute;serve maximale d&rsquo;Adr&eacute;naline est &eacute;gale &agrave; : 5 &times; votre niveau de Brute + votre modificateur de Constitution.</p>
+                    <p>Vous r&eacute;cup&eacute;rez toute votre Adr&eacute;naline &agrave; la fin d&rsquo;un repos court ou d&rsquo;un repos long. Certaines aptitudes de Brute et de voie consomment de l&rsquo;Adr&eacute;naline.</p>
+                    <p><strong>Hurlement mena&ccedil;ant.</strong> En action bonus, vous imposez brutalement votre pr&eacute;sence : cri, insulte, menace, tir dans le d&eacute;cor, coup dans une cloison ou simple avanc&eacute;e terrifiante.</p>
+                    <p>Choisissez un nombre de cr&eacute;atures ennemies pouvant vous voir ou vous entendre dans un rayon de 9 m&egrave;tres autour de vous, jusqu&rsquo;&agrave; un maximum &eacute;gal &agrave; votre bonus de ma&icirc;trise. Chaque cible doit r&eacute;ussir un jet de sauvegarde d&rsquo;Esprit contre un DD &eacute;gal &agrave; 8 + votre bonus de ma&icirc;trise + votre modificateur de Constitution.</p>
+                    <p>En cas d&rsquo;&eacute;chec, la cr&eacute;ature subit un d&eacute;savantage &agrave; toute attaque qui ne vous cible pas jusqu&rsquo;au d&eacute;but de votre prochain tour.</p>
+                    <p>Vous pouvez utiliser cette aptitude un nombre de fois &eacute;gal &agrave; votre bonus de ma&icirc;trise. Vous r&eacute;cup&eacute;rez toutes ses utilisations apr&egrave;s un repos court ou long.</p>
+                    <p><strong>Dur au mal.</strong> Quand vous subissez des d&eacute;g&acirc;ts, vous pouvez d&eacute;penser de l&rsquo;Adr&eacute;naline pour ignorer autant de d&eacute;g&acirc;ts.</p>
+                    <p>Vous choisissez le montant d&rsquo;Adr&eacute;naline d&eacute;pens&eacute; apr&egrave;s avoir pris connaissance des d&eacute;g&acirc;ts, mais avant d&rsquo;en appliquer les cons&eacute;quences.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout">
+                    <strong>Voie de Brute</strong>
+                    <p>Vous choisissez une voie qui d&eacute;finit votre mani&egrave;re de combattre : Voie de la chair, Voie de l&rsquo;acier ou Voie du plomb.</p>
+                    <p>Votre voie vous accorde des aptitudes au niveau 2, puis aux niveaux 5, 8 et 11.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveaux 3, 6, 9 et 12</div>
+                  <div class="callout">
+                    <strong>Am&eacute;lioration de caract&eacute;ristique</strong>
+                    <p>Lorsque vous atteignez le niveau 3, puis les niveaux 6, 9 et 12, vous pouvez augmenter une caract&eacute;ristique de 2, ou deux caract&eacute;ristiques de 1.</p>
+                    <p>Vous ne pouvez pas augmenter une caract&eacute;ristique au-del&agrave; de 20 de cette mani&egrave;re. Si ton syst&egrave;me pr&eacute;voit des dons, ces niveaux peuvent &eacute;galement servir &agrave; en obtenir un.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 4</div>
+                  <div class="callout">
+                    <strong>D&eacute;molisseur</strong>
+                    <p>Vous &ecirc;tes une arme de si&egrave;ge.</p>
+                    <p>Vous avez l&rsquo;avantage aux tests de Force effectu&eacute;s pour :</p>
+                    <ul>
+                      <li>enfoncer une porte, une cloison, une grille ou une vitre</li>
+                      <li>briser une couverture l&eacute;g&egrave;re</li>
+                      <li>arracher, renverser ou d&eacute;placer un &eacute;l&eacute;ment de d&eacute;cor lourd</li>
+                      <li>ouvrir un passage l&agrave; o&ugrave; il n&rsquo;y en avait pas</li>
+                    </ul>
+                    <p>En combat, vos attaques de m&ecirc;l&eacute;e et attaques improvis&eacute;es infligent des d&eacute;g&acirc;ts doubles aux objets et aux structures.</p>
+                    <p>De plus, les couvertures l&eacute;g&egrave;res ne donnent aucun bonus &agrave; la CA contre vos attaques de m&ecirc;l&eacute;e.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 7</div>
+                  <div class="callout">
+                    <strong>Plus dur, plus fort</strong>
+                    <p>La violence vous relance.</p>
+                    <p>Au d&eacute;but de votre tour, vous r&eacute;cup&eacute;rez un montant d&rsquo;Adr&eacute;naline &eacute;gal &agrave; votre modificateur de Constitution, jusqu&rsquo;&agrave; votre maximum, si vous avez subi des d&eacute;g&acirc;ts depuis la fin de votre dernier tour.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 10</div>
+                  <div class="callout">
+                    <strong>Jusqu&rsquo;&agrave; l&rsquo;os</strong>
+                    <p>Quand votre Adr&eacute;naline est vide, vous continuez en br&ucirc;lant directement votre chair.</p>
+                    <p>Lorsque vous &ecirc;tes &agrave; 0 Adr&eacute;naline, vous pouvez payer le co&ucirc;t de vos aptitudes de Brute et de voie en points de vie &agrave; la place.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="brute-chair" role="tabpanel" aria-labelledby="tab-brute-chair" data-subtab-panel hidden>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <p>La Voie de la chair est l&rsquo;expression la plus brute de la Brute : masse, os, sang, impact. Elle domine le corps &agrave; corps prolong&eacute; et transforme son Adr&eacute;naline en d&eacute;g&acirc;ts imm&eacute;diats.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/brute_chair.png" alt="Illustration de la Brute, voie de la chair" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Poings de boucher</strong>
+                    <p>Quand vous touchez avec une attaque au corps &agrave; corps, vous pouvez d&eacute;penser de l&rsquo;Adr&eacute;naline pour augmenter les d&eacute;g&acirc;ts de cette attaque. Pour chaque point d&rsquo;Adr&eacute;naline d&eacute;pens&eacute;, l&rsquo;attaque inflige 1 d&eacute;g&acirc;t suppl&eacute;mentaire.</p>
+                    <p>Vous pouvez d&eacute;penser sur cette aptitude un nombre maximum de points d&rsquo;Adr&eacute;naline &eacute;gal &agrave; votre bonus de ma&icirc;trise par attaque.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Corps de si&egrave;ge</strong>
+                    <p>Vous dominez physiquement toute cible &agrave; votre port&eacute;e.</p>
+                    <p>Vous avez l&rsquo;avantage sur les tests de Force effectu&eacute;s pour :</p>
+                    <ul>
+                      <li>saisir une cr&eacute;ature</li>
+                      <li>pousser une cr&eacute;ature</li>
+                      <li>maintenir une cr&eacute;ature au contact</li>
+                      <li>r&eacute;sister &agrave; un d&eacute;placement forc&eacute;</li>
+                    </ul>
+                    <p>De plus, une cr&eacute;ature agripp&eacute;e par vous a un d&eacute;savantage &agrave; ses tests visant &agrave; mettre fin &agrave; cette entrave.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Carnage &agrave; mains nues</strong>
+                    <p>Quand vous d&eacute;pensez au moins 1 point d&rsquo;Adr&eacute;naline avec Poings de boucher, vous pouvez appliquer un des effets suivants &agrave; la cible touch&eacute;e :</p>
+                    <ul>
+                      <li>la repousser de 3 m&egrave;tres</li>
+                      <li>la faire tomber &agrave; terre si elle n&rsquo;est pas de taille sup&eacute;rieure &agrave; vous</li>
+                      <li>infliger un montant de d&eacute;g&acirc;ts &eacute;gal &agrave; votre bonus de ma&icirc;trise &agrave; une seconde cr&eacute;ature situ&eacute;e &agrave; 1,50 m&egrave;tre de la cible</li>
+                    </ul>
+                    <p>Vous ne pouvez appliquer cet effet qu&rsquo;une fois par tour.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Monstre de chair</strong>
+                    <p>Vous &ecirc;tes &agrave; votre meilleur quand le combat s&rsquo;enlise et que le corps &agrave; corps devient une boucherie.</p>
+                    <p>Au d&eacute;but de votre tour, si vous &ecirc;tes &agrave; 1,50 m&egrave;tre d&rsquo;une cr&eacute;ature ennemie, vous r&eacute;cup&eacute;rez un montant d&rsquo;Adr&eacute;naline &eacute;gal &agrave; votre bonus de ma&icirc;trise.</p>
+                    <p>De plus, le premier point d&rsquo;Adr&eacute;naline d&eacute;pens&eacute; avec Poings de boucher &agrave; chacun de vos tours est gratuit.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="brute-acier" role="tabpanel" aria-labelledby="tab-brute-acier" data-subtab-panel hidden>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <p>La Voie de l&rsquo;acier est celle de la Brute arm&eacute;e, plus rapide, plus nerveuse et plus technique. Elle convertit l&rsquo;Adr&eacute;naline en rythme, en placement et en encha&icirc;nements.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/brute_acier.png" alt="Illustration de la Brute, voie de l'acier" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Lame sous tension</strong>
+                    <p>Une fois par tour, quand vous effectuez une attaque de m&ecirc;l&eacute;e avec une arme, vous pouvez d&eacute;penser 2 points d&rsquo;Adr&eacute;naline pour obtenir l&rsquo;avantage sur ce jet d&rsquo;attaque.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Ru&eacute;e d&rsquo;acier</strong>
+                    <p>Vous pouvez d&eacute;penser 3 points d&rsquo;Adr&eacute;naline pour effectuer l&rsquo;action Foncer ou Se d&eacute;sengager en action bonus.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Cadence meurtri&egrave;re</strong>
+                    <p>Une fois par tour, quand vous effectuez l&rsquo;action Attaquer avec une arme de m&ecirc;l&eacute;e, vous pouvez d&eacute;penser 5 points d&rsquo;Adr&eacute;naline pour effectuer une attaque suppl&eacute;mentaire en action bonus.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Danse de guerre</strong>
+                    <p>Une fois par repos long, vous pouvez entrer en Danse de guerre pendant 1 minute.</p>
+                    <p>Pendant cet &eacute;tat :</p>
+                    <ul>
+                      <li>chaque attaque de m&ecirc;l&eacute;e avec une arme qui touche vous rend 2 points d&rsquo;Adr&eacute;naline</li>
+                      <li>Ru&eacute;e d&rsquo;acier ne consomme plus d&rsquo;action bonus</li>
+                      <li>Lame sous tension reste limit&eacute;e &agrave; une utilisation par tour</li>
+                    </ul>
+                    <p>La Danse de guerre prend fin pr&eacute;matur&eacute;ment si vous &ecirc;tes inconscient ou si vous choisissez d&rsquo;y mettre fin.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="brute-plomb" role="tabpanel" aria-labelledby="tab-brute-plomb" data-subtab-panel hidden>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <p>La Voie du plomb est celle des armes de proximit&eacute;, des chargeurs vid&eacute;s trop vite, des couloirs satur&eacute;s et des tirs qui font reculer la ligne adverse. Elle domine par le bruit, la pression et le burst.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/brute_plomb.png" alt="Illustration de la Brute, voie du plomb" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Chargeurs</strong>
+                    <p>Le syst&egrave;me d&rsquo;armes &agrave; feu de la Voie du plomb repose sur des chargeurs abstraits.</p>
+                    <ul>
+                      <li>Une arme &agrave; feu poss&egrave;de un chargeur de 2, 4 ou 6.</li>
+                      <li>Quand le chargeur tombe &agrave; 0, il faut recharger.</li>
+                      <li>Le rechargement d&rsquo;une arme demande soit une action bonus, soit une action, selon son profil.</li>
+                    </ul>
+                    <p><strong>Feu &agrave; bout portant.</strong> Vous ne subissez pas de d&eacute;savantage lorsque vous effectuez une attaque &agrave; distance contre une cible situ&eacute;e &agrave; 1,50 m&egrave;tre de vous.</p>
+                    <p>De plus, quand vous rechargez une arme &agrave; feu, vous pouvez d&eacute;penser 3 points d&rsquo;Adr&eacute;naline pour r&eacute;duire le co&ucirc;t de recharge d&rsquo;un cran :</p>
+                    <ul>
+                      <li>action &rarr; action bonus</li>
+                      <li>action bonus &rarr; action gratuite</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Tir de suppression</strong>
+                    <p>Une fois par tour, quand vous touchez avec une arme &agrave; feu de la Voie du plomb, vous pouvez d&eacute;penser 3 points d&rsquo;Adr&eacute;naline pour appliquer l&rsquo;un des effets suivants &agrave; la cible touch&eacute;e :</p>
+                    <ul>
+                      <li>elle est repouss&eacute;e de 3 m&egrave;tres</li>
+                      <li>elle subit un d&eacute;savantage &agrave; sa prochaine attaque avant la fin de son prochain tour</li>
+                      <li>une seconde cr&eacute;ature &agrave; 1,50 m&egrave;tre de la cible subit des d&eacute;g&acirc;ts &eacute;gaux &agrave; votre bonus de ma&icirc;trise</li>
+                      <li>sa couverture l&eacute;g&egrave;re est d&eacute;truite ou cesse de lui accorder un bonus jusqu&rsquo;au d&eacute;but de votre prochain tour</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Salve brutale</strong>
+                    <p>Une fois par tour, quand vous effectuez l&rsquo;action Attaquer avec une arme de la Voie du plomb, vous pouvez d&eacute;penser 5 points d&rsquo;Adr&eacute;naline pour effectuer une attaque suppl&eacute;mentaire en action bonus avec cette arme.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>D&eacute;luge de plomb</strong>
+                    <p>Une fois par repos long, vous pouvez entrer en D&eacute;luge de plomb pendant 1 minute.</p>
+                    <p>Pendant cet &eacute;tat :</p>
+                    <ul>
+                      <li>quand vous touchez avec une arme de la Voie du plomb, vous pouvez d&eacute;penser 2 points d&rsquo;Adr&eacute;naline pour ajouter 1 d&eacute; de d&eacute;g&acirc;ts suppl&eacute;mentaire &agrave; cette attaque</li>
+                      <li>le d&eacute; suppl&eacute;mentaire est le d&eacute; de l&rsquo;arme</li>
+                      <li>vous pouvez ajouter un nombre maximal de d&eacute;s suppl&eacute;mentaires &eacute;gal &agrave; votre bonus de ma&icirc;trise par attaque</li>
+                      <li>vous ignorez totalement le d&eacute;savantage du tir &agrave; bout portant</li>
+                      <li>chaque fois que vous rechargez une arme de la Voie du plomb, vous r&eacute;duisez automatiquement le co&ucirc;t de recharge d&rsquo;un cran</li>
+                    </ul>
+                    <p>Le D&eacute;luge de plomb prend fin pr&eacute;matur&eacute;ment si vous &ecirc;tes inconscient ou si vous choisissez d&rsquo;y mettre fin.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="page-section panel" id="personnage-classe-gachette" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Gachette</h2><a class="anchor-link" href="#personnage-classe-gachette">Lien direct</a></div></div>
-            <p>Placeholder: precision, angles de tir, couverture mobile et elimination rapide.</p>
+            <p>Professionnel du tir, de la ligne de vue, de la portee et de l&rsquo;appui feu.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Gachette">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="gachette-base" id="tab-gachette-base" data-subtab-target="gachette-base">Base</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="gachette-sniper" id="tab-gachette-sniper" data-subtab-target="gachette-sniper">Sniper</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="gachette-carreau" id="tab-gachette-carreau" data-subtab-target="gachette-carreau">As de carreau</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="gachette-akimbo" id="tab-gachette-akimbo" data-subtab-target="gachette-akimbo">Akimbo</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="gachette-base" role="tabpanel" aria-labelledby="tab-gachette-base" data-subtab-panel>
+                <div class="callout">
+                  <strong>Ligne de tir</strong>
+                  <p>La Gachette vit de l&rsquo;angle, du tempo et de la maitrise du feu. C&rsquo;est la classe qui transforme la distance, la couverture et la ligne de vue en avantage tactique pour toute l&rsquo;equipe.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="gachette-sniper" role="tabpanel" aria-labelledby="tab-gachette-sniper" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Position dominante</strong>
+                  <p>Le Sniper mise sur le tir prepare, la discretion, la precision extreme et l&rsquo;efficacite depuis une position favorable.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="gachette-carreau" role="tabpanel" aria-labelledby="tab-gachette-carreau" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Ballistique deformee</strong>
+                  <p>L&rsquo;As de carreau manie des armes balistiques speciales dont chaque tir peut declencher un effet secondaire imprevu.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="gachette-akimbo" role="tabpanel" aria-labelledby="tab-gachette-akimbo" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Pression continue</strong>
+                  <p>L&rsquo;Akimbo joue la double arme, la saturation, la couverture, la pression constante et les tirs qui ouvrent plusieurs cibles a la fois.</p>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="page-section panel" id="personnage-classe-ferailleur" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Ferailleur</h2><a class="anchor-link" href="#personnage-classe-ferailleur">Lien direct</a></div></div>
-            <p>Placeholder: recuperation, bricolage, adaptation de terrain et detournement de materiel.</p>
+            <p>Bricoleur de guerre, recuperateur de terrain et maitre des machines de fortune, toujours accompagne d&rsquo;une unite mecanique qu&rsquo;il assemble, entretient et pousse au-dela de ses limites.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Ferailleur">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="ferailleur-base" id="tab-ferailleur-base" data-subtab-target="ferailleur-base">Base</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="ferailleur-k9" id="tab-ferailleur-k9" data-subtab-target="ferailleur-k9">K9</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="ferailleur-recon" id="tab-ferailleur-recon" data-subtab-target="ferailleur-recon">Recon</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="ferailleur-medibot" id="tab-ferailleur-medibot" data-subtab-target="ferailleur-medibot">Medibot</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="ferailleur-base" role="tabpanel" aria-labelledby="tab-ferailleur-base" data-subtab-panel>
+                <div class="callout">
+                  <strong>Bricolage de guerre</strong>
+                  <p>Le Ferailleur transforme les rebuts, les pieces volees et le materiel casse en outils de survie. Sa signature, c&rsquo;est une unite mecanique de terrain, bricolée pour l&rsquo;escorte, l&rsquo;attaque ou le soutien, qu&rsquo;il pilote, repare et adapte selon la mission.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="ferailleur-k9" role="tabpanel" aria-labelledby="tab-ferailleur-k9" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Chasseur mecanique</strong>
+                  <p>Le K9 s&rsquo;appuie sur un compagnon mecanique de combat rapproche, concu pour traquer, harceler et dechiqueter au contact.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="ferailleur-recon" role="tabpanel" aria-labelledby="tab-ferailleur-recon" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Controle du terrain</strong>
+                  <p>Le Recon deploye un drone de reperage et de soutien pour surveiller, marquer, assister et garder le controle du terrain.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="ferailleur-medibot" role="tabpanel" aria-labelledby="tab-ferailleur-medibot" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Soutien de survie</strong>
+                  <p>Le Medibot met en ligne un assistant medical improvise, capable de reparer, stabiliser, injecter et maintenir une equipe en etat de marche.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="page-section panel" id="personnage-classe-dopeur" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Dopeur</h2><a class="anchor-link" href="#personnage-classe-dopeur">Lien direct</a></div></div>
+            <p>Specialiste du corps vivant : soins de terrain, chimie, stims, toxines et survie.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Dopeur">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="dopeur-base" id="tab-dopeur-base" data-subtab-target="dopeur-base">Base</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="dopeur-scalpel" id="tab-dopeur-scalpel" data-subtab-target="dopeur-scalpel">Pratique du scalpel</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="dopeur-doses" id="tab-dopeur-doses" data-subtab-target="dopeur-doses">Pratique des doses</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="dopeur-nerfs" id="tab-dopeur-nerfs" data-subtab-target="dopeur-nerfs">Pratique des nerfs</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="dopeur-base" role="tabpanel" aria-labelledby="tab-dopeur-base" data-subtab-panel>
+                <div class="callout">
+                  <strong>Corps et chimie</strong>
+                  <p>Le Dopeur connait la chair comme un champ de bataille. Il maintient l&rsquo;equipe debout, pousse les organismes au-dela du raisonnable et sait exactement quel produit sauve, casse ou transforme une situation.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="dopeur-scalpel" role="tabpanel" aria-labelledby="tab-dopeur-scalpel" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Precision clinique</strong>
+                  <p>La Pratique du scalpel couvre le soin, la stabilisation, la chirurgie de fortune et la precision medicale sous pression.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="dopeur-doses" role="tabpanel" aria-labelledby="tab-dopeur-doses" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Cuisine de combat</strong>
+                  <p>La Pratique des doses joue sur les boosts, les toxines, les drogues de combat, le dopage et l&rsquo;affaiblissement des ennemis.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="dopeur-nerfs" role="tabpanel" aria-labelledby="tab-dopeur-nerfs" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Guerre mentale</strong>
+                  <p>La Pratique des nerfs travaille le stress, le trauma, la lucidite, la panique et toute la guerre mentale biomedicale.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="page-section panel" id="personnage-classe-runner" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Runner</h2><a class="anchor-link" href="#personnage-classe-runner">Lien direct</a></div></div>
+            <p>Specialiste des missions discretes, de l&rsquo;intrusion, du sale boulot et des operations solo.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Runner">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="runner-base" id="tab-runner-base" data-subtab-target="runner-base">Base</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="runner-tueur" id="tab-runner-tueur" data-subtab-target="runner-tueur">Tueur a gages</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="runner-fixeur" id="tab-runner-fixeur" data-subtab-target="runner-fixeur">Fixeur</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="runner-hacker" id="tab-runner-hacker" data-subtab-target="runner-hacker">Hacker</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="runner-base" role="tabpanel" aria-labelledby="tab-runner-base" data-subtab-panel>
+                <div class="callout">
+                  <strong>Operation sale</strong>
+                  <p>Le Runner gere les angles morts, les acces interdits et les missions qui se passent mieux quand personne ne sait qu&rsquo;elles ont eu lieu. C&rsquo;est la classe de l&rsquo;intrusion, de l&rsquo;autonomie et du travail execute au cordeau.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="runner-tueur" role="tabpanel" aria-labelledby="tab-runner-tueur" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Elimination ciblee</strong>
+                  <p>Le Tueur a gages repose sur la traque, l&rsquo;elimination ciblee, l&rsquo;assassinat et la chasse methodique.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="runner-fixeur" role="tabpanel" aria-labelledby="tab-runner-fixeur" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Intermediaire toxique</strong>
+                  <p>Le Fixeur est un intermediaire, negociateur de terrain, touche-a-tout social et maitre des combines utiles ou douteuses.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="runner-hacker" role="tabpanel" aria-labelledby="tab-runner-hacker" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Intrusion offensive</strong>
+                  <p>Le Hacker pratique l&rsquo;intrusion systeme, le sabotage, l&rsquo;infiltration techno et l&rsquo;usage offensif des reseaux.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="page-section panel" id="personnage-classe-neuro" data-section data-category="personnage">
+            <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Neuro</h2><a class="anchor-link" href="#personnage-classe-neuro">Lien direct</a></div></div>
+            <p>Porteur d&rsquo;un implant neural militaire capable de produire des effets quasi anormaux, puissants et instables.</p>
+
+            <div class="subtabs" data-subtabs>
+              <div class="subtabs-nav" role="tablist" aria-label="Neuro">
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="neuro-base" id="tab-neuro-base" data-subtab-target="neuro-base">Base</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-psychose" id="tab-neuro-psychose" data-subtab-target="neuro-psychose">Psychose</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-surtension" id="tab-neuro-surtension" data-subtab-target="neuro-surtension">Surtension</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-rupture" id="tab-neuro-rupture" data-subtab-target="neuro-rupture">Rupture</button>
+              </div>
+
+              <div class="subtab-panel is-active" id="neuro-base" role="tabpanel" aria-labelledby="tab-neuro-base" data-subtab-panel>
+                <div class="callout">
+                  <strong>Implant instable</strong>
+                  <p>Le Neuro porte un implant neural militaire qui produit des effets quasi anormaux. Sa puissance est reelle, mais chaque usage donne la sensation de toucher quelque chose de trop fort, trop sale et pas vraiment concu pour un corps humain normal.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="neuro-psychose" role="tabpanel" aria-labelledby="tab-neuro-psychose" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Pression cognitive</strong>
+                  <p>Psychose mise sur les attaques mentales, la guerre cognitive, l&rsquo;alteration des perceptions et la pression psychique.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="neuro-surtension" role="tabpanel" aria-labelledby="tab-neuro-surtension" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Decharge instable</strong>
+                  <p>Surtension canalise la projection de decharges, le dechainement d&rsquo;energie et une puissance offensive aussi brutale qu&rsquo;instable.</p>
+                </div>
+              </div>
+
+              <div class="subtab-panel" id="neuro-rupture" role="tabpanel" aria-labelledby="tab-neuro-rupture" data-subtab-panel hidden>
+                <div class="callout accent">
+                  <strong>Bris de ligne</strong>
+                  <p>Rupture pousse vers la transformation temporaire, les assauts devastateurs et une brutalite auto-destructrice au corps a corps.</p>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section class="page-section panel" id="personnage-hub-armes" data-section data-category="personnage">
