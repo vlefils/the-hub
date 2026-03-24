@@ -18,28 +18,44 @@
     <script src="script.js" defer></script>
   </head>
   <body>
-    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <div class="background-scene" aria-hidden="true">
+      <div class="bg-layer bg-concrete"></div>
+      <div class="bg-layer bg-joints">
+        <span class="bg-joint joint-v-a"></span>
+        <span class="bg-joint joint-v-b"></span>
+        <span class="bg-joint joint-h-a"></span>
+        <span class="bg-joint joint-h-b"></span>
+      </div>
+      <div class="bg-layer bg-posters">
+        <span class="bg-poster poster-warning"></span>
+        <span class="bg-poster poster-tagged"></span>
+        <span class="bg-poster poster-flyer"></span>
+        <span class="bg-sticker sticker-a"></span>
+        <span class="bg-sticker sticker-b"></span>
+      </div>
+      <div class="bg-layer bg-cables">
+        <span class="bg-cable cable-a"></span>
+        <span class="bg-cable cable-b"></span>
+        <span class="bg-cable cable-c"></span>
+        <span class="bg-box box-a"></span>
+        <span class="bg-box box-b"></span>
+      </div>
+      <div class="bg-layer bg-stains">
+        <span class="bg-stain stain-a"></span>
+        <span class="bg-stain stain-b"></span>
+        <span class="bg-stain stain-c"></span>
+      </div>
+      <div class="bg-layer bg-light-sweep"></div>
+      <div class="bg-layer bg-noise"></div>
+    </div>
 
     <div class="page-shell">
       <header class="site-header" id="top">
+        <a class="brand brand-hero" href="#news-overview" aria-label="The Hub">
+          <img class="brand-logo" src="assets/logo.png" alt="The Hub" />
+        </a>
+
         <nav class="topbar" aria-label="Navigation principale">
-          <a class="brand" href="#news-overview">
-            <span class="brand-mark" aria-hidden="true"></span>
-            <span>
-              <strong>The Hub</strong>
-              <small>Regles de jeu</small>
-            </span>
-          </a>
-
-          <button
-            class="menu-toggle"
-            type="button"
-            aria-expanded="false"
-            aria-controls="menu-categories"
-          >
-            Categories
-          </button>
-
           <div class="topbar-links" id="menu-categories">
             <a href="#news-overview" data-category-link="news">News</a>
             <a href="#lore-overview" data-category-link="lore">Lore</a>
@@ -263,12 +279,6 @@
             <p>Placeholder: fronts, horloges, rappels de rythme et generateur de pression.</p>
           </section>
         </main>
-      </div>
-
-      <footer class="site-footer panel">
-        <p>Navigation par categories et sous-categories contextuelles, prete pour accueillir tes vraies pages de regles.</p>
-        <a class="button button-secondary" href="#news-overview">Retour au debut</a>
-      </footer>
-    </div>
+      </div>    </div>
   </body>
 </html>
