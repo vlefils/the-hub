@@ -7,7 +7,12 @@ const sidebarLinks = [...document.querySelectorAll(".sidebar a")];
 const sections = [...document.querySelectorAll("[data-section]")];
 const subtabs = [...document.querySelectorAll("[data-subtabs]")];
 const sidebarSubgroups = [...document.querySelectorAll(".sidebar-subgroup")];
-const defaultSection = sections.find((section) => section.id === "lore-overview") || sections[0];
+const defaultSection = sections.find((section) => section.id === "lore-the-hub") || sections[0];
+const sectionNavRoots = new Map(
+  sections
+    .filter((section) => section.dataset.navRoot)
+    .map((section) => [section.id, section.dataset.navRoot]),
+);
 const subtabParentSections = new Map();
 const subtabActivators = new Map();
 const sectionSubtabActivators = new Map();
@@ -58,7 +63,7 @@ const activateCategory = (category) => {
 };
 
 const activateSidebarLink = (id) => {
-  const parentSectionId = subtabParentSections.get(id);
+  const parentSectionId = sectionNavRoots.get(id) || subtabParentSections.get(id);
 
   sidebarLinks.forEach((link) => {
     const href = link.getAttribute("href");
@@ -77,7 +82,7 @@ const activateSidebarLink = (id) => {
 };
 
 const syncSidebarSubgroups = (id) => {
-  const contextualParentId = subtabParentSections.get(id) || id;
+  const contextualParentId = sectionNavRoots.get(id) || subtabParentSections.get(id) || id;
 
   sidebarSubgroups.forEach((group) => {
     group.hidden = group.dataset.contextParent !== contextualParentId;
@@ -128,7 +133,13 @@ const showSection = (id) => {
 };
 
 const syncFromHash = () => {
-  const id = window.location.hash.replace("#", "") || "lore-overview";
+  const requestedId = window.location.hash.replace("#", "") || "lore-the-hub";
+  const id = requestedId === "lore-overview" ? "lore-the-hub" : requestedId;
+
+  if (requestedId !== id) {
+    history.replaceState(null, "", `#${id}`);
+  }
+
   showSection(id);
 };
 
@@ -208,7 +219,7 @@ subtabs.forEach((subtabRoot) => {
 });
 
 if (!window.location.hash) {
-  history.replaceState(null, "", "#lore-overview");
+  history.replaceState(null, "", "#lore-the-hub");
 }
 
 syncFromHash();

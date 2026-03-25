@@ -878,6 +878,12 @@ td {
   margin-top: 1.35rem;
 }
 
+.the-hub-hero {
+  margin-bottom: 1.35rem;
+  aspect-ratio: 16 / 9;
+  object-position: center;
+}
+
 .tablet-chassis {
   position: relative;
   padding: clamp(0.9rem, 1.8vw, 1.2rem);
