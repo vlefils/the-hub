@@ -1286,6 +1286,12 @@ td {
   height: 100%;
 }
 
+.subtab-column {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
 .subtab-media {
   margin: 0;
   align-self: stretch;
@@ -1298,6 +1304,60 @@ td {
   object-fit: contain;
   aspect-ratio: 4 / 5;
   background: #0f1116;
+}
+
+.subtab-media-placeholder {
+  background:
+    linear-gradient(180deg, rgba(92, 215, 255, 0.08), rgba(10, 12, 18, 0.92)),
+    #0f1116;
+}
+
+.media-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 100%;
+  aspect-ratio: 4 / 5;
+  padding: 1.2rem;
+  background:
+    radial-gradient(circle at top left, rgba(195, 255, 57, 0.08), transparent 34%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 14px),
+    linear-gradient(180deg, rgba(21, 27, 38, 0.98), rgba(10, 12, 18, 0.98));
+  color: var(--muted);
+  text-align: center;
+}
+
+.media-placeholder span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem 0.6rem;
+  border: 1px solid #3d4552;
+  background: rgba(12, 16, 24, 0.78);
+  color: var(--green-acid);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  clip-path: polygon(12px 0, calc(100% - 10px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 14px 100%, 0 calc(100% - 8px), 0 12px);
+}
+
+.companion-card {
+  margin: 0;
+}
+
+.companion-card h3 {
+  margin: 0 0 0.85rem;
+  color: var(--green-acid);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.companion-card p {
+  margin: 0.42rem 0;
 }
 
 .level-block + .level-block {
