@@ -5,7 +5,6 @@ const sidebarTitle = document.querySelector("[data-sidebar-title]");
 const sidebarNavs = [...document.querySelectorAll("[data-sidebar-nav]")];
 const sidebarLinks = [...document.querySelectorAll(".sidebar a")];
 const sections = [...document.querySelectorAll("[data-section]")];
-const anchorLinks = [...document.querySelectorAll(".anchor-link")];
 const subtabs = [...document.querySelectorAll("[data-subtabs]")];
 const sidebarSubgroups = [...document.querySelectorAll(".sidebar-subgroup")];
 const defaultSection = sections.find((section) => section.id === "lore-overview") || sections[0];
@@ -134,33 +133,6 @@ const syncFromHash = () => {
 };
 
 window.addEventListener("hashchange", syncFromHash);
-
-anchorLinks.forEach((link) => {
-  link.addEventListener("click", async (event) => {
-    const href = link.getAttribute("href");
-    if (!href) {
-      return;
-    }
-
-    const absoluteUrl = new URL(href, window.location.href).toString();
-
-    if (navigator.clipboard?.writeText) {
-      event.preventDefault();
-      history.replaceState(null, "", href);
-      showSection(href.slice(1));
-
-      try {
-        await navigator.clipboard.writeText(absoluteUrl);
-        link.textContent = "Lien copie";
-        window.setTimeout(() => {
-          link.textContent = "Lien direct";
-        }, 1400);
-      } catch {
-        syncFromHash();
-      }
-    }
-  });
-});
 
 subtabs.forEach((subtabRoot) => {
   const buttons = [...subtabRoot.querySelectorAll("[data-subtab-target]")];
