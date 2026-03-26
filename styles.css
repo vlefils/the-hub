@@ -1511,7 +1511,579 @@ th {
   }
 }
 
+.sheet-intro {
+  max-width: 78ch;
+}
+
+.sheet-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin: 1.1rem 0 1.2rem;
+}
+
+.sheet-toolbar-copy {
+  margin: 0;
+  max-width: 62ch;
+}
+
+.sheet-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.character-sheet {
+  margin-top: 0.6rem;
+}
+
+.character-sheet-paper {
+  width: min(100%, 210mm);
+  margin: 0 auto;
+  padding: 1rem;
+  color: #111820;
+  background:
+    linear-gradient(180deg, rgba(214, 238, 196, 0.75), rgba(214, 238, 196, 0) 16%),
+    linear-gradient(180deg, #fbfcfd, #eef2f5 72%);
+  border: 1px solid #aeb7c0;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.92);
+  clip-path: polygon(14px 0, calc(100% - 16px) 0, 100% 14px, 100% calc(100% - 16px), calc(100% - 14px) 100%, 18px 100%, 0 calc(100% - 12px), 0 18px);
+}
+
+.character-sheet-paper *,
+.character-sheet-paper *::before,
+.character-sheet-paper *::after {
+  box-sizing: border-box;
+}
+
+.character-sheet-paper output,
+.character-sheet-paper p,
+.character-sheet-paper span,
+.character-sheet-paper label,
+.character-sheet-paper h3 {
+  color: inherit;
+}
+
+.character-sheet-paper input,
+.character-sheet-paper select,
+.character-sheet-paper textarea,
+.character-sheet-paper button {
+  font: inherit;
+}
+
+.character-sheet-head {
+  display: grid;
+  grid-template-columns: minmax(12rem, 14rem) minmax(0, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.character-sheet-brand,
+.sheet-panel,
+.sheet-summary-card,
+.sheet-ability-card {
+  border: 1px solid #b8c1ca;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.character-sheet-brand {
+  display: grid;
+  gap: 0.15rem;
+  align-content: start;
+  padding: 0.75rem 0.85rem;
+  background:
+    linear-gradient(135deg, rgba(195, 255, 57, 0.14), rgba(255, 255, 255, 0.92) 35%),
+    rgba(255, 255, 255, 0.92);
+}
+
+.character-sheet-kicker,
+.sheet-panel-kicker,
+.sheet-summary-label,
+.sheet-field > span,
+.sheet-inline-split label > span,
+.sheet-death-track > span,
+.sheet-ability-short,
+.sheet-skill-ability,
+.sheet-attack-head span {
+  margin: 0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.character-sheet-kicker,
+.sheet-panel-kicker {
+  color: #6a7a2d;
+}
+
+.character-sheet-title {
+  margin: 0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 2.25rem;
+  line-height: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #15202a;
+}
+
+.character-sheet-caption {
+  margin: 0.25rem 0 0;
+  color: #4f5d69;
+  font-size: 0.9rem;
+}
+
+.character-sheet-identity {
+  display: grid;
+  grid-template-columns: 1.5fr 1.05fr 1fr 1fr 0.72fr 1.15fr;
+  gap: 0.55rem;
+}
+
+.sheet-field {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.sheet-field-name {
+  grid-column: span 2;
+}
+
+.sheet-field-block {
+  gap: 0.35rem;
+}
+
+.sheet-input,
+.sheet-select,
+.sheet-textarea {
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.42rem 0.5rem;
+  border: 1px solid #98a4af;
+  background: rgba(255, 255, 255, 0.98);
+  color: #111820;
+  border-radius: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.sheet-input:focus-visible,
+.sheet-select:focus-visible,
+.sheet-textarea:focus-visible {
+  outline: 2px solid #8cb52e;
+  outline-offset: 1px;
+}
+
+.sheet-textarea {
+  resize: none;
+  line-height: 1.35;
+}
+
+.character-sheet-summary {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.sheet-summary-card {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  min-height: 4.3rem;
+  padding: 0.5rem 0.55rem;
+}
+
+.sheet-summary-card-pv,
+.sheet-summary-card-death {
+  grid-column: span 2;
+}
+
+.sheet-summary-label {
+  color: #55616d;
+}
+
+.sheet-summary-value,
+.sheet-ability-mod,
+.sheet-skill-total,
+.sheet-ability-save output {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #a5b0ba;
+  background: linear-gradient(180deg, #f6f8f9, #e2e8ed);
+  color: #18212b;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.sheet-inline-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sheet-inline-edit .sheet-input {
+  width: 4.3rem;
+  min-height: 1.95rem;
+  padding-inline: 0.4rem;
+}
+
+.sheet-inline-edit span,
+.sheet-inline-split label > span {
+  color: #56616b;
+}
+
+.sheet-inline-split {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.sheet-inline-split label {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.sheet-inline-split .sheet-input {
+  min-height: 1.9rem;
+}
+
+.sheet-death-grid {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sheet-death-track {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.sheet-death-track label,
+.sheet-check-row,
+.sheet-skill-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.sheet-death-track label span,
+.sheet-skill-check span {
+  color: #55616d;
+  font-size: 0.72rem;
+}
+
+.character-sheet-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(18rem, 1fr);
+  gap: 0.65rem;
+}
+
+.character-sheet-primary,
+.character-sheet-secondary,
+.sheet-story-grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.sheet-panel {
+  padding: 0.6rem;
+}
+
+.sheet-panel-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.sheet-panel-title {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  color: #17222d;
+}
+
+.sheet-abilities-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.sheet-ability-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.45rem;
+}
+
+.sheet-ability-top,
+.sheet-ability-save {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sheet-ability-name {
+  margin: 0;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #17222d;
+}
+
+.sheet-ability-short,
+.sheet-skill-ability {
+  color: #6a7a2d;
+}
+
+.sheet-ability-mod {
+  min-width: 3rem;
+  font-size: 1.6rem;
+}
+
+.sheet-check-row {
+  justify-content: space-between;
+  color: #55616d;
+  font-size: 0.8rem;
+}
+
+.sheet-ability-save output {
+  min-width: 3rem;
+  min-height: 1.8rem;
+  font-size: 1.1rem;
+}
+
+.sheet-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.18rem 0.5rem;
+}
+
+.sheet-skill-row {
+  display: grid;
+  grid-template-columns: 2.7rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.15rem;
+  border-bottom: 1px solid #d7dde3;
+}
+
+.sheet-skill-total {
+  min-height: 1.8rem;
+  padding-inline: 0.3rem;
+  font-size: 1.08rem;
+}
+
+.sheet-skill-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.sheet-skill-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #1a2430;
+  font-size: 0.88rem;
+}
+
+.sheet-skill-check {
+  min-width: 2.3rem;
+  justify-content: center;
+}
+
+.sheet-defense-grid,
+.sheet-hooks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.sheet-hooks-grid label:last-child {
+  grid-column: span 2;
+}
+
+.sheet-attacks {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.sheet-attack-head,
+.sheet-attack-row {
+  display: grid;
+  grid-template-columns: 1.25fr 0.65fr 0.8fr 1.45fr;
+  gap: 0.35rem;
+}
+
+.sheet-attack-head span {
+  color: #55616d;
+}
+
+.sheet-attack-row .sheet-input {
+  min-height: 1.9rem;
+  padding-block: 0.32rem;
+}
+
+.sheet-story-grid .sheet-textarea {
+  min-height: 4.2rem;
+}
+
+.sheet-story-grid .sheet-field-block:last-child .sheet-textarea {
+  min-height: 4.6rem;
+}
+
+.character-sheet input[type="checkbox"] {
+  width: 0.95rem;
+  height: 0.95rem;
+  margin: 0;
+  accent-color: #6f9d20;
+}
+
+.character-sheet input[type="number"]::-webkit-outer-spin-button,
+.character-sheet input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 8mm;
+}
+
+@media print {
+  body {
+    min-height: auto;
+    color: #111820;
+    background: #ffffff;
+  }
+
+  .background-scene,
+  .site-header,
+  .sidebar,
+  .sheet-toolbar,
+  .sheet-intro,
+  #outils-fiche .section-heading {
+    display: none !important;
+  }
+
+  .page-shell,
+  .content-grid,
+  .content-flow {
+    display: block;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .panel,
+  .panel::before,
+  .panel::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    clip-path: none !important;
+  }
+
+  .page-section {
+    display: none !important;
+    padding: 0 !important;
+  }
+
+  #outils-fiche {
+    display: block !important;
+    margin: 0 !important;
+  }
+
+  .character-sheet-paper {
+    width: 100%;
+    margin: 0;
+    padding: 7mm;
+    background: #ffffff;
+    border: 1px solid #7f8a95;
+    box-shadow: none;
+    clip-path: none;
+  }
+
+  .sheet-panel,
+  .sheet-summary-card,
+  .sheet-ability-card,
+  .character-sheet-brand {
+    background: #ffffff;
+  }
+
+  .sheet-input,
+  .sheet-select,
+  .sheet-textarea,
+  .sheet-summary-value,
+  .sheet-ability-mod,
+  .sheet-skill-total,
+  .sheet-ability-save output {
+    background: #ffffff;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .character-sheet-head {
+    grid-template-columns: 1fr;
+  }
+
+  .character-sheet-identity {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sheet-field-name {
+    grid-column: span 3;
+  }
+
+  .character-sheet-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .sheet-summary-card-pv,
+  .sheet-summary-card-death {
+    grid-column: span 2;
+  }
+
+  .sheet-abilities-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 960px) {
+  .sheet-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sheet-toolbar-actions {
+    justify-content: flex-start;
+  }
+
+  .character-sheet-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet-skills-grid,
+  .sheet-abilities-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .content-grid,
   .card-grid.three-up {
     grid-template-columns: 1fr;
@@ -1542,6 +2114,39 @@ th {
 }
 
 @media (max-width: 760px) {
+  .character-sheet-paper {
+    padding: 0.8rem;
+    clip-path: none;
+  }
+
+  .character-sheet-identity,
+  .character-sheet-summary,
+  .sheet-defense-grid,
+  .sheet-hooks-grid,
+  .sheet-inline-split {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sheet-field-name,
+  .sheet-summary-card-pv,
+  .sheet-summary-card-death,
+  .sheet-hooks-grid label:last-child {
+    grid-column: span 2;
+  }
+
+  .sheet-abilities-grid,
+  .sheet-skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet-attack-head {
+    display: none;
+  }
+
+  .sheet-attack-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .bg-posters::before,
   .bg-posters::after,
   .poster-flyer,
@@ -1627,6 +2232,24 @@ th {
 
   h1 {
     font-size: clamp(2.8rem, 16vw, 4.8rem);
+  }
+}
+
+@media (max-width: 560px) {
+  .character-sheet-identity,
+  .character-sheet-summary,
+  .sheet-defense-grid,
+  .sheet-hooks-grid,
+  .sheet-inline-split,
+  .sheet-attack-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet-field-name,
+  .sheet-summary-card-pv,
+  .sheet-summary-card-death,
+  .sheet-hooks-grid label:last-child {
+    grid-column: auto;
   }
 }
 

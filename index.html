@@ -1788,8 +1788,13 @@
               </div>
 
               <div class="subtab-panel is-active" id="ferailleur-base" role="tabpanel" aria-labelledby="tab-ferailleur-base" data-subtab-panel>
-                <div class="callout">
-                  <p>Le socle du Ferrailleur repose sur son compagnon mecanique : une machine alliee qui evolue avec lui, prend sa place sur le terrain et transforme son bricolage en vraie superiorite tactique.</p>
+                <div class="subtab-hero">
+                  <div class="callout">
+                    <p>Le socle du Ferrailleur repose sur son compagnon mecanique : une machine alliee qui evolue avec lui, prend sa place sur le terrain et transforme son bricolage en vraie superiorite tactique.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/ferra.jfif" alt="Illustration du Ferrailleur, onglet Base" />
+                  </figure>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 1</div>
@@ -1875,8 +1880,8 @@
                       <p>Predateur mecanique concu pour le combat rapproche, le K9 traque, harcele et dechiquette les cibles a portee.</p>
                     </div>
                   </div>
-                  <figure class="media-frame subtab-media subtab-media-placeholder">
-                    <div class="media-placeholder"><span>Visuel K9 a venir</span></div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/ferra_k9.png" alt="Illustration du compagnon K9 du Ferrailleur" />
                   </figure>
                 </div>
                 <div class="level-block">
@@ -1889,7 +1894,7 @@
                       <li>niveau 1 : 1d6</li>
                       <li>niveau 5 : 1d8</li>
                       <li>niveau 8 : 1d10</li>
-                      <li>niveau 11 : 2d12</li>
+                      <li>niveau 11 : 1d12</li>
                     </ul>
                     <p>Le K9 ajoute son modificateur de Force aux degats de cette attaque, ainsi que votre bonus de maitrise grace a Architecture adaptative.</p>
                   </div>
@@ -1936,8 +1941,8 @@
                       <p>Drone de reperage et de soutien, le Recon surveille, marque, gene et controle le terrain a distance.</p>
                     </div>
                   </div>
-                  <figure class="media-frame subtab-media subtab-media-placeholder">
-                    <div class="media-placeholder"><span>Visuel Recon a venir</span></div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/ferra_recon.png" alt="Illustration du compagnon Recon du Ferrailleur" />
                   </figure>
                 </div>
                 <div class="level-block">
@@ -1997,8 +2002,8 @@
                       <p>Assistant medical improvise, capable de reparer, stabiliser, injecter et maintenir une equipe en etat de marche.</p>
                     </div>
                   </div>
-                  <figure class="media-frame subtab-media subtab-media-placeholder">
-                    <div class="media-placeholder"><span>Visuel Medibot a venir</span></div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/ferra_medibot.png" alt="Illustration du compagnon Medibot du Ferrailleur" />
                   </figure>
                 </div>
                 <div class="level-block">
@@ -2237,7 +2242,491 @@
 
           <section class="page-section panel" id="outils-fiche" data-section data-category="outils">
             <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Fiche PJ</h2></div></div>
-            <p>Placeholder: version imprimee et resumee de la feuille de personnage.</p>
+            <p class="sheet-intro">Version imprimable A4 de la feuille de personnage The Hub. Renseignez les champs, laissez les calculs de base se mettre a jour, puis utilisez l'export PDF du navigateur.</p>
+            <div class="sheet-toolbar">
+              <p class="sheet-toolbar-copy">V1 universelle pour la table: calcul des modificateurs, sauvegardes, competences, perception passive et CA de base, sans builder complet.</p>
+              <div class="sheet-toolbar-actions">
+                <button class="button button-primary" type="button" data-export-sheet>Exporter en PDF</button>
+                <button class="button button-secondary" type="button" data-reset-sheet>Effacer la fiche</button>
+              </div>
+            </div>
+
+            <form class="character-sheet" data-character-sheet novalidate autocomplete="off">
+              <div class="character-sheet-paper">
+                <header class="character-sheet-head">
+                  <div class="character-sheet-brand">
+                    <p class="character-sheet-kicker">The Hub</p>
+                    <p class="character-sheet-title">Fiche operative</p>
+                    <p class="character-sheet-caption">Profil terrain imprime sur une seule page A4.</p>
+                  </div>
+
+                  <div class="character-sheet-identity">
+                    <label class="sheet-field sheet-field-name">
+                      <span>Nom</span>
+                      <input class="sheet-input" type="text" name="character_name" placeholder="Nom de l'operateur" />
+                    </label>
+
+                    <label class="sheet-field">
+                      <span>Joueur</span>
+                      <input class="sheet-input" type="text" name="player_name" placeholder="Nom du joueur" />
+                    </label>
+
+                    <label class="sheet-field">
+                      <span>Classe</span>
+                      <input class="sheet-input" type="text" name="character_class" placeholder="Brute, Gachette..." />
+                    </label>
+
+                    <label class="sheet-field">
+                      <span>Origine</span>
+                      <input class="sheet-input" type="text" name="character_origin" placeholder="Rue, Corpo, Labo..." />
+                    </label>
+
+                    <label class="sheet-field">
+                      <span>Niveau</span>
+                      <input class="sheet-input" type="number" name="character_level" value="1" min="1" max="12" data-level />
+                    </label>
+
+                    <label class="sheet-field">
+                      <span>Concept</span>
+                      <input class="sheet-input" type="text" name="character_concept" placeholder="Role, vibe, specialite" />
+                    </label>
+                  </div>
+                </header>
+
+                <section class="character-sheet-summary" aria-label="Synthese du personnage">
+                  <article class="sheet-summary-card">
+                    <span class="sheet-summary-label">Bonus de maitrise</span>
+                    <output class="sheet-summary-value" data-proficiency-bonus>+2</output>
+                  </article>
+
+                  <article class="sheet-summary-card">
+                    <span class="sheet-summary-label">CA</span>
+                    <output class="sheet-summary-value" data-ac-total>12</output>
+                  </article>
+
+                  <article class="sheet-summary-card">
+                    <span class="sheet-summary-label">Initiative</span>
+                    <output class="sheet-summary-value" data-initiative-total>+0</output>
+                  </article>
+
+                  <article class="sheet-summary-card">
+                    <span class="sheet-summary-label">Vitesse</span>
+                    <label class="sheet-inline-edit">
+                      <input class="sheet-input" type="number" name="speed" value="9" min="0" step="1" />
+                      <span>m</span>
+                    </label>
+                  </article>
+
+                  <article class="sheet-summary-card">
+                    <span class="sheet-summary-label">Perception passive</span>
+                    <output class="sheet-summary-value" data-passive-perception>10</output>
+                  </article>
+
+                  <article class="sheet-summary-card sheet-summary-card-pv">
+                    <span class="sheet-summary-label">Points de vie</span>
+                    <div class="sheet-inline-split">
+                      <label>
+                        <span>Max</span>
+                        <input class="sheet-input" type="number" name="hp_max" min="0" step="1" />
+                      </label>
+                      <label>
+                        <span>Actuels</span>
+                        <input class="sheet-input" type="number" name="hp_current" min="0" step="1" />
+                      </label>
+                      <label>
+                        <span>Temp</span>
+                        <input class="sheet-input" type="number" name="hp_temp" min="0" step="1" />
+                      </label>
+                    </div>
+                  </article>
+
+                  <article class="sheet-summary-card">
+                    <span class="sheet-summary-label">Des de vie</span>
+                    <input class="sheet-input" type="text" name="hit_dice" placeholder="ex: 1d8" />
+                  </article>
+
+                  <article class="sheet-summary-card sheet-summary-card-death">
+                    <span class="sheet-summary-label">Jets contre la mort</span>
+                    <div class="sheet-death-grid">
+                      <div class="sheet-death-track">
+                        <span>Succes</span>
+                        <label><input type="checkbox" name="death_success_1" /> <span>1</span></label>
+                        <label><input type="checkbox" name="death_success_2" /> <span>2</span></label>
+                        <label><input type="checkbox" name="death_success_3" /> <span>3</span></label>
+                      </div>
+                      <div class="sheet-death-track">
+                        <span>Echecs</span>
+                        <label><input type="checkbox" name="death_fail_1" /> <span>1</span></label>
+                        <label><input type="checkbox" name="death_fail_2" /> <span>2</span></label>
+                        <label><input type="checkbox" name="death_fail_3" /> <span>3</span></label>
+                      </div>
+                    </div>
+                  </article>
+                </section>
+
+                <div class="character-sheet-layout">
+                  <div class="character-sheet-primary">
+                    <section class="sheet-panel" aria-labelledby="sheet-abilities-title">
+                      <div class="sheet-panel-head">
+                        <p class="sheet-panel-kicker">Base</p>
+                        <h3 id="sheet-abilities-title" class="sheet-panel-title">Caracteristiques et sauvegardes</h3>
+                      </div>
+
+                      <div class="sheet-abilities-grid">
+                        <article class="sheet-ability-card" data-ability="force">
+                          <div class="sheet-ability-top">
+                            <div>
+                              <p class="sheet-ability-name">Force</p>
+                              <p class="sheet-ability-short">FOR</p>
+                            </div>
+                            <output class="sheet-ability-mod" data-ability-mod="force">+0</output>
+                          </div>
+                          <label class="sheet-field">
+                            <span>Score</span>
+                            <input class="sheet-input" type="number" name="ability_force_score" value="10" min="1" max="30" data-ability-score="force" />
+                          </label>
+                          <label class="sheet-check-row">
+                            <span>Maitrise save</span>
+                            <input type="checkbox" name="save_force_prof" data-save-prof="force" />
+                          </label>
+                          <div class="sheet-ability-save">
+                            <span>Sauvegarde</span>
+                            <output data-save-total="force">+0</output>
+                          </div>
+                        </article>
+
+                        <article class="sheet-ability-card" data-ability="dexterite">
+                          <div class="sheet-ability-top">
+                            <div>
+                              <p class="sheet-ability-name">Dexterite</p>
+                              <p class="sheet-ability-short">DEX</p>
+                            </div>
+                            <output class="sheet-ability-mod" data-ability-mod="dexterite">+0</output>
+                          </div>
+                          <label class="sheet-field">
+                            <span>Score</span>
+                            <input class="sheet-input" type="number" name="ability_dexterite_score" value="10" min="1" max="30" data-ability-score="dexterite" />
+                          </label>
+                          <label class="sheet-check-row">
+                            <span>Maitrise save</span>
+                            <input type="checkbox" name="save_dexterite_prof" data-save-prof="dexterite" />
+                          </label>
+                          <div class="sheet-ability-save">
+                            <span>Sauvegarde</span>
+                            <output data-save-total="dexterite">+0</output>
+                          </div>
+                        </article>
+
+                        <article class="sheet-ability-card" data-ability="constitution">
+                          <div class="sheet-ability-top">
+                            <div>
+                              <p class="sheet-ability-name">Constitution</p>
+                              <p class="sheet-ability-short">CON</p>
+                            </div>
+                            <output class="sheet-ability-mod" data-ability-mod="constitution">+0</output>
+                          </div>
+                          <label class="sheet-field">
+                            <span>Score</span>
+                            <input class="sheet-input" type="number" name="ability_constitution_score" value="10" min="1" max="30" data-ability-score="constitution" />
+                          </label>
+                          <label class="sheet-check-row">
+                            <span>Maitrise save</span>
+                            <input type="checkbox" name="save_constitution_prof" data-save-prof="constitution" />
+                          </label>
+                          <div class="sheet-ability-save">
+                            <span>Sauvegarde</span>
+                            <output data-save-total="constitution">+0</output>
+                          </div>
+                        </article>
+
+                        <article class="sheet-ability-card" data-ability="esprit">
+                          <div class="sheet-ability-top">
+                            <div>
+                              <p class="sheet-ability-name">Esprit</p>
+                              <p class="sheet-ability-short">ESP</p>
+                            </div>
+                            <output class="sheet-ability-mod" data-ability-mod="esprit">+0</output>
+                          </div>
+                          <label class="sheet-field">
+                            <span>Score</span>
+                            <input class="sheet-input" type="number" name="ability_esprit_score" value="10" min="1" max="30" data-ability-score="esprit" />
+                          </label>
+                          <label class="sheet-check-row">
+                            <span>Maitrise save</span>
+                            <input type="checkbox" name="save_esprit_prof" data-save-prof="esprit" />
+                          </label>
+                          <div class="sheet-ability-save">
+                            <span>Sauvegarde</span>
+                            <output data-save-total="esprit">+0</output>
+                          </div>
+                        </article>
+
+                        <article class="sheet-ability-card" data-ability="charisme">
+                          <div class="sheet-ability-top">
+                            <div>
+                              <p class="sheet-ability-name">Charisme</p>
+                              <p class="sheet-ability-short">CHA</p>
+                            </div>
+                            <output class="sheet-ability-mod" data-ability-mod="charisme">+0</output>
+                          </div>
+                          <label class="sheet-field">
+                            <span>Score</span>
+                            <input class="sheet-input" type="number" name="ability_charisme_score" value="10" min="1" max="30" data-ability-score="charisme" />
+                          </label>
+                          <label class="sheet-check-row">
+                            <span>Maitrise save</span>
+                            <input type="checkbox" name="save_charisme_prof" data-save-prof="charisme" />
+                          </label>
+                          <div class="sheet-ability-save">
+                            <span>Sauvegarde</span>
+                            <output data-save-total="charisme">+0</output>
+                          </div>
+                        </article>
+                      </div>
+                    </section>
+
+                    <section class="sheet-panel" aria-labelledby="sheet-skills-title">
+                      <div class="sheet-panel-head">
+                        <p class="sheet-panel-kicker">Lecture</p>
+                        <h3 id="sheet-skills-title" class="sheet-panel-title">Competences</h3>
+                      </div>
+
+                      <div class="sheet-skills-grid">
+                        <div class="sheet-skill-row" data-skill="athletisme" data-skill-ability="force">
+                          <output class="sheet-skill-total" data-skill-total="athletisme">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Athletisme</span><span class="sheet-skill-ability">FOR</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_athletisme_prof" data-skill-prof="athletisme" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_athletisme_expertise" data-skill-expertise="athletisme" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="lutte" data-skill-ability="force">
+                          <output class="sheet-skill-total" data-skill-total="lutte">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Lutte</span><span class="sheet-skill-ability">FOR</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_lutte_prof" data-skill-prof="lutte" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_lutte_expertise" data-skill-expertise="lutte" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="discretion" data-skill-ability="dexterite">
+                          <output class="sheet-skill-total" data-skill-total="discretion">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Discretion</span><span class="sheet-skill-ability">DEX</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_discretion_prof" data-skill-prof="discretion" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_discretion_expertise" data-skill-expertise="discretion" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="acrobaties" data-skill-ability="dexterite">
+                          <output class="sheet-skill-total" data-skill-total="acrobaties">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Acrobaties</span><span class="sheet-skill-ability">DEX</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_acrobaties_prof" data-skill-prof="acrobaties" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_acrobaties_expertise" data-skill-expertise="acrobaties" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="escamotage" data-skill-ability="dexterite">
+                          <output class="sheet-skill-total" data-skill-total="escamotage">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Escamotage</span><span class="sheet-skill-ability">DEX</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_escamotage_prof" data-skill-prof="escamotage" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_escamotage_expertise" data-skill-expertise="escamotage" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="pilotage" data-skill-ability="dexterite">
+                          <output class="sheet-skill-total" data-skill-total="pilotage">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Pilotage</span><span class="sheet-skill-ability">DEX</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_pilotage_prof" data-skill-prof="pilotage" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_pilotage_expertise" data-skill-expertise="pilotage" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="perception" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="perception">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Perception</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_perception_prof" data-skill-prof="perception" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_perception_expertise" data-skill-expertise="perception" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="investigation" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="investigation">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Investigation</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_investigation_prof" data-skill-prof="investigation" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_investigation_expertise" data-skill-expertise="investigation" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="techno" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="techno">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Techno</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_techno_prof" data-skill-prof="techno" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_techno_expertise" data-skill-expertise="techno" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="medecine" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="medecine">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Medecine</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_medecine_prof" data-skill-prof="medecine" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_medecine_expertise" data-skill-expertise="medecine" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="references" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="references">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">References</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_references_prof" data-skill-prof="references" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_references_expertise" data-skill-expertise="references" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="contacts" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="contacts">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Contacts</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_contacts_prof" data-skill-prof="contacts" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_contacts_expertise" data-skill-expertise="contacts" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="intuition" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="intuition">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Intuition</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_intuition_prof" data-skill-prof="intuition" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_intuition_expertise" data-skill-expertise="intuition" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="survie" data-skill-ability="esprit">
+                          <output class="sheet-skill-total" data-skill-total="survie">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Survie</span><span class="sheet-skill-ability">ESP</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_survie_prof" data-skill-prof="survie" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_survie_expertise" data-skill-expertise="survie" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="influence" data-skill-ability="charisme">
+                          <output class="sheet-skill-total" data-skill-total="influence">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Influence</span><span class="sheet-skill-ability">CHA</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_influence_prof" data-skill-prof="influence" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_influence_expertise" data-skill-expertise="influence" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="intimidation" data-skill-ability="charisme">
+                          <output class="sheet-skill-total" data-skill-total="intimidation">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Intimidation</span><span class="sheet-skill-ability">CHA</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_intimidation_prof" data-skill-prof="intimidation" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_intimidation_expertise" data-skill-expertise="intimidation" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="tromperie" data-skill-ability="charisme">
+                          <output class="sheet-skill-total" data-skill-total="tromperie">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Tromperie</span><span class="sheet-skill-ability">CHA</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_tromperie_prof" data-skill-prof="tromperie" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_tromperie_expertise" data-skill-expertise="tromperie" /><span>E</span></label>
+                        </div>
+                        <div class="sheet-skill-row" data-skill="representation" data-skill-ability="charisme">
+                          <output class="sheet-skill-total" data-skill-total="representation">+0</output>
+                          <div class="sheet-skill-meta"><span class="sheet-skill-name">Representation</span><span class="sheet-skill-ability">CHA</span></div>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_representation_prof" data-skill-prof="representation" /><span>M</span></label>
+                          <label class="sheet-skill-check"><input type="checkbox" name="skill_representation_expertise" data-skill-expertise="representation" /><span>E</span></label>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <div class="character-sheet-secondary">
+                    <section class="sheet-panel" aria-labelledby="sheet-combat-title">
+                      <div class="sheet-panel-head">
+                        <p class="sheet-panel-kicker">Combat</p>
+                        <h3 id="sheet-combat-title" class="sheet-panel-title">Armes et defense</h3>
+                      </div>
+
+                      <div class="sheet-defense-grid">
+                        <label class="sheet-field">
+                          <span>Type d'armure</span>
+                          <select class="sheet-select" name="armor_type" data-armor-type>
+                            <option value="light" selected>Legere</option>
+                            <option value="medium">Intermediaire</option>
+                            <option value="heavy">Lourde</option>
+                          </select>
+                        </label>
+
+                        <label class="sheet-check-row">
+                          <span>Bouclier</span>
+                          <input type="checkbox" name="armor_shield" data-armor-shield />
+                        </label>
+
+                        <label class="sheet-field">
+                          <span>Mod. CA</span>
+                          <input class="sheet-input" type="number" name="ac_misc" value="0" step="1" />
+                        </label>
+
+                        <label class="sheet-field">
+                          <span>CA manuelle</span>
+                          <input class="sheet-input" type="number" name="ac_override" min="0" step="1" placeholder="Override" />
+                        </label>
+                      </div>
+
+                      <div class="sheet-attacks">
+                        <div class="sheet-attack-head">
+                          <span>Arme</span>
+                          <span>Bonus</span>
+                          <span>Degats</span>
+                          <span>Portee / tags</span>
+                        </div>
+
+                        <div class="sheet-attack-row">
+                          <input class="sheet-input" type="text" name="attack_1_name" placeholder="Nom" />
+                          <input class="sheet-input" type="text" name="attack_1_bonus" placeholder="+5" />
+                          <input class="sheet-input" type="text" name="attack_1_damage" placeholder="1d8+3" />
+                          <input class="sheet-input" type="text" name="attack_1_tags" placeholder="30 m, deux mains..." />
+                        </div>
+
+                        <div class="sheet-attack-row">
+                          <input class="sheet-input" type="text" name="attack_2_name" placeholder="Nom" />
+                          <input class="sheet-input" type="text" name="attack_2_bonus" placeholder="+5" />
+                          <input class="sheet-input" type="text" name="attack_2_damage" placeholder="1d6+3" />
+                          <input class="sheet-input" type="text" name="attack_2_tags" placeholder="Chargeur, finesse..." />
+                        </div>
+
+                        <div class="sheet-attack-row">
+                          <input class="sheet-input" type="text" name="attack_3_name" placeholder="Nom" />
+                          <input class="sheet-input" type="text" name="attack_3_bonus" placeholder="+5" />
+                          <input class="sheet-input" type="text" name="attack_3_damage" placeholder="1d4+3" />
+                          <input class="sheet-input" type="text" name="attack_3_tags" placeholder="Contact, lancer..." />
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="sheet-panel" aria-labelledby="sheet-story-title">
+                      <div class="sheet-panel-head">
+                        <p class="sheet-panel-kicker">Terrain</p>
+                        <h3 id="sheet-story-title" class="sheet-panel-title">Ressources et accroches</h3>
+                      </div>
+
+                      <div class="sheet-story-grid">
+                        <label class="sheet-field sheet-field-block">
+                          <span>Armure / equipement</span>
+                          <textarea class="sheet-textarea" name="gear" rows="3" placeholder="Armure, kits, munitions, outils, medkit, badges..."></textarea>
+                        </label>
+
+                        <label class="sheet-field sheet-field-block">
+                          <span>Aptitudes et ressources</span>
+                          <textarea class="sheet-textarea" name="features" rows="4" placeholder="Aptitudes de classe, usages, recharges, pouvoirs, stims..."></textarea>
+                        </label>
+
+                        <label class="sheet-field sheet-field-block">
+                          <span>Compagnon ou module</span>
+                          <textarea class="sheet-textarea" name="companion" rows="3" placeholder="Drone, K9, module, surcharge, details tactiques..."></textarea>
+                        </label>
+
+                        <div class="sheet-hooks-grid">
+                          <label class="sheet-field">
+                            <span>Contact</span>
+                            <input class="sheet-input" type="text" name="hook_contact" />
+                          </label>
+
+                          <label class="sheet-field">
+                            <span>Dette</span>
+                            <input class="sheet-input" type="text" name="hook_debt" />
+                          </label>
+
+                          <label class="sheet-field">
+                            <span>Raison de prendre des contrats</span>
+                            <input class="sheet-input" type="text" name="hook_reason" />
+                          </label>
+
+                          <label class="sheet-field">
+                            <span>Ligne rouge</span>
+                            <input class="sheet-input" type="text" name="hook_line" />
+                          </label>
+
+                          <label class="sheet-field">
+                            <span>Signe distinctif</span>
+                            <input class="sheet-input" type="text" name="hook_signature" />
+                          </label>
+                        </div>
+
+                        <label class="sheet-field sheet-field-block">
+                          <span>Notes</span>
+                          <textarea class="sheet-textarea" name="notes" rows="4" placeholder="Rappels de mission, details de faction, objectifs, infos a ne pas oublier..."></textarea>
+                        </label>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </form>
           </section>
 
           <section class="page-section panel" id="outils-tables" data-section data-category="outils">
