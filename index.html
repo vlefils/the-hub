@@ -107,6 +107,7 @@
               <a href="#regles-combat-survie">0 PV et survie</a>
               <a href="#regles-combat-conditions">Conditions</a>
             </div>
+            <a href="#regles-seconde-chance">Seconde Chance</a>
             <a href="#regles-equipement">Equipement</a>
             <div class="sidebar-group sidebar-subgroup" data-context-parent="regles-equipement" hidden>
               <a href="#regles-equipement-armures">Armures</a>
@@ -765,10 +766,14 @@
               <strong>Tomber a 0 PV</strong>
               <p>Quand une creature atteint 0 point de vie, elle s&rsquo;effondre, devient inconsciente et commence a jouer sa survie sur des jets contre la mort, sauf exception tres claire.</p>
             </div>
+            <div class="callout accent">
+              <strong>Regle cle de The Hub</strong>
+              <p>Une creature a 0 point de vie qui n&rsquo;est pas stabilisee ne peut pas recuperer de points de vie. Il faut d&rsquo;abord la stabiliser, sauf si une regle dit explicitement le contraire.</p>
+            </div>
             <div class="card-grid three-up">
               <article class="info-card"><h3>Jets contre la mort</h3><p>Au debut de chacun de vos tours a 0 PV, lancez 1d20. 10 ou plus = une reussite. 9 ou moins = un echec. Trois reussites stabilisent. Trois echecs tuent.</p></article>
-              <article class="info-card"><h3>Stabiliser</h3><p>Un allie adjacent peut vous stabiliser avec les bons gestes, une trousse adaptee ou un test d&rsquo;Esprit (Medecine) si la table le demande. Un personnage stabilise reste a 0 PV, inconscient, mais cesse de faire des jets contre la mort.</p></article>
-              <article class="info-card"><h3>Soigner</h3><p>Des soins vous ramennent en general au-dessus de 0 et vous remettent dans la scene, meme si vous restez fragile.</p></article>
+              <article class="info-card"><h3>Stabiliser</h3><p>Un allie adjacent peut vous stabiliser avec les bons gestes, une trousse adaptee ou un test d&rsquo;Esprit (Medecine) si la table le demande. Un personnage stabilise reste a 0 PV, inconscient, mais cesse de faire des jets contre la mort et peut de nouveau recevoir des soins.</p></article>
+              <article class="info-card"><h3>Soigner</h3><p>Une creature a 0 PV non stabilisee ne peut pas etre soignee. Une fois stabilisee, des soins peuvent la ramener au-dessus de 0 et la remettre dans la scene, meme si elle reste fragile.</p></article>
             </div>
             <div class="callout">
               <strong>Mort instantanee</strong>
@@ -816,6 +821,132 @@
             <div class="callout">
               <strong>Regle simple</strong>
               <p>Si un effet ressemble clairement a une condition existante, reutilisez-la plutot que d&rsquo;inventer un nouvel etat. Le jeu gagne en lisibilite quand la table parle toujours le meme vocabulaire tactique.</p>
+            </div>
+          </section>
+
+          <section class="page-section panel" id="regles-seconde-chance" data-section data-category="regles">
+            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Seconde Chance</h2></div></div>
+            <div class="callout accent">
+              <strong>Dans The Hub, mourir n&rsquo;est pas un echec. C&rsquo;est une ligne de cout.</strong>
+              <p>Aucun mercenaire serieux ne part en mission sans contrat de reconstruction. Pas par courage. Par pragmatisme. Sans assurance, tu n&rsquo;es pas dangereux. Tu es deja mort.</p>
+              <p>Les compagnies de reconstruction, appelees dans la rue &ldquo;Seconde Chance&rdquo;, ont transforme la mort en service. Tant que ta puce memoire est recuperee, ton corps n&rsquo;est qu&rsquo;un consommable et ton esprit un actif reinjectable.</p>
+              <p>Mais comme tout dans The Hub, la survie a un prix. Et ce prix, c&rsquo;est la dette.</p>
+            </div>
+            <div class="callout">
+              <strong>Principe</strong>
+              <p>Les personnages joueurs font partie d&rsquo;une equipe couverte par un contrat de reconstruction mutualise appele Seconde Chance.</p>
+              <p>Ce contrat garantit la reconstruction d&rsquo;un membre tombe, a condition que sa puce memoire soit recuperee apres sa mort.</p>
+            </div>
+            <div class="card-grid three-up">
+              <article class="info-card">
+                <h3>Reconstruit</h3>
+                <p>La reconstruction inclut :</p>
+                <ul>
+                  <li>un corps neuf recree a partir des donnees biometriques du client</li>
+                  <li>la restauration de la memoire sauvegardee</li>
+                  <li>la reinstallation des implants cyber declares</li>
+                  <li>la restitution des modifications genetiques homologuees</li>
+                </ul>
+              </article>
+              <article class="info-card">
+                <h3>Condition</h3>
+                <p>La reconstruction n&rsquo;est possible que si la puce memoire du personnage est recuperee apres sa mort.</p>
+                <p>Si la puce est detruite, inaccessible ou volee, aucune reconstruction n&rsquo;est possible.</p>
+              </article>
+              <article class="info-card">
+                <h3>Perdu</h3>
+                <p>Tout equipement non integre au corps est perdu s&rsquo;il n&rsquo;a pas ete recupere par l&rsquo;equipe.</p>
+                <p>Le contrat reconstruit la personne assuree, pas son chargement de mission.</p>
+              </article>
+            </div>
+            <div class="callout">
+              <strong>Cote de sinistre</strong>
+              <p>Chaque equipe possede une cote de sinistre, qui represente sa rentabilite aux yeux de la compagnie et determine la part de chroma reellement percue sur les contrats.</p>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Element</th>
+                    <th>Effet</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Cote de depart</td><td>100 %</td></tr>
+                  <tr><td>Chaque mort</td><td>-5 %</td></tr>
+                  <tr><td>Mission d&rsquo;assurance reussie</td><td>+5 %</td></tr>
+                  <tr><td>Minimum</td><td>50 %</td></tr>
+                  <tr><td>Maximum</td><td>120 %</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout">
+              <strong>Lecture de la cote</strong>
+              <p>La cote s&rsquo;applique uniquement aux gains en chroma issus des contrats. Les montants sont toujours arrondis a l&rsquo;inferieur.</p>
+              <p>Exemple : une equipe a 85 % sur un contrat a 10 000 chroma ne percoit que 8 500 chroma. Le reste est preleve par la compagnie.</p>
+            </div>
+            <div class="callout accent">
+              <strong>Seuil critique</strong>
+              <p>A 50 %, le contrat est considere comme critique. Si un nouvel incident devait faire passer la cote sous ce seuil, le contrat est immediatement resilie.</p>
+            </div>
+            <div class="callout">
+              <strong>Radiation</strong>
+              <p>Une equipe radiee perd l&rsquo;acces au circuit standard de Seconde Chance.</p>
+              <ul>
+                <li>plus de reconstruction garantie</li>
+                <li>acces refuse aux cliniques partenaires</li>
+                <li>impossibilite de souscrire un contrat classique</li>
+                <li>reputation fortement degradee</li>
+              </ul>
+              <p>Les equipes radiees doivent soit survivre sans assurance, soit se tourner vers des solutions clandestines, instables ou predatrices.</p>
+            </div>
+            <div class="card-grid three-up">
+              <article class="info-card">
+                <h3>Missions d&rsquo;assurance</h3>
+                <p>Une equipe peut ameliorer sa cote en acceptant des missions pour la compagnie.</p>
+                <ul>
+                  <li>recuperation de puces memoire sur des zones actives</li>
+                  <li>extraction de clients assures</li>
+                  <li>recouvrement ou saisie d&rsquo;implants</li>
+                  <li>neutralisation de fraudeurs</li>
+                  <li>operations sensibles ou illegales pour le compte de l&rsquo;assureur</li>
+                </ul>
+                <p>Une mission d&rsquo;assurance reussie augmente la cote de +5 %.</p>
+              </article>
+              <article class="info-card">
+                <h3>Pression contractuelle</h3>
+                <p>Plus la cote de sinistre est basse, plus la compagnie impose ses conditions.</p>
+                <ul>
+                  <li>les offres de missions se rarefient</li>
+                  <li>certaines operations deviennent inaccessibles</li>
+                  <li>les missions d&rsquo;assurance deviennent fortement recommandees</li>
+                  <li>la surveillance contractuelle s&rsquo;intensifie</li>
+                </ul>
+                <p>A 50 %, l&rsquo;equipe est consideree comme non viable.</p>
+              </article>
+              <article class="info-card">
+                <h3>Stigmatisation</h3>
+                <p>Dans The Hub, la cote de sinistre est connue, directement ou indirectement. Les equipes a faible cote sont percues comme instables, couteuses et dangereuses pour les partenaires.</p>
+                <p>Former une nouvelle equipe implique une renegociation complete avec l&rsquo;assureur. Dans les faits, la cote la plus basse tire l&rsquo;ensemble du groupe vers le bas.</p>
+                <p>Dans les bas niveaux de The Hub, on appelle ces equipes les &ldquo;brules&rdquo; : encore en activite, mais deja considerees comme perdues.</p>
+              </article>
+            </div>
+            <div class="callout">
+              <strong>Effets secondaires</strong>
+              <p>Chaque reconstruction peut entrainer des imperfections mineures, laissees a l&rsquo;appreciation du MJ :</p>
+              <ul>
+                <li>trous de memoire recents</li>
+                <li>sensations corporelles alterees</li>
+                <li>latence sensorielle</li>
+                <li>impression de decalage</li>
+              </ul>
+              <p>Rien de suffisamment grave pour empecher de fonctionner. Juste assez pour rappeler que quelque chose a ete perdu.</p>
+            </div>
+            <div class="callout accent">
+              <strong>Tonalite</strong>
+              <p>Seconde Chance ne vous sauve pas. Elle vous maintient exploitable.</p>
+              <p>Tant que vous rapportez plus que vous ne coutez, vous revenez. Le jour ou ce n&rsquo;est plus le cas, vous sortez du systeme.</p>
+              <p>Et dans The Hub, sortir du systeme, c&rsquo;est la seule mort qui compte.</p>
             </div>
           </section>
 
@@ -1911,7 +2042,7 @@
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Execution assistee</strong>
-                    <p>Lorsque votre K9 touche une creature qui a deja subi des degats plus tot durant le tour en cours, il inflige un de de degats supplementaire, du meme type que son attaque de morsure.</p>
+                    <p>Lorsque votre K9 touche une cible qui a deja subi des degats plus tot durant le tour en cours, il inflige un de de degats supplementaire, du meme type que son attaque de morsure.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -1952,9 +2083,9 @@
                     <p>Votre Recon est equipe de deux modules de votre choix parmi la liste ci-dessous. Vous choisissez un module supplementaire aux niveaux 5, 8 et 11.</p>
                     <p>Sauf indication contraire, l&rsquo;utilisation d&rsquo;un module demande une action du drone.</p>
                     <p><strong>Fumigene.</strong> Le drone deploie un ecran de fumee sur un point qu&rsquo;il peut voir a 9 metres ou moins. La fumee occupe une zone de 3 metres de rayon et dure jusqu&rsquo;au debut de votre prochain tour. Cette zone est fortement obscurcie.</p>
-                    <p><strong>Designation laser.</strong> Choisissez une creature que le drone peut voir a 18 metres ou moins. Jusqu&rsquo;au debut de votre prochain tour, cette creature est affectee par le module. La premiere attaque portee contre elle par l&rsquo;un de vos allies beneficie d&rsquo;un avantage.</p>
-                    <p><strong>Tourelle.</strong> Le drone effectue un tir de soutien contre une creature qu&rsquo;il peut voir a portee. L&rsquo;attaque inflige 1d6 degats perforants ou energetiques. Ces degats passent a 1d8 au niveau 8, puis a 1d10 au niveau 11.</p>
-                    <p><strong>Taser.</strong> Choisissez une creature que le drone peut voir a portee. La cible doit reussir un jet de sauvegarde de Constitution contre un DD egal a 8 + votre bonus de maitrise + votre modificateur d&rsquo;Esprit, ou voir sa vitesse reduite a 0 jusqu&rsquo;au debut de votre prochain tour. En cas de reussite, sa vitesse est reduite de 3 metres a la place.</p>
+                    <p><strong>Designation laser.</strong> Choisissez une cible que le drone peut voir a 18 metres ou moins. Jusqu&rsquo;au debut de votre prochain tour, cette cible est affectee par le module. La premiere attaque portee contre elle par l&rsquo;un de vos allies beneficie d&rsquo;un avantage.</p>
+                    <p><strong>Tourelle.</strong> Le drone effectue un tir de soutien contre une cible qu&rsquo;il peut voir a portee. L&rsquo;attaque inflige 1d6 degats perforants ou energetiques. Ces degats passent a 1d8 au niveau 8, puis a 1d10 au niveau 11.</p>
+                    <p><strong>Taser.</strong> Choisissez une cible que le drone peut voir a portee. La cible doit reussir un jet de sauvegarde de Constitution contre un DD egal a 8 + votre bonus de maitrise + votre modificateur d&rsquo;Esprit, ou voir sa vitesse reduite a 0 jusqu&rsquo;au debut de votre prochain tour. En cas de reussite, sa vitesse est reduite de 3 metres a la place.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -1969,8 +2100,8 @@
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Exploitation tactique</strong>
-                    <p>Une creature affectee par un module de votre Recon subit un malus de 2 a la CA contre vos attaques.</p>
-                    <p>De plus, une fois par tour, lorsque vous touchez une telle creature avec une attaque, vous lui infligez 1d6 degats supplementaires.</p>
+                    <p>Une cible affectee par un module de votre Recon subit un malus de 2 a la CA contre vos attaques.</p>
+                    <p>De plus, une fois par tour, lorsque vous touchez une telle cible avec une attaque, vous lui infligez 1d6 degats supplementaires.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -1978,9 +2109,9 @@
                   <div class="callout accent">
                     <strong>Module legendaire</strong>
                     <p>Choisissez l&rsquo;un des modules suivants.</p>
-                    <p><strong>Lance-roquettes.</strong> Le drone tire une roquette sur un point qu&rsquo;il peut voir a portee. Chaque creature situee dans un rayon de 3 metres subit 4d6 degats explosifs et doit reussir un jet de sauvegarde de Dexterite ou tomber a terre.</p>
+                    <p><strong>Lance-roquettes.</strong> Le drone tire une roquette sur un point qu&rsquo;il peut voir a portee. Chaque cible situee dans un rayon de 3 metres subit 4d6 degats explosifs et doit reussir un jet de sauvegarde de Dexterite ou tomber a terre.</p>
                     <p><strong>Phantom.</strong> Le drone devient invisible en permanence. Cette invisibilite ne prend pas fin lorsqu&rsquo;il agit ou inflige des degats.</p>
-                    <p><strong>Stase.</strong> Choisissez une creature que le drone peut voir a portee. Elle doit reussir un jet de sauvegarde contre votre DD de module ou etre etourdie jusqu&rsquo;a la fin de son prochain tour.</p>
+                    <p><strong>Stase.</strong> Choisissez une cible que le drone peut voir a portee. Elle doit reussir un jet de sauvegarde contre votre DD de module ou etre etourdie jusqu&rsquo;a la fin de son prochain tour.</p>
                     <p>Si le module legendaire choisi demande une activation, une fois utilise, vous ne pouvez pas l&rsquo;utiliser de nouveau avant d&rsquo;avoir termine un repos court ou long.</p>
                   </div>
                 </div>
@@ -2010,21 +2141,23 @@
                   <div class="level-banner">Niveau 1</div>
                   <div class="callout accent">
                     <strong>Assistance d&rsquo;urgence</strong>
-                    <p>Votre Medibot peut utiliser une action pour soigner une creature alliee situee a 1,5 metre de lui. Le nombre de des de soin evolue selon votre niveau de Ferrailleur :</p>
+                    <p>Votre Medibot peut utiliser une action pour administrer des soins de fortune a une cible alliee situee a 1,5 metre de lui. La cible recupere un nombre de points de vie egal a :</p>
                     <ul>
-                      <li>niveau 1 : 1d6 + votre modificateur d&rsquo;Esprit</li>
-                      <li>niveau 5 : 2d6 + votre modificateur d&rsquo;Esprit</li>
-                      <li>niveau 8 : 3d6 + votre modificateur d&rsquo;Esprit</li>
-                      <li>niveau 11 : 4d6 + votre modificateur d&rsquo;Esprit</li>
+                      <li>niveau 1 : 1d4</li>
+                      <li>niveau 5 : 2d4</li>
+                      <li>niveau 8 : 3d4</li>
+                      <li>niveau 11 : 4d4</li>
                     </ul>
+                    <p>Le Medibot ne peut utiliser le soin de cette aptitude qu&rsquo;une seule fois par tour.</p>
+                    <p>A la place, le Medibot peut utiliser son action pour tenter de stabiliser une cible a 0 point de vie situee a 1,5 metre de lui. Pour cela, il effectue un test de Medecine en utilisant votre modificateur d&rsquo;Esprit et votre bonus de maitrise.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 5</div>
                   <div class="callout accent">
                     <strong>Medecine preventive</strong>
-                    <p>A la fin de chaque repos court ou long, vous pouvez choisir un nombre de creatures alliees egal a votre modificateur d&rsquo;Esprit, minimum 1, a 9 metres ou moins du Medibot. Chacune gagne un nombre de points de vie temporaires egal a votre niveau de Ferrailleur + votre modificateur d&rsquo;Esprit.</p>
-                    <p>De plus, pendant un repos court, le Medibot peut neutraliser soit un poison, soit une maladie affectant une creature qu&rsquo;il traite pendant toute la duree de ce repos.</p>
+                    <p>A la fin de chaque repos court ou long, vous pouvez choisir un nombre d&rsquo;allies egal a votre modificateur d&rsquo;Esprit, minimum 1, a 9 metres ou moins du Medibot. Chacun gagne un nombre de points de vie temporaires egal a votre niveau de Ferrailleur + votre modificateur d&rsquo;Esprit.</p>
+                    <p>De plus, pendant un repos court, le Medibot peut neutraliser soit un poison, soit une maladie affectant une cible qu&rsquo;il traite pendant toute la duree de ce repos.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2032,7 +2165,7 @@
                   <div class="callout accent">
                     <strong>Injecteur balistique</strong>
                     <p>Votre Medibot peut desormais utiliser son soin a distance, sur une cible situee a 9 metres ou moins.</p>
-                    <p>Il peut egalement cibler une creature hostile avec cette aptitude. Dans ce cas, au lieu de soigner, il inflige des degats necrotiques egaux aux des de soin de l&rsquo;aptitude.</p>
+                    <p>Il peut egalement utiliser cette aptitude sur une cible hostile. Dans ce cas, au lieu de soigner, il inflige des degats necrotiques egaux aux des de soin de l&rsquo;aptitude.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2042,7 +2175,7 @@
                     <p>Le Medibot projette une aura de stabilisation dans un rayon de 9 metres.</p>
                     <p>Les allies dans cette zone beneficient d&rsquo;un bonus de +2 a tous leurs jets de sauvegarde.</p>
                     <p>De plus, lorsqu&rsquo;un allie situe dans cette zone recupere des points de vie, il recupere un nombre supplementaire de points de vie egal a votre bonus de maitrise.</p>
-                    <p>Enfin, les creatures alliees dans cette zone ont l&rsquo;avantage aux jets effectues pour resister au poison et a la maladie.</p>
+                    <p>Enfin, les allies dans cette zone ont l&rsquo;avantage aux jets effectues pour resister au poison et a la maladie.</p>
                   </div>
                 </div>
               </div>
@@ -2052,6 +2185,61 @@
           <section class="page-section panel" id="personnage-classe-dopeur" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Dopeur</h2></div></div>
             <p>Specialiste du corps vivant : soins de terrain, chimie, stims, toxines et survie.</p>
+            <p>Le Dopeur connait les limites du corps, les reactions du systeme nerveux et le prix du maintien en vie. Il rafistole a la volee, dope ses allies, empoisonne ses ennemis et transforme la douleur en levier tactique.</p>
+            <p>Mais chaque geste de soin lui coute du controle. A force de maintenir les autres debout, il finit parfois par ceder lui-meme.</p>
+
+            <div class="card-grid three-up">
+              <article class="info-card">
+                <strong>Ressource de classe</strong>
+                <p>Votre Sang-froid va de 1 a 6, commence a 4 au debut de chaque combat et fluctue selon que vous apaisez, soutenez ou brutalisez le vivant.</p>
+              </article>
+              <article class="info-card">
+                <strong>Posture de combat</strong>
+                <p>Bas Sang-froid : vous tenez mieux sous les coups, mais risquez la Rage. Haut Sang-froid : vos aptitudes de soin deviennent bien plus efficaces.</p>
+              </article>
+              <article class="info-card">
+                <strong>Pratiques</strong>
+                <p>Scalpel pour la chirurgie de terrain, Doses pour la chimie tactique, Nerfs pour l&rsquo;apaisement, la panique et la rupture mentale.</p>
+              </article>
+            </div>
+
+            <div class="callout accent">
+              <strong>Role</strong>
+              <p>Le Dopeur est un soutien agressif capable de :</p>
+              <ul>
+                <li>soigner et relever en combat</li>
+                <li>renforcer ses allies avec des stimulants</li>
+                <li>affaiblir les ennemis avec des toxines et des effets nerveux</li>
+                <li>alterner entre maitrise clinique et rupture violente</li>
+              </ul>
+              <p>Sa mecanique centrale est le Sang-froid.</p>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Niveau</th>
+                    <th>Bonus de maitrise</th>
+                    <th>Aptitudes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>+2</td><td>Sang-froid, Rage, Medecine de guerre</td></tr>
+                  <tr><td>2</td><td>+2</td><td>Pratique de Dopeur</td></tr>
+                  <tr><td>3</td><td>+2</td><td>Amelioration de caracteristique</td></tr>
+                  <tr><td>4</td><td>+3</td><td>Apprentissage de terrain</td></tr>
+                  <tr><td>5</td><td>+3</td><td>Aptitude de pratique</td></tr>
+                  <tr><td>6</td><td>+3</td><td>Amelioration de caracteristique</td></tr>
+                  <tr><td>7</td><td>+4</td><td>Seuils critiques</td></tr>
+                  <tr><td>8</td><td>+4</td><td>Aptitude de pratique</td></tr>
+                  <tr><td>9</td><td>+4</td><td>Amelioration de caracteristique</td></tr>
+                  <tr><td>10</td><td>+5</td><td>Auto-regulation</td></tr>
+                  <tr><td>11</td><td>+5</td><td>Aptitude de pratique</td></tr>
+                  <tr><td>12</td><td>+5</td><td>Amelioration de caracteristique</td></tr>
+                </tbody>
+              </table>
+            </div>
 
             <div class="subtabs" data-subtabs>
               <div class="subtabs-nav" role="tablist" aria-label="Dopeur">
@@ -2062,30 +2250,278 @@
               </div>
 
               <div class="subtab-panel is-active" id="dopeur-base" role="tabpanel" aria-labelledby="tab-dopeur-base" data-subtab-panel>
-                <div class="callout">
-                  <strong>Corps et chimie</strong>
-                  <p>Le Dopeur connait la chair comme un champ de bataille. Il maintient l&rsquo;equipe debout, pousse les organismes au-dela du raisonnable et sait exactement quel produit sauve, casse ou transforme une situation.</p>
+                <div class="subtab-hero">
+                  <div class="callout">
+                    <strong>Corps et chimie</strong>
+                    <p>Le Dopeur connait le corps vivant comme un systeme a maintenir, pousser, casser ou relancer. Son style de jeu repose sur un va-et-vient constant entre soutien clinique, dopage de terrain et debordement brutal quand le Sang-froid lache.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/dopeur_base.png" alt="Illustration du Dopeur, onglet Base" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 1</div>
+                  <div class="callout">
+                    <strong>Sang-froid</strong>
+                    <p>A partir du niveau 1, vous possedez une jauge de Sang-froid allant de 1 a 6, representee par un d6. Vous commencez chaque combat avec un Sang-froid de 4.</p>
+                    <p>Certaines aptitudes et certains evenements modifient votre Sang-froid. En regle generale :</p>
+                    <ul>
+                      <li>soigner, relever, proteger ou apaiser fait baisser votre Sang-froid</li>
+                      <li>blesser, empoisonner, affaiblir ou provoquer une crise le fait monter</li>
+                    </ul>
+                    <p>Votre Sang-froid ne peut jamais depasser 6.</p>
+                    <p>Le Sang-froid n&rsquo;augmente pas directement la puissance de vos aptitudes. Il modifie votre posture de combat et l&rsquo;acces a certains effets.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 1</div>
+                  <div class="callout">
+                    <strong>Rage</strong>
+                    <p>A partir du niveau 1, quand un effet vous ferait tomber a 1 Sang-froid, vous entrez immediatement en Rage.</p>
+                    <p>Tant que vous etes en Rage :</p>
+                    <ul>
+                      <li>vous ne pouvez pas utiliser d&rsquo;aptitudes de soin, de stabilisation ou de protection</li>
+                      <li>vous avez avantage aux jets de sauvegarde contre la peur et contre les effets qui vous empecheraient d&rsquo;agir</li>
+                      <li>vous avez avantage a tous vos jets d&rsquo;attaque</li>
+                      <li>vous ajoutez votre modificateur d&rsquo;Esprit aux degats de vos attaques</li>
+                      <li>vous pouvez continuer a utiliser vos aptitudes offensives, toxiques et nerveuses</li>
+                      <li>vous etes considere comme ayant un Sang-froid de 1</li>
+                    </ul>
+                    <p>Au debut de chacun de vos tours, vous effectuez un jet de sauvegarde d&rsquo;Esprit, DD 12. En cas de reussite, votre Rage prend fin et votre Sang-froid remonte a 4.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 1</div>
+                  <div class="callout">
+                    <strong>Medecine de guerre</strong>
+                    <p>A partir du niveau 1, vous savez soigner dans le chaos.</p>
+                    <p>Au contact d&rsquo;une cible vivante, vous pouvez utiliser une action pour lui rendre un nombre de points de vie egal a 1d6 + votre modificateur d&rsquo;Esprit.</p>
+                    <p>Cette aptitude fait exception a la regle des 0 point de vie : vous pouvez l&rsquo;utiliser sur une cible a 0 point de vie non stabilisee, et si elle recupere des points de vie, elle est relevee normalement.</p>
+                    <p>Quand vous utilisez cette aptitude, vous perdez 1 Sang-froid.</p>
+                    <p>Vous pouvez utiliser cette aptitude un nombre de fois egal a votre bonus de maitrise par repos long.</p>
+                    <p>Le de de soin augmente avec vos niveaux :</p>
+                    <ul>
+                      <li>niveau 5 : 2d6 + votre modificateur d&rsquo;Esprit</li>
+                      <li>niveau 9 : 3d6 + votre modificateur d&rsquo;Esprit</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout">
+                    <strong>Pratique de Dopeur</strong>
+                    <p>Au niveau 2, choisissez une pratique :</p>
+                    <ul>
+                      <li>Pratique du scalpel</li>
+                      <li>Pratique des doses</li>
+                      <li>Pratique des nerfs</li>
+                    </ul>
+                    <p>Vous gagnez une aptitude de votre pratique au niveau 2, puis aux niveaux 5, 8 et 11.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveaux 3, 6, 9 et 12</div>
+                  <div class="callout">
+                    <strong>Amelioration de caracteristique</strong>
+                    <p>Aux niveaux 3, 6, 9 et 12, vous augmentez une caracteristique de 2, ou deux caracteristiques de 1, sans depasser le maximum habituel.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 4</div>
+                  <div class="callout">
+                    <strong>Apprentissage de terrain</strong>
+                    <p>Vous apprenez a assimiler vite, a improviser sous pression et a corriger vos erreurs sur le terrain.</p>
+                    <p>Choisissez deux competences. Vous gagnez l&rsquo;expertise dans ces competences, ce qui vous permet d&rsquo;ajouter deux fois votre bonus de maitrise aux tests que vous effectuez avec elles si vous les maitrisez deja.</p>
+                    <p>De plus, une fois par repos court, lorsque vous echouez a un test de competence, vous pouvez le relancer.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 7</div>
+                  <div class="callout">
+                    <strong>Seuils critiques</strong>
+                    <p>Vous apprenez a exploiter les extremes de votre Sang-froid.</p>
+                    <p>Tant que votre Sang-froid est a 1 ou 2, vous beneficiez d&rsquo;une resistance aux degats contondants, perforants et tranchants.</p>
+                    <p>Tant que votre Sang-froid est a 5 ou 6, vous doublez les des de soin de vos aptitudes de Dopeur.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 10</div>
+                  <div class="callout">
+                    <strong>Auto-regulation</strong>
+                    <p>Au niveau 10, une fois par repos court, vous pouvez utiliser une action pour fixer librement votre Sang-froid a la valeur de votre choix, entre 1 et 6.</p>
+                    <p>Si vous choisissez 1, vous entrez immediatement en Rage.</p>
+                  </div>
                 </div>
               </div>
 
               <div class="subtab-panel" id="dopeur-scalpel" role="tabpanel" aria-labelledby="tab-dopeur-scalpel" data-subtab-panel hidden>
-                <div class="callout accent">
-                  <strong>Precision clinique</strong>
-                  <p>La Pratique du scalpel couvre le soin, la stabilisation, la chirurgie de fortune et la precision medicale sous pression.</p>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <strong>Precision clinique</strong>
+                    <p>Soin, stabilisation, chirurgie de fortune et precision medicale.</p>
+                    <p>Le Scalpel est un medecin de guerre, un operateur de terrain et, quand il craque, un boucher qui sait exactement ou couper.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/dopeur_scalpel.png" alt="Illustration du Dopeur, pratique du scalpel" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Main sure</strong>
+                    <p>Tant que votre Sang-froid est de 4 ou plus :</p>
+                    <ul>
+                      <li>vous pouvez utiliser Medecine de guerre en action bonus au lieu d&rsquo;une action</li>
+                      <li>vous ne pouvez utiliser Medecine de guerre qu&rsquo;une seule fois par tour</li>
+                      <li>quand vous relevez une cible a 0 point de vie, elle gagne aussi des points de vie temporaires egaux a votre bonus de maitrise</li>
+                    </ul>
+                    <p>De plus, quand vous touchez une cible avec une arme de finesse, vous pouvez choisir de ne pas la tuer.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Suivi post-operatoire</strong>
+                    <p>Quand vous terminez un repos court avec votre groupe, vous pouvez superviser les soins de terrain. Un nombre d&rsquo;allies egal a votre modificateur d&rsquo;Esprit (minimum 1) recuperent des points de vie supplementaires egaux au de actuel de votre Medecine de guerre.</p>
+                    <p>De plus, quand une cible alliee que vous voyez subit une blessure grave, un traumatisme durable ou un effet comparable, vous pouvez lui permettre de relancer immediatement son jet de sauvegarde ou son jet de recuperation associe. Une meme cible ne peut beneficier de cet effet qu&rsquo;une fois par repos long.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Coupe vitale</strong>
+                    <p>Quand vous touchez une cible avec une arme de finesse, vos attaques infligent 1d6 degats supplementaires.</p>
+                    <p>Si la cible est blessee, vous pouvez en plus choisir l&rsquo;un des effets suivants :</p>
+                    <ul>
+                      <li>elle a desavantage a sa prochaine attaque</li>
+                      <li>sa vitesse devient 0 jusqu&rsquo;au debut de votre prochain tour</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Reanimation impossible</strong>
+                    <p>Vous pouvez ramener a la vie une cible morte depuis moins d&rsquo;1 minute.</p>
+                    <p>En utilisant une action au contact du corps, vous ramenez cette cible a 1 point de vie. La cible est inconsciente jusqu&rsquo;a la fin de son prochain tour, puis peut agir normalement.</p>
+                    <p>Pour utiliser cette aptitude, vous devez avoir un Sang-froid de 6, puis vous perdez 4 Sang-froid.</p>
+                    <p>Une fois que vous utilisez cette aptitude, vous ne pouvez plus l&rsquo;utiliser avant un repos long.</p>
+                  </div>
                 </div>
               </div>
 
               <div class="subtab-panel" id="dopeur-doses" role="tabpanel" aria-labelledby="tab-dopeur-doses" data-subtab-panel hidden>
-                <div class="callout accent">
-                  <strong>Cuisine de combat</strong>
-                  <p>La Pratique des doses joue sur les boosts, les toxines, les drogues de combat, le dopage et l&rsquo;affaiblissement des ennemis.</p>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <strong>Cuisine de combat</strong>
+                    <p>Boosts, toxines, drogues de combat, dopage et affaiblissement des ennemis.</p>
+                    <p>Le Dopeur des Doses pousse la chimie plus loin que les autres. Il trafique son metabolisme, prepare des composes instables et transforme chaque injection en arme tactique.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/dopeur_dose.png" alt="Illustration du Dopeur, pratique des doses" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Cocktails de combat</strong>
+                    <p>Vous maitrisez des composes de terrain rapides et sales.</p>
+                    <p>Vous connaissez 2 cocktails de votre choix dans la liste ci-dessous. Vous apprenez un cocktail supplementaire aux niveaux 5, 8 et 11.</p>
+                    <p>Vous pouvez utiliser vos cocktails un nombre de fois egal a votre bonus de maitrise par repos long.</p>
+                    <p>Sauf mention contraire, utiliser un cocktail demande une action bonus.</p>
+                    <p><strong>Coagulant express.</strong> Quand une cible situee a 9 metres ou moins de vous subit des degats, vous pouvez utiliser votre reaction pour reduire ces degats de 1d8 + votre modificateur d&rsquo;Esprit. Vous perdez 1 Sang-froid.</p>
+                    <p><strong>Stimulant brutal.</strong> Une cible situee a 9 metres ou moins de vous augmente sa vitesse de 3 metres pendant 1 minute et gagne des points de vie temporaires egaux a votre bonus de maitrise. Vous perdez 1 Sang-froid.</p>
+                    <p><strong>Toxine de guerre.</strong> Quand vous touchez une cible avec une attaque, vous pouvez lui infliger 3d6 degats supplementaires. Vous gagnez 1 Sang-froid.</p>
+                    <p><strong>Sedatif de choc.</strong> Quand vous touchez une cible avec une attaque, elle doit reussir un jet de sauvegarde de Constitution ou etre empoisonnee pendant 1 minute. Elle peut refaire le jet a la fin de chacun de ses tours, mettant fin a l&rsquo;effet en cas de reussite. Vous gagnez 1 Sang-froid.</p>
+                    <p><strong>Piqure de reprise.</strong> Vous touchez une cible alliee a 0 point de vie. Elle recupere 1 point de vie. Vous perdez 1 Sang-froid.</p>
+                    <p><strong>Dopage nerveux.</strong> Une cible situee a 9 metres ou moins de vous ajoute 1d4 a tous ses jets d&rsquo;attaque et jets de sauvegarde pendant 1 minute. L&rsquo;effet prend fin si vous etes inconscient. Vous perdez 1 Sang-froid.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Preparateur clandestin</strong>
+                    <p>A la fin d&rsquo;un repos long, vous pouvez preparer un nombre de potions de soin egal a votre modificateur d&rsquo;Esprit (minimum 1).</p>
+                    <p>Une cible qui boit l&rsquo;une de ces potions recupere un nombre de points de vie egal au de actuel de votre Medecine de guerre.</p>
+                    <p>Les potions perdent leur efficacite a la fin de votre prochain repos long.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Double injection</strong>
+                    <p>Une fois pendant chacun de vos tours, quand vous utilisez un cocktail en action bonus, vous pouvez utiliser un second cocktail different dans la meme action bonus.</p>
+                    <p>Si vous faites ainsi, vous perdez 1 Sang-froid supplementaire.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Surcharge chimique</strong>
+                    <p>Vous pouvez declencher un cocktail experimental sur vous-meme ou sur une cible consentante que vous touchez.</p>
+                    <p>La cible beneficie, pendant 1 minute, des effets suivants :</p>
+                    <ul>
+                      <li>sa vitesse est doublee</li>
+                      <li>elle gagne un bonus de +2 a la CA</li>
+                      <li>elle a avantage aux jets de Dexterite</li>
+                      <li>elle peut effectuer une action supplementaire a chacun de ses tours, limitee a Attaquer (une seule attaque), Foncer, Se desengager, Se cacher ou Utiliser un objet</li>
+                    </ul>
+                    <p>Quand l&rsquo;effet prend fin, la cible ne peut ni se deplacer ni effectuer d&rsquo;actions jusqu&rsquo;a la fin de son prochain tour.</p>
+                    <p>Pour utiliser cette aptitude, vous devez avoir un Sang-froid de 6, puis vous perdez 4 Sang-froid.</p>
+                    <p>Une fois que vous utilisez cette aptitude, vous ne pouvez plus l&rsquo;utiliser avant un repos court.</p>
+                  </div>
                 </div>
               </div>
 
               <div class="subtab-panel" id="dopeur-nerfs" role="tabpanel" aria-labelledby="tab-dopeur-nerfs" data-subtab-panel hidden>
-                <div class="callout accent">
-                  <strong>Guerre mentale</strong>
-                  <p>La Pratique des nerfs travaille le stress, le trauma, la lucidite, la panique et toute la guerre mentale biomedicale.</p>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <strong>Guerre mentale</strong>
+                    <p>Stress, trauma, lucidite, panique et guerre mentale biomedicale.</p>
+                    <p>Le Dopeur des Nerfs manipule la douleur, le calme artificiel, la panique et la rupture mentale. Il sait apaiser un esprit au bord de la crise comme en fissurer un autre a dessein.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/dopeur_nerfs.png" alt="Illustration du Dopeur, pratique des nerfs" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Regulation emotionnelle</strong>
+                    <p>En action, vous pouvez provoquer l&rsquo;un des effets suivants sur une cible que vous voyez a 18 metres ou moins.</p>
+                    <p><strong>Apaisement.</strong> La cible doit reussir un jet de sauvegarde d&rsquo;Esprit ou etre affectee comme par apaisement des emotions jusqu&rsquo;a la fin de votre prochain tour. Si vous utilisez cet effet, vous perdez 1 Sang-froid.</p>
+                    <p><strong>Cruaute nerveuse.</strong> La cible doit reussir un jet de sauvegarde d&rsquo;Esprit ou subir l&rsquo;effet de moquerie cruelle. Si vous utilisez cet effet, vous gagnez 1 Sang-froid.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Presence invasive</strong>
+                    <p>Vous ajoutez votre modificateur d&rsquo;Esprit a tous vos tests bases sur le Charisme.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Rupture ou soutien</strong>
+                    <p>Quand une cible que vous voyez a 9 metres ou moins effectue un jet de sauvegarde, vous pouvez utiliser votre reaction pour choisir l&rsquo;un des effets suivants :</p>
+                    <ul>
+                      <li>une cible alliee ajoute votre modificateur d&rsquo;Esprit a son jet de sauvegarde ; vous perdez 2 Sang-froid</li>
+                      <li>une cible ennemie soustrait votre modificateur d&rsquo;Esprit a son jet de sauvegarde ; vous gagnez 2 Sang-froid</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Domination clinique</strong>
+                    <p>Vous tentez de subjuguer un humanoide que vous voyez a 18 metres ou moins. Celui-ci doit reussir un jet de sauvegarde d&rsquo;Esprit ou etre charme pendant 1 minute. Si vous ou des allies le combattez, il beneficie d&rsquo;un avantage a son jet de sauvegarde.</p>
+                    <p>Tant que la cible est charmee, vous etablissez un contact telepathique avec elle. Vous pouvez utiliser ce lien telepathique pour donner des ordres a la cible tant que vous etes conscient, sans action requise. La cible fait tout ce qui est en son pouvoir pour obeir. Vous pouvez preciser un type d&rsquo;action a la fois simple et general, comme &laquo; Attaque cette cible &raquo;, &laquo; Cours jusque-la &raquo; ou &laquo; Rapporte cet objet &raquo;. Si la cible execute la demande et ne recoit pas d&rsquo;autres indications de votre part, elle se defend au mieux de sa capacite.</p>
+                    <p>Vous pouvez utiliser une action pour obtenir le controle total et precis de la cible. Jusqu&rsquo;a la fin de votre prochain tour, la cible agit seulement selon vos choix et elle ne peut rien faire sans que vous ne l&rsquo;autorisiez. Pendant cette periode, vous pouvez provoquer une reaction de la part de la cible, mais l&rsquo;usage de cette reaction sera aussi le votre.</p>
+                    <p>Chaque fois que la cible subit des degats, elle tente un nouveau jet de sauvegarde d&rsquo;Esprit. En cas de reussite, l&rsquo;effet prend fin.</p>
+                    <p>Pour utiliser cette aptitude, vous devez avoir un Sang-froid de 6, puis vous perdez 4 Sang-froid.</p>
+                    <p>Une fois que vous utilisez cette aptitude, vous ne pouvez plus l&rsquo;utiliser avant un repos long.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2094,6 +2530,57 @@
           <section class="page-section panel" id="personnage-classe-runner" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Runner</h2></div></div>
             <p>Specialiste des missions discretes, de l&rsquo;intrusion, du sale boulot et des operations solo.</p>
+            <p>Le Runner infiltre, manipule, contourne et disparait.</p>
+            <p>Il lit ses cibles avant qu&rsquo;elles ne le lisent, gagne des niveaux de faille sur elles, puis exploite cet ascendant selon sa specialite.</p>
+
+            <div class="card-grid three-up">
+              <article class="info-card">
+                <strong>Points de vie</strong>
+                <p><strong>De de vie :</strong> 1d8 par niveau de Runner</p>
+                <p><strong>Niveau 1 :</strong> 8 + votre modificateur de Constitution</p>
+                <p><strong>Niveaux superieurs :</strong> 1d8 (ou 5) + votre modificateur de Constitution par niveau de Runner apres le niveau 1</p>
+              </article>
+              <article class="info-card">
+                <strong>Maitrises</strong>
+                <p><strong>Armures :</strong> armures legeres</p>
+                <p><strong>Armes :</strong> armes simples, pistolets, armes de precision, armes legeres de melee</p>
+                <p><strong>Outils :</strong> kit d&rsquo;intrusion, kit de falsification</p>
+                <p><strong>Jets de sauvegarde :</strong> Dexterite, Esprit</p>
+                <p><strong>Competences :</strong> choisissez 4 competences parmi Acrobaties, Athletisme, Discretion, Escamotage, Intuition, Investigation, Perception, Influence, Tromperie et Techno</p>
+              </article>
+              <article class="info-card">
+                <strong>DD du Runner</strong>
+                <p>Certaines de vos aptitudes imposent un jet de sauvegarde.</p>
+                <p><strong>DD de sauvegarde du Runner :</strong> 8 + votre bonus de maitrise + votre modificateur de Charisme (CHA)</p>
+                <p>Le Runner utilise explicitement le Charisme (CHA) pour ses aptitudes qui imposent un jet de sauvegarde.</p>
+              </article>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Niveau</th>
+                    <th>Bonus de maitrise</th>
+                    <th>Aptitudes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>+2</td><td>Faille, Expertise</td></tr>
+                  <tr><td>2</td><td>+2</td><td>Voie de Runner</td></tr>
+                  <tr><td>3</td><td>+2</td><td>Amelioration de caracteristique</td></tr>
+                  <tr><td>4</td><td>+3</td><td>Couverture et planque</td></tr>
+                  <tr><td>5</td><td>+3</td><td>Aptitude de voie</td></tr>
+                  <tr><td>6</td><td>+3</td><td>Amelioration de caracteristique</td></tr>
+                  <tr><td>7</td><td>+4</td><td>Opportuniste</td></tr>
+                  <tr><td>8</td><td>+4</td><td>Aptitude de voie</td></tr>
+                  <tr><td>9</td><td>+4</td><td>Amelioration de caracteristique</td></tr>
+                  <tr><td>10</td><td>+5</td><td>Intouchable</td></tr>
+                  <tr><td>11</td><td>+5</td><td>Aptitude de voie</td></tr>
+                  <tr><td>12</td><td>+5</td><td>Amelioration de caracteristique</td></tr>
+                </tbody>
+              </table>
+            </div>
 
             <div class="subtabs" data-subtabs>
               <div class="subtabs-nav" role="tablist" aria-label="Runner">
@@ -2104,30 +2591,284 @@
               </div>
 
               <div class="subtab-panel is-active" id="runner-base" role="tabpanel" aria-labelledby="tab-runner-base" data-subtab-panel>
-                <div class="callout">
-                  <strong>Operation sale</strong>
-                  <p>Le Runner gere les angles morts, les acces interdits et les missions qui se passent mieux quand personne ne sait qu&rsquo;elles ont eu lieu. C&rsquo;est la classe de l&rsquo;intrusion, de l&rsquo;autonomie et du travail execute au cordeau.</p>
+                <div class="subtab-hero">
+                  <div class="callout">
+                    <strong>Operation sale</strong>
+                    <p>Le Runner vit de lecture, de placement et d&rsquo;ascendant silencieux. Il ne gagne pas en puissance en frontal : il construit une prise sur ses cibles, puis la transforme en protection, en ouverture tactique ou en execution.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/runner_base.png" alt="Illustration du Runner, onglet Base" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 1</div>
+                  <div class="callout">
+                    <strong>Faille</strong>
+                    <p>Vous savez reperer les automatismes, les angles morts et les vulnerabilites d&rsquo;une cible avant qu&rsquo;elle ne vous identifie comme une menace immediate.</p>
+                    <p>En tant qu&rsquo;action bonus, choisissez une cible que vous voyez a 18 metres ou moins de vous, a condition :</p>
+                    <ul>
+                      <li>qu&rsquo;elle n&rsquo;ait subi aucun degat de votre part depuis le debut du combat ou de la scene</li>
+                      <li>et que vous ne soyez pas ouvertement menacant a son egard</li>
+                    </ul>
+                    <p>La cible doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, vous gagnez 1 niveau de faille sur elle, jusqu&rsquo;a un maximum de 6.</p>
+                    <p>Les niveaux de faille que vous gagnez sont personnels.</p>
+                    <p><strong>Seuils de faille.</strong> Les niveaux de faille que vous avez sur une cible vous procurent les benefices suivants contre elle :</p>
+                    <ul>
+                      <li>1 a 2 failles : vous beneficiez d&rsquo;un bonus de +1 a la CA contre les attaques de cette cible</li>
+                      <li>3 a 4 failles : cette cible a desavantage a ses attaques d&rsquo;opportunite contre vous</li>
+                      <li>5 a 6 failles : lorsqu&rsquo;elle veut vous cibler avec une attaque ou un effet hostile, elle doit d&rsquo;abord reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, elle doit choisir une autre cible si possible. Si elle ne peut pas choisir une autre cible, elle ne peut pas vous prendre pour cible pour cette attaque ou cet effet</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 1</div>
+                  <div class="callout">
+                    <strong>Expertise</strong>
+                    <p>Choisissez 2 maitrises parmi vos competences maitrisees ou vos outils maitrises. Votre bonus de maitrise est double pour tout test utilisant l&rsquo;une des maitrises choisies.</p>
+                    <p>Au niveau 9, vous choisissez 2 maitrises supplementaires auxquelles ce benefice s&rsquo;applique.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout">
+                    <strong>Voie de Runner</strong>
+                    <p>Vous choisissez une voie qui definit votre maniere d&rsquo;exploiter les failles : Tueur a gages, Fixeur ou Hacker.</p>
+                    <p>Votre voie vous accorde des aptitudes au niveau 2, puis aux niveaux 5, 8 et 11.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveaux 3, 6, 9 et 12</div>
+                  <div class="callout">
+                    <strong>Amelioration de caracteristique</strong>
+                    <p>Aux niveaux 3, 6, 9 et 12, vous augmentez une caracteristique de 2, ou deux caracteristiques de 1, sans depasser le maximum habituel.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 4</div>
+                  <div class="callout">
+                    <strong>Couverture et planque</strong>
+                    <p>Vous avez appris a preparer des identites de rechange et des refuges temporaires.</p>
+                    <p><strong>Deguisement.</strong> Au terme d&rsquo;un repos long, vous pouvez preparer un deguisement complet pour vous-meme ou pour une autre cible de taille similaire. Ce deguisement permet d&rsquo;adopter l&rsquo;apparence generale, la tenue et les accessoires d&rsquo;un role credible : agent de securite, technicien, employe, civil, mercenaire, livreur, etc.</p>
+                    <p>Toute cible qui cherche a percer ce deguisement doit reussir un test oppose d&rsquo;Esprit (Intuition) contre votre test de Charisme (Tromperie) ou de Dexterite avec un kit de falsification.</p>
+                    <p>Vous pouvez maintenir jusqu&rsquo;a 2 deguisements prepares a la fois.</p>
+                    <p><strong>Planque.</strong> Apres avoir passe au moins 8 heures dans un quartier, un batiment ou une zone urbaine, vous pouvez y etablir une planque discrete. Cette planque peut abriter jusqu&rsquo;a 6 cibles, cacher du materiel leger et offrir un abri discret pendant 24 heures.</p>
+                    <p>Toute tentative ordinaire pour retrouver cette planque se fait avec desavantage, a moins qu&rsquo;un temoin vous y ait vu entrer ou qu&rsquo;un indice precis mene a elle.</p>
+                    <p>Vous ne pouvez avoir qu&rsquo;une seule planque active a la fois.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 7</div>
+                  <div class="callout">
+                    <strong>Opportuniste</strong>
+                    <p>Vous savez transformer vos lectures en aide immediate pour vos allies.</p>
+                    <p>Lorsqu&rsquo;une cible sur laquelle vous avez au moins 1 niveau de faille attaque un allie que vous voyez a 9 metres ou moins de vous, vous pouvez utiliser votre reaction pour choisir l&rsquo;un des effets suivants :</p>
+                    <ul>
+                      <li>imposer un malus au jet d&rsquo;attaque de la cible</li>
+                      <li>accorder un bonus a la CA de l&rsquo;allie contre cette attaque</li>
+                    </ul>
+                    <p>Le bonus ou malus depend du nombre de niveaux de faille que vous avez sur cette cible :</p>
+                    <ul>
+                      <li>1 a 2 failles : 1d6</li>
+                      <li>3 a 4 failles : 1d8</li>
+                      <li>5 a 6 failles : 1d10</li>
+                    </ul>
+                    <p>Vous lancez le de apres le jet d&rsquo;attaque, mais avant que le MJ n&rsquo;annonce si l&rsquo;attaque touche ou non.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 10</div>
+                  <div class="callout">
+                    <strong>Intouchable</strong>
+                    <p>Votre lecture des cibles devient presque impossible a briser.</p>
+                    <p>Les benefices de votre aptitude Faille sont ameliores comme suit :</p>
+                    <ul>
+                      <li>1 a 2 failles : vous beneficiez d&rsquo;un bonus de +2 a la CA contre les attaques de cette cible</li>
+                      <li>3 a 4 failles : cette cible a desavantage a tous ses jets d&rsquo;attaque contre vous</li>
+                      <li>5 a 6 failles : lorsqu&rsquo;elle echoue a son jet de sauvegarde d&rsquo;Esprit pour vous cibler, elle doit choisir une autre cible si possible. Si elle ne peut pas choisir une autre cible, elle perd son action, son attaque ou l&rsquo;utilisation de l&rsquo;effet hostile concerne. Dans tous les cas, elle ne peut plus vous prendre pour cible avec une attaque ou un effet hostile jusqu&rsquo;a la fin de son prochain tour</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
               <div class="subtab-panel" id="runner-tueur" role="tabpanel" aria-labelledby="tab-runner-tueur" data-subtab-panel hidden>
-                <div class="callout accent">
-                  <strong>Elimination ciblee</strong>
-                  <p>Le Tueur a gages repose sur la traque, l&rsquo;elimination ciblee, l&rsquo;assassinat et la chasse methodique.</p>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <strong>Elimination ciblee</strong>
+                    <p>Traque, elimination ciblee, assassinat et chasse methodique.</p>
+                    <p>Le Tueur a gages ouvre une cible methodiquement, puis la detruit.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/runner_tueur.png" alt="Illustration du Runner, voie Tueur a gages" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Exploitation letale</strong>
+                    <p>Une fois par tour, lorsque vous touchez une cible avec une attaque d&rsquo;arme, vous lui infligez des degats supplementaires en fonction du nombre de niveaux de faille que vous avez sur elle :</p>
+                    <ul>
+                      <li>1 a 2 failles : +1d6</li>
+                      <li>3 a 4 failles : +2d6</li>
+                      <li>5 a 6 failles : +3d6</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Predateur methodique</strong>
+                    <p>Une fois par tour, lorsque vous touchez une cible avec une attaque d&rsquo;arme, vous gagnez 1 niveau de faille sur elle.</p>
+                    <p>Vous gagnez 2 niveaux de faille a la place si au moins l&rsquo;une des conditions suivantes est remplie :</p>
+                    <ul>
+                      <li>vous aviez l&rsquo;avantage sur le jet d&rsquo;attaque</li>
+                      <li>la cible est surprise</li>
+                      <li>la cible est isolee</li>
+                    </ul>
+                    <p>Une cible est consideree comme isolee si aucun de ses allies conscients ne se trouve a 3 metres ou moins d&rsquo;elle.</p>
+                    <p>Vous ne pouvez pas gagner plus de 2 niveaux de faille par tour grace a cette aptitude sur une meme cible.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Mise a mort calculee</strong>
+                    <p>Vous ajoutez votre modificateur d&rsquo;Esprit a vos jets d&rsquo;attaque contre les cibles sur lesquelles vous avez au moins 1 niveau de faille.</p>
+                    <p>De plus, lorsque vous touchez une cible sur laquelle vous avez 4 niveaux de faille ou plus, vous ajoutez egalement votre modificateur d&rsquo;Esprit aux degats de l&rsquo;attaque.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Meurtre violent</strong>
+                    <p>Lorsque vous reduisez a 0 point de vie une cible sur laquelle vous aviez au moins 1 niveau de faille, vous pouvez choisir une autre cible que vous voyez a 9 metres ou moins de la premiere.</p>
+                    <p>Cette cible doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, vous lui transferez un nombre de niveaux de faille egal a la moitie des niveaux de faille que vous aviez sur la cible reduite a 0, arrondi a l&rsquo;inferieur.</p>
+                    <p>Vous ne pouvez pas depasser votre maximum normal de 6 niveaux de faille sur la nouvelle cible.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Carnage methodique</strong>
+                    <p>Les degats supplementaires de votre aptitude Exploitation letale sont doubles :</p>
+                    <ul>
+                      <li>1 a 2 failles : +2d6</li>
+                      <li>3 a 4 failles : +4d6</li>
+                      <li>5 a 6 failles : +6d6</li>
+                    </ul>
+                    <p>De plus, lorsque vous reduisez a 0 point de vie une cible sur laquelle vous aviez au moins 1 niveau de faille, chaque cible de votre choix a 9 metres ou moins d&rsquo;elle doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
+                    <p>En cas d&rsquo;echec, vous transferez a chacune d&rsquo;elles un nombre de niveaux de faille egal a la moitie des niveaux de faille que vous aviez sur la cible reduite a 0, arrondi a l&rsquo;inferieur.</p>
+                  </div>
                 </div>
               </div>
 
               <div class="subtab-panel" id="runner-fixeur" role="tabpanel" aria-labelledby="tab-runner-fixeur" data-subtab-panel hidden>
-                <div class="callout accent">
-                  <strong>Intermediaire toxique</strong>
-                  <p>Le Fixeur est un intermediaire, negociateur de terrain, touche-a-tout social et maitre des combines utiles ou douteuses.</p>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <strong>Intermediaire toxique</strong>
+                    <p>Intermediaire, negociateur de terrain, touche-a-tout social et maitre des combines.</p>
+                    <p>Le Fixeur repand les failles vite et sur plusieurs cibles. Il perturbe les lignes ennemies, ouvre des opportunites a ses allies et retourne les adversaires les uns contre les autres.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/runner_fixeur.png" alt="Illustration du Runner, voie Fixeur" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Semer le doute</strong>
+                    <p>En tant qu&rsquo;action, choisissez un nombre de cibles que vous voyez a 12 metres ou moins de vous, pouvant vous voir ou vous entendre, inferieur ou egal a votre bonus de maitrise.</p>
+                    <p>Chaque cible doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, vous gagnez 1 niveau de faille sur elle.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Ouvrez-le</strong>
+                    <p>Lorsqu&rsquo;un allie que vous voyez a 9 metres ou moins de vous attaque une cible sur laquelle vous avez 4 niveaux de faille ou plus, vous pouvez utiliser votre reaction pour lui donner l&rsquo;avantage sur ce jet d&rsquo;attaque.</p>
+                    <p>Si vous avez 6 niveaux de faille sur la cible et que l&rsquo;attaque touche, elle inflige 1d8 degats supplementaires.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Paranoia</strong>
+                    <p>En tant qu&rsquo;action, choisissez une cible que vous voyez a 18 metres ou moins de vous, sur laquelle vous avez 6 niveaux de faille. La cible doit effectuer un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. Une cible immunisee a l&rsquo;etat Effraye reussit automatiquement ce jet.</p>
+                    <p>En cas d&rsquo;echec, jusqu&rsquo;a la fin de votre prochain tour, la cible ne distingue plus correctement ses allies de ses ennemis :</p>
+                    <ul>
+                      <li>chaque fois qu&rsquo;elle choisit une cible pour une attaque, une capacite ou un effet hostile, elle doit choisir cette cible au hasard parmi les cibles qu&rsquo;elle peut voir et qui sont a portee</li>
+                      <li>si une cible provoque une attaque d&rsquo;opportunite de sa part, elle doit effectuer cette attaque si elle en est capable</li>
+                    </ul>
+                    <p>Chaque fois que la cible subit des degats, elle peut repeter le jet de sauvegarde, mettant fin a l&rsquo;effet sur elle-meme en cas de reussite.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Finissez-le</strong>
+                    <p>Lorsque vous utilisez Ouvrez-le et que l&rsquo;attaque touche, vous pouvez consommer tout ou partie des niveaux de faille que vous avez sur la cible. Pour chaque niveau de faille consomme de cette maniere, l&rsquo;attaque inflige 1d8 degats supplementaires.</p>
+                  </div>
                 </div>
               </div>
 
               <div class="subtab-panel" id="runner-hacker" role="tabpanel" aria-labelledby="tab-runner-hacker" data-subtab-panel hidden>
-                <div class="callout accent">
-                  <strong>Intrusion offensive</strong>
-                  <p>Le Hacker pratique l&rsquo;intrusion systeme, le sabotage, l&rsquo;infiltration techno et l&rsquo;usage offensif des reseaux.</p>
+                <div class="subtab-hero">
+                  <div class="callout accent">
+                    <strong>Intrusion offensive</strong>
+                    <p>Intrusion systeme, sabotage, infiltration techno et usage offensif des reseaux.</p>
+                    <p>Le Hacker compromet une cible, charge un payload, puis le declenche d&rsquo;un coup.</p>
+                  </div>
+                  <figure class="media-frame subtab-media">
+                    <img src="assets/runner_hacker.png" alt="Illustration du Runner, voie Hacker" />
+                  </figure>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Breche assistee</strong>
+                    <p>Lorsque vous utilisez votre aptitude Faille sur une cible equipee d&rsquo;implants, de protheses, d&rsquo;armes connectees, d&rsquo;armures intelligentes, de drones lies ou de systemes numeriques integres, cette cible effectue son jet de sauvegarde avec desavantage.</p>
+                    <p>En cas d&rsquo;echec, vous gagnez 2 niveaux de faille sur elle au lieu de 1.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Payload : Decharge neurale</strong>
+                    <p>En tant qu&rsquo;action, choisissez une cible que vous voyez a 18 metres ou moins de vous, sur laquelle vous avez au moins 1 niveau de faille. La cible doit effectuer un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
+                    <p>Elle subit 1d8 degats electriques ou neuraux par niveau de faille consomme, ou la moitie de ces degats en cas de reussite.</p>
+                    <p>Lorsque vous utilisez cette aptitude, vous consommez tous les niveaux de faille que vous avez sur la cible.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Payload : Parasite sensoriel</strong>
+                    <p>En tant qu&rsquo;action, choisissez une cible que vous voyez a 18 metres ou moins de vous, sur laquelle vous avez au moins 3 niveaux de faille. La cible doit effectuer un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
+                    <p>En cas d&rsquo;echec :</p>
+                    <ul>
+                      <li>elle ne peut pas effectuer de reaction</li>
+                      <li>elle a desavantage a ses jets d&rsquo;attaque</li>
+                      <li>elle a desavantage aux tests de Perception et de Techno</li>
+                      <li>ces effets durent jusqu&rsquo;a la fin de votre prochain tour</li>
+                    </ul>
+                    <p>En cas de reussite, elle ne peut quand meme pas effectuer de reaction jusqu&rsquo;a la fin de votre tour.</p>
+                    <p>Lorsque vous utilisez cette aptitude, vous consommez tous les niveaux de faille que vous avez sur la cible.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Residu malveillant</strong>
+                    <p>Lorsque vous utilisez une aptitude Payload sur une cible, vous ne perdez pas entierement votre prise sur elle. Au lieu de perdre tous les niveaux de faille que vous aviez sur elle, vous retombez a 2 niveaux de faille sur cette cible.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Payload : Explosion d&rsquo;implant</strong>
+                    <p>Lorsque vous utilisez Decharge neurale sur une cible sur laquelle vous avez 6 niveaux de faille, les degats infliges deviennent 8d8 degats electriques au lieu de l&rsquo;effet normal.</p>
+                    <p>De plus, chaque autre cible situee a 3 metres ou moins de la cible principale doit effectuer un jet de sauvegarde de Dexterite contre votre DD de sauvegarde du Runner, subissant 3d8 degats electriques en cas d&rsquo;echec, ou la moitie de ces degats en cas de reussite.</p>
+                    <p>Enfin, l&rsquo;implant memoire de la cible principale est irrecuperable.</p>
+                  </div>
                 </div>
               </div>
             </div>
