@@ -1414,7 +1414,7 @@
               <div class="subtab-panel" id="brute-chair" role="tabpanel" aria-labelledby="tab-brute-chair" data-subtab-panel hidden>
                 <div class="subtab-hero">
                   <div class="callout accent">
-                    <p>La Voie de la chair est l&rsquo;expression la plus brute de la Brute : masse, os, sang, impact. Elle domine le corps &agrave; corps prolong&eacute; et transforme son Adr&eacute;naline en d&eacute;g&acirc;ts imm&eacute;diats.</p>
+                    <p>La Voie de la chair est la forme la plus brute de la Brute : muscles, os, douleur et impact. L&agrave; o&ugrave; d&rsquo;autres s&rsquo;appuient sur l&rsquo;acier, les gadgets ou le calibre de leur arme, elle fait de son propre corps un outil de guerre. Elle domine le corps &agrave; corps prolong&eacute;, convertit son Adr&eacute;naline en violence imm&eacute;diate et devient de plus en plus terrifiante &agrave; mesure que la m&ecirc;l&eacute;e s&rsquo;enlise.</p>
                   </div>
                   <figure class="media-frame subtab-media">
                     <img src="assets/brute_chair.png" alt="Illustration de la Brute, voie de la chair" />
@@ -1424,7 +1424,14 @@
                   <div class="level-banner">Niveau 2</div>
                   <div class="callout accent">
                     <strong>Poings de boucher</strong>
-                    <p>Quand vous touchez avec une attaque au corps &agrave; corps, vous pouvez d&eacute;penser de l&rsquo;Adr&eacute;naline pour augmenter les d&eacute;g&acirc;ts de cette attaque. Pour chaque point d&rsquo;Adr&eacute;naline d&eacute;pens&eacute;, l&rsquo;attaque inflige 1 d&eacute;g&acirc;t suppl&eacute;mentaire.</p>
+                    <p>&Agrave; partir du niveau 2, vos attaques &agrave; mains nues infligent 1d6 d&eacute;g&acirc;ts.</p>
+                    <p>Ce d&eacute; augmente &agrave; mesure que vous progressez dans cette voie :</p>
+                    <ul>
+                      <li>niveau 5 : 1d8</li>
+                      <li>niveau 8 : 1d10</li>
+                      <li>niveau 11 : 1d12</li>
+                    </ul>
+                    <p>Quand vous touchez avec une attaque &agrave; mains nues, vous pouvez d&eacute;penser de l&rsquo;Adr&eacute;naline pour augmenter les d&eacute;g&acirc;ts de cette attaque. Pour chaque point d&rsquo;Adr&eacute;naline d&eacute;pens&eacute;, l&rsquo;attaque inflige 1 d&eacute;g&acirc;t suppl&eacute;mentaire.</p>
                     <p>Vous pouvez d&eacute;penser sur cette aptitude un nombre maximum de points d&rsquo;Adr&eacute;naline &eacute;gal &agrave; votre bonus de ma&icirc;trise par attaque.</p>
                   </div>
                 </div>
@@ -1447,13 +1454,7 @@
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Carnage &agrave; mains nues</strong>
-                    <p>Quand vous d&eacute;pensez au moins 1 point d&rsquo;Adr&eacute;naline avec Poings de boucher, vous pouvez appliquer un des effets suivants &agrave; la cible touch&eacute;e :</p>
-                    <ul>
-                      <li>la repousser de 3 m&egrave;tres</li>
-                      <li>la faire tomber &agrave; terre si elle n&rsquo;est pas de taille sup&eacute;rieure &agrave; vous</li>
-                      <li>infliger un montant de d&eacute;g&acirc;ts &eacute;gal &agrave; votre bonus de ma&icirc;trise &agrave; une seconde cr&eacute;ature situ&eacute;e &agrave; 1,50 m&egrave;tre de la cible</li>
-                    </ul>
-                    <p>Vous ne pouvez appliquer cet effet qu&rsquo;une fois par tour.</p>
+                    <p>Une fois par tour, quand vous d&eacute;pensez au moins 1 point d&rsquo;Adr&eacute;naline avec Poings de boucher, vous pouvez effectuer une attaque &agrave; mains nues suppl&eacute;mentaire.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -1462,7 +1463,7 @@
                     <strong>Monstre de chair</strong>
                     <p>Vous &ecirc;tes &agrave; votre meilleur quand le combat s&rsquo;enlise et que le corps &agrave; corps devient une boucherie.</p>
                     <p>Au d&eacute;but de votre tour, si vous &ecirc;tes &agrave; 1,50 m&egrave;tre d&rsquo;une cr&eacute;ature ennemie, vous r&eacute;cup&eacute;rez un montant d&rsquo;Adr&eacute;naline &eacute;gal &agrave; votre bonus de ma&icirc;trise.</p>
-                    <p>De plus, le premier point d&rsquo;Adr&eacute;naline d&eacute;pens&eacute; avec Poings de boucher &agrave; chacun de vos tours est gratuit.</p>
+                    <p>De plus, Carnage &agrave; mains nues n&rsquo;est plus limit&eacute; &agrave; une seule fois par tour. Vous ne pouvez toutefois l&rsquo;utiliser qu&rsquo;une fois par attaque.</p>
                   </div>
                 </div>
               </div>
@@ -2876,44 +2877,1109 @@
 
           <section class="page-section panel" id="personnage-classe-neuro" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Classe</p><div><h2>Neuro</h2></div></div>
-            <p>Porteur d&rsquo;un implant neural militaire capable de produire des effets quasi anormaux, puissants et instables.</p>
+            <p>Porteur d&rsquo;un implant neural militaire exp&eacute;rimental, le Neuro manipule des Protocoles capables de tordre la perception, de d&eacute;cha&icirc;ner l&rsquo;&eacute;nergie ou de transformer son propre corps en arme vivante. L&agrave; o&ugrave; les autres combattent avec des armes, des drones ou du muscle, le Neuro pilote directement un syst&egrave;me de guerre branch&eacute; sur son cerveau.</p>
+            <p>En combat, le Neuro contr&ocirc;le, explose, fracture, encaisse et monte en r&eacute;gime jusqu&rsquo;&agrave; risquer la rupture. Hors combat, il exploite les outils embarqu&eacute;s de son implant pour communiquer, s&rsquo;orienter, enregistrer des donn&eacute;es et op&eacute;rer comme une unit&eacute; de reconnaissance augment&eacute;e.</p>
+
+            <div class="card-grid three-up">
+              <article class="info-card">
+                <strong>R&ocirc;le</strong>
+                <p>Caster, contr&ocirc;le, d&eacute;g&acirc;ts sp&eacute;ciaux, mont&eacute;e en puissance.</p>
+              </article>
+              <article class="info-card">
+                <strong>Caract&eacute;ristique principale</strong>
+                <p><strong>Esprit</strong> est votre caract&eacute;ristique principale pour vos Protocoles.</p>
+              </article>
+              <article class="info-card">
+                <strong>Points de vie</strong>
+                <p><strong>D&eacute; de vie :</strong> 1d8 par niveau de Neuro</p>
+              </article>
+            </div>
+
+            <p><strong>Tableau de progression du Neuro</strong></p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Niveau</th>
+                    <th>Bonus de ma&icirc;trise</th>
+                    <th>Aptitudes</th>
+                    <th>Impulsions connues</th>
+                    <th>Protocoles connus</th>
+                    <th>Rang maximal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>+2</td><td>Protocoles neuraux, Surcharge neurale</td><td>2</td><td>2</td><td>1</td></tr>
+                  <tr><td>2</td><td>+2</td><td>Voie neurale</td><td>2</td><td>3</td><td>1</td></tr>
+                  <tr><td>3</td><td>+2</td><td>ASI</td><td>2</td><td>3</td><td>1</td></tr>
+                  <tr><td>4</td><td>+3</td><td>Interface tactique</td><td>3</td><td>4</td><td>1</td></tr>
+                  <tr><td>5</td><td>+3</td><td>Acc&egrave;s aux Protocoles de rang 2</td><td>3</td><td>5</td><td>2</td></tr>
+                  <tr><td>6</td><td>+3</td><td>ASI</td><td>3</td><td>5</td><td>2</td></tr>
+                  <tr><td>7</td><td>+4</td><td>Dissipation d&rsquo;urgence</td><td>3</td><td>6</td><td>2</td></tr>
+                  <tr><td>8</td><td>+4</td><td>Acc&egrave;s aux Protocoles de rang 3, aptitude de voie</td><td>3</td><td>7</td><td>3</td></tr>
+                  <tr><td>9</td><td>+4</td><td>ASI</td><td>3</td><td>7</td><td>3</td></tr>
+                  <tr><td>10</td><td>+5</td><td>&Eacute;nergie r&eacute;siduelle</td><td>4</td><td>8</td><td>3</td></tr>
+                  <tr><td>11</td><td>+5</td><td>Aptitude de voie</td><td>4</td><td>9</td><td>3</td></tr>
+                  <tr><td>12</td><td>+5</td><td>ASI</td><td>4</td><td>9</td><td>3</td></tr>
+                </tbody>
+              </table>
+            </div>
 
             <div class="subtabs" data-subtabs>
               <div class="subtabs-nav" role="tablist" aria-label="Neuro">
                 <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="neuro-base" id="tab-neuro-base" data-subtab-target="neuro-base">Base</button>
-                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-psychose" id="tab-neuro-psychose" data-subtab-target="neuro-psychose">Psychose</button>
-                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-surtension" id="tab-neuro-surtension" data-subtab-target="neuro-surtension">Surtension</button>
-                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-rupture" id="tab-neuro-rupture" data-subtab-target="neuro-rupture">Rupture</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-psycher" id="tab-neuro-psycher" data-subtab-target="neuro-psycher">Psycher</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-overdrive" id="tab-neuro-overdrive" data-subtab-target="neuro-overdrive">Overdrive</button>
+                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="neuro-shock" id="tab-neuro-shock" data-subtab-target="neuro-shock">Shock</button>
               </div>
 
               <div class="subtab-panel is-active" id="neuro-base" role="tabpanel" aria-labelledby="tab-neuro-base" data-subtab-panel>
-                <div class="callout">
-                  <strong>Implant instable</strong>
-                  <p>Le Neuro porte un implant neural militaire qui produit des effets quasi anormaux. Sa puissance est reelle, mais chaque usage donne la sensation de toucher quelque chose de trop fort, trop sale et pas vraiment concu pour un corps humain normal.</p>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 1</div>
+                  <div class="callout">
+                    <strong>Protocoles neuraux</strong>
+                    <p>Votre implant neural militaire vous permet d&rsquo;apprendre et d&rsquo;ex&eacute;cuter des Protocoles de rang 0 &agrave; 3.</p>
+                    <p>Vous connaissez un nombre d&rsquo;Impulsions et de Protocoles indiqu&eacute; dans le tableau du Neuro.</p>
+                    <ul>
+                      <li>Les Impulsions sont des Protocoles de rang 0.</li>
+                      <li>Les autres Protocoles sont de rang 1 &agrave; 3.</li>
+                    </ul>
+                    <p>Quand vous gagnez un niveau dans cette classe, vous pouvez remplacer un Protocole connu par un autre Protocole de rang que vous &ecirc;tes capable de lancer.</p>
+                    <p>Vous ne pouvez lancer des Protocoles de :</p>
+                    <ul>
+                      <li>rang 2 qu&rsquo;&agrave; partir du niveau 5</li>
+                      <li>rang 3 qu&rsquo;&agrave; partir du niveau 8</li>
+                    </ul>
+                    <p>Certains Protocoles peuvent &ecirc;tre lanc&eacute;s &agrave; un rang sup&eacute;rieur pour produire un effet plus puissant.</p>
+                    <p><strong>DD de sauvegarde de vos Protocoles :</strong> 8 + bonus de ma&icirc;trise + modificateur d&rsquo;Esprit</p>
+                    <p><strong>Modificateur d&rsquo;attaque de vos Protocoles :</strong> bonus de ma&icirc;trise + modificateur d&rsquo;Esprit</p>
+                    <strong>Surcharge neurale</strong>
+                    <p>Votre implant g&eacute;n&egrave;re un niveau de Surcharge compris entre 1 et 20. Il est recommand&eacute; de le suivre avec un d20.</p>
+                    <p>Apr&egrave;s un repos court ou long, votre Surcharge retombe &agrave; 1.</p>
+                    <p><strong>Lancer un Protocole :</strong> quand vous lancez un Protocole au rang 1 ou sup&eacute;rieur, votre Surcharge augmente imm&eacute;diatement d&rsquo;un montant &eacute;gal au rang auquel il est lanc&eacute;, avant sa r&eacute;solution.</p>
+                    <p>Si un Protocole de rang 0 est lanc&eacute; &agrave; un rang sup&eacute;rieur, utilisez le rang auquel il est lanc&eacute; pour d&eacute;terminer la Surcharge neurale.</p>
+                    <p>Un Protocole lanc&eacute; au rang 0 :</p>
+                    <ul>
+                      <li>n&rsquo;augmente pas votre Surcharge</li>
+                      <li>ne d&eacute;clenche pas de test de Surcharge</li>
+                      <li>ne peut pas provoquer de contrecoup neural</li>
+                    </ul>
+                    <p>Si l&rsquo;activation d&rsquo;un Protocole devait faire monter votre Surcharge au-del&agrave; de 20, le Protocole est quand m&ecirc;me lanc&eacute;, mais vous &eacute;chouez automatiquement au test de Surcharge associ&eacute;.</p>
+                    <p><strong>Refroidissement :</strong> &agrave; la fin de votre tour :</p>
+                    <ul>
+                      <li>si vous n&rsquo;avez lanc&eacute; aucun Protocole, votre Surcharge diminue de 2, jusqu&rsquo;&agrave; un minimum de 1</li>
+                      <li>si vous n&rsquo;avez lanc&eacute; que des Protocoles au rang 0, votre Surcharge diminue de 1, jusqu&rsquo;&agrave; un minimum de 1</li>
+                    </ul>
+                    <p><strong>Contrecoup neural :</strong> chaque fois que vous lancez un Protocole au rang 1 ou sup&eacute;rieur, apr&egrave;s sa r&eacute;solution, vous effectuez un jet de sauvegarde d&rsquo;Esprit.</p>
+                    <p>La DD de ce jet est &eacute;gale &agrave; votre Surcharge actuelle.</p>
+                    <p>En cas d&rsquo;&eacute;chec, vous subissez un contrecoup neural.</p>
+                    <p><strong>D&eacute;g&acirc;ts neuraux :</strong> vous subissez 1d6 d&eacute;g&acirc;ts psychiques, plus 1d6 suppl&eacute;mentaire pour chaque tranche compl&egrave;te de 5 points de Surcharge :</p>
+                    <ul>
+                      <li>Surcharge 1 &agrave; 5 : 1d6</li>
+                      <li>Surcharge 6 &agrave; 10 : 2d6</li>
+                      <li>Surcharge 11 &agrave; 15 : 3d6</li>
+                      <li>Surcharge 16 &agrave; 20 : 4d6</li>
+                    </ul>
+                    <p><strong>Effets de contrecoup :</strong> en plus des d&eacute;g&acirc;ts :</p>
+                    <ul>
+                      <li>&agrave; partir de 8, vous ne pouvez pas effectuer de r&eacute;action jusqu&rsquo;au d&eacute;but de votre prochain tour</li>
+                      <li>&agrave; partir de 13, votre vitesse est r&eacute;duite de moiti&eacute; jusqu&rsquo;&agrave; la fin de votre prochain tour</li>
+                      <li>&agrave; partir de 18, vous &ecirc;tes &Eacute;tourdi jusqu&rsquo;&agrave; la fin de votre prochain tour</li>
+                    </ul>
+                  </div>
                 </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout">
+                    <strong>Voie neurale</strong>
+                    <p>Au niveau 2, vous choisissez une voie neurale. Les voies actuellement d&eacute;finies sont :</p>
+                    <ul>
+                      <li>Psycher</li>
+                      <li>Overdrive</li>
+                      <li>Shock</li>
+                    </ul>
+                    <p>Votre voie vous accorde une aptitude au niveau 2, puis aux niveaux 5, 8 et 11, ainsi qu&rsquo;une progression propre de Protocoles d&rsquo;arch&eacute;type.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveaux 3, 6, 9 et 12</div>
+                  <div class="callout">
+                    <strong>ASI</strong>
+                    <p>Lorsque vous atteignez le niveau 3, puis les niveaux 6, 9 et 12, vous pouvez augmenter une caract&eacute;ristique de 2, ou deux caract&eacute;ristiques de 1.</p>
+                    <p>Vous ne pouvez pas augmenter une caract&eacute;ristique au-del&agrave; de 20 de cette mani&egrave;re. Si votre syst&egrave;me pr&eacute;voit des dons, ces niveaux peuvent &eacute;galement servir &agrave; en obtenir un.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 4</div>
+                  <div class="callout">
+                    <strong>Interface tactique</strong>
+                    <p>Votre implant int&egrave;gre un ensemble de fonctions utilitaires standard issues d&rsquo;un ancien package militaire.</p>
+                    <p>Vous obtenez les b&eacute;n&eacute;fices suivants :</p>
+                    <ul>
+                      <li>vous b&eacute;n&eacute;ficiez d&rsquo;une vision nocturne sur 18 m&egrave;tres</li>
+                      <li>vous connaissez en permanence votre orientation, votre altitude approximative et la distance approximative qui vous s&eacute;pare d&rsquo;un point que vous avez d&eacute;j&agrave; visit&eacute; au cours des derni&egrave;res 24 heures</li>
+                      <li>vous pouvez enregistrer jusqu&rsquo;&agrave; 1 heure d&rsquo;images, de sons ou de donn&eacute;es sensorielles per&ccedil;ues par votre implant, puis les rejouer mentalement ou les afficher sur un support compatible</li>
+                      <li>vous avez l&rsquo;avantage aux tests effectu&eacute;s pour vous rep&eacute;rer, suivre un itin&eacute;raire, retrouver un point de passage, analyser un plan, identifier une trajectoire ou exploiter des donn&eacute;es de navigation et de reconnaissance</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout">
+                    <strong>Acc&egrave;s aux Protocoles de rang 2</strong>
+                    <p>&Agrave; partir du niveau 5, vous pouvez apprendre et lancer des Protocoles de rang 2.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 7</div>
+                  <div class="callout">
+                    <strong>Dissipation d&rsquo;urgence</strong>
+                    <p>Quand vous &eacute;chouez &agrave; un test de Surcharge, r&eacute;duisez imm&eacute;diatement votre Surcharge de 3.</p>
+                    <p>De plus, une fois par repos court, quand vous subissez un contrecoup neural, vous pouvez ignorer tous ses effets autres que les d&eacute;g&acirc;ts psychiques.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout">
+                    <strong>Acc&egrave;s aux Protocoles de rang 3</strong>
+                    <p>&Agrave; partir du niveau 8, vous pouvez apprendre et lancer des Protocoles de rang 3.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 10</div>
+                  <div class="callout">
+                    <strong>&Eacute;nergie r&eacute;siduelle</strong>
+                    <p>Une fois par tour, quand vous lancez un Protocole au rang 1 ou sup&eacute;rieur, vous pouvez lancer une Impulsion en action bonus.</p>
+                    <p>Cette Impulsion peut &ecirc;tre lanc&eacute;e &agrave; un rang maximum &eacute;gal au rang du Protocole principal moins 1.</p>
+                    <p>Cette Impulsion suit les r&egrave;gles normales de Surcharge.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Impulsions</div>
+                  <div class="callout">
+                    <p>Les Impulsions du Neuro sont des Protocoles de rang 0. Cliquez sur un nom pour ouvrir son d&eacute;tail.</p>
+                  </div>
+                  <ul class="protocol-list" aria-label="Impulsions du Neuro">
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#impulsion-cinetique" data-protocol-trigger="impulsion-cinetique" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">Impulsion cin&eacute;tique</a>
+                        <p class="protocol-summary">Pouss&eacute;e invisible qui &eacute;crase et renverse une cible.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#projectile-cinetique" data-protocol-trigger="projectile-cinetique" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">Projectile cin&eacute;tique</a>
+                        <p class="protocol-summary">Trait de force pure pour une attaque &agrave; distance directe.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#marquage-tactique" data-protocol-trigger="marquage-tactique" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">Marquage tactique</a>
+                        <p class="protocol-summary">Expose les angles morts d&rsquo;une cible pour la prochaine attaque.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#lame-sonique" data-protocol-trigger="lame-sonique" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">Lame sonique</a>
+                        <p class="protocol-summary">Lame de contrainte pour frapper au corps &agrave; corps.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#saccade-neurale" data-protocol-trigger="saccade-neurale" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">Saccade neurale</a>
+                        <p class="protocol-summary">D&eacute;charge psychique qui blesse et coupe les r&eacute;actions.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#transmission" data-protocol-trigger="transmission" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">Transmission</a>
+                        <p class="protocol-summary">Message mental bref et discret entre esprits reli&eacute;s.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#telekinesie" data-protocol-trigger="telekinesie" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">T&eacute;l&eacute;kin&eacute;sie</a>
+                        <p class="protocol-summary">D&eacute;placement t&eacute;l&eacute;kin&eacute;tique simple d&rsquo;un objet &agrave; distance.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                    <li class="protocol-list-item">
+                      <div class="protocol-copy">
+                        <a class="protocol-link" href="#court-circuit" data-protocol-trigger="court-circuit" data-protocol-meta="Neuro de base, impulsion de rang 0" aria-haspopup="dialog">Court-circuit</a>
+                        <p class="protocol-summary">Perturbation br&egrave;ve d&rsquo;un appareil &eacute;lectronique simple.</p>
+                      </div>
+                      <span class="protocol-badge">Rang 0</span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Protocoles</div>
+                  <div class="callout">
+                    <p>Les Protocoles du Neuro sont regroup&eacute;s ici. Cliquez sur un nom pour ouvrir son d&eacute;tail complet.</p>
+                  </div>
+                  <div class="protocol-rank-groups" aria-label="Protocoles du Neuro">
+                    <section class="protocol-rank-group" aria-labelledby="protocol-rank-1">
+                      <h4 class="protocol-rank-heading" id="protocol-rank-1">Rang 1</h4>
+                      <ul class="protocol-list" aria-label="Protocoles de rang 1 du Neuro">
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#saut-vectoriel" data-protocol-trigger="saut-vectoriel" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">Saut vectoriel</a>
+                            <p class="protocol-summary">Bond inertiel rapide qui ne provoque pas d&rsquo;attaque d&rsquo;opportunit&eacute;.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#salve-de-nano-missiles" data-protocol-trigger="salve-de-nano-missiles" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">Salve de nano-missiles</a>
+                            <p class="protocol-summary">Vol&eacute;e de projectiles intelligents qui touchent sans erreur.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#champ-de-force-commun" data-protocol-trigger="champ-de-force-commun" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">Champ de force</a>
+                            <p class="protocol-summary">Barri&egrave;re r&eacute;active qui hausse fortement la CA un instant.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#feuille-morte" data-protocol-trigger="feuille-morte" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">Feuille morte</a>
+                            <p class="protocol-summary">Freine les chutes et annule les d&eacute;g&acirc;ts d&rsquo;atterrissage.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#echo-sonar" data-protocol-trigger="echo-sonar" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">&Eacute;cho sonar</a>
+                            <p class="protocol-summary">Impulsion de d&eacute;tection qui cartographie bri&egrave;vement la zone.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#onde-de-recul" data-protocol-trigger="onde-de-recul" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">D&eacute;charge inertielle</a>
+                            <p class="protocol-summary">C&ocirc;ne de force qui blesse et repousse brutalement.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#deflagration" data-protocol-trigger="deflagration" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">D&eacute;flagration</a>
+                            <p class="protocol-summary">Explosion de feu qui laisse une zone br&ucirc;lante au sol.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#zone-de-stase" data-protocol-trigger="zone-de-stase" data-protocol-meta="Neuro de base, protocole commun de rang 1" aria-haspopup="dialog">Zone de stase</a>
+                            <p class="protocol-summary">Zone de ralentissement durable qui casse les d&eacute;placements.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 1</span>
+                        </li>
+                      </ul>
+                    </section>
+                    <section class="protocol-rank-group" aria-labelledby="protocol-rank-2">
+                      <h4 class="protocol-rank-heading" id="protocol-rank-2">Rang 2</h4>
+                      <ul class="protocol-list" aria-label="Protocoles de rang 2 du Neuro">
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#cage-inertielle" data-protocol-trigger="cage-inertielle" data-protocol-meta="Neuro de base, protocole commun de rang 2" aria-haspopup="dialog">Arr&ecirc;t cin&eacute;tique</a>
+                            <p class="protocol-summary">Fige une cible et peut la paralyser durablement.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 2</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#faille-sismique" data-protocol-trigger="faille-sismique" data-protocol-meta="Neuro de base, protocole commun de rang 2" aria-haspopup="dialog">Faille sismique</a>
+                            <p class="protocol-summary">Ligne de choc qui fracasse le sol et laisse une zone difficile.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 2</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#camouflage-optique" data-protocol-trigger="camouflage-optique" data-protocol-meta="Neuro de base, protocole commun de rang 2" aria-haspopup="dialog">Camouflage optique</a>
+                            <p class="protocol-summary">Vous rend invisible jusqu&rsquo;&agrave; l&rsquo;attaque ou au prochain Protocole.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 2</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#fracture-armure" data-protocol-trigger="fracture-armure" data-protocol-meta="Neuro de base, protocole commun de rang 2" aria-haspopup="dialog">Fracture d&rsquo;armure</a>
+                            <p class="protocol-summary">Affaiblit la protection d&rsquo;une cible pendant 1 minute.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 2</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#surcharge-sensorielle" data-protocol-trigger="surcharge-sensorielle" data-protocol-meta="Neuro de base, protocole commun de rang 2" aria-haspopup="dialog">Surcharge sensorielle</a>
+                            <p class="protocol-summary">Aveugle et assourdit brutalement dans une large zone.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 2</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#mur-de-force" data-protocol-trigger="mur-de-force" data-protocol-meta="Neuro de base, protocole commun de rang 2" aria-haspopup="dialog">Mur de force</a>
+                            <p class="protocol-summary">Cr&eacute;e une barriere solide et temporaire sur le champ de bataille.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 2</span>
+                        </li>
+                      </ul>
+                    </section>
+                    <section class="protocol-rank-group" aria-labelledby="protocol-rank-3">
+                      <h4 class="protocol-rank-heading" id="protocol-rank-3">Rang 3</h4>
+                      <ul class="protocol-list" aria-label="Protocoles de rang 3 du Neuro">
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#puits-gravitationnel" data-protocol-trigger="puits-gravitationnel" data-protocol-meta="Neuro de base, protocole commun de rang 3" aria-haspopup="dialog">Puits gravitationnel</a>
+                            <p class="protocol-summary">Zone de gravit&eacute; lourde qui ralentit, cloue et renverse.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 3</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#implosion-locale" data-protocol-trigger="implosion-locale" data-protocol-meta="Neuro de base, protocole commun de rang 3" aria-haspopup="dialog">Implosion locale</a>
+                            <p class="protocol-summary">Aspire vers le centre avant une d&eacute;charge de force.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 3</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#vol-vectoriel" data-protocol-trigger="vol-vectoriel" data-protocol-meta="Neuro de base, protocole commun de rang 3" aria-haspopup="dialog">Vol vectoriel</a>
+                            <p class="protocol-summary">Donne une vitesse de vol temporaire sous contr&ocirc;le neural.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 3</span>
+                        </li>
+                        <li class="protocol-list-item">
+                          <div class="protocol-copy">
+                            <a class="protocol-link" href="#lien-neural" data-protocol-trigger="lien-neural" data-protocol-meta="Neuro de base, protocole commun de rang 3" aria-haspopup="dialog">Lien neural</a>
+                            <p class="protocol-summary">Lien de soutien qui renforce d&eacute;fense, sauvegardes et attaques.</p>
+                          </div>
+                          <span class="protocol-badge">Rang 3</span>
+                        </li>
+                      </ul>
+                    </section>
+                  </div>
+                </div>
+
+                <template id="impulsion-cinetique">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Vous &eacute;crasez bri&egrave;vement une cr&eacute;ature visible &agrave; port&eacute;e par une pouss&eacute;e de force invisible.</p>
+                  <p>Une cr&eacute;ature que vous voyez &agrave; port&eacute;e doit effectuer une sauvegarde de Force. En cas d&rsquo;&eacute;chec, elle subit 1d8 d&eacute;g&acirc;ts de force et tombe &agrave; terre. En cas de r&eacute;ussite, elle ne subit aucun effet.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez cette Impulsion au rang 1, les d&eacute;g&acirc;ts passent &agrave; 2d8. Au rang 2 (niveau 5), ils passent &agrave; 3d8. Au rang 3 (niveau 8), ils passent &agrave; 4d8.</p>
+                </template>
+                <template id="projectile-cinetique">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Vous projetez un trait de force pure vers une cr&eacute;ature visible &agrave; port&eacute;e.</p>
+                  <p>Effectuez une attaque de Protocole &agrave; distance. En cas de r&eacute;ussite, la cible subit 1d12 d&eacute;g&acirc;ts de force.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez cette Impulsion au rang 1, les d&eacute;g&acirc;ts passent &agrave; 2d12. Au rang 2 (niveau 5), ils passent &agrave; 3d12. Au rang 3 (niveau 8), ils passent &agrave; 4d12.</p>
+                </template>
+                <template id="marquage-tactique">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> jusqu&rsquo;au d&eacute;but de votre prochain tour</p>
+                  </div>
+                  <p>Vous d&eacute;signez une ou plusieurs cr&eacute;atures et exposez bri&egrave;vement leurs angles morts.</p>
+                  <p>Choisissez une cr&eacute;ature que vous voyez &agrave; port&eacute;e. La prochaine attaque effectu&eacute;e contre elle avant le d&eacute;but de votre prochain tour est faite avec avantage.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez cette Impulsion au rang 1, vous pouvez cibler une cr&eacute;ature suppl&eacute;mentaire. Au rang 2 (niveau 5), vous pouvez cibler deux cr&eacute;atures suppl&eacute;mentaires. Au rang 3 (niveau 8), vous pouvez cibler trois cr&eacute;atures suppl&eacute;mentaires.</p>
+                </template>
+                <template id="lame-sonique">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 1,5 m&egrave;tre</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Une lame vibratoire de contrainte appara&icirc;t le long de votre avant-bras ou dans votre main.</p>
+                  <p>Effectuez une attaque de Protocole de m&ecirc;l&eacute;e contre une cr&eacute;ature situ&eacute;e &agrave; 1,5 m&egrave;tre de vous. En cas de r&eacute;ussite, la cible subit 2d6 d&eacute;g&acirc;ts tranchants.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez cette Impulsion au rang 1, les d&eacute;g&acirc;ts passent &agrave; 4d6. Au rang 2 (niveau 5), ils passent &agrave; 6d6. Au rang 3 (niveau 8), ils passent &agrave; 8d6.</p>
+                </template>
+                <template id="saccade-neurale">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> jusqu&rsquo;au d&eacute;but du prochain tour de la cible</p>
+                  </div>
+                  <p>Vous provoquez une br&egrave;ve d&eacute;charge parasite dans le syst&egrave;me nerveux ou les r&eacute;flexes d&rsquo;une cr&eacute;ature.</p>
+                  <p>Choisissez une cr&eacute;ature que vous voyez &agrave; port&eacute;e. Elle doit effectuer une sauvegarde d&rsquo;Esprit. En cas d&rsquo;&eacute;chec, elle subit 1d10 d&eacute;g&acirc;ts psychiques et ne peut pas effectuer de r&eacute;action jusqu&rsquo;au d&eacute;but de son prochain tour.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez cette Impulsion au rang 1, les d&eacute;g&acirc;ts passent &agrave; 2d10. Au rang 2 (niveau 5), ils passent &agrave; 3d10. Au rang 3 (niveau 8), ils passent &agrave; 4d10.</p>
+                </template>
+                <template id="transmission">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Vous transmettez un message mental bref &agrave; une cr&eacute;ature que vous voyez &agrave; port&eacute;e.</p>
+                  <p>La cible entend imm&eacute;diatement votre message dans son esprit et peut vous r&eacute;pondre de la m&ecirc;me mani&egrave;re, &agrave; condition d&rsquo;&ecirc;tre capable de comprendre au moins une langue.</p>
+                  <p>Cette transmission est br&egrave;ve, discr&egrave;te et inaudible pour les autres cr&eacute;atures, sauf effet sp&eacute;cial contraire.</p>
+                </template>
+                <template id="telekinesie">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 9 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Vous exercez une pouss&eacute;e t&eacute;l&eacute;kin&eacute;tique discr&egrave;te sur un objet non tenu que vous voyez &agrave; port&eacute;e.</p>
+                  <p>Cette Impulsion permet uniquement de d&eacute;placer &agrave; distance un objet. Elle ne peut ni attaquer, ni activer un objet complexe, ni manipuler un objet port&eacute; ou tenu par une cr&eacute;ature.</p>
+                  <p>Cette t&eacute;l&eacute;kin&eacute;sie peut d&eacute;placer jusqu&rsquo;&agrave; 5 kg.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez cette Impulsion au rang 1, le poids maximal port&eacute; passe &agrave; 25 kg. Au rang 2 (niveau 5), il passe &agrave; 100 kg. Au rang 3 (niveau 8), il passe &agrave; 300 kg.</p>
+                </template>
+                <template id="court-circuit">
+                  <p><em>Impulsion de rang 0</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 tour</p>
+                  </div>
+                  <p>Vous injectez une impulsion parasite dans un appareil &eacute;lectronique simple et non prot&eacute;g&eacute; que vous voyez &agrave; port&eacute;e.</p>
+                  <p>L&rsquo;appareil est d&eacute;sactiv&eacute; ou perturb&eacute; bri&egrave;vement, c&rsquo;est-&agrave;-dire pendant 1 tour.</p>
+                  <p>Vous pouvez par exemple :</p>
+                  <ul>
+                    <li>d&eacute;sactiver une cam&eacute;ra</li>
+                    <li>&eacute;teindre ou faire clignoter les lumi&egrave;res dans une salle</li>
+                    <li>d&eacute;clencher une alarme de voiture</li>
+                    <li>brouiller un &eacute;cran simple</li>
+                    <li>couper momentan&eacute;ment un micro ou un haut-parleur</li>
+                    <li>provoquer un dysfonctionnement bref sur une serrure &eacute;lectronique simple</li>
+                  </ul>
+                  <p>Les syst&egrave;mes robustes, s&eacute;curis&eacute;s, militaires, prot&eacute;g&eacute;s ou int&eacute;gr&eacute;s &agrave; une cr&eacute;ature ne sont pas affect&eacute;s par cette Impulsion, sauf d&eacute;cision contraire du MJ.</p>
+                </template>
+                <template id="saut-vectoriel">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> personnelle</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Vous modifiez brutalement votre inertie et vous propulsez d&rsquo;un bond sur une courte distance.</p>
+                  <p>Vous sautez jusqu&rsquo;&agrave; 9 m&egrave;tres vers un espace inoccup&eacute; que vous voyez.</p>
+                  <p>Ce d&eacute;placement ne provoque pas d&rsquo;attaques d&rsquo;opportunit&eacute;.</p>
+                  <p>Si vous terminez ce saut dans les airs sans support suffisant, vous retombez normalement selon les r&egrave;gles habituelles.</p>
+                </template>
+                <template id="salve-de-nano-missiles">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Vous d&eacute;ployez une vol&eacute;e de micro-projectiles intelligents qui frappent sans erreur.</p>
+                  <p>Cr&eacute;ez 3 nano-missiles. Chaque missile touche automatiquement une cr&eacute;ature que vous voyez &agrave; port&eacute;e et inflige 1d4 + 1 d&eacute;g&acirc;ts de force.</p>
+                  <p>Les missiles peuvent &ecirc;tre r&eacute;partis entre une ou plusieurs cr&eacute;atures.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez ce Protocole au rang 2 (niveau 5), vous cr&eacute;ez 5 nano-missiles. Au rang 3 (niveau 8), vous en cr&eacute;ez 7.</p>
+                </template>
+                <template id="champ-de-force-commun">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 r&eacute;action</p>
+                    <p><strong>Port&eacute;e :</strong> personnelle</p>
+                    <p><strong>Dur&eacute;e :</strong> jusqu&rsquo;au d&eacute;but de votre prochain tour</p>
+                  </div>
+                  <p>Vous &eacute;rigez instantan&eacute;ment une barri&egrave;re de force pour d&eacute;vier un impact.</p>
+                  <p>Quand vous &ecirc;tes touch&eacute; par une attaque ou cibl&eacute; par un effet n&eacute;cessitant un jet d&rsquo;attaque, vous pouvez utiliser votre r&eacute;action pour gagner un bonus de +5 &agrave; la CA jusqu&rsquo;au d&eacute;but de votre prochain tour, y compris contre l&rsquo;attaque d&eacute;clenchante.</p>
+                </template>
+                <template id="feuille-morte">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 r&eacute;action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute ou jusqu&rsquo;&agrave; l&rsquo;atterrissage</p>
+                  </div>
+                  <p>Vous ralentissez brutalement une chute par une inversion partielle de votre inertie.</p>
+                  <p>Choisissez jusqu&rsquo;&agrave; 5 cr&eacute;atures en chute que vous voyez &agrave; port&eacute;e. Jusqu&rsquo;&agrave; la fin du Protocole, leur vitesse de chute est r&eacute;duite &agrave; une descente lente et contr&ocirc;l&eacute;e, et elles ne subissent aucun d&eacute;g&acirc;t de chute en atterrissant.</p>
+                  <p>Le Protocole prend fin pour une cr&eacute;ature lorsqu&rsquo;elle touche le sol.</p>
+                </template>
+                <template id="echo-sonar">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> personnelle (rayon 18 m)</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Vous &eacute;mettez une impulsion de d&eacute;tection qui cartographie bri&egrave;vement votre environnement.</p>
+                  <p>Pendant un instant, vous percevez la position des cr&eacute;atures, obstacles, ouvertures et volumes significatifs dans une sph&egrave;re de 18 m&egrave;tres autour de vous, m&ecirc;me dans l&rsquo;obscurit&eacute; totale.</p>
+                  <p>Ce Protocole ne r&eacute;v&egrave;le pas les pens&eacute;es, l&rsquo;identit&eacute; pr&eacute;cise ou les d&eacute;tails fins, mais il permet de d&eacute;tecter la pr&eacute;sence, la direction, la taille approximative et le d&eacute;placement des formes pr&eacute;sentes dans la zone.</p>
+                </template>
+                <template id="onde-de-recul">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> c&ocirc;ne de 4,5 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Vous rel&acirc;chez devant vous une onde brutale de pression et de force.</p>
+                  <p>Chaque cr&eacute;ature dans un c&ocirc;ne de 4,5 m&egrave;tres doit effectuer un jet de sauvegarde d&rsquo;Agilit&eacute;.</p>
+                  <p>En cas d&rsquo;&eacute;chec, une cr&eacute;ature subit 3d8 d&eacute;g&acirc;ts de force et est repouss&eacute;e de 3 m&egrave;tres.</p>
+                  <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; de ces d&eacute;g&acirc;ts et n&rsquo;est pas repouss&eacute;e.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez ce Protocole au rang 2 (niveau 5), les d&eacute;g&acirc;ts passent &agrave; 5d8 et la cible est repouss&eacute;e de 4,5 m&egrave;tres. Au rang 3 (niveau 8), les d&eacute;g&acirc;ts passent &agrave; 7d8 et la cible est repouss&eacute;e de 6 m&egrave;tres.</p>
+                </template>
+                <template id="deflagration">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e, puis zone pendant 3 tours</p>
+                  </div>
+                  <p>Vous concentrez une charge instable avant de la faire exploser.</p>
+                  <p>Choisissez un point visible &agrave; port&eacute;e. Chaque cr&eacute;ature dans une sph&egrave;re de 3 m&egrave;tres de rayon autour de ce point doit effectuer un jet de sauvegarde d&rsquo;Agilit&eacute;.</p>
+                  <p>En cas d&rsquo;&eacute;chec, une cr&eacute;ature subit 4d6 d&eacute;g&acirc;ts de feu.</p>
+                  <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; de ces d&eacute;g&acirc;ts.</p>
+                  <p>Une zone enflamm&eacute;e de 3 m&egrave;tres de rayon reste ensuite au sol pendant 3 tours. Lorsqu&rsquo;une cr&eacute;ature entre dans cette zone pour la premi&egrave;re fois d&rsquo;un tour ou qu&rsquo;elle y commence son tour, elle subit 1d6 d&eacute;g&acirc;ts de feu.</p>
+                  <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez ce Protocole au rang 2 (niveau 5), les d&eacute;g&acirc;ts initiaux passent &agrave; 6d6 et les d&eacute;g&acirc;ts de zone &agrave; 2d6. Au rang 3 (niveau 8), les d&eacute;g&acirc;ts initiaux passent &agrave; 8d6 et les d&eacute;g&acirc;ts de zone &agrave; 3d6.</p>
+                </template>
+                <template id="zone-de-stase">
+                  <p><em>Protocole de rang 1</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Vous cr&eacute;ez une zone de ralentissement brutal qui g&ecirc;ne fortement les d&eacute;placements.</p>
+                  <p>Choisissez un point visible &agrave; port&eacute;e. Une sph&egrave;re de 4,5 m&egrave;tres de rayon centr&eacute;e sur ce point devient une zone de stase pendant 1 minute.</p>
+                  <p>La zone est un terrain difficile.</p>
+                  <p>Lorsqu&rsquo;une cr&eacute;ature entre dans la zone pour la premi&egrave;re fois d&rsquo;un tour ou qu&rsquo;elle y commence son tour, elle doit r&eacute;ussir un jet de sauvegarde d&rsquo;Agilit&eacute; ou voir sa vitesse r&eacute;duite de moiti&eacute; jusqu&rsquo;au d&eacute;but de son prochain tour.</p>
+                  <p><strong>Au rang 2 (niveau 5) :</strong> le rayon passe &agrave; 6 m&egrave;tres.</p>
+                  <p><strong>Au rang 3 (niveau 8) :</strong> une cr&eacute;ature qui &eacute;choue &agrave; sa sauvegarde dans la zone ne peut pas effectuer de r&eacute;action jusqu&rsquo;au d&eacute;but de son prochain tour.</p>
+                </template>
+                <template id="cage-inertielle">
+                  <p><em>Protocole de rang 2</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Vous figez brutalement les vecteurs de mouvement d&rsquo;une cr&eacute;ature visible &agrave; port&eacute;e.</p>
+                  <p>La cible doit r&eacute;ussir un jet de sauvegarde d&rsquo;Esprit ou &ecirc;tre Paralys&eacute;e pendant 1 minute.</p>
+                  <p>La cible peut r&eacute;p&eacute;ter son jet de sauvegarde d&rsquo;Esprit &agrave; la fin de chacun de ses tours, mettant fin &agrave; l&rsquo;effet en cas de r&eacute;ussite.</p>
+                </template>
+                <template id="faille-sismique">
+                  <p><em>Protocole de rang 2</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> ligne de 9 m&egrave;tres partant de vous</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e, puis terrain difficile jusqu&rsquo;&agrave; la fin de votre prochain tour</p>
+                  </div>
+                  <p>Vous ouvrez une ligne de choc dans le sol depuis votre position.</p>
+                  <p>Choisissez une ligne de 9 m&egrave;tres de long et de 4,5 m&egrave;tres de large partant de vous. Chaque cr&eacute;ature dans la zone doit effectuer un jet de sauvegarde d&rsquo;Agilit&eacute;.</p>
+                  <p>En cas d&rsquo;&eacute;chec, une cr&eacute;ature subit 6d6 d&eacute;g&acirc;ts contondants. En cas de r&eacute;ussite, elle subit la moiti&eacute; de ces d&eacute;g&acirc;ts.</p>
+                  <p>La zone devient un terrain difficile jusqu&rsquo;&agrave; la fin de votre prochain tour.</p>
+                  <p><strong>Au rang 3 (niveau 8) :</strong> les d&eacute;g&acirc;ts passent &agrave; 8d6.</p>
+                </template>
+                <template id="camouflage-optique">
+                  <p><em>Protocole de rang 2</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> personnelle</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Vous brouillez votre signature visuelle et disparaissez aux yeux du monde.</p>
+                  <p>Vous devenez Invisible pendant 1 minute.</p>
+                  <p>Le Protocole prend fin imm&eacute;diatement si vous attaquez ou si vous lancez un Protocole.</p>
+                </template>
+                <template id="fracture-armure">
+                  <p><em>Protocole de rang 2</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Vous affaiblissez la structure ou la protection d&rsquo;une cr&eacute;ature visible &agrave; port&eacute;e.</p>
+                  <p>La cible doit effectuer un jet de sauvegarde de Constitution. En cas d&rsquo;&eacute;chec, sa CA est r&eacute;duite de 2 pendant 1 minute.</p>
+                  <p>La cible peut r&eacute;p&eacute;ter son jet de sauvegarde de Constitution &agrave; la fin de chacun de ses tours, mettant fin &agrave; l&rsquo;effet en cas de r&eacute;ussite.</p>
+                  <p><strong>Au rang 3 (niveau 8) :</strong> la p&eacute;nalit&eacute; passe &agrave; -4 CA.</p>
+                </template>
+                <template id="surcharge-sensorielle">
+                  <p><em>Protocole de rang 2</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres (rayon 9 m)</p>
+                    <p><strong>Dur&eacute;e :</strong> 1d4 rounds</p>
+                  </div>
+                  <p>Vous provoquez une saturation brutale des entr&eacute;es sensorielles dans une large zone.</p>
+                  <p>Choisissez un point visible &agrave; port&eacute;e. Chaque cr&eacute;ature dans une sph&egrave;re de 9 m&egrave;tres de rayon autour de ce point doit effectuer un jet de sauvegarde d&rsquo;Esprit.</p>
+                  <p>En cas d&rsquo;&eacute;chec, une cr&eacute;ature est Aveugl&eacute;e et Assourdie pendant 1d4 rounds. Lancez le d&eacute; s&eacute;par&eacute;ment pour chaque cr&eacute;ature affect&eacute;e.</p>
+                  <p>En cas de r&eacute;ussite, elle n&rsquo;est pas affect&eacute;e.</p>
+                </template>
+                <template id="mur-de-force">
+                  <p><em>Protocole de rang 2</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Vous cr&eacute;ez un mur de force rectiligne de 6 m&egrave;tres de long. Le mur n&rsquo;a qu&rsquo;une &eacute;paisseur de quelques centim&egrave;tres.</p>
+                  <p>Le mur est infranchissable tant qu&rsquo;il demeure intact. Il poss&egrave;de une CA de 16, 50 points de vie, et peut supporter jusqu&rsquo;&agrave; 100 kg.</p>
+                  <p>Le mur persiste pendant 1 minute, jusqu&rsquo;&agrave; ce qu&rsquo;il soit d&eacute;truit, ou jusqu&rsquo;&agrave; ce que vous le dissipiez volontairement.</p>
+                </template>
+                <template id="puits-gravitationnel">
+                  <p><em>Protocole commun de rang 3</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres (rayon 4,5 m)</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Vous augmentez brutalement la gravit&eacute; dans une sph&egrave;re de 4,5 m&egrave;tres de rayon pendant 1 minute.</p>
+                  <ul>
+                    <li>la zone devient un terrain difficile</li>
+                    <li>il est impossible de voler dans cette zone</li>
+                    <li>les cr&eacute;atures dans la zone ont le d&eacute;savantage &agrave; leurs jets d&rsquo;attaque</li>
+                    <li>lorsqu&rsquo;une cr&eacute;ature entre dans la zone pour la premi&egrave;re fois d&rsquo;un tour ou qu&rsquo;elle y commence son tour, elle doit r&eacute;ussir un jet de sauvegarde de Force sous peine de tomber &agrave; terre</li>
+                  </ul>
+                </template>
+                <template id="implosion-locale">
+                  <p><em>Protocole commun de rang 3</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres (rayon 4,5 m)</p>
+                    <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+                  </div>
+                  <p>Chaque cr&eacute;ature dans une sph&egrave;re de 4,5 m&egrave;tres de rayon doit effectuer une sauvegarde de Force.</p>
+                  <p>En cas d&rsquo;&eacute;chec, elle est attir&eacute;e de 1,5 m&egrave;tre vers le centre puis subit 8d8 d&eacute;g&acirc;ts de force.</p>
+                  <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; des d&eacute;g&acirc;ts et n&rsquo;est pas d&eacute;plac&eacute;e.</p>
+                </template>
+                <template id="vol-vectoriel">
+                  <p><em>Protocole commun de rang 3</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> personnelle</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Pendant 1 minute, vous gagnez une vitesse de vol de 9 m&egrave;tres.</p>
+                  <p>Ce Protocole prend fin imm&eacute;diatement si vous devenez Incapable d&rsquo;agir ou &Eacute;tourdi.</p>
+                </template>
+                <template id="lien-neural">
+                  <p><em>Protocole commun de rang 3</em></p>
+                  <div class="protocol-facts">
+                    <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                    <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                    <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+                  </div>
+                  <p>Pendant 1 minute, vous &eacute;tablissez un lien avec un alli&eacute; visible &agrave; port&eacute;e.</p>
+                  <p>Tant que vous et cet alli&eacute; restez &agrave; port&eacute;e du lien :</p>
+                  <ul>
+                    <li>vous gagnez tous les deux +1 &agrave; la CA</li>
+                    <li>vous gagnez tous les deux 1d4 aux jets de sauvegarde</li>
+                    <li>chacun de vous ajoute le modificateur d&rsquo;Esprit de l&rsquo;autre &agrave; ses jets d&rsquo;attaque</li>
+                  </ul>
+                  <p>Le lien prend fin si vous ou votre alli&eacute; devenez Incapables d&rsquo;agir, tombez inconscients, ou si vous y mettez fin volontairement.</p>
+                </template>
               </div>
 
-              <div class="subtab-panel" id="neuro-psychose" role="tabpanel" aria-labelledby="tab-neuro-psychose" data-subtab-panel hidden>
+              <div class="subtab-panel" id="neuro-psycher" role="tabpanel" aria-labelledby="tab-neuro-psycher" data-subtab-panel hidden>
                 <div class="callout accent">
-                  <strong>Pression cognitive</strong>
-                  <p>Psychose mise sur les attaques mentales, la guerre cognitive, l&rsquo;alteration des perceptions et la pression psychique.</p>
+                  <strong>Psycher</strong>
+                  <p>Le Psycher fait de l&rsquo;implant une arme cognitive. Il parasite les perceptions, fracture la volont&eacute; et provoque des effondrements mentaux cibl&eacute;s. L&agrave; o&ugrave; d&rsquo;autres Neuro d&eacute;cha&icirc;nent l&rsquo;&eacute;nergie ou transforment leur corps, le Psycher force les esprits &agrave; c&eacute;der.</p>
                 </div>
+                <p><strong>Tableau des Protocoles de Psycher</strong></p>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Niveau de Neuro</th>
+                        <th>Protocole</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>2</td><td>Intrusion froide</td></tr>
+                      <tr><td>5</td><td>Pointe invasive</td></tr>
+                      <tr><td>8</td><td>Blackout</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p>Ces Protocoles ne comptent pas dans votre nombre de Protocoles connus.</p>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Parasitage</strong>
+                    <p>Quand vous lancez un Protocole qui impose un jet de sauvegarde &agrave; au moins une cr&eacute;ature, vous pouvez utiliser votre action bonus pour parasiter l&rsquo;une des cr&eacute;atures affect&eacute;es.</p>
+                    <p>Si vous le faites :</p>
+                    <ul>
+                      <li>vous augmentez votre Surcharge de 1</li>
+                      <li>cette cr&eacute;ature subit un d&eacute;savantage &agrave; son jet de sauvegarde contre ce Protocole</li>
+                    </ul>
+                    <p>Vous devez choisir d&rsquo;utiliser cette aptitude avant que la cible n&rsquo;effectue son jet de sauvegarde.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>L&eacute;sion mn&eacute;sique</strong>
+                    <p>Une fois par tour, quand une cr&eacute;ature &eacute;choue &agrave; un jet de sauvegarde contre l&rsquo;un de vos Protocoles, elle subit des d&eacute;g&acirc;ts psychiques suppl&eacute;mentaires &eacute;gaux &agrave; votre modificateur d&rsquo;Esprit.</p>
+                    <p>Si le Protocole &eacute;tait lanc&eacute; au rang 2 ou sup&eacute;rieur, ces d&eacute;g&acirc;ts suppl&eacute;mentaires deviennent &eacute;gaux &agrave; deux fois votre modificateur d&rsquo;Esprit.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Lecture invasive</strong>
+                    <p>Quand un adversaire que vous pouvez voir vous impose un jet de sauvegarde, vous pouvez utiliser votre r&eacute;action pour sonder son intention imm&eacute;diate et anticiper son action.</p>
+                    <p>Si vous le faites :</p>
+                    <ul>
+                      <li>vous gagnez l&rsquo;avantage &agrave; ce jet de sauvegarde</li>
+                      <li>vous augmentez votre Surcharge de 1</li>
+                    </ul>
+                    <p>Vous pouvez utiliser cette aptitude un nombre de fois &eacute;gal &agrave; votre bonus de ma&icirc;trise par repos long.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Rupture cognitive</strong>
+                    <p>Quand vous lancez un Protocole qui cible une seule cr&eacute;ature et qui lui impose un jet de sauvegarde, vous pouvez tenter d&rsquo;&eacute;tendre l&rsquo;intrusion &agrave; une seconde cible valide &agrave; port&eacute;e.</p>
+                    <p>Si vous le faites :</p>
+                    <ul>
+                      <li>choisissez une seconde cr&eacute;ature valide &agrave; port&eacute;e</li>
+                      <li>cette cr&eacute;ature est &eacute;galement affect&eacute;e par le Protocole et effectue son propre jet de sauvegarde</li>
+                      <li>vous augmentez votre Surcharge de 1 suppl&eacute;mentaire</li>
+                    </ul>
+                    <p>Vous pouvez utiliser cette aptitude une fois par tour.</p>
+                  </div>
+                </div>
+                <ul class="protocol-list" aria-label="Protocoles de Psycher">
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-psycher-intrusion-froide" data-protocol-trigger="protocol-psycher-intrusion-froide" data-protocol-meta="Psycher, rang 1, niveau 2" aria-haspopup="dialog">Intrusion froide</a>
+                      <p class="protocol-summary">Assaut mental bref qui blesse et coupe les r&eacute;actions.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 2</span>
+                  </li>
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-psycher-pointe-invasive" data-protocol-trigger="protocol-psycher-pointe-invasive" data-protocol-meta="Psycher, rang 2, niveau 5" aria-haspopup="dialog">Pointe invasive</a>
+                      <p class="protocol-summary">Pression mentale qui rend le mensonge douloureux.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 5</span>
+                  </li>
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-psycher-blackout" data-protocol-trigger="protocol-psycher-blackout" data-protocol-meta="Psycher, rang 3, niveau 8" aria-haspopup="dialog">Blackout</a>
+                      <p class="protocol-summary">Effondrement cognitif capable d&rsquo;&eacute;tourdir une cible.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 8</span>
+                  </li>
+                </ul>
               </div>
 
-              <div class="subtab-panel" id="neuro-surtension" role="tabpanel" aria-labelledby="tab-neuro-surtension" data-subtab-panel hidden>
+              <div class="subtab-panel" id="neuro-overdrive" role="tabpanel" aria-labelledby="tab-neuro-overdrive" data-subtab-panel hidden>
                 <div class="callout accent">
-                  <strong>Decharge instable</strong>
-                  <p>Surtension canalise la projection de decharges, le dechainement d&rsquo;energie et une puissance offensive aussi brutale qu&rsquo;instable.</p>
+                  <strong>Overdrive</strong>
+                  <p>Overdrive pousse l&rsquo;implant au-del&agrave; des limites de s&eacute;curit&eacute;. Cette voie privil&eacute;gie la mont&eacute;e rapide en surcharge, l&rsquo;acc&egrave;s &agrave; des Protocoles d&eacute;vastateurs et l&rsquo;acceptation du risque comme moteur de puissance. Plus l&rsquo;implant chauffe, plus l&rsquo;Overdrive devient dangereux, jusqu&rsquo;&agrave; devenir un v&eacute;ritable accident industriel vivant.</p>
                 </div>
+                <p><strong>Tableau des Protocoles d&rsquo;Overdrive</strong></p>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Niveau de Neuro</th>
+                        <th>Protocole</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>2</td><td>&Eacute;lectrocution</td></tr>
+                      <tr><td>5</td><td>Surcharge plasma</td></tr>
+                      <tr><td>8</td><td>Rayon d&rsquo;annihilation</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p>Ces Protocoles ne comptent pas dans votre nombre de Protocoles connus.</p>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Mont&eacute;e en r&eacute;gime</strong>
+                    <p>Au d&eacute;but d&rsquo;un combat, vous pouvez fixer votre Surcharge &agrave; 3 au lieu de 1.</p>
+                    <p>De plus, une fois par tour, quand vous lancez un Protocole qui inflige des d&eacute;g&acirc;ts, vous pouvez augmenter votre Surcharge de 1 suppl&eacute;mentaire. Si vous le faites, ajoutez votre modificateur d&rsquo;Esprit &agrave; un jet de d&eacute;g&acirc;ts de ce Protocole.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Chambre haute</strong>
+                    <p>Tant que votre Surcharge est de 10 ou plus, quand vous lancez un Protocole qui inflige des d&eacute;g&acirc;ts, vous pouvez relancer les 1 et les 2 sur ses d&eacute;s de d&eacute;g&acirc;ts.</p>
+                    <p>Vous devez conserver les nouveaux r&eacute;sultats.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>Fen&ecirc;tre critique</strong>
+                    <p>Quand vous lancez un Protocole qui cr&eacute;e une zone d&rsquo;effet, vous pouvez doubler la taille de cette zone.</p>
+                    <p>Si vous le faites, augmentez votre Surcharge de 2 suppl&eacute;mentaires.</p>
+                    <p>Vous pouvez utiliser cette aptitude une fois par tour.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Rupture thermique</strong>
+                    <p>Quand vous lancez un Protocole qui inflige des d&eacute;g&acirc;ts, vous pouvez provoquer une Rupture thermique.</p>
+                    <p>Si vous le faites :</p>
+                    <ul>
+                      <li>augmentez votre Surcharge de 2 suppl&eacute;mentaires</li>
+                      <li>ajoutez votre modificateur d&rsquo;Esprit aux d&eacute;g&acirc;ts de chaque cible affect&eacute;e</li>
+                      <li>si cette activation devait faire monter votre Surcharge au-del&agrave; de 20, le Protocole est quand m&ecirc;me lanc&eacute; et vous effectuez quand m&ecirc;me le test de Surcharge associ&eacute;</li>
+                    </ul>
+                    <p>Vous pouvez utiliser cette aptitude une fois par tour.</p>
+                  </div>
+                </div>
+                <ul class="protocol-list" aria-label="Protocoles d&rsquo;Overdrive">
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-overdrive-electrocution" data-protocol-trigger="protocol-overdrive-electrocution" data-protocol-meta="Overdrive, rang 1, niveau 2" aria-haspopup="dialog">&Eacute;lectrocution</a>
+                      <p class="protocol-summary">Arc continu qui grimpe en puissance tant qu&rsquo;il est maintenu.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 2</span>
+                  </li>
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-overdrive-surcharge-plasma" data-protocol-trigger="protocol-overdrive-surcharge-plasma" data-protocol-meta="Overdrive, rang 2, niveau 5" aria-haspopup="dialog">Surcharge plasma</a>
+                      <p class="protocol-summary">Explosion de plasma instable qui nettoie une zone.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 5</span>
+                  </li>
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-overdrive-rayon-annihilation" data-protocol-trigger="protocol-overdrive-rayon-annihilation" data-protocol-meta="Overdrive, rang 3, niveau 8" aria-haspopup="dialog">Rayon d&rsquo;annihilation</a>
+                      <p class="protocol-summary">C&ocirc;ne destructeur qui aveugle au passage.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 8</span>
+                  </li>
+                </ul>
               </div>
 
-              <div class="subtab-panel" id="neuro-rupture" role="tabpanel" aria-labelledby="tab-neuro-rupture" data-subtab-panel hidden>
+              <div class="subtab-panel" id="neuro-shock" role="tabpanel" aria-labelledby="tab-neuro-shock" data-subtab-panel hidden>
                 <div class="callout accent">
-                  <strong>Bris de ligne</strong>
-                  <p>Rupture pousse vers la transformation temporaire, les assauts devastateurs et une brutalite auto-destructrice au corps a corps.</p>
+                  <strong>Shock</strong>
+                  <p>Les Neuro-Shocks canalisent l&rsquo;implant en barri&egrave;re de contrainte, en armure dynamique et en onde d&rsquo;impact. Cette voie privil&eacute;gie le combat &agrave; courte port&eacute;e, la r&eacute;sistance frontale et la conversion de la surcharge en champs de force, en rel&acirc;chements sismiques et en pression de zone. Plus le syst&egrave;me encaisse, plus il se densifie, jusqu&rsquo;&agrave; transformer la moindre d&eacute;charge en masse, en choc et en contr&ocirc;le de l&rsquo;espace.</p>
                 </div>
+                <p><strong>Tableau des Protocoles de Shock</strong></p>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Niveau de Neuro</th>
+                        <th>Protocole</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>2</td><td>Frappe sismique</td></tr>
+                      <tr><td>5</td><td>Onde de rupture</td></tr>
+                      <tr><td>8</td><td>Noyau de si&egrave;ge</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p>Ces Protocoles ne comptent pas dans votre nombre de Protocoles connus.</p>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 2</div>
+                  <div class="callout accent">
+                    <strong>Champ de force</strong>
+                    <p>Quand vous subissez des d&eacute;g&acirc;ts d&rsquo;une attaque ou d&rsquo;un effet que vous pouvez percevoir, vous pouvez augmenter votre Surcharge de 1 pour r&eacute;duire ces d&eacute;g&acirc;ts d&rsquo;un montant &eacute;gal &agrave; votre modificateur d&rsquo;Esprit.</p>
+                    <p>Vous pouvez utiliser cette aptitude plusieurs fois par tour, mais une seule fois par source de d&eacute;g&acirc;ts.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 5</div>
+                  <div class="callout accent">
+                    <strong>Surcharge vitale</strong>
+                    <p>En action bonus, vous pouvez forcer votre implant &agrave; compenser brutalement vos blessures.</p>
+                    <p>Vous r&eacute;cup&eacute;rez 1d8 + votre modificateur d&rsquo;Esprit points de vie, puis votre Surcharge augmente de 2.</p>
+                    <p>Aux niveaux 8 et 11, les soins augmentent respectivement &agrave; 2d8 + votre modificateur d&rsquo;Esprit puis 3d8 + votre modificateur d&rsquo;Esprit.</p>
+                    <p>Vous pouvez utiliser cette aptitude un nombre de fois &eacute;gal &agrave; votre bonus de ma&icirc;trise par repos long.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 8</div>
+                  <div class="callout accent">
+                    <strong>D&eacute;charge d&rsquo;impact</strong>
+                    <p>Quand Dissipation d&rsquo;urgence se d&eacute;clenche, chaque cr&eacute;ature de votre choix situ&eacute;e &agrave; 1,5 m&egrave;tre ou moins de vous subit des d&eacute;g&acirc;ts contondants &eacute;gaux &agrave; votre niveau de Surcharge avant la r&eacute;duction.</p>
+                    <p>Si votre Surcharge &eacute;tait de 10 ou plus avant cette r&eacute;duction, ces cr&eacute;atures doivent &eacute;galement r&eacute;ussir une sauvegarde de Force ou &ecirc;tre repouss&eacute;es de 1,5 m&egrave;tre.</p>
+                  </div>
+                </div>
+                <div class="level-block">
+                  <div class="level-banner">Niveau 11</div>
+                  <div class="callout accent">
+                    <strong>Noyau absorbant</strong>
+                    <p>Quand vous utilisez Champ de force, vous pouvez choisir d&rsquo;augmenter votre Surcharge de 2 au lieu de 1.</p>
+                    <p>Si vous le faites, r&eacute;duisez les d&eacute;g&acirc;ts d&rsquo;un montant &eacute;gal &agrave; deux fois votre modificateur d&rsquo;Esprit.</p>
+                    <p>De plus, tant que votre Surcharge est de 10 ou plus, vous avez l&rsquo;avantage &agrave; tous les jets de sauvegarde.</p>
+                  </div>
+                </div>
+                <ul class="protocol-list" aria-label="Protocoles de Shock">
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-shock-frappe-sismique" data-protocol-trigger="protocol-shock-frappe-sismique" data-protocol-meta="Shock, rang 1, niveau 2" aria-haspopup="dialog">Frappe sismique</a>
+                      <p class="protocol-summary">Impulsion de zone au contact qui &eacute;crase l&rsquo;espace autour de vous.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 2</span>
+                  </li>
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-shock-onde-rupture" data-protocol-trigger="protocol-shock-onde-rupture" data-protocol-meta="Shock, rang 2, niveau 5" aria-haspopup="dialog">Onde de rupture</a>
+                      <p class="protocol-summary">Impact cibl&eacute; qui fracasse, repousse et renverse.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 5</span>
+                  </li>
+                  <li class="protocol-list-item">
+                    <div class="protocol-copy">
+                      <a class="protocol-link" href="#protocol-shock-noyau-siege" data-protocol-trigger="protocol-shock-noyau-siege" data-protocol-meta="Shock, rang 3, niveau 8" aria-haspopup="dialog">Noyau de si&egrave;ge</a>
+                      <p class="protocol-summary">D&eacute;tonation sismique large qui renverse et bloque l&rsquo;avance.</p>
+                    </div>
+                    <span class="protocol-badge">Niv. 8</span>
+                  </li>
+                </ul>
               </div>
             </div>
+
+            <template id="protocol-psycher-intrusion-froide">
+              <p><em>Protocole de Psycher de rang 1</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                <p><strong>Dur&eacute;e :</strong> instantan&eacute;e, r&eacute;action bloqu&eacute;e jusqu&rsquo;au d&eacute;but du prochain tour de la cible</p>
+              </div>
+              <p>Vous forcez une br&egrave;ve intrusion dans l&rsquo;esprit d&rsquo;une cr&eacute;ature visible &agrave; port&eacute;e, provoquant douleur et rupture de rythme.</p>
+              <p>Une cr&eacute;ature que vous voyez &agrave; port&eacute;e doit effectuer une sauvegarde d&rsquo;Esprit. En cas d&rsquo;&eacute;chec, elle subit 2d8 d&eacute;g&acirc;ts psychiques et ne peut pas effectuer de r&eacute;action jusqu&rsquo;au d&eacute;but de son prochain tour.</p>
+              <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; des d&eacute;g&acirc;ts et ne subit aucun autre effet.</p>
+              <p>Au rang 2 (niveau 5), les d&eacute;g&acirc;ts passent &agrave; 3d8.</p>
+              <p>Au rang 3 (niveau 8), les d&eacute;g&acirc;ts passent &agrave; 4d8.</p>
+            </template>
+            <template id="protocol-psycher-pointe-invasive">
+              <p><em>Protocole de Psycher de rang 2</em></p>
+              <p><em>Niveau 5</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> 9 m&egrave;tres</p>
+                <p><strong>Dur&eacute;e :</strong> 1 minute</p>
+              </div>
+              <p>Vous enfoncez une pointe intrusive dans l&rsquo;esprit d&rsquo;une cr&eacute;ature que vous voyez &agrave; port&eacute;e et forcez ses pens&eacute;es &agrave; remonter &agrave; la surface.</p>
+              <p>La cible doit effectuer une sauvegarde d&rsquo;Esprit. En cas d&rsquo;&eacute;chec, pendant 1 minute, elle ne peut pas mentir d&eacute;lib&eacute;r&eacute;ment en r&eacute;pondant &agrave; vos questions.</p>
+              <p>Si, pendant cette dur&eacute;e, la cible tente malgr&eacute; tout de mentir, elle doit imm&eacute;diatement effectuer une nouvelle sauvegarde d&rsquo;Esprit. En cas d&rsquo;&eacute;chec, elle subit 4d8 d&eacute;g&acirc;ts psychiques et sa tentative de mensonge &eacute;choue.</p>
+              <p>La cible peut r&eacute;p&eacute;ter sa sauvegarde d&rsquo;Esprit &agrave; la fin de chacun de ses tours, mettant fin &agrave; l&rsquo;effet en cas de r&eacute;ussite.</p>
+              <p>Ce Protocole ne force pas la cible &agrave; parler, ni &agrave; r&eacute;pondre compl&egrave;tement, mais il rend le mensonge mentalement douloureux et difficile &agrave; maintenir.</p>
+              <p>Au rang 3 (niveau 8), les d&eacute;g&acirc;ts inflig&eacute;s par une tentative de mensonge passent &agrave; 5d8.</p>
+            </template>
+            <template id="protocol-psycher-blackout">
+              <p><em>Protocole de Psycher de rang 3</em></p>
+              <p><em>Niveau 8</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                <p><strong>Dur&eacute;e :</strong> 1 minute, avec nouveau jet &agrave; la fin de chaque tour</p>
+              </div>
+              <p>Vous provoquez un effondrement brutal de l&rsquo;activit&eacute; consciente d&rsquo;une cr&eacute;ature que vous voyez &agrave; port&eacute;e.</p>
+              <p>La cible doit effectuer une sauvegarde d&rsquo;Esprit. En cas d&rsquo;&eacute;chec, elle est &Eacute;tourdie pendant 1 minute.</p>
+              <p>La cible peut r&eacute;p&eacute;ter sa sauvegarde d&rsquo;Esprit &agrave; la fin de chacun de ses tours, mettant fin &agrave; l&rsquo;effet en cas de r&eacute;ussite.</p>
+              <p>En cas de r&eacute;ussite initiale, le Protocole n&rsquo;a aucun effet.</p>
+            </template>
+            <template id="protocol-overdrive-electrocution">
+              <p><em>Protocole d&rsquo;Overdrive de rang 1</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> 18 m&egrave;tres</p>
+                <p><strong>Dur&eacute;e :</strong> maintenu, jusqu&rsquo;&agrave; interruption</p>
+              </div>
+              <p>Vous projetez un arc &eacute;lectrique continu vers une cr&eacute;ature que vous voyez &agrave; port&eacute;e.</p>
+              <p>La cible doit effectuer une sauvegarde d&rsquo;Agilit&eacute;. En cas d&rsquo;&eacute;chec, elle subit 3d6 d&eacute;g&acirc;ts &eacute;lectriques. En cas de r&eacute;ussite, elle en subit la moiti&eacute;.</p>
+              <p><strong>Surcharge minimale :</strong> 3.</p>
+              <p>Vous pouvez maintenir ce Protocole lors de vos tours suivants en utilisant votre action, tant que la cible reste &agrave; port&eacute;e et en vue. S&rsquo;il est maintenu, il inflige &agrave; nouveau ses d&eacute;g&acirc;ts, augment&eacute;s de 1 d&eacute; par maintien d&eacute;j&agrave; effectu&eacute;.</p>
+              <p>&Agrave; chaque maintien, votre Surcharge augmente d&rsquo;un montant &eacute;gal au rang de lancement + nombre de maintiens d&eacute;j&agrave; effectu&eacute;s.</p>
+              <p>Le Protocole prend fin si vous cessez de le maintenir, si la cible sort de port&eacute;e ou de vue, ou si vous devenez Incapable d&rsquo;agir ou &Eacute;tourdi.</p>
+              <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez ce Protocole au rang 2 (niveau 5), ses d&eacute;g&acirc;ts deviennent des d8 au lieu de d6. Au rang 3 (niveau 8), ils deviennent des d10.</p>
+            </template>
+            <template id="protocol-overdrive-surcharge-plasma">
+              <p><em>Protocole d&rsquo;Overdrive de rang 2</em></p>
+              <p><em>Niveau 5</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> 36 m&egrave;tres (rayon 6 m)</p>
+                <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+              </div>
+              <p>Vous concentrez une masse de plasma instable avant de la projeter en explosion.</p>
+              <p>Choisissez un point visible &agrave; port&eacute;e. Chaque cr&eacute;ature dans une sph&egrave;re de 6 m&egrave;tres autour de ce point doit effectuer une sauvegarde d&rsquo;Agilit&eacute;.</p>
+              <p>En cas d&rsquo;&eacute;chec, une cr&eacute;ature dans la zone subit 8d6 d&eacute;g&acirc;ts de feu.</p>
+              <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; des d&eacute;g&acirc;ts.</p>
+              <p><strong>Surcharge minimale :</strong> 8.</p>
+              <p>Au rang 3 (niveau 8), les d&eacute;g&acirc;ts passent &agrave; 10d6.</p>
+            </template>
+            <template id="protocol-overdrive-rayon-annihilation">
+              <p><em>Protocole d&rsquo;Overdrive de rang 3</em></p>
+              <p><em>Niveau 8</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> c&ocirc;ne de 9 m&egrave;tres</p>
+                <p><strong>Dur&eacute;e :</strong> instantan&eacute;e, aveuglement jusqu&rsquo;au d&eacute;but de votre prochain tour</p>
+              </div>
+              <p>Vous ouvrez votre implant &agrave; pleine puissance et d&eacute;versez un flot d&rsquo;&eacute;nergie destructrice devant vous.</p>
+              <p>Chaque cr&eacute;ature dans un c&ocirc;ne de 9 m&egrave;tres doit effectuer une sauvegarde d&rsquo;Agilit&eacute;.</p>
+              <p>En cas d&rsquo;&eacute;chec, une cr&eacute;ature dans le c&ocirc;ne subit 8d8 d&eacute;g&acirc;ts &eacute;nerg&eacute;tiques et est Aveugl&eacute;e jusqu&rsquo;au d&eacute;but de votre prochain tour.</p>
+              <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; des d&eacute;g&acirc;ts et n&rsquo;est pas aveugl&eacute;e.</p>
+              <p><strong>Surcharge minimale :</strong> 13.</p>
+            </template>
+            <template id="protocol-shock-frappe-sismique">
+              <p><em>Protocole de Shock de rang 1</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> rayon de 1,5 m&egrave;tre autour de vous</p>
+                <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+              </div>
+              <p>Vous &eacute;crasez le sol ou l&rsquo;espace imm&eacute;diat autour de vous avec une impulsion courte et brutale.</p>
+              <p>Chaque cr&eacute;ature de votre choix situ&eacute;e &agrave; 1,5 m&egrave;tre ou moins de vous doit effectuer une sauvegarde d&rsquo;Agilit&eacute;.</p>
+              <p>En cas d&rsquo;&eacute;chec, elle subit 3d6 d&eacute;g&acirc;ts contondants.</p>
+              <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; de ces d&eacute;g&acirc;ts.</p>
+              <p><strong>Surcharge minimale :</strong> 3.</p>
+              <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez ce Protocole au rang 2 (niveau 5), ses d&eacute;g&acirc;ts deviennent des d8 au lieu de d6. Au rang 3 (niveau 8), ils deviennent des d10.</p>
+            </template>
+            <template id="protocol-shock-onde-rupture">
+              <p><em>Protocole de Shock de rang 2</em></p>
+              <p><em>Niveau 5</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> 4,5 m&egrave;tres</p>
+                <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+              </div>
+              <p>Vous concentrez la pression de votre implant dans un point d&rsquo;impact unique avant de la rel&acirc;cher violemment.</p>
+              <p>Choisissez une cr&eacute;ature que vous voyez &agrave; 4,5 m&egrave;tres ou moins de vous. Elle doit effectuer une sauvegarde de Force.</p>
+              <p>En cas d&rsquo;&eacute;chec, elle subit 8d6 d&eacute;g&acirc;ts contondants, est repouss&eacute;e de 3 m&egrave;tres et tombe &agrave; terre.</p>
+              <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; des d&eacute;g&acirc;ts, n&rsquo;est pas repouss&eacute;e et ne tombe pas &agrave; terre.</p>
+              <p><strong>Surcharge minimale :</strong> 8.</p>
+              <p><strong>Au rang 3 (niveau 8) :</strong> les d&eacute;g&acirc;ts passent &agrave; 10d6.</p>
+            </template>
+            <template id="protocol-shock-noyau-siege">
+              <p><em>Protocole de Shock de rang 3</em></p>
+              <p><em>Niveau 8</em></p>
+              <div class="protocol-facts">
+                <p><strong>Temps d&rsquo;activation :</strong> 1 action</p>
+                <p><strong>Port&eacute;e :</strong> rayon de 4,5 m&egrave;tres autour de vous</p>
+                <p><strong>Dur&eacute;e :</strong> instantan&eacute;e</p>
+              </div>
+              <p>Vous compactez violemment l&rsquo;&eacute;nergie de votre implant avant de l&rsquo;&eacute;craser autour de vous en une d&eacute;tonation sismique.</p>
+              <p>Chaque cr&eacute;ature de votre choix situ&eacute;e &agrave; 4,5 m&egrave;tres ou moins de vous doit effectuer une sauvegarde de Force.</p>
+              <p>En cas d&rsquo;&eacute;chec, elle subit 8d8 d&eacute;g&acirc;ts contondants, est renvers&eacute;e, et sa vitesse tombe &agrave; 0 jusqu&rsquo;&agrave; la fin de son prochain tour.</p>
+              <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; des d&eacute;g&acirc;ts et ne subit aucun autre effet.</p>
+              <p><strong>Surcharge minimale :</strong> 13.</p>
+              <p>Quand vous lancez ce Protocole, vous pouvez consommer jusqu&rsquo;&agrave; 3 points de Surcharge. Pour chaque point ainsi consomm&eacute;, augmentez le rayon de l&rsquo;effet de 1,5 m&egrave;tre, jusqu&rsquo;&agrave; un maximum de 9 m&egrave;tres.</p>
+            </template>
           </section>
 
           <section class="page-section panel" id="personnage-hub-armes" data-section data-category="personnage">
@@ -3481,5 +4547,15 @@
           </section>
         </main>
       </div>    </div>
+
+    <div class="protocol-modal" data-protocol-modal hidden>
+      <div class="protocol-modal-backdrop" data-protocol-close></div>
+      <div class="protocol-modal-card" role="dialog" aria-modal="true" aria-labelledby="protocol-modal-title" tabindex="-1">
+        <button class="protocol-modal-close" type="button" data-protocol-close aria-label="Fermer la fiche du protocole">Fermer</button>
+        <p class="protocol-modal-meta" data-protocol-meta hidden></p>
+        <h3 id="protocol-modal-title" class="protocol-modal-title" data-protocol-title></h3>
+        <div class="protocol-modal-body" data-protocol-content></div>
+      </div>
+    </div>
   </body>
 </html>

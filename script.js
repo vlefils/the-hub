@@ -224,6 +224,112 @@ if (!window.location.hash) {
 
 syncFromHash();
 
+const protocolModal = document.querySelector("[data-protocol-modal]");
+const protocolTriggers = [...document.querySelectorAll("[data-protocol-trigger]")];
+
+if (protocolModal && protocolTriggers.length) {
+  const protocolModalCard = protocolModal.querySelector(".protocol-modal-card");
+  const protocolModalTitle = protocolModal.querySelector("[data-protocol-title]");
+  const protocolModalMeta = protocolModal.querySelector("[data-protocol-meta]");
+  const protocolModalContent = protocolModal.querySelector("[data-protocol-content]");
+  let lastProtocolTrigger = null;
+
+  const buildProtocolHeading = (trigger) => {
+    const name = trigger.textContent.trim();
+    const meta = trigger.dataset.protocolMeta?.trim() || "";
+    const rankMatch = meta.match(/rang\s+\d+/i);
+
+    if (!rankMatch) {
+      return name;
+    }
+
+    return `${rankMatch[0].toLowerCase()} - ${name}`;
+  };
+
+  const stripProtocolLeadMeta = (container) => {
+    while (container.firstElementChild?.matches("p")) {
+      const leadText = container.firstElementChild.textContent.trim().toLowerCase();
+
+      if (
+        leadText.startsWith("impulsion de rang")
+        || leadText.startsWith("protocole")
+        || /^niveau\s+\d+/.test(leadText)
+      ) {
+        container.firstElementChild.remove();
+        continue;
+      }
+
+      break;
+    }
+  };
+
+  const closeProtocolModal = () => {
+    if (protocolModal.hidden) {
+      return;
+    }
+
+    protocolModal.hidden = true;
+    document.body.classList.remove("protocol-modal-open");
+    protocolModalContent.replaceChildren();
+    protocolModalMeta.textContent = "";
+    protocolModalMeta.hidden = true;
+    document.removeEventListener("keydown", handleProtocolModalKeydown);
+
+    if (lastProtocolTrigger) {
+      lastProtocolTrigger.focus();
+      lastProtocolTrigger = null;
+    }
+  };
+
+  function handleProtocolModalKeydown(event) {
+    if (event.key !== "Escape") {
+      return;
+    }
+
+    event.preventDefault();
+    closeProtocolModal();
+  }
+
+  const openProtocolModal = (trigger) => {
+    const templateId = trigger.dataset.protocolTrigger;
+    const template = document.getElementById(templateId);
+
+    if (!template) {
+      return;
+    }
+
+    lastProtocolTrigger = trigger;
+    protocolModalTitle.textContent = buildProtocolHeading(trigger);
+
+    const contentWrapper = document.createElement("div");
+    contentWrapper.append(template.content.cloneNode(true));
+    stripProtocolLeadMeta(contentWrapper);
+
+    protocolModalMeta.textContent = "";
+    protocolModalMeta.hidden = true;
+    protocolModalContent.replaceChildren(...contentWrapper.childNodes);
+    protocolModal.hidden = false;
+    document.body.classList.add("protocol-modal-open");
+    document.addEventListener("keydown", handleProtocolModalKeydown);
+    window.requestAnimationFrame(() => protocolModalCard.focus());
+  };
+
+  protocolTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      openProtocolModal(trigger);
+    });
+  });
+
+  protocolModal.addEventListener("click", (event) => {
+    if (!event.target.closest("[data-protocol-close]")) {
+      return;
+    }
+
+    closeProtocolModal();
+  });
+}
+
 const characterSheet = document.querySelector("[data-character-sheet]");
 
 if (characterSheet) {
