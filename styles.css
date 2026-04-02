@@ -1169,6 +1169,12 @@ td {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.faction-list {
+  display: grid;
+  gap: 1.15rem;
+  margin-top: 1.15rem;
+}
+
 .info-card,
 .callout {
   position: relative;
@@ -1202,6 +1208,233 @@ td {
 .callout strong,
 .info-card strong {
   color: var(--green-acid);
+}
+
+.faction-card {
+  --faction-accent: var(--green);
+  --faction-accent-soft: rgba(125, 255, 101, 0.16);
+  --faction-bg: #181b22;
+  --faction-bg-2: #10131a;
+  --faction-text: var(--text);
+  height: 100%;
+  color: var(--faction-text);
+  padding: 1.15rem 1.1rem 1.15rem 1.2rem;
+  background:
+    linear-gradient(180deg, var(--faction-accent-soft), transparent 3.5rem),
+    linear-gradient(155deg, color-mix(in srgb, var(--faction-accent) 8%, transparent), transparent 32%),
+    linear-gradient(180deg, var(--faction-bg), var(--faction-bg-2));
+  border-color: color-mix(in srgb, var(--faction-accent) 28%, #363943);
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--faction-accent) 12%, transparent),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 0 0 1px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.faction-card::before {
+  height: 5px;
+  background: var(--faction-accent);
+}
+
+.faction-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--faction-pattern, none);
+  opacity: 0.26;
+  pointer-events: none;
+}
+
+.faction-card > * {
+  max-width: 84ch;
+}
+
+.faction-card h3 {
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+  margin-bottom: 0.85rem;
+  color: var(--faction-title, var(--text));
+  letter-spacing: 0.04em;
+}
+
+.faction-card p {
+  position: relative;
+  z-index: 1;
+}
+
+.faction-card p:not(.faction-label) {
+  font-size: 1rem;
+  line-height: 1.68;
+}
+
+.faction-card p:last-child {
+  margin-bottom: 0;
+}
+
+.faction-cabinet {
+  --faction-accent: #d2c39b;
+  --faction-accent-soft: rgba(210, 195, 155, 0.14);
+  --faction-bg: #191817;
+  --faction-bg-2: #11100f;
+  --faction-title: #f2ebda;
+  --faction-pattern:
+    linear-gradient(90deg, transparent 0 1.1rem, rgba(255, 255, 255, 0.05) 1.1rem 1.2rem, transparent 1.2rem),
+    repeating-linear-gradient(180deg, transparent 0 1.75rem, rgba(210, 195, 155, 0.08) 1.75rem 1.82rem, transparent 1.82rem 3.6rem),
+    linear-gradient(0deg, rgba(210, 195, 155, 0.08), rgba(210, 195, 155, 0.08));
+}
+
+.faction-cabinet h3,
+.faction-blackridge h3 {
+  text-transform: uppercase;
+}
+
+.faction-cabinet {
+  border-left: 10px solid rgba(210, 195, 155, 0.32);
+}
+
+.faction-bastion {
+  --faction-accent: #aab07a;
+  --faction-accent-soft: rgba(170, 176, 122, 0.16);
+  --faction-bg: #1a1b14;
+  --faction-bg-2: #0f110d;
+  --faction-label: #c7d19d;
+  --faction-title: #edf0dc;
+  --faction-pattern:
+    repeating-linear-gradient(135deg, rgba(170, 176, 122, 0.18) 0 10px, transparent 10px 20px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 18px),
+    linear-gradient(180deg, transparent 0 2.8rem, rgba(0, 0, 0, 0.24) 2.8rem 3rem, transparent 3rem);
+}
+
+.faction-bastion {
+  border-left: 10px solid rgba(170, 176, 122, 0.38);
+}
+
+.faction-syndicat {
+  --faction-accent: #ff6a3d;
+  --faction-accent-soft: rgba(255, 106, 61, 0.16);
+  --faction-bg: #231512;
+  --faction-bg-2: #151010;
+  --faction-title: #fff0ea;
+  --faction-pattern:
+    repeating-linear-gradient(90deg, rgba(255, 106, 61, 0.12) 0 14px, transparent 14px 28px),
+    repeating-linear-gradient(180deg, transparent 0 2.1rem, rgba(255, 255, 255, 0.05) 2.1rem 2.2rem, transparent 2.2rem 4.2rem),
+    linear-gradient(135deg, rgba(255, 106, 61, 0.16) 0 18%, transparent 18% 100%);
+}
+
+.faction-syndicat {
+  transform: rotate(-0.45deg);
+  border: 2px solid #ff6a3d;
+  box-shadow:
+    0 0 30px rgba(255, 106, 61, 0.12),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    6px 6px 0 #0a0707;
+}
+
+.faction-syndicat h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.faction-seconde-chance {
+  --faction-accent: #93e4dc;
+  --faction-accent-soft: rgba(147, 228, 220, 0.18);
+  --faction-bg: #edf7f6;
+  --faction-bg-2: #dceeed;
+  --faction-text: #173239;
+  --faction-title: #21454b;
+  --faction-pattern:
+    radial-gradient(circle at 14% 18%, rgba(255, 255, 255, 0.45) 0 3.2rem, transparent 3.3rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent 40%),
+    repeating-linear-gradient(90deg, rgba(147, 228, 220, 0.08) 0 1px, transparent 1px 22px);
+}
+
+.faction-seconde-chance p {
+  color: #19343a;
+}
+
+.faction-seconde-chance {
+  border-left: 10px solid rgba(147, 228, 220, 0.34);
+}
+
+.faction-helix {
+  --faction-accent: #6cff8f;
+  --faction-accent-soft: rgba(108, 255, 143, 0.16);
+  --faction-bg: #0f1813;
+  --faction-bg-2: #0b110d;
+  --faction-title: #e1ffe8;
+  --faction-pattern:
+    radial-gradient(circle at 16% 24%, rgba(108, 255, 143, 0.18) 0 2.2rem, transparent 2.3rem),
+    radial-gradient(circle at 72% 68%, rgba(108, 255, 143, 0.16) 0 1.3rem, transparent 1.4rem),
+    repeating-linear-gradient(60deg, transparent 0 12px, rgba(108, 255, 143, 0.08) 12px 14px, transparent 14px 28px),
+    repeating-linear-gradient(120deg, transparent 0 12px, rgba(108, 255, 143, 0.08) 12px 14px, transparent 14px 28px);
+}
+
+.faction-helix h3 {
+  text-shadow: 0 0 14px rgba(108, 255, 143, 0.18);
+}
+
+.faction-helix {
+  border-left: 10px solid rgba(108, 255, 143, 0.36);
+}
+
+.faction-synapse {
+  --faction-accent: #7ad6ff;
+  --faction-accent-soft: rgba(122, 214, 255, 0.16);
+  --faction-bg: #0b131b;
+  --faction-bg-2: #080d13;
+  --faction-title: #e7f6ff;
+  --faction-pattern:
+    repeating-linear-gradient(90deg, rgba(122, 214, 255, 0.07) 0 1px, transparent 1px 12px),
+    repeating-linear-gradient(180deg, rgba(122, 214, 255, 0.05) 0 1px, transparent 1px 10px),
+    linear-gradient(135deg, transparent 0 60%, rgba(122, 214, 255, 0.08) 60% 62%, transparent 62%),
+    linear-gradient(180deg, rgba(7, 13, 22, 0.72), rgba(7, 13, 22, 0.1));
+}
+
+.faction-synapse h3 {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.faction-synapse {
+  border-left: 10px solid rgba(122, 214, 255, 0.34);
+}
+
+.faction-blackridge {
+  --faction-accent: #f1c76b;
+  --faction-accent-soft: rgba(241, 199, 107, 0.16);
+  --faction-bg: #161412;
+  --faction-bg-2: #0d0c0b;
+  --faction-title: #fff1c9;
+  --faction-pattern:
+    linear-gradient(90deg, transparent 0 82%, rgba(241, 199, 107, 0.18) 82% 84%, transparent 84%),
+    repeating-linear-gradient(180deg, transparent 0 1.7rem, rgba(241, 199, 107, 0.07) 1.7rem 1.8rem, transparent 1.8rem 3.4rem),
+    linear-gradient(180deg, rgba(241, 199, 107, 0.08), transparent 24%);
+}
+
+.faction-blackridge {
+  border-left: 10px solid rgba(241, 199, 107, 0.36);
+}
+
+.faction-velvet {
+  --faction-accent: #ff5b86;
+  --faction-accent-soft: rgba(255, 91, 134, 0.18);
+  --faction-bg: #2a0f18;
+  --faction-bg-2: #15070d;
+  --faction-title: #ffe2eb;
+  --faction-pattern:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.2) 0 1rem, transparent 1.1rem),
+    radial-gradient(circle at 82% 26%, rgba(255, 91, 134, 0.18) 0 2.4rem, transparent 2.5rem),
+    linear-gradient(135deg, transparent 0 70%, rgba(255, 170, 197, 0.11) 70% 76%, transparent 76%),
+    linear-gradient(180deg, rgba(255, 91, 134, 0.09), transparent 28%);
+}
+
+.faction-velvet h3 {
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 18px rgba(255, 91, 134, 0.22);
+}
+
+.faction-velvet {
+  border-left: 10px solid rgba(255, 91, 134, 0.34);
 }
 
 .page-section img,
