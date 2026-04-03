@@ -324,7 +324,7 @@
                 <li><strong>Demi-couverture :</strong> +2 a la CA et aux sauvegardes de Dexterite contre une menace venant de l&rsquo;autre cote.</li>
                 <li><strong>Trois-quarts couverture :</strong> +5 a la CA et aux sauvegardes de Dexterite.</li>
                 <li><strong>Couverture totale :</strong> impossible a cibler directement.</li>
-                <li><strong>Munitions / chargeur / recharge :</strong> les armes a feu consomment 1 munition par attaque, disposent d&rsquo;un chargeur, puis se rechargent selon leur profil.</li>
+                <li><strong>Munitions / chargeur / recharge :</strong> les armes a feu consomment 1 usage de chargeur par attaque efficace ; cette valeur reste une abstraction tactique, puis l&rsquo;arme se recharge selon son profil.</li>
               </ul>
             </div>
           </section>
@@ -972,20 +972,22 @@
 
           <section class="page-section panel" id="regles-equipement-armures" data-section data-category="regles" data-nav-root="regles-equipement">
             <div class="section-heading"><p class="section-kicker">Equipement</p><div><h2>Armures</h2></div></div>
+            <p>Les armures de base representent l&rsquo;equipement courant accessible aux personnages en debut de partie. Elles couvrent les protections civiles, de rue, tactiques ou lourdes les plus repandues. Les equipements plus rares ou technologiquement avances relevent ensuite des armures speciales disponibles au Hub.</p>
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
                     <th>Type</th>
-                    <th>CA par defaut</th>
+                    <th>CA</th>
                     <th>Usage</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>Legere</td><td>12 + modificateur de Dexterite</td><td>Profils mobiles, tirs, infiltration, reaction rapide.</td></tr>
-                  <tr><td>Intermediaire</td><td>14 + modificateur de Dexterite (maximum +2)</td><td>Compromis entre protection et mobilite.</td></tr>
-                  <tr><td>Lourde</td><td>17</td><td>Protection stable, Dexterite ignoree, port exigeant.</td></tr>
-                  <tr><td>Bouclier</td><td>+2 a la CA</td><td>Necessite une main libre et la maitrise adequate.</td></tr>
+                  <tr><td>Sans armure</td><td>10 + modificateur de Dexterite</td><td>Vetements civils, tenues discretes, habits de travail, manteaux ou toute tenue sans vraie protection balistique ou tactique.</td></tr>
+                  <tr><td>Legere</td><td>12 + modificateur de Dexterite</td><td>Cuir renforce, veste de motard, tenue de garde, uniforme de milice, protections souples ou vetements renforces.</td></tr>
+                  <tr><td>Intermediaire</td><td>14 + modificateur de Dexterite (maximum +2)</td><td>Gilet pare-balles, casque, protections d&rsquo;intervention, equipement anti-emeute leger ou tenue d&rsquo;assaut classique.</td></tr>
+                  <tr><td>Lourde</td><td>17</td><td>Armure d&rsquo;assaut lourde, combinaison de deminage, blindage complet en kevlar ou equipement d&rsquo;intervention entierement recouvert.</td></tr>
+                  <tr><td>Bouclier</td><td>+2 a la CA</td><td>Bouclier balistique ou ecran de protection lourd porte au bras. Necessite une main libre.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -995,42 +997,278 @@
             </div>
             <div class="callout">
               <strong>Maitrise et port</strong>
-              <p>Porter une armure sans maitrise donne en general desavantage aux tests de Force et de Dexterite, aux attaques qui demandent des gestes propres, et a toute action fine ou rapide. Si une armure lourde suppose une Force minimale de 13 et que vous ne l&rsquo;avez pas, reduisez la vitesse de 3 metres.</p>
+              <p>Comme d&rsquo;habitude, porter une armure ou un bouclier sans maitrise reste un mauvais plan. Dans le doute, reprenez la lecture D&amp;D5e la plus simple : c&rsquo;est genant, bruyant et penalisant pour les gestes qui demandent vitesse, precision ou mobilite.</p>
             </div>
           </section>
 
           <section class="page-section panel" id="regles-equipement-armes" data-section data-category="regles" data-nav-root="regles-equipement">
             <div class="section-heading"><p class="section-kicker">Equipement</p><div><h2>Armes</h2></div></div>
             <div class="card-grid three-up">
-              <article class="info-card"><h3>Melee</h3><p>Souvent basees sur la Force. Elles dominent les espaces et imposent la menace immediate.</p></article>
-              <article class="info-card"><h3>Distance</h3><p>Generalement liees a la Dexterite. Elles dependent davantage de la ligne de vue, de la couverture et du calme de tir.</p></article>
-              <article class="info-card"><h3>Finesse et lancer</h3><p>Certaines armes permettent de choisir la Dexterite, d&rsquo;autres se lancent, certaines demandent deux mains ou acceptent plusieurs usages.</p></article>
+              <article class="info-card"><h3>Armes de rue</h3><p>Courantes, simples, brutales et largement diffusees. Ce sont les armes les plus accessibles en debut de partie.</p></article>
+              <article class="info-card"><h3>Armes de corpo</h3><p>Plus professionnelles, plus specialisees ou plus exigeantes a manier. Elles definissent l&rsquo;equipement de securite et d&rsquo;intervention.</p></article>
+              <article class="info-card"><h3>Armes a feu</h3><p>Leurs degats et leurs chargeurs sont abstraits : ils representent l&rsquo;efficacite tactique d&rsquo;une attaque, pas un comptage balle par balle.</p></article>
             </div>
             <div class="callout">
-              <strong>Proprietes d&rsquo;armes utiles</strong>
-              <p>Les proprietes importantes a retenir sont surtout finesse, legere, lourde, allongee, deux mains, lancer, munitions, chargeur et recharge. Ce sont elles qui changent la maniere de jouer une arme bien plus que son simple de de degats.</p>
-            </div>
-            <div class="callout">
-              <strong>Tags de jeu utiles</strong>
+              <strong>Proprietes des armes</strong>
               <ul>
-                <li><strong>Finesse :</strong> utilisez Force ou Dexterite.</li>
-                <li><strong>Legere :</strong> bonne pour le double maniement ou les armes secondaires.</li>
-                <li><strong>Lourde :</strong> penalise les espaces serres et certaines configurations legeres.</li>
-                <li><strong>Allongee :</strong> augmente la zone de menace au contact.</li>
-                <li><strong>Deux mains :</strong> requiert les deux mains pour attaquer.</li>
-                <li><strong>Lancer :</strong> peut etre utilisee au contact ou jetee a distance.</li>
-                <li><strong>Munitions :</strong> consomme 1 munition par attaque, sauf regle contraire.</li>
-                <li><strong>Chargeur X :</strong> l&rsquo;arme peut tirer X fois avant d&rsquo;etre vide.</li>
-                <li><strong>Recharge libre / bonus / action :</strong> cout de recharge de l&rsquo;arme.</li>
+                <li><strong>Legere :</strong> une arme legere est facile a manier d&rsquo;une seule main. Elle peut etre utilisee pour le combat a deux armes.</li>
+                <li><strong>Finesse :</strong> avec une arme dotee de cette propriete, vous pouvez utiliser la Dexterite a la place de la Force pour les jets d&rsquo;attaque et de degats.</li>
+                <li><strong>A deux mains :</strong> cette arme necessite deux mains pour etre utilisee.</li>
+                <li><strong>Lourde :</strong> une arme lourde est encombrante et difficile a manier. Cette propriete sert principalement a identifier les armes les plus imposantes du jeu.</li>
+                <li><strong>Brutale :</strong> une arme dotee de cette propriete utilise la Force a la place de la Dexterite pour les jets d&rsquo;attaque et de degats a distance.</li>
+                <li><strong>Polyvalente :</strong> cette arme peut etre maniee a une main ou a deux mains. Les degats indiques entre parentheses sont utilises lorsqu&rsquo;elle est maniee a deux mains.</li>
+                <li><strong>Lancer :</strong> une arme dotee de cette propriete peut etre lancee. Elle suit les memes regles que dans D&amp;D 5e, avec une portee normale et une portee longue.</li>
+                <li><strong>Main nue :</strong> cette arme compte comme une attaque a mains nues pour les capacites et effets qui s&rsquo;appliquent aux attaques a mains nues.</li>
               </ul>
             </div>
             <div class="callout">
-              <strong>Munitions, recharge et melee sale</strong>
-              <p>Les armes a distance demandent des munitions utilisables. Quand leur chargeur tombe a 0, il faut les recharger selon leur tag. Une attaque a distance contre un ennemi a 1,50 metre se fait normalement avec desavantage, sauf aptitude contraire. Un coup non arme existe toujours, meme dans le pire couloir, meme quand tout le reste a ete perdu ou saisi.</p>
+              <strong>Regles sur les armes a feu</strong>
+              <ul>
+                <li>Les armes a feu de The Hub ne sont pas simulees balle par balle.</li>
+                <li>Les degats d&rsquo;une arme representent l&rsquo;ensemble des tirs, impacts ou rafales efficaces produits pendant une action d&rsquo;attaque, soit quelques secondes de combat soutenu.</li>
+                <li>La valeur de chargeur ne represente pas forcement le nombre exact de cartouches presentes dans l&rsquo;arme, mais le nombre d&rsquo;actions d&rsquo;attaque efficaces qu&rsquo;elle peut produire avant de devoir etre rechargee.</li>
+                <li>Un chargeur de 4 ou 6 represente donc une autonomie tactique abstraite, et non un comptage litteral munition par munition.</li>
+                <li>Le rechargement indique le cout necessaire pour remettre l&rsquo;arme en etat de tirer efficacement : la plupart des armes se rechargent par une action bonus ; certaines armes plus lourdes ou plus contraignantes demandent une action complete.</li>
+              </ul>
+            </div>
+            <p>Les armes de base sont reparties en deux grandes categories : les armes de rue, courantes, simples, brutales et largement diffusees ; et les armes de corpo, plus professionnelles, plus specialisees ou plus exigeantes a manier.</p>
+            <div class="weapon-catalog" data-arsenal="street">
+              <div class="weapon-catalog-head">
+                <p class="weapon-catalog-kicker">Armes de rue</p>
+                <p class="weapon-catalog-copy">Les profils les plus courants, les plus sales et les plus faciles a trouver dans Paradise.</p>
+              </div>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">Melee</p>
+                </div>
+                <div class="weapon-grid">
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Poings americains</span></h3>
+                      <p class="weapon-damage">1d4 contondant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> Contact</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">Legere</span>
+                      <span class="weapon-tag">Finesse</span>
+                      <span class="weapon-tag">Main nue</span>
+                    </div>
+                    <p class="weapon-note">Bagarre discrete et attaques a mains nues renforcees.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Couteau</span></h3>
+                      <p class="weapon-damage">1d4 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> Contact, lancer 6 m / 18 m</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">Legere</span>
+                      <span class="weapon-tag">Finesse</span>
+                      <span class="weapon-tag">Lancer</span>
+                    </div>
+                    <p class="weapon-note">Arme de secours simple, legere et facile a lancer.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Couteau de chasse</span></h3>
+                      <p class="weapon-damage">1d6 tranchant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> Contact</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">Legere</span>
+                      <span class="weapon-tag">Finesse</span>
+                    </div>
+                    <p class="weapon-note">Lame de melee offensive de rue sans perdre en mobilite.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Batte</span></h3>
+                      <p class="weapon-damage">1d8 contondant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> Contact</span>
+                      <span class="weapon-stat"><strong>Deux mains</strong> 1d10</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">Polyvalente</span>
+                    </div>
+                    <p class="weapon-note">Arme de percussion simple, brutale et immediatement lisible.</p>
+                  </article>
+                </div>
+              </div>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">Distance</p>
+                </div>
+                <div class="weapon-grid">
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Pistolet 9 mm</span></h3>
+                      <p class="weapon-damage">1d6 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> 12 m / 36 m</span>
+                      <span class="weapon-stat"><strong>Chargeur</strong> 6</span>
+                      <span class="weapon-stat"><strong>Rechargement</strong> Action bonus</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">Legere</span>
+                    </div>
+                    <p class="weapon-note">Arme de poing standard, fiable et polyvalente.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Pistolet mitrailleur</span></h3>
+                      <p class="weapon-damage">2d4 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> 9 m / 27 m</span>
+                      <span class="weapon-stat"><strong>Chargeur</strong> 6</span>
+                      <span class="weapon-stat"><strong>Rechargement</strong> Action bonus</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">Legere</span>
+                    </div>
+                    <p class="weapon-note">Volume de feu agressif pour le combat urbain rapproche.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Fusil a pompe</span></h3>
+                      <p class="weapon-damage">2d6 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> 6 m / 18 m</span>
+                      <span class="weapon-stat"><strong>Chargeur</strong> 4</span>
+                      <span class="weapon-stat"><strong>Rechargement</strong> Action bonus</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Brutale</span>
+                    </div>
+                    <p class="weapon-note">Arme de proximite terrifiante qui demande de tenir le recul.</p>
+                  </article>
+                </div>
+              </div>
+            </div>
+            <div class="weapon-catalog" data-arsenal="corpo">
+              <div class="weapon-catalog-head">
+                <p class="weapon-catalog-kicker">Armes de corpo</p>
+                <p class="weapon-catalog-copy">Des profils plus propres, plus techniques et plus professionnels pour les equipes structurees.</p>
+              </div>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">Melee</p>
+                </div>
+                <div class="weapon-grid">
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Matraque</span></h3>
+                      <p class="weapon-damage">1d6 contondant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> Contact</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag weapon-tag-muted">Sans propriete</span>
+                    </div>
+                    <p class="weapon-note">Arme d&rsquo;intervention compacte, robuste et professionnelle.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Katana</span></h3>
+                      <p class="weapon-damage">1d10 tranchant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> Contact</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Finesse</span>
+                    </div>
+                    <p class="weapon-note">Lame d&rsquo;elite pour un corps a corps precis et letal.</p>
+                  </article>
+                </div>
+              </div>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">Distance</p>
+                </div>
+                <div class="weapon-grid">
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Pistolet lourd</span></h3>
+                      <p class="weapon-damage">1d8 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> 12 m / 36 m</span>
+                      <span class="weapon-stat"><strong>Chargeur</strong> 4</span>
+                      <span class="weapon-stat"><strong>Rechargement</strong> Action bonus</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag weapon-tag-muted">Sans propriete</span>
+                    </div>
+                    <p class="weapon-note">Arme secondaire de professionnel a fort impact.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Fusil d&rsquo;assaut</span></h3>
+                      <p class="weapon-damage">1d10 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> 18 m / 72 m</span>
+                      <span class="weapon-stat"><strong>Chargeur</strong> 6</span>
+                      <span class="weapon-stat"><strong>Rechargement</strong> Action bonus</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                    </div>
+                    <p class="weapon-note">Reference du combat structure et de la moyenne portee.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Fusil de precision</span></h3>
+                      <p class="weapon-damage">1d12 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> 30 m / 120 m</span>
+                      <span class="weapon-stat"><strong>Chargeur</strong> 4</span>
+                      <span class="weapon-stat"><strong>Rechargement</strong> Action bonus</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Lourde</span>
+                    </div>
+                    <p class="weapon-note">Arme specialisee pour les angles longs et les cibles exposees.</p>
+                  </article>
+                  <article class="weapon-card">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Mitrailleuse legere</span></h3>
+                      <p class="weapon-damage">2d6 perforant</p>
+                    </div>
+                    <div class="weapon-stats">
+                      <span class="weapon-stat"><strong>Portee</strong> 18 m / 72 m</span>
+                      <span class="weapon-stat"><strong>Chargeur</strong> 6</span>
+                      <span class="weapon-stat"><strong>Rechargement</strong> Action complete</span>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Lourde</span>
+                      <span class="weapon-tag">Brutale</span>
+                    </div>
+                    <p class="weapon-note">Arme de saturation lourde reservee aux combattants capables de l&rsquo;assumer physiquement.</p>
+                  </article>
+                </div>
+              </div>
             </div>
             <div class="callout">
-              <strong>Defaults rapides</strong>
-              <p>Si vous n&rsquo;avez pas encore de profil plus precis : une arme de melee legere inflige 1d6, une arme de melee standard 1d8, une arme lourde ou allongee 1d10, une arme improvisee 1d4, et un coup non arme 1 + modificateur de Force. Les armes a feu legeres tournent en general autour d&rsquo;un chargeur 4 ou 6 et d&rsquo;une recharge en action bonus ; les armes plus lourdes ou speciales montent plus haut en degats mais se rechargent souvent en action.</p>
+              <strong>Tir au contact et secours</strong>
+              <p>Une attaque a distance contre un ennemi a 1,50 metre se fait normalement avec desavantage, sauf aptitude contraire. Un coup non arme existe toujours, meme dans le pire couloir, meme quand tout le reste a ete perdu ou saisi.</p>
             </div>
           </section>
 
@@ -1286,7 +1524,7 @@
               <article class="info-card">
                 <strong>Ma&icirc;trises</strong>
                 <p><strong>Armures :</strong> armures l&eacute;g&egrave;res, interm&eacute;diaires, lourdes, boucliers</p>
-                <p><strong>Armes :</strong> armes simples, armes de guerre</p>
+                <p><strong>Armes :</strong> armes de rue, armes de corpo</p>
                 <p><strong>Jets de sauvegarde :</strong> Force, Constitution</p>
                 <p><strong>Comp&eacute;tences :</strong> choisissez 2 parmi Athl&eacute;tisme, Intimidation, Perception, Intuition, Survie</p>
               </article>
@@ -1294,9 +1532,10 @@
                 <strong>&Eacute;quipement de d&eacute;part</strong>
                 <p>Vous commencez avec l&rsquo;&eacute;quipement suivant, en plus de celui accord&eacute; par votre historique :</p>
                 <ul>
-                  <li>une arme de guerre ou deux armes simples</li>
-                  <li>une armure adapt&eacute;e &agrave; votre profil</li>
-                  <li>une arme secondaire</li>
+                  <li>un fusil &agrave; pompe ou une batte</li>
+                  <li>une armure interm&eacute;diaire ou une armure lourde</li>
+                  <li>un bouclier balistique ou un pistolet 9 mm</li>
+                  <li>un couteau de chasse</li>
                   <li>un kit de terrain</li>
                   <li>un pack de munitions ou d&rsquo;entretien selon votre &eacute;quipement</li>
                 </ul>
@@ -1597,7 +1836,7 @@
               <article class="info-card">
                 <strong>Ma&icirc;trises</strong>
                 <p><strong>Armures :</strong> armures l&eacute;g&egrave;res</p>
-                <p><strong>Armes :</strong> armes simples, armes de guerre &agrave; distance</p>
+                <p><strong>Armes :</strong> armes de rue, pistolets lourds, fusils d&rsquo;assaut, fusils de precision, mitrailleuses legeres</p>
                 <p><strong>Jets de sauvegarde :</strong> Dexterite, Esprit</p>
                 <p><strong>Comp&eacute;tences :</strong> choisissez 3 comp&eacute;tences parmi Acrobaties, Athl&eacute;tisme, Discr&eacute;tion, Intimidation, Investigation, Perception, Survie et Tromperie</p>
               </article>
@@ -1605,12 +1844,12 @@
                 <strong>&Eacute;quipement de d&eacute;part</strong>
                 <p>Vous commencez avec l&rsquo;&eacute;quipement suivant, en plus de celui accord&eacute; par votre historique :</p>
                 <ul>
-                  <li>une arme &agrave; distance principale</li>
-                  <li>une arme secondaire</li>
+                  <li>un pistolet mitrailleur, un fusil d&rsquo;assaut ou un fusil de precision</li>
+                  <li>un pistolet 9 mm ou un pistolet lourd</li>
                   <li>une armure l&eacute;g&egrave;re</li>
+                  <li>un couteau</li>
                   <li>un kit d&rsquo;entretien d&rsquo;armes</li>
-                  <li>des munitions</li>
-                  <li>un couteau ou une arme de secours</li>
+                  <li>deux packs de munitions</li>
                 </ul>
               </article>
             </div>
@@ -1883,6 +2122,17 @@
                 <strong>Cadre du compagnon</strong>
                 <p>Tous les compagnons utilisent un de de vie de d6. Quand ils doivent utiliser Esprit ou Charisme, ils prennent votre modificateur correspondant. A 0 point de vie, ils sont detruits et ne reviennent qu&rsquo;apres un repos long.</p>
               </article>
+            </div>
+            <div class="callout">
+              <strong>Equipement de depart</strong>
+              <p>Vous commencez avec l&rsquo;equipement suivant, en plus de celui accorde par votre historique :</p>
+              <ul>
+                <li>un pistolet 9 mm ou une matraque</li>
+                <li>une armure legere</li>
+                <li>un couteau</li>
+                <li>un kit d&rsquo;atelier portable</li>
+                <li>des pieces de rechange, des batteries et une interface de commande pour votre compagnon mecanique</li>
+              </ul>
             </div>
 
             <div class="table-wrap">
@@ -2215,6 +2465,17 @@
               </ul>
               <p>Sa mecanique centrale est le Sang-froid.</p>
             </div>
+            <div class="callout">
+              <strong>Equipement de depart</strong>
+              <p>Vous commencez avec l&rsquo;equipement suivant, en plus de celui accorde par votre historique :</p>
+              <ul>
+                <li>un pistolet 9 mm ou une matraque</li>
+                <li>une armure legere</li>
+                <li>un couteau de chasse</li>
+                <li>un medkit de terrain</li>
+                <li>un lot de stims, d&rsquo;injecteurs et de recharges pharmaceutiques de base</li>
+              </ul>
+            </div>
 
             <div class="table-wrap">
               <table>
@@ -2544,7 +2805,7 @@
               <article class="info-card">
                 <strong>Maitrises</strong>
                 <p><strong>Armures :</strong> armures legeres</p>
-                <p><strong>Armes :</strong> armes simples, pistolets, armes de precision, armes legeres de melee</p>
+                <p><strong>Armes :</strong> armes de rue, pistolets lourds, fusils de precision</p>
                 <p><strong>Outils :</strong> kit d&rsquo;intrusion, kit de falsification</p>
                 <p><strong>Jets de sauvegarde :</strong> Dexterite, Esprit</p>
                 <p><strong>Competences :</strong> choisissez 4 competences parmi Acrobaties, Athletisme, Discretion, Escamotage, Intuition, Investigation, Perception, Influence, Tromperie et Techno</p>
@@ -2555,6 +2816,18 @@
                 <p><strong>DD de sauvegarde du Runner :</strong> 8 + votre bonus de maitrise + votre modificateur de Charisme (CHA)</p>
                 <p>Le Runner utilise explicitement le Charisme (CHA) pour ses aptitudes qui imposent un jet de sauvegarde.</p>
               </article>
+            </div>
+            <div class="callout">
+              <strong>Equipement de depart</strong>
+              <p>Vous commencez avec l&rsquo;equipement suivant, en plus de celui accorde par votre historique :</p>
+              <ul>
+                <li>un pistolet lourd ou un fusil de precision</li>
+                <li>un pistolet 9 mm ou un couteau</li>
+                <li>une armure legere</li>
+                <li>un kit d&rsquo;intrusion</li>
+                <li>un kit de falsification</li>
+                <li>un pack de munitions</li>
+              </ul>
             </div>
 
             <div class="table-wrap">
@@ -2893,6 +3166,17 @@
                 <strong>Points de vie</strong>
                 <p><strong>D&eacute; de vie :</strong> 1d8 par niveau de Neuro</p>
               </article>
+            </div>
+            <div class="callout">
+              <strong>Equipement de depart</strong>
+              <p>Vous commencez avec l&rsquo;equipement suivant, en plus de celui accorde par votre historique :</p>
+              <ul>
+                <li>un pistolet 9 mm ou une matraque</li>
+                <li>une armure legere</li>
+                <li>un couteau</li>
+                <li>un module de stabilisation neurale</li>
+                <li>un kit de batteries, de calibration et d&rsquo;entretien pour votre implant</li>
+              </ul>
             </div>
 
             <p><strong>Tableau de progression du Neuro</strong></p>
@@ -3984,28 +4268,113 @@
 
           <section class="page-section panel" id="personnage-hub-armes" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Armes</h2></div></div>
-            <p>Le Hub vend surtout des profils d&rsquo;armes, pas des listes mortes. Choisissez une silhouette de combat, appliquez les tags du coeur de regles, puis habillez-la avec une marque, un calibre, une provenance et une sale histoire.</p>
+            <p>Au Hub, les armes de base servent de socle. Choisissez d&rsquo;abord un profil du coeur de regles, puis habillez-le avec une marque, un calibre, une provenance et une sale histoire.</p>
+            <p>Les armes du Hub sont des armes speciales, rares ou couteuses, achetables avec la monnaie du Hub. Elles sont plus puissantes que les armes de base et finissent naturellement par les remplacer, mais elles ne relevent plus du simple armement courant. Elles ouvrent des styles de jeu differents, plus extremes, plus specialises ou plus spectaculaires.</p>
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Profil de depart</th>
+                    <th>Profil du Hub</th>
+                    <th>Base recommandee</th>
                     <th>Usage</th>
-                    <th>Default utile</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>Arme secondaire</td><td>Secours, couloir, dernier mot</td><td>1d6 a 1d8, chargeur 4 ou 6, recharge bonus</td></tr>
-                  <tr><td>Arme principale polyvalente</td><td>Tir de mission standard</td><td>1d8, bonne portee, chargeur 6, recharge bonus</td></tr>
-                  <tr><td>Precision</td><td>Angles longs, cible exposee</td><td>1d10, longue portee, chargeur 4, recharge action</td></tr>
-                  <tr><td>Brutale de proximite</td><td>Porte, angle serre, burst</td><td>1d10, courte portee, faible chargeur, impact fort</td></tr>
-                  <tr><td>Melee</td><td>Silence, pression, secours</td><td>1d6 a 1d10 selon taille, tags finesse, legere ou allongee</td></tr>
+                  <tr><td>Secours</td><td>Poings americains, couteau, pistolet 9 mm ou pistolet lourd</td><td>Couloir, dernier mot, sortie d&rsquo;urgence.</td></tr>
+                  <tr><td>Polyvalent</td><td>Batte, pistolet mitrailleur ou fusil d&rsquo;assaut</td><td>Mission standard, terrain mixte, pression mobile.</td></tr>
+                  <tr><td>Precision</td><td>Fusil de precision</td><td>Angles longs, couverture, cible exposee.</td></tr>
+                  <tr><td>Brutal</td><td>Fusil a pompe ou mitrailleuse legere</td><td>Porte, angle serre, saturation et rupture de ligne.</td></tr>
+                  <tr><td>Melee specialisee</td><td>Couteau de chasse, matraque ou katana</td><td>Silence, duel, intervention ou execution rapide.</td></tr>
                 </tbody>
               </table>
             </div>
+            <div class="weapon-catalog" data-arsenal="hub">
+              <div class="weapon-catalog-head">
+                <p class="weapon-catalog-kicker">Armes speciales du Hub</p>
+                <p class="weapon-catalog-copy">Chaque arme ci-dessous coute 500 chroma et propose un style de combat nettement plus extreme que l&rsquo;armement de base.</p>
+              </div>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">Distance speciale</p>
+                </div>
+                <div class="weapon-grid">
+                  <article class="weapon-card weapon-card-hub">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Lance-flammes</span></h3>
+                      <p class="weapon-cost">500 chroma</p>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Lourde</span>
+                    </div>
+                    <div class="weapon-summary-row">
+                      <p class="weapon-note">Arme de nettoyage de zone qui noie un angle entier sous le feu.</p>
+                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-lance-flammes" data-hub-weapon-title="Lance-flammes" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Lance-grenades</span></h3>
+                      <p class="weapon-cost">500 chroma</p>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Lourde</span>
+                    </div>
+                    <div class="weapon-summary-row">
+                      <p class="weapon-note">Explosif de zone ideal pour deloger un groupe ou casser un couvert.</p>
+                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-lance-grenades" data-hub-weapon-title="Lance-grenades" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Baliste a poulie</span></h3>
+                      <p class="weapon-cost">500 chroma</p>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Lourde</span>
+                      <span class="weapon-tag">Brutale</span>
+                    </div>
+                    <div class="weapon-summary-row">
+                      <p class="weapon-note">Arme techno-mecanique brutale qui frappe comme un belier a distance.</p>
+                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-baliste-poulie" data-hub-weapon-title="Baliste a poulie" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Fusil a arc electrique</span></h3>
+                      <p class="weapon-cost">500 chroma</p>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                    </div>
+                    <div class="weapon-summary-row">
+                      <p class="weapon-note">Decharge specialisee pour perturber les reflexes, les implants et les reactions.</p>
+                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-fusil-arc-electrique" data-hub-weapon-title="Fusil a arc electrique" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub">
+                    <div class="weapon-card-head">
+                      <h3 class="weapon-name"><span>Sulfateuse</span></h3>
+                      <p class="weapon-cost">500 chroma</p>
+                    </div>
+                    <div class="weapon-tags">
+                      <span class="weapon-tag">A deux mains</span>
+                      <span class="weapon-tag">Lourde</span>
+                      <span class="weapon-tag">Brutale</span>
+                    </div>
+                    <div class="weapon-summary-row">
+                      <p class="weapon-note">Arme de tir soutenu qui devient de plus en plus dangereuse tant qu&rsquo;on maintient la pression.</p>
+                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-sulfateuse" data-hub-weapon-title="Sulfateuse" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
             <div class="callout">
               <strong>Choix minimum pour un PJ</strong>
-              <p>Un personnage jouable a interet a partir avec une arme principale, une arme secondaire ou de secours, et au moins une reponse si le combat passe au contact. Si votre build depend des munitions, notez aussi votre type de chargeur et votre cout de recharge des la creation.</p>
+              <p>Un personnage jouable a interet a partir avec au moins une arme de base du coeur de regles, une solution de secours, et une reponse si le combat passe au contact. Si votre build depend des munitions, notez aussi votre chargeur et votre cout de rechargement des la creation.</p>
             </div>
           </section>
 
@@ -4547,6 +4916,99 @@
           </section>
         </main>
       </div>    </div>
+
+    <template id="hub-weapon-lance-flammes">
+      <div class="protocol-facts">
+        <p><strong>Cout :</strong> 500 chroma</p>
+        <p><strong>Degats :</strong> 2d8 feu</p>
+        <p><strong>Portee :</strong> cone de 6 m</p>
+        <p><strong>Chargeur :</strong> 4</p>
+        <p><strong>Rechargement :</strong> action complete</p>
+        <p><strong>Proprietes :</strong> A deux mains, Lourde</p>
+      </div>
+      <p>Le lance-flammes projette une nappe de feu sur toutes les creatures dans un cone de 6 metres.</p>
+      <ul>
+        <li>Cette attaque touche automatiquement.</li>
+        <li>Chaque creature affectee effectue un jet de sauvegarde de Dexterite.</li>
+        <li>En cas d&rsquo;echec, elle subit 2d8 degats de feu.</li>
+        <li>En cas de reussite, elle subit la moitie de ces degats.</li>
+      </ul>
+    </template>
+
+    <template id="hub-weapon-lance-grenades">
+      <div class="protocol-facts">
+        <p><strong>Cout :</strong> 500 chroma</p>
+        <p><strong>Degats :</strong> 2d10 explosif</p>
+        <p><strong>Portee :</strong> 18 m / 54 m</p>
+        <p><strong>Chargeur :</strong> 4</p>
+        <p><strong>Rechargement :</strong> action complete</p>
+        <p><strong>Proprietes :</strong> A deux mains, Lourde</p>
+      </div>
+      <p>Le lance-grenades tire un projectile explosif qui detonne a l&rsquo;impact.</p>
+      <ul>
+        <li>La cible principale et toutes les creatures situees dans un rayon de 1,50 metre autour du point d&rsquo;impact subissent les degats de l&rsquo;arme.</li>
+        <li>Les creatures affectees effectuent une sauvegarde de Dexterite pour reduire les degats de moitie.</li>
+        <li>Si le jet d&rsquo;attaque contre la cible principale touche, celle-ci echoue automatiquement a sa sauvegarde.</li>
+      </ul>
+    </template>
+
+    <template id="hub-weapon-baliste-poulie">
+      <div class="protocol-facts">
+        <p><strong>Cout :</strong> 500 chroma</p>
+        <p><strong>Degats :</strong> 2d8 perforant</p>
+        <p><strong>Portee :</strong> 18 m / 72 m</p>
+        <p><strong>Chargeur :</strong> 4</p>
+        <p><strong>Rechargement :</strong> action bonus</p>
+        <p><strong>Proprietes :</strong> A deux mains, Lourde, Brutale</p>
+      </div>
+      <p>La baliste a poulie est une arme techno-mecanique de haute tension, concue pour projeter de lourds traits metalliques avec une violence extreme.</p>
+      <ul>
+        <li>Lorsqu&rsquo;une creature est touchee par cette arme, elle doit reussir un jet de sauvegarde de Force.</li>
+        <li>En cas d&rsquo;echec, elle est repoussee de 1,50 metre.</li>
+      </ul>
+    </template>
+
+    <template id="hub-weapon-fusil-arc-electrique">
+      <div class="protocol-facts">
+        <p><strong>Cout :</strong> 500 chroma</p>
+        <p><strong>Degats :</strong> 3d6 foudre</p>
+        <p><strong>Portee :</strong> 12 m / 36 m</p>
+        <p><strong>Chargeur :</strong> 4</p>
+        <p><strong>Rechargement :</strong> action bonus</p>
+        <p><strong>Proprietes :</strong> A deux mains</p>
+      </div>
+      <p>Le fusil a arc electrique projette une decharge concentree qui frappe a la fois les tissus, les implants et les systemes embarques.</p>
+      <ul>
+        <li>Lorsqu&rsquo;une creature subit les degats de cette arme, elle ne peut pas effectuer de reaction jusqu&rsquo;au debut de son prochain tour.</li>
+      </ul>
+    </template>
+
+    <template id="hub-weapon-sulfateuse">
+      <div class="protocol-facts">
+        <p><strong>Cout :</strong> 500 chroma</p>
+        <p><strong>Degats :</strong> 2d6 perforant</p>
+        <p><strong>Portee :</strong> 18 m / 72 m</p>
+        <p><strong>Chargeur :</strong> &mdash;</p>
+        <p><strong>Rechargement :</strong> &mdash;</p>
+        <p><strong>Proprietes :</strong> A deux mains, Lourde, Brutale</p>
+      </div>
+      <p>La sulfateuse est une arme de tir soutenu concue pour maintenir une pression continue sans se soucier d&rsquo;un chargeur classique.</p>
+      <ul>
+        <li>Chaque tour consecutif durant lequel vous attaquez avec cette arme, ses degats augmentent de 1d6.</li>
+        <li>Ils montent jusqu&rsquo;a un maximum de 5d6.</li>
+        <li>Des que vous passez un tour sans attaquer avec la sulfateuse, ses degats reviennent a 2d6.</li>
+      </ul>
+    </template>
+
+    <div class="protocol-modal hub-weapon-modal" data-hub-weapon-modal hidden>
+      <div class="protocol-modal-backdrop" data-hub-weapon-close></div>
+      <div class="protocol-modal-card" role="dialog" aria-modal="true" aria-labelledby="hub-weapon-modal-title" tabindex="-1">
+        <button class="protocol-modal-close" type="button" data-hub-weapon-close aria-label="Fermer la fiche de l'arme">Fermer</button>
+        <p class="protocol-modal-meta" data-hub-weapon-meta hidden></p>
+        <h3 id="hub-weapon-modal-title" class="protocol-modal-title" data-hub-weapon-title></h3>
+        <div class="protocol-modal-body" data-hub-weapon-content></div>
+      </div>
+    </div>
 
     <div class="protocol-modal" data-protocol-modal hidden>
       <div class="protocol-modal-backdrop" data-protocol-close></div>
