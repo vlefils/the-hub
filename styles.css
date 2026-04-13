@@ -1393,6 +1393,26 @@ td {
   line-height: 1.55;
 }
 
+.catalog-detail {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 0.42rem;
+  color: #ddd7ca;
+  line-height: 1.55;
+}
+
+.catalog-detail p {
+  margin: 0;
+}
+
+.catalog-detail strong {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .weapon-summary-row {
   grid-column: 1 / -1;
   display: flex;
@@ -1407,6 +1427,10 @@ td {
   flex: 1;
   padding-top: 0;
   color: #d9d1c3;
+}
+
+.weapon-card-hub .catalog-detail {
+  grid-column: 1;
 }
 
 .weapon-card-hub {
