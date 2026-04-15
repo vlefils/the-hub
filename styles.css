@@ -1570,6 +1570,73 @@ td {
   color: var(--green-acid);
 }
 
+.origins-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+
+.origin-card {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+}
+
+.origin-card-head {
+  display: grid;
+  gap: 0.3rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.origin-card-head h3,
+.origin-card-bonus,
+.origin-card-summary,
+.origin-card-label,
+.origin-card-feature {
+  margin: 0;
+}
+
+.origin-card-bonus {
+  color: #c9c1b3;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.origin-card-summary,
+.origin-card-feature {
+  color: #d7d0c4;
+  line-height: 1.65;
+}
+
+.origin-card-section {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.origin-card-label {
+  color: #f3efe6;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.origin-card-list,
+.origin-card-features {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.origin-card-list {
+  padding-left: 1.1rem;
+}
+
 .implant-rules {
   display: grid;
   gap: 1rem;
@@ -3248,7 +3315,8 @@ th {
   }
 
   .content-grid,
-  .card-grid.three-up {
+  .card-grid.three-up,
+  .origins-grid {
     grid-template-columns: 1fr;
   }
 
