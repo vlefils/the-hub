@@ -3229,7 +3229,7 @@ th {
   #outils-fiche .section-heading,
   #outils-pretires .section-heading,
   #outils-pretires .pretired-overview,
-  #outils-pretires .subtabs-nav {
+  #pretire-mara-rail-voss .section-heading {
     display: none !important;
   }
 
@@ -3257,28 +3257,23 @@ th {
   }
 
   body:not([data-print-target]) #outils-fiche,
-  body[data-print-target=""outils-fiche""] #outils-fiche,
-  body[data-print-target^=""pretired-sheet-""] #outils-pretires {
+  body[data-print-target="outils-fiche"] #outils-fiche,
+  body[data-print-target^="pretired-sheet-"] .print-target-section {
     display: block !important;
     margin: 0 !important;
   }
 
-  body[data-print-target^=""pretired-sheet-""] #outils-pretires .subtab-panel,
-  body[data-print-target^=""pretired-sheet-""] #outils-pretires .pretired-sheet {
+  body[data-print-target^="pretired-sheet-"] .print-target-section .pretired-brief,
+  body[data-print-target^="pretired-sheet-"] .print-target-section .pretired-sheet {
     display: none !important;
   }
 
-  body[data-print-target=""pretired-sheet-mara-rail-voss""] #pretire-mara-rail-voss,
-  body[data-print-target=""pretired-sheet-mara-rail-voss""] #pretired-sheet-mara-rail-voss {
+  body[data-print-target^="pretired-sheet-"] .print-target-sheet {
     display: block !important;
   }
 
-  body[data-print-target^=""pretired-sheet-""] #outils-pretires .pretired-sheet-stack {
+  body[data-print-target^="pretired-sheet-"] .print-target-section .pretired-sheet-stack {
     margin-top: 0 !important;
-  }
-
-  body[data-print-target=""pretired-sheet-mara-rail-voss""] #pretire-mara-rail-voss > :not(.pretired-sheet-stack) {
-    display: none !important;
   }
 
   .character-sheet-paper {

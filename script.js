@@ -646,6 +646,8 @@ if (characterSheet) {
   const clearPrintMode = () => {
     document.body.classList.remove("sheet-print-mode");
     delete document.body.dataset.printTarget;
+    document.querySelectorAll(".print-target-section").forEach((element) => element.classList.remove("print-target-section"));
+    document.querySelectorAll(".print-target-sheet").forEach((element) => element.classList.remove("print-target-sheet"));
   };
 
   editableControls.forEach((control) => {
@@ -676,13 +678,18 @@ if (characterSheet) {
   printButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const targetId = button.dataset.printTarget?.trim();
+      const targetSheet = targetId ? document.getElementById(targetId) : null;
+      const targetSection = targetSheet?.closest("[data-section]");
 
-      if (!targetId) {
+      if (!targetId || !targetSheet) {
         return;
       }
 
+      clearPrintMode();
       document.body.classList.add("sheet-print-mode");
       document.body.dataset.printTarget = targetId;
+      targetSheet.classList.add("print-target-sheet");
+      targetSection?.classList.add("print-target-section");
       window.requestAnimationFrame(() => window.print());
       window.setTimeout(clearPrintMode, 1500);
     });
