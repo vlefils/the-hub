@@ -1944,7 +1944,8 @@ td {
   margin-bottom: 1rem;
 }
 
-[id^="personnage-classe-"] .subtabs-nav {
+[id^="personnage-classe-"] .subtabs-nav,
+#outils-pretires .subtabs-nav {
   display: flex;
 }
 
@@ -2572,6 +2573,105 @@ th {
 .pretired-brief-note {
   padding-top: 0.2rem;
   color: #b9b1a2;
+}
+
+.pretired-overview {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.pretired-overview-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pretired-overview-kicker,
+.pretired-overview-count,
+.pretired-directory-meta,
+.pretired-directory-summary,
+.pretired-directory-focus {
+  margin: 0;
+}
+
+.pretired-overview-kicker {
+  color: var(--green-acid);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.pretired-overview-head h3 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.45rem, 1.15rem + 0.85vw, 1.95rem);
+  line-height: 0.98;
+}
+
+.pretired-overview-count,
+.pretired-directory-meta {
+  color: #c9c1b3;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pretired-overview-count {
+  white-space: nowrap;
+}
+
+.pretired-directory {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pretired-directory-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.7fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.15rem;
+  background:
+    linear-gradient(180deg, rgba(125, 255, 101, 0.06), transparent 4.5rem),
+    #181b22;
+  border: 1px solid #363943;
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 14px 100%, 0 calc(100% - 10px), 0 12px);
+}
+
+.pretired-directory-copy {
+  display: grid;
+  gap: 0.38rem;
+}
+
+.pretired-directory-card h4 {
+  margin: 0;
+  color: #f3efe6;
+  font-size: clamp(1.35rem, 1.1rem + 0.7vw, 1.7rem);
+  line-height: 0.96;
+}
+
+.pretired-directory-summary {
+  color: #d7d0c4;
+  line-height: 1.6;
+}
+
+.pretired-directory-focus {
+  padding: 0.7rem 0.8rem 0.7rem 0.95rem;
+  border-left: 3px solid rgba(125, 255, 101, 0.45);
+  background: rgba(255, 255, 255, 0.03);
+  color: #f3efe6;
+  line-height: 1.55;
+}
+
+.pretired-directory-link {
+  justify-self: end;
+  min-width: 12.5rem;
 }
 
 .pretired-sheet-stack {
@@ -3749,6 +3849,15 @@ th {
     grid-template-columns: 1fr;
   }
 
+  .pretired-directory-card {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: flex-start;
+  }
+
+  .pretired-directory-link {
+    justify-self: start;
+  }
+
   .sheet-panel[aria-labelledby="sheet-skills-title"],
   .sheet-panel-skills {
     grid-column: 1 / -1;
@@ -3779,6 +3888,7 @@ th {
 }
 
 @media (max-width: 680px) {
+  .pretired-overview-head,
   .pretired-brief-head,
   .character-sheet-identity,
   .sheet-story-grid,
@@ -3791,6 +3901,14 @@ th {
 
   .pretired-brief-head {
     display: grid;
+  }
+
+  .pretired-overview-head {
+    display: grid;
+  }
+
+  .pretired-overview-count {
+    white-space: normal;
   }
 
   .pretired-stat-list div {
