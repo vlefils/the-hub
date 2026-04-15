@@ -5059,12 +5059,13 @@
 
             <div class="pretired-sheet-stack">
               <section class="character-sheet pretired-sheet" aria-label="Fiche pre-tiree de Mara Rail Voss">
-                <div class="character-sheet-paper">
+                <div class="character-sheet-pages">
+                <div class="character-sheet-paper character-sheet-paper--game">
+                  <div class="character-sheet-top">
                   <header class="character-sheet-head">
                     <div class="character-sheet-brand">
                       <p class="character-sheet-kicker">The Hub</p>
                       <p class="character-sheet-title">Fiche operative</p>
-                      <p class="character-sheet-caption">Pre-tire terrain pret a jouer.</p>
                     </div>
 
                     <div class="character-sheet-identity">
@@ -5073,105 +5074,113 @@
                         <input class="sheet-input" type="text" value="Mara &quot;Rail&quot; Voss" readonly />
                       </label>
 
-                      <label class="sheet-field">
-                        <span>Joueur</span>
-                        <input class="sheet-input" type="text" value="Libre" readonly />
-                      </label>
-
-                      <label class="sheet-field">
+                      <label class="sheet-field sheet-field-class">
                         <span>Classe</span>
                         <input class="sheet-input" type="text" value="Brute - Voie de l'acier" readonly />
                       </label>
 
-                      <label class="sheet-field">
+                      <label class="sheet-field sheet-field-origin">
                         <span>Origine</span>
                         <input class="sheet-input" type="text" value="Guerre privee" readonly />
                       </label>
 
-                      <label class="sheet-field">
+                      <label class="sheet-field sheet-field-level">
                         <span>Niveau</span>
                         <input class="sheet-input" type="number" value="5" readonly />
-                      </label>
-
-                      <label class="sheet-field">
-                        <span>Concept</span>
-                        <input class="sheet-input" type="text" value="Brise-ligne mobile / breacher de contact" readonly />
                       </label>
                     </div>
                   </header>
 
                   <section class="character-sheet-summary" aria-label="Synthese du personnage">
-                    <article class="sheet-summary-card">
-                      <span class="sheet-summary-label">Bonus de maitrise</span>
-                      <output class="sheet-summary-value">+3</output>
-                    </article>
-
-                    <article class="sheet-summary-card">
-                      <span class="sheet-summary-label">CA</span>
-                      <output class="sheet-summary-value">17</output>
-                    </article>
-
-                    <article class="sheet-summary-card">
-                      <span class="sheet-summary-label">Initiative</span>
-                      <output class="sheet-summary-value">+1</output>
-                    </article>
-
-                    <article class="sheet-summary-card">
-                      <span class="sheet-summary-label">Vitesse</span>
-                      <label class="sheet-inline-edit">
-                        <input class="sheet-input" type="number" value="12" readonly />
-                        <span>m</span>
-                      </label>
-                    </article>
-
-                    <article class="sheet-summary-card">
-                      <span class="sheet-summary-label">Perception passive</span>
-                      <output class="sheet-summary-value">14</output>
-                    </article>
-
-                    <article class="sheet-summary-card sheet-summary-card-pv">
-                      <span class="sheet-summary-label">Points de vie</span>
-                      <div class="sheet-inline-split">
-                        <label>
-                          <span>Max</span>
-                          <input class="sheet-input" type="number" value="55" readonly />
-                        </label>
-                        <label>
-                          <span>Actuels</span>
-                          <input class="sheet-input" type="number" value="55" readonly />
-                        </label>
-                        <label>
-                          <span>Temp</span>
-                          <input class="sheet-input" type="number" value="0" readonly />
-                        </label>
+                    <div class="sheet-summary-group sheet-summary-group-defense">
+                      <div class="sheet-summary-group-head">
+                        <span class="sheet-summary-group-title">Defense</span>
                       </div>
-                    </article>
 
-                    <article class="sheet-summary-card">
-                      <span class="sheet-summary-label">Des de vie</span>
-                      <input class="sheet-input" type="text" value="5d12" readonly />
-                    </article>
+                      <div class="sheet-summary-group-body sheet-summary-group-body-defense">
+                        <article class="sheet-summary-card sheet-summary-card-primary sheet-summary-card-ac">
+                          <span class="sheet-summary-label">CA</span>
+                          <output class="sheet-summary-value">17</output>
+                        </article>
 
-                    <article class="sheet-summary-card sheet-summary-card-death">
-                      <span class="sheet-summary-label">Jets contre la mort</span>
-                      <div class="sheet-death-grid">
-                        <div class="sheet-death-track">
-                          <span>Succes</span>
-                          <label><input type="checkbox" disabled /> <span>1</span></label>
-                          <label><input type="checkbox" disabled /> <span>2</span></label>
-                          <label><input type="checkbox" disabled /> <span>3</span></label>
-                        </div>
-                        <div class="sheet-death-track">
-                          <span>Echecs</span>
-                          <label><input type="checkbox" disabled /> <span>1</span></label>
-                          <label><input type="checkbox" disabled /> <span>2</span></label>
-                          <label><input type="checkbox" disabled /> <span>3</span></label>
-                        </div>
+                        <article class="sheet-summary-card sheet-summary-card-primary sheet-summary-card-mastery">
+                          <span class="sheet-summary-label">Bonus mait.</span>
+                          <output class="sheet-summary-value">+3</output>
+                        </article>
+
+                        <article class="sheet-summary-card sheet-summary-card-secondary sheet-summary-card-speed">
+                          <span class="sheet-summary-label">Vitesse</span>
+                          <label class="sheet-inline-edit">
+                            <input class="sheet-input" type="number" value="12" readonly />
+                            <span>m</span>
+                          </label>
+                        </article>
+
+                        <article class="sheet-summary-card sheet-summary-card-primary sheet-summary-card-init">
+                          <span class="sheet-summary-label">Init.</span>
+                          <output class="sheet-summary-value">+1</output>
+                        </article>
                       </div>
-                    </article>
+                    </div>
+
+                    <div class="sheet-summary-group sheet-summary-group-vitality">
+                      <div class="sheet-summary-group-head">
+                        <span class="sheet-summary-group-title">Vitalite</span>
+                      </div>
+
+                      <article class="sheet-summary-card sheet-summary-card-hero sheet-summary-card-pv">
+                        <span class="sheet-summary-label">PV</span>
+                        <div class="sheet-inline-split">
+                          <label>
+                            <span>Max</span>
+                            <input class="sheet-input" type="number" value="55" readonly />
+                          </label>
+                          <label>
+                            <span>Actuels</span>
+                            <input class="sheet-input" type="number" value="55" readonly />
+                          </label>
+                          <label>
+                            <span>Temp</span>
+                            <input class="sheet-input" type="number" value="0" readonly />
+                          </label>
+                        </div>
+                      </article>
+                    </div>
+
+                    <div class="sheet-summary-group sheet-summary-group-survival">
+                      <div class="sheet-summary-group-head">
+                        <span class="sheet-summary-group-title">Survie</span>
+                      </div>
+
+                      <div class="sheet-summary-group-body sheet-summary-group-body-survival">
+                        <article class="sheet-summary-card sheet-summary-card-secondary sheet-summary-card-hitdice">
+                          <span class="sheet-summary-label">Des vie</span>
+                          <input class="sheet-input" type="text" value="5d12" readonly />
+                        </article>
+
+                        <article class="sheet-summary-card sheet-summary-card-secondary sheet-summary-card-death">
+                          <span class="sheet-summary-label">Mort</span>
+                          <div class="sheet-death-grid">
+                            <div class="sheet-death-track">
+                              <span>Succes</span>
+                              <label><input type="checkbox" disabled /> <span>1</span></label>
+                              <label><input type="checkbox" disabled /> <span>2</span></label>
+                              <label><input type="checkbox" disabled /> <span>3</span></label>
+                            </div>
+                            <div class="sheet-death-track">
+                              <span>Echecs</span>
+                              <label><input type="checkbox" disabled /> <span>1</span></label>
+                              <label><input type="checkbox" disabled /> <span>2</span></label>
+                              <label><input type="checkbox" disabled /> <span>3</span></label>
+                            </div>
+                          </div>
+                        </article>
+                      </div>
+                    </div>
                   </section>
+                  </div>
 
-                  <div class="character-sheet-layout">
+                  <div class="character-sheet-layout character-sheet-layout--game">
                     <div class="character-sheet-primary">
                       <section class="sheet-panel sheet-panel-abilities" aria-labelledby="pretire-abilities-title">
                         <div class="sheet-panel-head">
@@ -5193,11 +5202,11 @@
                               <input class="sheet-input" type="number" value="18" readonly />
                             </label>
                             <label class="sheet-check-row">
-                              <span>Maitrise save</span>
+                              <span>M save</span>
                               <input type="checkbox" checked disabled />
                             </label>
                             <div class="sheet-ability-save">
-                              <span>Sauvegarde</span>
+                              <span>Save</span>
                               <output>+7</output>
                             </div>
                           </article>
@@ -5215,11 +5224,11 @@
                               <input class="sheet-input" type="number" value="13" readonly />
                             </label>
                             <label class="sheet-check-row">
-                              <span>Maitrise save</span>
+                              <span>M save</span>
                               <input type="checkbox" disabled />
                             </label>
                             <div class="sheet-ability-save">
-                              <span>Sauvegarde</span>
+                              <span>Save</span>
                               <output>+1</output>
                             </div>
                           </article>
@@ -5237,11 +5246,11 @@
                               <input class="sheet-input" type="number" value="16" readonly />
                             </label>
                             <label class="sheet-check-row">
-                              <span>Maitrise save</span>
+                              <span>M save</span>
                               <input type="checkbox" checked disabled />
                             </label>
                             <div class="sheet-ability-save">
-                              <span>Sauvegarde</span>
+                              <span>Save</span>
                               <output>+6</output>
                             </div>
                           </article>
@@ -5259,11 +5268,11 @@
                               <input class="sheet-input" type="number" value="12" readonly />
                             </label>
                             <label class="sheet-check-row">
-                              <span>Maitrise save</span>
+                              <span>M save</span>
                               <input type="checkbox" disabled />
                             </label>
                             <div class="sheet-ability-save">
-                              <span>Sauvegarde</span>
+                              <span>Save</span>
                               <output>+1</output>
                             </div>
                           </article>
@@ -5281,11 +5290,11 @@
                               <input class="sheet-input" type="number" value="10" readonly />
                             </label>
                             <label class="sheet-check-row">
-                              <span>Maitrise save</span>
+                              <span>M save</span>
                               <input type="checkbox" disabled />
                             </label>
                             <div class="sheet-ability-save">
-                              <span>Sauvegarde</span>
+                              <span>Save</span>
                               <output>+0</output>
                             </div>
                           </article>
@@ -5293,9 +5302,16 @@
                       </section>
 
                       <section class="sheet-panel sheet-panel-skills" aria-labelledby="pretire-skills-title">
-                        <div class="sheet-panel-head">
-                          <p class="sheet-panel-kicker">Lecture</p>
-                          <h3 id="pretire-skills-title" class="sheet-panel-title">Competences</h3>
+                        <div class="sheet-panel-head sheet-panel-head-split">
+                          <div class="sheet-panel-head-copy">
+                            <p class="sheet-panel-kicker">Lecture</p>
+                            <h3 id="pretire-skills-title" class="sheet-panel-title">Competences</h3>
+                          </div>
+
+                          <div class="sheet-skills-legend" aria-hidden="true">
+                            <span><strong>M</strong> maitrise</span>
+                            <span><strong>E</strong> expertise</span>
+                          </div>
                         </div>
 
                         <div class="sheet-skills-grid">
@@ -5418,147 +5434,168 @@
                           <h3 id="pretire-combat-title" class="sheet-panel-title">Armes et defense</h3>
                         </div>
 
-                        <div class="sheet-defense-grid">
-                          <label class="sheet-field">
-                            <span>Type d'armure</span>
-                            <select class="sheet-select" disabled>
-                              <option value="light">Legere</option>
-                              <option value="medium">Intermediaire</option>
-                              <option value="heavy" selected>Lourde</option>
-                            </select>
-                          </label>
+                        <div class="sheet-combat-layout">
+                          <div class="sheet-combat-subsection">
+                            <div class="sheet-subsection-head">
+                              <p class="sheet-subsection-title">Defense</p>
+                            </div>
 
-                          <label class="sheet-check-row">
-                            <span>Bouclier</span>
-                            <input type="checkbox" disabled />
-                          </label>
+                            <div class="sheet-defense-grid">
+                              <div class="sheet-defense-main">
+                                <label class="sheet-field sheet-field-armor">
+                                  <span>Armure</span>
+                                  <select class="sheet-select" disabled>
+                                    <option value="light">Legere</option>
+                                    <option value="medium">Intermediaire</option>
+                                    <option value="heavy" selected>Lourde</option>
+                                  </select>
+                                </label>
 
-                          <label class="sheet-field">
-                            <span>Mod. CA</span>
-                            <input class="sheet-input" type="number" value="0" readonly />
-                          </label>
+                                <label class="sheet-check-row sheet-check-row-shield">
+                                  <span>Bouclier</span>
+                                  <input type="checkbox" disabled />
+                                </label>
+                              </div>
 
-                          <label class="sheet-field">
-                            <span>CA manuelle</span>
-                            <input class="sheet-input" type="number" placeholder="-" readonly />
-                          </label>
-                        </div>
-
-                        <div class="sheet-attacks">
-                          <div class="sheet-attack-head">
-                            <span>Arme</span>
-                            <span>Bonus</span>
-                            <span>Degats</span>
-                            <span>Portee / tags</span>
+                              <label class="sheet-field sheet-field-mod-ca">
+                                <span>Mod. CA</span>
+                                <input class="sheet-input" type="number" value="0" readonly />
+                              </label>
+                            </div>
                           </div>
 
-                          <div class="sheet-attack-row">
-                            <input class="sheet-input" type="text" value="Batte" readonly />
-                            <input class="sheet-input" type="text" value="+7" readonly />
-                            <input class="sheet-input" type="text" value="1d8+6" readonly />
-                            <input class="sheet-input" type="text" value="Contact, polyvalente" readonly />
-                          </div>
+                          <div class="sheet-combat-subsection">
+                            <div class="sheet-subsection-head">
+                              <p class="sheet-subsection-title">Armement</p>
+                            </div>
 
-                          <div class="sheet-attack-row">
-                            <input class="sheet-input" type="text" value="Pistolet 9 mm" readonly />
-                            <input class="sheet-input" type="text" value="+4" readonly />
-                            <input class="sheet-input" type="text" value="1d6+1" readonly />
-                            <input class="sheet-input" type="text" value="12 m / 36 m, chargeur 6, rechargement action bonus" readonly />
-                          </div>
+                            <div class="sheet-attacks">
+                              <div class="sheet-attack-block">
+                                <div class="sheet-attack-head">
+                                  <span>Arme</span>
+                                  <span>Bonus</span>
+                                  <span>Degats</span>
+                                </div>
+                                <div class="sheet-attack-row">
+                                  <input class="sheet-input" type="text" value="Batte" readonly />
+                                  <input class="sheet-input" type="text" value="+7" readonly />
+                                  <input class="sheet-input" type="text" value="1d8+6" readonly />
+                                </div>
+                                <label class="sheet-field sheet-field-block sheet-attack-effect">
+                                  <span>Effet</span>
+                                  <textarea class="sheet-textarea sheet-textarea-compact" rows="3" readonly>Polyvalente</textarea>
+                                </label>
+                              </div>
 
-                          <div class="sheet-attack-row">
-                            <input class="sheet-input" type="text" value="Couteau de chasse" readonly />
-                            <input class="sheet-input" type="text" value="+7" readonly />
-                            <input class="sheet-input" type="text" value="1d6+4" readonly />
-                            <input class="sheet-input" type="text" value="Contact" readonly />
+                              <div class="sheet-attack-block">
+                                <div class="sheet-attack-head">
+                                  <span>Arme</span>
+                                  <span>Bonus</span>
+                                  <span>Degats</span>
+                                </div>
+                                <div class="sheet-attack-row">
+                                  <input class="sheet-input" type="text" value="Pistolet 9 mm" readonly />
+                                  <input class="sheet-input" type="text" value="+4" readonly />
+                                  <input class="sheet-input" type="text" value="1d6+1" readonly />
+                                </div>
+                                <label class="sheet-field sheet-field-block sheet-attack-effect">
+                                  <span>Effet</span>
+                                  <textarea class="sheet-textarea sheet-textarea-compact" rows="3" readonly>Chargeur 6, rechargement action bonus</textarea>
+                                </label>
+                              </div>
+
+                              <div class="sheet-attack-block">
+                                <div class="sheet-attack-head">
+                                  <span>Arme</span>
+                                  <span>Bonus</span>
+                                  <span>Degats</span>
+                                </div>
+                                <div class="sheet-attack-row">
+                                  <input class="sheet-input" type="text" value="Couteau de chasse" readonly />
+                                  <input class="sheet-input" type="text" value="+7" readonly />
+                                  <input class="sheet-input" type="text" value="1d6+4" readonly />
+                                </div>
+                                <label class="sheet-field sheet-field-block sheet-attack-effect">
+                                  <span>Effet</span>
+                                  <textarea class="sheet-textarea sheet-textarea-compact" rows="3" readonly>-</textarea>
+                                </label>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </section>
 
-                      <section class="sheet-panel sheet-panel-story" aria-labelledby="pretire-story-title">
-                        <div class="sheet-panel-head">
-                          <p class="sheet-panel-kicker">Terrain</p>
-                          <h3 id="pretire-story-title" class="sheet-panel-title">Ressources et accroches</h3>
-                        </div>
+                    </div>
+                  </div>
 
-                        <div class="sheet-story-grid">
-                          <label class="sheet-field sheet-field-block">
-                            <span>Armure / equipement</span>
-                            <textarea class="sheet-textarea" rows="12" readonly>Armure lourde
+                  <section class="sheet-panel sheet-panel-implants--game" aria-labelledby="pretire-implants-title">
+                    <div class="sheet-panel-head">
+                      <h3 id="pretire-implants-title" class="sheet-panel-title">Implants / mods</h3>
+                    </div>
+                    <label class="sheet-field sheet-field-block sheet-implants-free">
+                      <span>Synthese implants / mods</span>
+                      <textarea class="sheet-textarea sheet-textarea-compact" rows="3" readonly>Neural : -
+Oculaire : -
+Bras : Bras d'assaut
+Jambes : Lames de course
+Torse : Harnais servo
+Bio-mod : Renfort musculaire</textarea>
+                    </label>
+                  </section>
+                </div>
+
+                <div class="character-sheet-paper character-sheet-paper--notes">
+                  <section class="sheet-panel sheet-panel-story sheet-panel-story--full" aria-labelledby="pretire-story-title">
+                    <div class="sheet-panel-head">
+                      <p class="sheet-panel-kicker">Terrain</p>
+                      <h3 id="pretire-story-title" class="sheet-panel-title">Suivi de mission</h3>
+                    </div>
+
+                    <div class="sheet-story-grid sheet-story-grid--page2">
+                      <div class="sheet-story-column sheet-story-column-gear">
+                        <label class="sheet-field sheet-field-block">
+                          <span>Equipement</span>
+                          <textarea class="sheet-textarea" rows="11" readonly>Armure lourde
 Batte
 Pistolet 9 mm
 Couteau de chasse
 Kit de terrain
 Pack de munitions
-Bras d'assaut (450 chromas)
-Lames de course (450 chromas)
-Gantelet a impulsion (350 chromas)
-Harnais servo-assiste leger (250 chromas)
+Gantelet a impulsion
+Harnais servo-assiste leger
 Budget Hub total : 1500 chromas</textarea>
-                          </label>
+                        </label>
+                      </div>
 
-                          <label class="sheet-field sheet-field-block">
-                            <span>Aptitudes et ressources</span>
-                            <textarea class="sheet-textarea" rows="12" readonly>Adr&eacute;naline max : 28
-Hurlement mena&ccedil;ant : 3 utilisations / repos court ou long, rayon 9 m, jusqu'a 3 cibles, DD 14
-Dur au mal : depensez de l'Adr&eacute;naline pour ignorer autant de degats
-Lame sous tension : 2 Adr&eacute;naline, 1 fois / tour, avantage sur une attaque de melee avec arme
-Demolisseur : avantage sur la casse et degats doubles aux objets et structures en melee
-Ruee d'acier : 3 Adr&eacute;naline, Foncer ou Se desengager en action bonus
-Bras d'assaut : +2 degats sur les attaques de melee faites avec ce bras ; avantage sur les tests de Lutte impliquant ce bras
-Gantelet a impulsion : 1 fois / tour, repousse une cible touchee de 1,50 metre
-Charge cyber totale : 4
-Palier de sequelles : 3 a 4</textarea>
-                          </label>
+                      <div class="sheet-story-column sheet-story-column-details">
+                        <label class="sheet-field sheet-field-block">
+                          <span>Aptitudes / details</span>
+                          <textarea class="sheet-textarea" rows="8" readonly>Hurlement mena&ccedil;ant : rayon 9 m, jusqu'a 3 cibles, DD 14.
+Dur au mal : depensez de l'Adr&eacute;naline pour ignorer autant de degats.
+Lame sous tension : 2 Adr&eacute;naline, 1 fois / tour, avantage sur une attaque de melee avec arme.
+Demolisseur : avantage sur la casse et degats doubles aux objets et structures en melee.
+Ruee d'acier : 3 Adr&eacute;naline, Foncer ou Se desengager en action bonus.</textarea>
+                        </label>
+                      </div>
 
-                          <label class="sheet-field sheet-field-block">
-                            <span>Compagnon ou module</span>
-                            <textarea class="sheet-textarea" rows="5" readonly>Aucun compagnon.
-Chrome visible : bras d'assaut au bras droit, lames de course aux jambes.
-Support : harnais servo-assiste leger et gantelet a impulsion.
-Role : tenir la ligne, ouvrir un passage et absorber la reponse.</textarea>
-                          </label>
+                      <div class="sheet-story-column sheet-story-column-notes">
+                        <label class="sheet-field sheet-field-block">
+                          <span>Notes / contacts / dette</span>
+                          <textarea class="sheet-textarea" rows="10" readonly>Contact : ancien logisticien de son unite privee reconverti au Hub.
+Dette : facture de reconstruction musculaire et de reeducation motrice.
+Raison : effacer sa dette avant qu'on la remette sous drapeau.
+Ligne rouge : n'abandonne pas un allie conscient.
+Signe distinctif : demarche lourde, plaques d'attache visibles au bras droit et aux jambes.
 
-                          <div class="sheet-hooks-grid">
-                            <label class="sheet-field">
-                              <span>Contact</span>
-                              <input class="sheet-input" type="text" value="Ancien logisticien de son unite privee reconverti au Hub" readonly />
-                            </label>
+Ouverture de scene : lance Hurlement mena&ccedil;ant pour fixer jusqu'a 3 ennemis.
+Utilise Ruee d'acier pour coller une ligne, contourner un angle ou sortir d'un piege.</textarea>
+                        </label>
+                      </div>
 
-                            <label class="sheet-field">
-                              <span>Dette</span>
-                              <input class="sheet-input" type="text" value="Facture de reconstruction musculaire et de reeducation motrice" readonly />
-                            </label>
-
-                            <label class="sheet-field">
-                              <span>Raison de prendre des contrats</span>
-                              <input class="sheet-input" type="text" value="Effacer sa dette avant qu'on la remette sous drapeau" readonly />
-                            </label>
-
-                            <label class="sheet-field">
-                              <span>Ligne rouge</span>
-                              <input class="sheet-input" type="text" value="N'abandonne pas un allie conscient" readonly />
-                            </label>
-
-                            <label class="sheet-field">
-                              <span>Signe distinctif</span>
-                              <input class="sheet-input" type="text" value="Demarche lourde, plaques d'attache visibles au bras droit et aux jambes" readonly />
-                            </label>
-                          </div>
-
-                          <label class="sheet-field sheet-field-block">
-                            <span>Notes</span>
-                            <textarea class="sheet-textarea" rows="6" readonly>Ouverture de scene : lance Hurlement mena&ccedil;ant pour fixer jusqu'a 3 ennemis.
-Utilise Ruee d'acier pour coller une ligne, contourner un angle ou sortir d'un piege.
-Lame sous tension sert a fiabiliser la frappe qui doit absolument passer.
-La batte reste l'arme de pression principale ; le pistolet 9 mm sert de secours de couloir.
-Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.</textarea>
-                          </label>
-                        </div>
-                      </section>
                     </div>
-                  </div>
+                  </section>
                 </div>
+              </div>
               </section>
             </div>
           </section>
@@ -5567,7 +5604,7 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
             <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Fiche PJ</h2></div></div>
             <p class="sheet-intro">Version imprimable A4 de la feuille de personnage The Hub. Renseignez les champs, laissez les calculs de base se mettre a jour, puis utilisez l'export PDF du navigateur.</p>
             <div class="sheet-toolbar">
-              <p class="sheet-toolbar-copy">V1 universelle pour la table: calcul des modificateurs, sauvegardes, competences, perception passive et CA de base, sans builder complet.</p>
+              <p class="sheet-toolbar-copy">V4 print-first sur 2 pages A4: page 1 pour le jeu immediat et les implants, page 2 pour le suivi et les notes.</p>
               <div class="sheet-toolbar-actions">
                 <button class="button button-primary" type="button" data-export-sheet>Exporter en PDF</button>
                 <button class="button button-secondary" type="button" data-reset-sheet>Effacer la fiche</button>
@@ -5575,12 +5612,13 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
             </div>
 
             <form class="character-sheet" data-character-sheet novalidate autocomplete="off">
-              <div class="character-sheet-paper">
+                <div class="character-sheet-pages">
+                <div class="character-sheet-paper character-sheet-paper--game">
+                <div class="character-sheet-top">
                 <header class="character-sheet-head">
                   <div class="character-sheet-brand">
                     <p class="character-sheet-kicker">The Hub</p>
                     <p class="character-sheet-title">Fiche operative</p>
-                    <p class="character-sheet-caption">Profil terrain imprime sur une seule page A4.</p>
                   </div>
 
                   <div class="character-sheet-identity">
@@ -5589,107 +5627,115 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
                       <input class="sheet-input" type="text" name="character_name" placeholder="Nom de l'operateur" />
                     </label>
 
-                    <label class="sheet-field">
-                      <span>Joueur</span>
-                      <input class="sheet-input" type="text" name="player_name" placeholder="Nom du joueur" />
-                    </label>
-
-                    <label class="sheet-field">
+                    <label class="sheet-field sheet-field-class">
                       <span>Classe</span>
                       <input class="sheet-input" type="text" name="character_class" placeholder="Brute, Gachette..." />
                     </label>
 
-                    <label class="sheet-field">
+                    <label class="sheet-field sheet-field-origin">
                       <span>Origine</span>
                       <input class="sheet-input" type="text" name="character_origin" placeholder="Rue, Corpo, Labo..." />
                     </label>
 
-                    <label class="sheet-field">
+                    <label class="sheet-field sheet-field-level">
                       <span>Niveau</span>
                       <input class="sheet-input" type="number" name="character_level" value="1" min="1" max="12" data-level />
-                    </label>
-
-                    <label class="sheet-field">
-                      <span>Concept</span>
-                      <input class="sheet-input" type="text" name="character_concept" placeholder="Role, vibe, specialite" />
                     </label>
                   </div>
                 </header>
 
                 <section class="character-sheet-summary" aria-label="Synthese du personnage">
-                  <article class="sheet-summary-card">
-                    <span class="sheet-summary-label">Bonus de maitrise</span>
-                    <output class="sheet-summary-value" data-proficiency-bonus>+2</output>
-                  </article>
-
-                  <article class="sheet-summary-card">
-                    <span class="sheet-summary-label">CA</span>
-                    <output class="sheet-summary-value" data-ac-total>12</output>
-                  </article>
-
-                  <article class="sheet-summary-card">
-                    <span class="sheet-summary-label">Initiative</span>
-                    <output class="sheet-summary-value" data-initiative-total>+0</output>
-                  </article>
-
-                  <article class="sheet-summary-card">
-                    <span class="sheet-summary-label">Vitesse</span>
-                    <label class="sheet-inline-edit">
-                      <input class="sheet-input" type="number" name="speed" value="9" min="0" step="1" />
-                      <span>m</span>
-                    </label>
-                  </article>
-
-                  <article class="sheet-summary-card">
-                    <span class="sheet-summary-label">Perception passive</span>
-                    <output class="sheet-summary-value" data-passive-perception>10</output>
-                  </article>
-
-                  <article class="sheet-summary-card sheet-summary-card-pv">
-                    <span class="sheet-summary-label">Points de vie</span>
-                    <div class="sheet-inline-split">
-                      <label>
-                        <span>Max</span>
-                        <input class="sheet-input" type="number" name="hp_max" min="0" step="1" />
-                      </label>
-                      <label>
-                        <span>Actuels</span>
-                        <input class="sheet-input" type="number" name="hp_current" min="0" step="1" />
-                      </label>
-                      <label>
-                        <span>Temp</span>
-                        <input class="sheet-input" type="number" name="hp_temp" min="0" step="1" />
-                      </label>
+                  <div class="sheet-summary-group sheet-summary-group-defense">
+                    <div class="sheet-summary-group-head">
+                      <span class="sheet-summary-group-title">Defense</span>
                     </div>
-                  </article>
 
-                  <article class="sheet-summary-card">
-                    <span class="sheet-summary-label">Des de vie</span>
-                    <input class="sheet-input" type="text" name="hit_dice" placeholder="ex: 1d8" />
-                  </article>
+                    <div class="sheet-summary-group-body sheet-summary-group-body-defense">
+                      <article class="sheet-summary-card sheet-summary-card-primary sheet-summary-card-ac">
+                        <span class="sheet-summary-label">CA</span>
+                        <output class="sheet-summary-value" data-ac-total>12</output>
+                      </article>
 
-                  <article class="sheet-summary-card sheet-summary-card-death">
-                    <span class="sheet-summary-label">Jets contre la mort</span>
-                    <div class="sheet-death-grid">
-                      <div class="sheet-death-track">
-                        <span>Succes</span>
-                        <label><input type="checkbox" name="death_success_1" /> <span>1</span></label>
-                        <label><input type="checkbox" name="death_success_2" /> <span>2</span></label>
-                        <label><input type="checkbox" name="death_success_3" /> <span>3</span></label>
-                      </div>
-                      <div class="sheet-death-track">
-                        <span>Echecs</span>
-                        <label><input type="checkbox" name="death_fail_1" /> <span>1</span></label>
-                        <label><input type="checkbox" name="death_fail_2" /> <span>2</span></label>
-                        <label><input type="checkbox" name="death_fail_3" /> <span>3</span></label>
-                      </div>
+                      <article class="sheet-summary-card sheet-summary-card-primary sheet-summary-card-mastery">
+                        <span class="sheet-summary-label">Bonus mait.</span>
+                        <output class="sheet-summary-value" data-proficiency-bonus>+2</output>
+                      </article>
+
+                      <article class="sheet-summary-card sheet-summary-card-secondary sheet-summary-card-speed">
+                        <span class="sheet-summary-label">Vitesse</span>
+                        <label class="sheet-inline-edit">
+                          <input class="sheet-input" type="number" name="speed" value="9" min="0" step="1" />
+                          <span>m</span>
+                        </label>
+                      </article>
+
+                      <article class="sheet-summary-card sheet-summary-card-primary sheet-summary-card-init">
+                        <span class="sheet-summary-label">Init.</span>
+                        <output class="sheet-summary-value" data-initiative-total>+0</output>
+                      </article>
                     </div>
-                  </article>
+                  </div>
+
+                  <div class="sheet-summary-group sheet-summary-group-vitality">
+                    <div class="sheet-summary-group-head">
+                      <span class="sheet-summary-group-title">Vitalite</span>
+                    </div>
+
+                    <article class="sheet-summary-card sheet-summary-card-hero sheet-summary-card-pv">
+                      <span class="sheet-summary-label">PV</span>
+                      <div class="sheet-inline-split">
+                        <label>
+                          <span>Max</span>
+                          <input class="sheet-input" type="number" name="hp_max" min="0" step="1" />
+                        </label>
+                        <label>
+                          <span>Actuels</span>
+                          <input class="sheet-input" type="number" name="hp_current" min="0" step="1" />
+                        </label>
+                        <label>
+                          <span>Temp</span>
+                          <input class="sheet-input" type="number" name="hp_temp" min="0" step="1" />
+                        </label>
+                      </div>
+                    </article>
+                  </div>
+
+                  <div class="sheet-summary-group sheet-summary-group-survival">
+                    <div class="sheet-summary-group-head">
+                      <span class="sheet-summary-group-title">Survie</span>
+                    </div>
+
+                    <div class="sheet-summary-group-body sheet-summary-group-body-survival">
+                      <article class="sheet-summary-card sheet-summary-card-secondary sheet-summary-card-hitdice">
+                        <span class="sheet-summary-label">Des vie</span>
+                        <input class="sheet-input" type="text" name="hit_dice" placeholder="ex: 1d8" />
+                      </article>
+
+                      <article class="sheet-summary-card sheet-summary-card-secondary sheet-summary-card-death">
+                        <span class="sheet-summary-label">Mort</span>
+                        <div class="sheet-death-grid">
+                          <div class="sheet-death-track">
+                            <span>Succes</span>
+                            <label><input type="checkbox" name="death_success_1" /> <span>1</span></label>
+                            <label><input type="checkbox" name="death_success_2" /> <span>2</span></label>
+                            <label><input type="checkbox" name="death_success_3" /> <span>3</span></label>
+                          </div>
+                          <div class="sheet-death-track">
+                            <span>Echecs</span>
+                            <label><input type="checkbox" name="death_fail_1" /> <span>1</span></label>
+                            <label><input type="checkbox" name="death_fail_2" /> <span>2</span></label>
+                            <label><input type="checkbox" name="death_fail_3" /> <span>3</span></label>
+                          </div>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
                 </section>
+                </div>
 
-                <div class="character-sheet-layout">
+                <div class="character-sheet-layout character-sheet-layout--game">
                   <div class="character-sheet-primary">
-                    <section class="sheet-panel" aria-labelledby="sheet-abilities-title">
+                    <section class="sheet-panel sheet-panel-abilities" aria-labelledby="sheet-abilities-title">
                       <div class="sheet-panel-head">
                         <p class="sheet-panel-kicker">Base</p>
                         <h3 id="sheet-abilities-title" class="sheet-panel-title">Caracteristiques et sauvegardes</h3>
@@ -5709,11 +5755,11 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
                             <input class="sheet-input" type="number" name="ability_force_score" value="10" min="1" max="30" data-ability-score="force" />
                           </label>
                           <label class="sheet-check-row">
-                            <span>Maitrise save</span>
+                            <span>M save</span>
                             <input type="checkbox" name="save_force_prof" data-save-prof="force" />
                           </label>
                           <div class="sheet-ability-save">
-                            <span>Sauvegarde</span>
+                            <span>Save</span>
                             <output data-save-total="force">+0</output>
                           </div>
                         </article>
@@ -5731,11 +5777,11 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
                             <input class="sheet-input" type="number" name="ability_dexterite_score" value="10" min="1" max="30" data-ability-score="dexterite" />
                           </label>
                           <label class="sheet-check-row">
-                            <span>Maitrise save</span>
+                            <span>M save</span>
                             <input type="checkbox" name="save_dexterite_prof" data-save-prof="dexterite" />
                           </label>
                           <div class="sheet-ability-save">
-                            <span>Sauvegarde</span>
+                            <span>Save</span>
                             <output data-save-total="dexterite">+0</output>
                           </div>
                         </article>
@@ -5753,11 +5799,11 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
                             <input class="sheet-input" type="number" name="ability_constitution_score" value="10" min="1" max="30" data-ability-score="constitution" />
                           </label>
                           <label class="sheet-check-row">
-                            <span>Maitrise save</span>
+                            <span>M save</span>
                             <input type="checkbox" name="save_constitution_prof" data-save-prof="constitution" />
                           </label>
                           <div class="sheet-ability-save">
-                            <span>Sauvegarde</span>
+                            <span>Save</span>
                             <output data-save-total="constitution">+0</output>
                           </div>
                         </article>
@@ -5775,11 +5821,11 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
                             <input class="sheet-input" type="number" name="ability_esprit_score" value="10" min="1" max="30" data-ability-score="esprit" />
                           </label>
                           <label class="sheet-check-row">
-                            <span>Maitrise save</span>
+                            <span>M save</span>
                             <input type="checkbox" name="save_esprit_prof" data-save-prof="esprit" />
                           </label>
                           <div class="sheet-ability-save">
-                            <span>Sauvegarde</span>
+                            <span>Save</span>
                             <output data-save-total="esprit">+0</output>
                           </div>
                         </article>
@@ -5797,21 +5843,28 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
                             <input class="sheet-input" type="number" name="ability_charisme_score" value="10" min="1" max="30" data-ability-score="charisme" />
                           </label>
                           <label class="sheet-check-row">
-                            <span>Maitrise save</span>
+                            <span>M save</span>
                             <input type="checkbox" name="save_charisme_prof" data-save-prof="charisme" />
                           </label>
                           <div class="sheet-ability-save">
-                            <span>Sauvegarde</span>
+                            <span>Save</span>
                             <output data-save-total="charisme">+0</output>
                           </div>
                         </article>
                       </div>
                     </section>
 
-                    <section class="sheet-panel" aria-labelledby="sheet-skills-title">
-                      <div class="sheet-panel-head">
-                        <p class="sheet-panel-kicker">Lecture</p>
-                        <h3 id="sheet-skills-title" class="sheet-panel-title">Competences</h3>
+                    <section class="sheet-panel sheet-panel-skills" aria-labelledby="sheet-skills-title">
+                      <div class="sheet-panel-head sheet-panel-head-split">
+                        <div class="sheet-panel-head-copy">
+                          <p class="sheet-panel-kicker">Lecture</p>
+                          <h3 id="sheet-skills-title" class="sheet-panel-title">Competences</h3>
+                        </div>
+
+                        <div class="sheet-skills-legend" aria-hidden="true">
+                          <span><strong>M</strong> maitrise</span>
+                          <span><strong>E</strong> expertise</span>
+                        </div>
                       </div>
 
                       <div class="sheet-skills-grid">
@@ -5928,125 +5981,148 @@ Le chrome est deja tres visible : Mara attire vite l'attention, volontairement.<
                   </div>
 
                   <div class="character-sheet-secondary">
-                    <section class="sheet-panel" aria-labelledby="sheet-combat-title">
+                    <section class="sheet-panel sheet-panel-combat" aria-labelledby="sheet-combat-title">
                       <div class="sheet-panel-head">
                         <p class="sheet-panel-kicker">Combat</p>
                         <h3 id="sheet-combat-title" class="sheet-panel-title">Armes et defense</h3>
                       </div>
 
-                      <div class="sheet-defense-grid">
-                        <label class="sheet-field">
-                          <span>Type d'armure</span>
-                          <select class="sheet-select" name="armor_type" data-armor-type>
-                            <option value="light" selected>Legere</option>
-                            <option value="medium">Intermediaire</option>
-                            <option value="heavy">Lourde</option>
-                          </select>
-                        </label>
+                      <div class="sheet-combat-layout">
+                        <div class="sheet-combat-subsection">
+                          <div class="sheet-subsection-head">
+                            <p class="sheet-subsection-title">Defense</p>
+                          </div>
 
-                        <label class="sheet-check-row">
-                          <span>Bouclier</span>
-                          <input type="checkbox" name="armor_shield" data-armor-shield />
-                        </label>
+                          <div class="sheet-defense-grid">
+                            <div class="sheet-defense-main">
+                              <label class="sheet-field sheet-field-armor">
+                                <span>Armure</span>
+                                <select class="sheet-select" name="armor_type" data-armor-type>
+                                  <option value="light" selected>Legere</option>
+                                  <option value="medium">Intermediaire</option>
+                                  <option value="heavy">Lourde</option>
+                                </select>
+                              </label>
 
-                        <label class="sheet-field">
-                          <span>Mod. CA</span>
-                          <input class="sheet-input" type="number" name="ac_misc" value="0" step="1" />
-                        </label>
+                              <label class="sheet-check-row sheet-check-row-shield">
+                                <span>Bouclier</span>
+                                <input type="checkbox" name="armor_shield" data-armor-shield />
+                              </label>
+                            </div>
 
-                        <label class="sheet-field">
-                          <span>CA manuelle</span>
-                          <input class="sheet-input" type="number" name="ac_override" min="0" step="1" placeholder="Override" />
-                        </label>
-                      </div>
-
-                      <div class="sheet-attacks">
-                        <div class="sheet-attack-head">
-                          <span>Arme</span>
-                          <span>Bonus</span>
-                          <span>Degats</span>
-                          <span>Portee / tags</span>
+                            <label class="sheet-field sheet-field-mod-ca">
+                              <span>Mod. CA</span>
+                              <input class="sheet-input" type="number" name="ac_misc" value="0" step="1" />
+                            </label>
+                          </div>
                         </div>
 
-                        <div class="sheet-attack-row">
-                          <input class="sheet-input" type="text" name="attack_1_name" placeholder="Nom" />
-                          <input class="sheet-input" type="text" name="attack_1_bonus" placeholder="+5" />
-                          <input class="sheet-input" type="text" name="attack_1_damage" placeholder="1d8+3" />
-                          <input class="sheet-input" type="text" name="attack_1_tags" placeholder="30 m, deux mains..." />
+                        <div class="sheet-combat-subsection">
+                          <div class="sheet-subsection-head">
+                            <p class="sheet-subsection-title">Armement</p>
+                          </div>
+
+                          <div class="sheet-attacks">
+                            <div class="sheet-attack-block">
+                              <div class="sheet-attack-head">
+                                <span>Arme</span>
+                                <span>Bonus</span>
+                                <span>Degats</span>
+                              </div>
+                              <div class="sheet-attack-row">
+                                <input class="sheet-input" type="text" name="attack_1_name" placeholder="Nom" />
+                                <input class="sheet-input" type="text" name="attack_1_bonus" placeholder="+5" />
+                                <input class="sheet-input" type="text" name="attack_1_damage" placeholder="1d8+3" />
+                              </div>
+                              <label class="sheet-field sheet-field-block sheet-attack-effect">
+                                <span>Effet</span>
+                                <textarea class="sheet-textarea sheet-textarea-compact" name="attack_1_tags" rows="3" placeholder="Deux mains, polyvalente..."></textarea>
+                              </label>
+                            </div>
+
+                            <div class="sheet-attack-block">
+                              <div class="sheet-attack-head">
+                                <span>Arme</span>
+                                <span>Bonus</span>
+                                <span>Degats</span>
+                              </div>
+                              <div class="sheet-attack-row">
+                                <input class="sheet-input" type="text" name="attack_2_name" placeholder="Nom" />
+                                <input class="sheet-input" type="text" name="attack_2_bonus" placeholder="+5" />
+                                <input class="sheet-input" type="text" name="attack_2_damage" placeholder="1d6+3" />
+                              </div>
+                              <label class="sheet-field sheet-field-block sheet-attack-effect">
+                                <span>Effet</span>
+                                <textarea class="sheet-textarea sheet-textarea-compact" name="attack_2_tags" rows="3" placeholder="Chargeur, rechargement, finesse..."></textarea>
+                              </label>
+                            </div>
+
+                            <div class="sheet-attack-block">
+                              <div class="sheet-attack-head">
+                                <span>Arme</span>
+                                <span>Bonus</span>
+                                <span>Degats</span>
+                              </div>
+                              <div class="sheet-attack-row">
+                                <input class="sheet-input" type="text" name="attack_3_name" placeholder="Nom" />
+                                <input class="sheet-input" type="text" name="attack_3_bonus" placeholder="+5" />
+                                <input class="sheet-input" type="text" name="attack_3_damage" placeholder="1d4+3" />
+                              </div>
+                              <label class="sheet-field sheet-field-block sheet-attack-effect">
+                                <span>Effet</span>
+                                <textarea class="sheet-textarea sheet-textarea-compact" name="attack_3_tags" rows="3" placeholder="Lancer, entrave, recul..."></textarea>
+                              </label>
+                            </div>
+                          </div>
                         </div>
-
-                        <div class="sheet-attack-row">
-                          <input class="sheet-input" type="text" name="attack_2_name" placeholder="Nom" />
-                          <input class="sheet-input" type="text" name="attack_2_bonus" placeholder="+5" />
-                          <input class="sheet-input" type="text" name="attack_2_damage" placeholder="1d6+3" />
-                          <input class="sheet-input" type="text" name="attack_2_tags" placeholder="Chargeur, finesse..." />
-                        </div>
-
-                        <div class="sheet-attack-row">
-                          <input class="sheet-input" type="text" name="attack_3_name" placeholder="Nom" />
-                          <input class="sheet-input" type="text" name="attack_3_bonus" placeholder="+5" />
-                          <input class="sheet-input" type="text" name="attack_3_damage" placeholder="1d4+3" />
-                          <input class="sheet-input" type="text" name="attack_3_tags" placeholder="Contact, lancer..." />
-                        </div>
-                      </div>
-                    </section>
-
-                    <section class="sheet-panel" aria-labelledby="sheet-story-title">
-                      <div class="sheet-panel-head">
-                        <p class="sheet-panel-kicker">Terrain</p>
-                        <h3 id="sheet-story-title" class="sheet-panel-title">Ressources et accroches</h3>
-                      </div>
-
-                      <div class="sheet-story-grid">
-                        <label class="sheet-field sheet-field-block">
-                          <span>Armure / equipement</span>
-                          <textarea class="sheet-textarea" name="gear" rows="3" placeholder="Armure, kits, munitions, outils, medkit, badges..."></textarea>
-                        </label>
-
-                        <label class="sheet-field sheet-field-block">
-                          <span>Aptitudes et ressources</span>
-                          <textarea class="sheet-textarea" name="features" rows="4" placeholder="Aptitudes de classe, usages, recharges, pouvoirs, stims..."></textarea>
-                        </label>
-
-                        <label class="sheet-field sheet-field-block">
-                          <span>Compagnon ou module</span>
-                          <textarea class="sheet-textarea" name="companion" rows="3" placeholder="Drone, K9, module, surcharge, details tactiques..."></textarea>
-                        </label>
-
-                        <div class="sheet-hooks-grid">
-                          <label class="sheet-field">
-                            <span>Contact</span>
-                            <input class="sheet-input" type="text" name="hook_contact" />
-                          </label>
-
-                          <label class="sheet-field">
-                            <span>Dette</span>
-                            <input class="sheet-input" type="text" name="hook_debt" />
-                          </label>
-
-                          <label class="sheet-field">
-                            <span>Raison de prendre des contrats</span>
-                            <input class="sheet-input" type="text" name="hook_reason" />
-                          </label>
-
-                          <label class="sheet-field">
-                            <span>Ligne rouge</span>
-                            <input class="sheet-input" type="text" name="hook_line" />
-                          </label>
-
-                          <label class="sheet-field">
-                            <span>Signe distinctif</span>
-                            <input class="sheet-input" type="text" name="hook_signature" />
-                          </label>
-                        </div>
-
-                        <label class="sheet-field sheet-field-block">
-                          <span>Notes</span>
-                          <textarea class="sheet-textarea" name="notes" rows="4" placeholder="Rappels de mission, details de faction, objectifs, infos a ne pas oublier..."></textarea>
-                        </label>
                       </div>
                     </section>
+
                   </div>
+                </div>
+
+                <section class="sheet-panel sheet-panel-implants--game" aria-labelledby="sheet-implants-title">
+                  <div class="sheet-panel-head">
+                    <h3 id="sheet-implants-title" class="sheet-panel-title">Implants / mods</h3>
+                  </div>
+                  <label class="sheet-field sheet-field-block sheet-implants-free">
+                    <span>Synthese implants / mods</span>
+                    <textarea class="sheet-textarea sheet-textarea-compact" name="implants_mods" rows="3" placeholder="Neural :&#10;Oculaire :&#10;Bras :&#10;Jambes :&#10;Torse :&#10;Bio-mod :"></textarea>
+                  </label>
+                </section>
+                </div>
+
+                <div class="character-sheet-paper character-sheet-paper--notes">
+                  <section class="sheet-panel sheet-panel-story sheet-panel-story--full" aria-labelledby="sheet-story-title">
+                    <div class="sheet-panel-head">
+                      <p class="sheet-panel-kicker">Terrain</p>
+                      <h3 id="sheet-story-title" class="sheet-panel-title">Suivi de mission</h3>
+                    </div>
+
+                    <div class="sheet-story-grid sheet-story-grid--page2">
+                      <div class="sheet-story-column sheet-story-column-gear">
+                        <label class="sheet-field sheet-field-block">
+                          <span>Equipement</span>
+                          <textarea class="sheet-textarea" name="gear" rows="4" placeholder="Armure, armes, kits, munitions, outils, medkit, badges..."></textarea>
+                        </label>
+                      </div>
+
+                      <div class="sheet-story-column sheet-story-column-details">
+                        <label class="sheet-field sheet-field-block">
+                          <span>Aptitudes / details</span>
+                          <textarea class="sheet-textarea" name="features" rows="5" placeholder="Aptitudes, depenses, recharge, procedure, limites, routines de mission..."></textarea>
+                        </label>
+                      </div>
+
+                      <div class="sheet-story-column sheet-story-column-notes">
+                        <label class="sheet-field sheet-field-block">
+                          <span>Notes / contacts / dette</span>
+                          <textarea class="sheet-textarea" name="notes" rows="6" placeholder="Notes, contact, dette, raison, ligne rouge, signe distinctif, rappels de mission..."></textarea>
+                        </label>
+                      </div>
+
+                    </div>
+                  </section>
                 </div>
               </div>
             </form>

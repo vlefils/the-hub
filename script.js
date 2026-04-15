@@ -516,6 +516,23 @@ if (characterSheet) {
     }
   };
 
+  const mergeLegacyText = (currentValue, sections) => {
+    const existingText = typeof currentValue === "string" ? currentValue.trim() : "";
+    const mergedParts = existingText ? [existingText] : [];
+
+    sections.forEach(({ label, value }) => {
+      const trimmedValue = typeof value === "string" ? value.trim() : "";
+
+      if (!trimmedValue || existingText.includes(trimmedValue)) {
+        return;
+      }
+
+      mergedParts.push(`${label} : ${trimmedValue}`);
+    });
+
+    return mergedParts.join("\n");
+  };
+
   const restoreSheet = () => {
     try {
       const raw = window.localStorage.getItem(storageKey);
@@ -537,6 +554,19 @@ if (characterSheet) {
           control.value = payload[control.name];
         }
       });
+
+      const featuresInput = characterSheet.querySelector('[name="features"]');
+      const notesInput = characterSheet.querySelector('[name="notes"]');
+
+      if (notesInput) {
+        notesInput.value = mergeLegacyText(notesInput.value, [
+          { label: "Contact", value: payload.hook_contact },
+          { label: "Dette", value: payload.hook_debt },
+          { label: "Raison", value: payload.hook_reason },
+          { label: "Ligne rouge", value: payload.hook_line },
+          { label: "Signe distinctif", value: payload.hook_signature },
+        ]);
+      }
     } catch (error) {
       console.warn("Unable to restore character sheet", error);
     }
