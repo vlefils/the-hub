@@ -2657,8 +2657,7 @@ th {
 .pretired-overview-kicker,
 .pretired-overview-count,
 .pretired-directory-meta,
-.pretired-directory-summary,
-.pretired-directory-focus {
+.pretired-directory-summary {
   margin: 0;
 }
 
@@ -2690,6 +2689,29 @@ th {
   white-space: nowrap;
 }
 
+.pretired-directory-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.24rem 0.5rem;
+}
+
+.pretired-directory-separator {
+  color: #6f7787;
+}
+
+.pretired-directory-tag--class {
+  color: #f2b96f;
+}
+
+.pretired-directory-tag--path {
+  color: #8dbff2;
+}
+
+.pretired-directory-tag--origin {
+  color: #c9ef8f;
+}
+
 .pretired-directory {
   display: grid;
   gap: 0.85rem;
@@ -2700,9 +2722,9 @@ th {
 
 .pretired-directory-card {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.7fr) auto;
-  gap: 1rem;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.9rem 1rem;
+  align-items: stretch;
   padding: 1rem 1.15rem;
   background:
     linear-gradient(180deg, rgba(125, 255, 101, 0.06), transparent 4.5rem),
@@ -2728,17 +2750,14 @@ th {
   line-height: 1.6;
 }
 
-.pretired-directory-focus {
-  padding: 0.7rem 0.8rem 0.7rem 0.95rem;
-  border-left: 3px solid rgba(125, 255, 101, 0.45);
-  background: rgba(255, 255, 255, 0.03);
-  color: #f3efe6;
-  line-height: 1.55;
-}
 
 .pretired-directory-link {
+  align-self: end;
   justify-self: end;
-  min-width: 12.5rem;
+  min-height: 2.35rem;
+  min-width: 0;
+  padding: 0.56rem 0.9rem;
+  font-size: 0.84rem;
 }
 
 .pretired-sheet-stack {
@@ -3946,7 +3965,7 @@ th {
   }
 
   .pretired-directory-link {
-    justify-self: start;
+    justify-self: end;
   }
 
   .sheet-panel[aria-labelledby="sheet-skills-title"],
