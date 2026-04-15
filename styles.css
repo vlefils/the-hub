@@ -2750,7 +2750,6 @@ th {
   line-height: 1.6;
 }
 
-
 .pretired-directory-link {
   align-self: end;
   justify-self: end;
@@ -5421,7 +5420,7 @@ th {
 }
 
 .sheet-panel-combat .sheet-subsection-title {
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   letter-spacing: 0.09em;
   line-height: 1;
   font-weight: 700;
@@ -5438,7 +5437,7 @@ th {
 
 .sheet-panel-combat .sheet-field > span,
 .sheet-panel-combat .sheet-attack-head span {
-  font-size: 0.48rem;
+  font-size: 0.56rem;
 }
 
 .sheet-panel-combat {
@@ -5450,7 +5449,7 @@ th {
   min-height: var(--sheet-field-h);
   height: var(--sheet-field-h);
   padding: 0.05rem 0.22rem;
-  font-size: 0.67rem;
+  font-size: 0.76rem;
 }
 
 .sheet-panel-combat :is(.sheet-input, .sheet-select, .sheet-textarea) {
@@ -5461,7 +5460,7 @@ th {
   min-height: var(--sheet-field-h);
   height: var(--sheet-field-h);
   padding-inline: 0.16rem;
-  font-size: 0.58rem;
+  font-size: 0.66rem;
 }
 
 .sheet-defense-grid {
@@ -5576,19 +5575,22 @@ th {
 
 .sheet-attack-effect > span {
   grid-column: 1 / 2;
-  font-size: 0.44rem;
+  font-size: 0.4rem;
   letter-spacing: 0.09em;
 }
 
 .sheet-attack-effect :is(.sheet-input, .sheet-textarea) {
   grid-column: 1 / 4;
-  min-height: 2.2rem;
+  min-height: 1.9rem;
   height: auto;
-  padding: 0.12rem 0.2rem;
+  padding: 0.08rem 0.18rem;
   line-height: 1.16;
 }
 
 .sheet-attack-effect .sheet-textarea {
+  margin-block: 0.04rem;
+  font-size: 0.64rem;
+  line-height: 1.1;
   resize: none;
   overflow: auto;
 }
@@ -5706,7 +5708,7 @@ th {
 }
 
 .character-sheet-layout--game .sheet-attack-effect :is(.sheet-input, .sheet-textarea) {
-  min-height: 2.1rem;
+  min-height: 1.8rem;
 }
 
 .character-sheet-layout--game .sheet-skills-grid {
@@ -5734,16 +5736,18 @@ th {
 }
 
 .character-sheet-layout--game .sheet-skill-check {
-  opacity: 0.74;
+  opacity: 1;
 }
 
 .character-sheet-layout--game .sheet-skill-check input {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.62rem;
+  height: 0.62rem;
 }
 
 .character-sheet-layout--game .sheet-skill-check span {
-  font-size: 0.4rem;
+  font-size: 0.44rem;
+  font-weight: 700;
+  color: #3a2f21;
 }
 
 .sheet-skill-row {
@@ -5782,15 +5786,28 @@ th {
 .sheet-skill-check {
   min-height: 0;
   min-width: 0;
-  padding: 0;
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 0.04rem;
+  padding: 0.02rem 0.04rem;
   border: 0;
   background: transparent;
   justify-content: flex-start;
 }
 
 .sheet-skill-check input {
-  width: 0.56rem;
-  height: 0.56rem;
+  width: 0.62rem;
+  height: 0.62rem;
+  accent-color: #9f8c72;
+}
+
+.sheet-skill-check input:checked {
+  accent-color: #2f281c;
+}
+
+.sheet-skill-check input:disabled {
+  opacity: 1;
 }
 
 .sheet-panel-story {
@@ -6186,3 +6203,4 @@ th {
       #f4ede1 !important;
   }
 }
+
