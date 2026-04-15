@@ -152,7 +152,6 @@
           <nav class="sidebar-nav" data-sidebar-nav="outils" hidden>
             <a href="#outils-pretires">Personnages pre-tires</a>
             <div class="sidebar-group sidebar-subgroup" data-context-parent="outils-pretires" hidden>
-              <a href="#pretire-general">General</a>
               <a href="#pretire-mara-rail-voss">Mara &ldquo;Rail&rdquo; Voss</a>
             </div>
             <a href="#outils-fiche">Fiche PJ</a>
@@ -5252,41 +5251,38 @@
 
           <section class="page-section panel" id="outils-pretires" data-section data-category="outils">
             <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Personnages pre-tires</h2></div></div>
+            <div class="pretired-overview">
+              <p class="sheet-intro">Ces fiches sont statiques, pretes a jouer et a imprimer. Elles ne chargent rien dans la fiche PJ editable : utilise simplement l&rsquo;impression du navigateur si tu veux les sortir sur papier.</p>
+
+              <div class="pretired-overview-head">
+                <div>
+                  <p class="pretired-overview-kicker">Disponibles</p>
+                  <h3>Choisis une fiche prete a jouer</h3>
+                </div>
+                <p class="pretired-overview-count">1 personnage disponible</p>
+              </div>
+
+              <ul class="pretired-directory" role="list">
+                <li>
+                  <article class="pretired-directory-card">
+                    <div class="pretired-directory-copy">
+                      <p class="pretired-directory-meta">Brute niveau 5 &middot; Voie de l&rsquo;acier &middot; Origine Securite</p>
+                      <h4>Mara &ldquo;Rail&rdquo; Voss</h4>
+                      <p class="pretired-directory-summary">Operatrice de breche construite pour ouvrir un passage, tenir la ligne et absorber la pression pendant que le reste de l&rsquo;equipe manouvre.</p>
+                    </div>
+                    <p class="pretired-directory-focus">Frontline solide, lecture immediate, prete a imprimer.</p>
+                    <a class="button button-primary pretired-directory-link" href="#pretire-mara-rail-voss">Ouvrir la fiche</a>
+                  </article>
+                </li>
+              </ul>
+            </div>
+
             <div class="subtabs" data-subtabs>
               <div class="subtabs-nav" role="tablist" aria-label="Personnages pre-tires disponibles">
-                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="pretire-general" id="tab-pretire-general" data-subtab-target="pretire-general">General</button>
-                <button class="subtab-button" type="button" role="tab" aria-selected="false" aria-controls="pretire-mara-rail-voss" id="tab-pretire-mara-rail-voss" data-subtab-target="pretire-mara-rail-voss">Mara &ldquo;Rail&rdquo; Voss</button>
+                <button class="subtab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="pretire-mara-rail-voss" id="tab-pretire-mara-rail-voss" data-subtab-target="pretire-mara-rail-voss">Mara &ldquo;Rail&rdquo; Voss</button>
               </div>
 
-              <div class="subtab-panel is-active" id="pretire-general" role="tabpanel" aria-labelledby="tab-pretire-general" data-subtab-panel>
-                <div class="pretired-overview">
-                  <p class="sheet-intro">Ces fiches sont statiques, pretes a jouer et a imprimer. Elles ne chargent rien dans la fiche PJ editable : utilise simplement l&rsquo;impression du navigateur si tu veux les sortir sur papier.</p>
-
-                  <div class="pretired-overview-head">
-                    <div>
-                      <p class="pretired-overview-kicker">Disponibles</p>
-                      <h3>Choisis une fiche prete a jouer</h3>
-                    </div>
-                    <p class="pretired-overview-count">1 personnage disponible</p>
-                  </div>
-
-                  <ul class="pretired-directory" role="list">
-                    <li>
-                      <article class="pretired-directory-card">
-                        <div class="pretired-directory-copy">
-                          <p class="pretired-directory-meta">Brute niveau 5 &middot; Voie de l&rsquo;acier &middot; Origine Securite</p>
-                          <h4>Mara &ldquo;Rail&rdquo; Voss</h4>
-                          <p class="pretired-directory-summary">Operatrice de breche construite pour ouvrir un passage, tenir la ligne et absorber la pression pendant que le reste de l&rsquo;equipe manouvre.</p>
-                        </div>
-                        <p class="pretired-directory-focus">Frontline solide, lecture immediate, prete a imprimer.</p>
-                        <a class="button button-primary pretired-directory-link" href="#pretire-mara-rail-voss">Ouvrir la fiche</a>
-                      </article>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="subtab-panel" id="pretire-mara-rail-voss" role="tabpanel" aria-labelledby="tab-pretire-mara-rail-voss" data-subtab-panel hidden>
+              <div class="subtab-panel is-active" id="pretire-mara-rail-voss" role="tabpanel" aria-labelledby="tab-pretire-mara-rail-voss" data-subtab-panel>
                 <article class="pretired-brief">
                   <div class="pretired-brief-head">
                     <div>
@@ -5342,8 +5338,15 @@
                   <p class="pretired-brief-note">Version statique autonome, prete a lire et a imprimer, sans chargement dans la fiche PJ editable.</p>
                 </article>
 
+                <div class="sheet-toolbar pretired-export-toolbar">
+                  <p class="sheet-toolbar-copy">Version imprimable A4 sur 2 pages. Ouvre l&rsquo;export PDF du navigateur pour sortir la fiche de Mara.</p>
+                  <div class="sheet-toolbar-actions">
+                    <button class="button button-primary" type="button" data-print-target="pretired-sheet-mara-rail-voss">Exporter en PDF</button>
+                  </div>
+                </div>
+
                 <div class="pretired-sheet-stack">
-                  <section class="character-sheet pretired-sheet" aria-label="Fiche pre-tiree de Mara Rail Voss">
+                  <section class="character-sheet pretired-sheet" id="pretired-sheet-mara-rail-voss" aria-label="Fiche pre-tiree de Mara Rail Voss">
                 <div class="character-sheet-pages">
                 <div class="character-sheet-paper character-sheet-paper--game">
                   <div class="character-sheet-top">
@@ -5895,7 +5898,7 @@ Utilise Ruee d'acier pour coller une ligne, contourner un angle ou sortir d'un p
             <div class="sheet-toolbar">
               <p class="sheet-toolbar-copy">V4 print-first sur 2 pages A4: page 1 pour le jeu immediat et les implants, page 2 pour le suivi et les notes.</p>
               <div class="sheet-toolbar-actions">
-                <button class="button button-primary" type="button" data-export-sheet>Exporter en PDF</button>
+                <button class="button button-primary" type="button" data-export-sheet data-print-target="outils-fiche">Exporter en PDF</button>
                 <button class="button button-secondary" type="button" data-reset-sheet>Effacer la fiche</button>
               </div>
             </div>

@@ -3207,7 +3207,10 @@ th {
   .sidebar,
   .sheet-toolbar,
   .sheet-intro,
-  #outils-fiche .section-heading {
+  #outils-fiche .section-heading,
+  #outils-pretires .section-heading,
+  #outils-pretires .pretired-overview,
+  #outils-pretires .subtabs-nav {
     display: none !important;
   }
 
@@ -3234,9 +3237,29 @@ th {
     padding: 0 !important;
   }
 
-  #outils-fiche {
+  body:not([data-print-target]) #outils-fiche,
+  body[data-print-target=""outils-fiche""] #outils-fiche,
+  body[data-print-target^=""pretired-sheet-""] #outils-pretires {
     display: block !important;
     margin: 0 !important;
+  }
+
+  body[data-print-target^=""pretired-sheet-""] #outils-pretires .subtab-panel,
+  body[data-print-target^=""pretired-sheet-""] #outils-pretires .pretired-sheet {
+    display: none !important;
+  }
+
+  body[data-print-target=""pretired-sheet-mara-rail-voss""] #pretire-mara-rail-voss,
+  body[data-print-target=""pretired-sheet-mara-rail-voss""] #pretired-sheet-mara-rail-voss {
+    display: block !important;
+  }
+
+  body[data-print-target^=""pretired-sheet-""] #outils-pretires .pretired-sheet-stack {
+    margin-top: 0 !important;
+  }
+
+  body[data-print-target=""pretired-sheet-mara-rail-voss""] #pretire-mara-rail-voss > :not(.pretired-sheet-stack) {
+    display: none !important;
   }
 
   .character-sheet-paper {
@@ -6126,4 +6149,3 @@ th {
   }
 
 }
-

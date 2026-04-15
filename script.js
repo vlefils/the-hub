@@ -134,7 +134,12 @@ const showSection = (id) => {
 
 const syncFromHash = () => {
   const requestedId = window.location.hash.replace("#", "") || "lore-the-hub";
-  const id = requestedId === "lore-overview" ? "lore-the-hub" : requestedId;
+  const id =
+    requestedId === "lore-overview"
+      ? "lore-the-hub"
+      : requestedId === "pretire-general"
+        ? "outils-pretires"
+        : requestedId;
 
   if (requestedId !== id) {
     history.replaceState(null, "", `#${id}`);
@@ -450,7 +455,7 @@ if (characterSheet) {
   const acTotalOutput = characterSheet.querySelector("[data-ac-total]");
   const acMiscInput = characterSheet.querySelector('[name="ac_misc"]');
   const acOverrideInput = characterSheet.querySelector('[name="ac_override"]');
-  const exportButton = document.querySelector("[data-export-sheet]");
+  const printButtons = [...document.querySelectorAll("[data-print-target]")];
   const resetButton = document.querySelector("[data-reset-sheet]");
 
   const clampLevel = (value) => Math.min(12, Math.max(1, value));
@@ -640,6 +645,7 @@ if (characterSheet) {
 
   const clearPrintMode = () => {
     document.body.classList.remove("sheet-print-mode");
+    delete document.body.dataset.printTarget;
   };
 
   editableControls.forEach((control) => {
@@ -667,13 +673,20 @@ if (characterSheet) {
     });
   }
 
-  if (exportButton) {
-    exportButton.addEventListener("click", () => {
+  printButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.printTarget?.trim();
+
+      if (!targetId) {
+        return;
+      }
+
       document.body.classList.add("sheet-print-mode");
+      document.body.dataset.printTarget = targetId;
       window.requestAnimationFrame(() => window.print());
       window.setTimeout(clearPrintMode, 1500);
     });
-  }
+  });
 
   window.addEventListener("afterprint", clearPrintMode);
 
