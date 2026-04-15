@@ -6163,3 +6163,26 @@ th {
   }
 
 }
+
+@media print {
+  body,
+  .character-sheet-paper,
+  .character-sheet-paper * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body[data-print-target^="pretired-sheet-"] .print-target-section .pretired-sheet:not(.print-target-sheet) {
+    display: none !important;
+  }
+
+  body[data-print-target^="pretired-sheet-"] .print-target-section .print-target-sheet {
+    display: block !important;
+  }
+
+  .character-sheet-paper {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 24%),
+      #f4ede1 !important;
+  }
+}
