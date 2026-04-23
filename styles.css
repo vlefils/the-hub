@@ -1491,6 +1491,35 @@ td {
   padding-top: 0.3rem;
 }
 
+.weapon-card-hub-visual {
+  grid-template-columns: 5.4rem minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: center;
+}
+
+.weapon-card-hub-visual .weapon-card-thumb {
+  grid-column: 1;
+  align-self: stretch;
+}
+
+.weapon-card-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  object-position: center;
+  padding: 0.18rem;
+  border-radius: 0.45rem;
+  border: 1px solid var(--weapon-accent-line);
+  background: rgba(8, 10, 14, 0.92);
+}
+
+.weapon-card-hub-main {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
 .weapon-detail-button {
   min-height: auto;
   padding: 0.48rem 0.82rem 0.42rem;
@@ -1527,6 +1556,72 @@ td {
 
 .hub-weapon-modal .protocol-modal-meta {
   color: #ffb347;
+}
+
+.hub-weapon-modal .protocol-modal-body {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.hub-weapon-detail-head {
+  margin: 0;
+}
+
+.hub-weapon-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 17rem);
+  gap: 1.1rem 1.35rem;
+  align-items: start;
+}
+
+.hub-weapon-detail-copy {
+  display: grid;
+  gap: 0.95rem;
+  min-width: 0;
+}
+
+.hub-weapon-detail-visual {
+  margin: 0;
+}
+
+.hub-weapon-detail-visual img {
+  display: block;
+  width: 100%;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 179, 71, 0.22);
+  background: rgba(8, 10, 14, 0.96);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+}
+
+.hub-weapon-detail-effect {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.hub-weapon-detail-label {
+  margin: 0;
+  color: #ffb347;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hub-weapon-detail-effect ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #ece4d5;
+}
+
+.hub-weapon-detail-effect li + li {
+  margin-top: 0.38rem;
+}
+
+.hub-weapon-detail-description {
+  margin: 0;
+  color: #9b968d;
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .faction-list {
@@ -3384,6 +3479,10 @@ th {
     gap: 0.7rem;
   }
 
+  .weapon-card-hub-visual {
+    grid-template-columns: 1fr;
+  }
+
   .weapon-card-head,
   .weapon-stats,
   .weapon-tags,
@@ -3391,9 +3490,17 @@ th {
     grid-column: 1;
   }
 
+  .weapon-card-hub-visual .weapon-card-thumb {
+    max-width: 6.25rem;
+  }
+
   .weapon-summary-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .hub-weapon-detail-layout {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -6203,4 +6310,3 @@ th {
       #f4ede1 !important;
   }
 }
-

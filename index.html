@@ -1073,6 +1073,7 @@
               <ul>
                 <li><strong>Legere :</strong> une arme legere est facile a manier d&rsquo;une seule main. Elle peut etre utilisee pour le combat a deux armes.</li>
                 <li><strong>Finesse :</strong> avec une arme dotee de cette propriete, vous pouvez utiliser la Dexterite a la place de la Force pour les jets d&rsquo;attaque et de degats.</li>
+                <li><strong>Allonge :</strong> une arme dotee de cette propriete peut frapper au-dela du simple contact. La distance precise figure entre parentheses dans son profil.</li>
                 <li><strong>A deux mains :</strong> cette arme necessite deux mains pour etre utilisee.</li>
                 <li><strong>Lourde :</strong> une arme lourde est encombrante et difficile a manier. Cette propriete sert principalement a identifier les armes les plus imposantes du jeu.</li>
                 <li><strong>Brutale :</strong> une arme dotee de cette propriete utilise la Force a la place de la Dexterite pour les jets d&rsquo;attaque et de degats a distance.</li>
@@ -4619,111 +4620,237 @@
             <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Armes</h2></div></div>
             <p>Au Hub, les armes de base servent de socle. Choisissez d&rsquo;abord un profil du coeur de regles, puis habillez-le avec une marque, un calibre, une provenance et une sale histoire.</p>
             <p>Les armes du Hub sont des armes speciales, rares ou couteuses, achetables avec la monnaie du Hub. Elles sont plus puissantes que les armes de base et finissent naturellement par les remplacer, mais elles ne relevent plus du simple armement courant. Elles ouvrent des styles de jeu differents, plus extremes, plus specialises ou plus spectaculaires.</p>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Profil du Hub</th>
-                    <th>Base recommandee</th>
-                    <th>Usage</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>Secours</td><td>Poings americains, couteau, pistolet 9 mm ou pistolet lourd</td><td>Couloir, dernier mot, sortie d&rsquo;urgence.</td></tr>
-                  <tr><td>Polyvalent</td><td>Batte, pistolet mitrailleur ou fusil d&rsquo;assaut</td><td>Mission standard, terrain mixte, pression mobile.</td></tr>
-                  <tr><td>Precision</td><td>Fusil de precision</td><td>Angles longs, couverture, cible exposee.</td></tr>
-                  <tr><td>Brutal</td><td>Fusil a pompe ou mitrailleuse legere</td><td>Porte, angle serre, saturation et rupture de ligne.</td></tr>
-                  <tr><td>Melee specialisee</td><td>Couteau de chasse, matraque ou katana</td><td>Silence, duel, intervention ou execution rapide.</td></tr>
-                </tbody>
-              </table>
-            </div>
             <div class="weapon-catalog" data-arsenal="hub">
-              <div class="weapon-catalog-head">
-                <p class="weapon-catalog-kicker">Armes speciales du Hub</p>
-                <p class="weapon-catalog-copy">Chaque arme ci-dessous coute 500 chroma et propose un style de combat nettement plus extreme que l&rsquo;armement de base.</p>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">Melee speciale</p>
+                </div>
+                <div class="weapon-grid">
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-lame-mono-moleculaire.png" alt="Lame mono-moleculaire" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Lame mono-moleculaire</span></h3>
+                        <p class="weapon-cost">300 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">Legere</span>
+                        <span class="weapon-tag">Finesse</span>
+                        <span class="weapon-tag">+1 attaque / degats</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Lame de precision haut de gamme, plus fiable et plus meurtriere qu&rsquo;une simple epee courte.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-lame-mono-moleculaire" data-hub-weapon-title="Lame mono-moleculaire" data-hub-weapon-meta="Arme speciale du Hub - 300 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-marteau-impact.png" alt="Marteau d'impact" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Marteau d&rsquo;impact</span></h3>
+                        <p class="weapon-cost">500 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">A deux mains</span>
+                        <span class="weapon-tag">Lourde</span>
+                        <span class="weapon-tag">Repousse</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Marteau inertiel de rupture capable d&rsquo;enfoncer une ligne et de projeter la cible.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-marteau-impact" data-hub-weapon-title="Marteau d&rsquo;impact" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-fouet-electrifie.png" alt="Fouet electrifie" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Fouet electrifie</span></h3>
+                        <p class="weapon-cost">300 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">Finesse</span>
+                        <span class="weapon-tag">Allonge 3 m</span>
+                        <span class="weapon-tag">Ralentit</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Arme de controle corpo capable de tenir une cible a distance de melee et de casser son elan.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-fouet-electrifie" data-hub-weapon-title="Fouet electrifie" data-hub-weapon-meta="Arme speciale du Hub - 300 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-gantelets-myomeres.png" alt="Gantelets myomeres" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Gantelets myomeres</span></h3>
+                        <p class="weapon-cost">500 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">Deux mains*</span>
+                        <span class="weapon-tag">Main nue</span>
+                        <span class="weapon-tag">Force 19</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Gantelets renforces pour un corps a corps nu qui frappe comme une machine industrielle.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-gantelets-myomeres" data-hub-weapon-title="Gantelets myomeres" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
+                    </div>
+                  </article>
+                </div>
               </div>
               <div class="weapon-group">
                 <div class="weapon-group-head">
                   <p class="weapon-group-title">Distance speciale</p>
                 </div>
                 <div class="weapon-grid">
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Lance-flammes</span></h3>
-                      <p class="weapon-cost">500 chroma</p>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-lance-flammes.png" alt="Lance-flammes" loading="lazy" />
                     </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">A deux mains</span>
-                      <span class="weapon-tag">Lourde</span>
-                    </div>
-                    <div class="weapon-summary-row">
-                      <p class="weapon-note">Arme de nettoyage de zone qui noie un angle entier sous le feu.</p>
-                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-lance-flammes" data-hub-weapon-title="Lance-flammes" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
-                    </div>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Lance-grenades</span></h3>
-                      <p class="weapon-cost">500 chroma</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">A deux mains</span>
-                      <span class="weapon-tag">Lourde</span>
-                    </div>
-                    <div class="weapon-summary-row">
-                      <p class="weapon-note">Explosif de zone ideal pour deloger un groupe ou casser un couvert.</p>
-                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-lance-grenades" data-hub-weapon-title="Lance-grenades" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Lance-flammes</span></h3>
+                        <p class="weapon-cost">500 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">A deux mains</span>
+                        <span class="weapon-tag">Lourde</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Arme de nettoyage de zone qui noie un angle entier sous le feu.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-lance-flammes" data-hub-weapon-title="Lance-flammes" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
                     </div>
                   </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Baliste a poulie</span></h3>
-                      <p class="weapon-cost">500 chroma</p>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-lance-grenades.png" alt="Lance-grenades" loading="lazy" />
                     </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">A deux mains</span>
-                      <span class="weapon-tag">Lourde</span>
-                      <span class="weapon-tag">Brutale</span>
-                    </div>
-                    <div class="weapon-summary-row">
-                      <p class="weapon-note">Arme techno-mecanique brutale qui frappe comme un belier a distance.</p>
-                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-baliste-poulie" data-hub-weapon-title="Baliste a poulie" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
-                    </div>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Fusil a arc electrique</span></h3>
-                      <p class="weapon-cost">500 chroma</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">A deux mains</span>
-                    </div>
-                    <div class="weapon-summary-row">
-                      <p class="weapon-note">Decharge specialisee pour perturber les reflexes, les implants et les reactions.</p>
-                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-fusil-arc-electrique" data-hub-weapon-title="Fusil a arc electrique" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Lance-grenades</span></h3>
+                        <p class="weapon-cost">500 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">A deux mains</span>
+                        <span class="weapon-tag">Lourde</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Explosif de zone ideal pour deloger un groupe ou casser un couvert.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-lance-grenades" data-hub-weapon-title="Lance-grenades" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
                     </div>
                   </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Sulfateuse</span></h3>
-                      <p class="weapon-cost">500 chroma</p>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-baliste-poulie.png" alt="Baliste a poulie" loading="lazy" />
                     </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">A deux mains</span>
-                      <span class="weapon-tag">Lourde</span>
-                      <span class="weapon-tag">Brutale</span>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Baliste a poulie</span></h3>
+                        <p class="weapon-cost">500 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">A deux mains</span>
+                        <span class="weapon-tag">Lourde</span>
+                        <span class="weapon-tag">Brutale</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Arme techno-mecanique brutale qui frappe comme un belier a distance.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-baliste-poulie" data-hub-weapon-title="Baliste a poulie" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
                     </div>
-                    <div class="weapon-summary-row">
-                      <p class="weapon-note">Arme de tir soutenu qui devient de plus en plus dangereuse tant qu&rsquo;on maintient la pression.</p>
-                      <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-sulfateuse" data-hub-weapon-title="Sulfateuse" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                  </article>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-fusil-anti-materiel.png" alt="Fusil anti-materiel" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Fusil anti-materiel</span></h3>
+                        <p class="weapon-cost">500 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">A deux mains</span>
+                        <span class="weapon-tag">Lourde</span>
+                        <span class="weapon-tag">Brutale</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Precision lourde concue pour percer les couverts, les blindages legers et la structure meme du terrain.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-fusil-anti-materiel" data-hub-weapon-title="Fusil anti-materiel" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-fusil-arc-electrique.png" alt="Fusil a arc electrique" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Fusil a arc electrique</span></h3>
+                        <p class="weapon-cost">400 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">A deux mains</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Decharge specialisee pour perturber les reflexes, les implants et les reactions.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-fusil-arc-electrique" data-hub-weapon-title="Fusil a arc electrique" data-hub-weapon-meta="Arme speciale du Hub - 400 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-bfc.png" alt="BFC" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>BFC</span></h3>
+                        <p class="weapon-cost">350 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">Brutale</span>
+                        <span class="weapon-tag">Force 16</span>
+                        <span class="weapon-tag">Courte portee</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Pistolet monstrueux a tres gros calibre, devastateur a courte distance pour qui peut tenir le recul.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-bfc" data-hub-weapon-title="BFC" data-hub-weapon-meta="Arme speciale du Hub - 350 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
+                    </div>
+                  </article>
+                  <article class="weapon-card weapon-card-hub weapon-card-hub-visual">
+                    <div class="weapon-card-thumb">
+                      <img src="assets/hub-sulfateuse.png" alt="Sulfateuse" loading="lazy" />
+                    </div>
+                    <div class="weapon-card-hub-main">
+                      <div class="weapon-card-head">
+                        <h3 class="weapon-name"><span>Sulfateuse</span></h3>
+                        <p class="weapon-cost">500 chroma</p>
+                      </div>
+                      <div class="weapon-tags">
+                        <span class="weapon-tag">A deux mains</span>
+                        <span class="weapon-tag">Lourde</span>
+                        <span class="weapon-tag">Brutale</span>
+                      </div>
+                      <div class="weapon-summary-row">
+                        <p class="weapon-note">Arme de tir soutenu qui devient de plus en plus dangereuse tant qu&rsquo;on maintient la pression.</p>
+                        <button class="button weapon-detail-button" type="button" data-hub-weapon-trigger="hub-weapon-sulfateuse" data-hub-weapon-title="Sulfateuse" data-hub-weapon-meta="Arme speciale du Hub - 500 chroma" aria-haspopup="dialog">Detail</button>
+                      </div>
                     </div>
                   </article>
                 </div>
               </div>
-            </div>
-            <div class="callout">
-              <strong>Choix minimum pour un PJ</strong>
-              <p>Un personnage jouable a interet a partir avec au moins une arme de base du coeur de regles, une solution de secours, et une reponse si le combat passe au contact. Si votre build depend des munitions, notez aussi votre chargeur et votre cout de rechargement des la creation.</p>
             </div>
           </section>
 
@@ -6474,86 +6601,283 @@ Utilise Ruee d'acier pour coller une ligne, contourner un angle ou sortir d'un p
       </div>    </div>
 
     <template id="hub-weapon-lance-flammes">
-      <div class="protocol-facts">
-        <p><strong>Cout :</strong> 500 chroma</p>
-        <p><strong>Degats :</strong> 2d8 feu</p>
-        <p><strong>Portee :</strong> cone de 6 m</p>
-        <p><strong>Chargeur :</strong> 4</p>
-        <p><strong>Rechargement :</strong> action complete</p>
-        <p><strong>Proprietes :</strong> A deux mains, Lourde</p>
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 500 chroma</p>
+            <p><strong>Degats :</strong> 2d8 feu</p>
+            <p><strong>Portee :</strong> cone de 6 m</p>
+            <p><strong>Chargeur :</strong> 4</p>
+            <p><strong>Rechargement :</strong> action complete</p>
+            <p><strong>Proprietes :</strong> A deux mains, Lourde</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Cette attaque touche automatiquement.</li>
+              <li>Chaque creature affectee effectue un jet de sauvegarde de Dexterite.</li>
+              <li>En cas d&rsquo;echec, elle subit 2d8 degats de feu.</li>
+              <li>En cas de reussite, elle subit la moitie de ces degats.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Le lance-flammes projette une nappe de feu sur toutes les creatures dans un cone de 6 metres.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-lance-flammes.png" alt="Lance-flammes" loading="lazy" />
+        </figure>
       </div>
-      <p>Le lance-flammes projette une nappe de feu sur toutes les creatures dans un cone de 6 metres.</p>
-      <ul>
-        <li>Cette attaque touche automatiquement.</li>
-        <li>Chaque creature affectee effectue un jet de sauvegarde de Dexterite.</li>
-        <li>En cas d&rsquo;echec, elle subit 2d8 degats de feu.</li>
-        <li>En cas de reussite, elle subit la moitie de ces degats.</li>
-      </ul>
+    </template>
+
+    <template id="hub-weapon-lame-mono-moleculaire">
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 300 chroma</p>
+            <p><strong>Degats :</strong> 1d6 perforant</p>
+            <p><strong>Portee :</strong> contact</p>
+            <p><strong>Proprietes :</strong> Legere, Finesse</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Vous beneficiez d&rsquo;un bonus de +1 aux jets d&rsquo;attaque effectues avec cette arme.</li>
+              <li>Vous beneficiez aussi d&rsquo;un bonus de +1 aux jets de degats effectues avec cette arme.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">La lame mono-moleculaire est une arme de precision de tres haute qualite, dont le tranchant extremement fin est stabilise par une technologie avancee. Fine, rapide et terriblement dangereuse, elle constitue l&rsquo;equivalent haut de gamme d&rsquo;une epee courte.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-lame-mono-moleculaire.png" alt="Lame mono-moleculaire" loading="lazy" />
+        </figure>
+      </div>
+    </template>
+
+    <template id="hub-weapon-marteau-impact">
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 500 chroma</p>
+            <p><strong>Degats :</strong> 2d8 contondant</p>
+            <p><strong>Portee :</strong> contact</p>
+            <p><strong>Proprietes :</strong> A deux mains, Lourde</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Lorsqu&rsquo;une creature est touchee par cette arme, elle doit reussir un jet de sauvegarde de Force.</li>
+              <li>Le DD de cette sauvegarde est egal a 8 + votre bonus de maitrise + votre modificateur de Force.</li>
+              <li>En cas d&rsquo;echec, la creature est repoussee de 1,50 metre.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Le marteau d&rsquo;impact est une arme lourde concue pour ecraser, rompre et balayer les lignes adverses. Son systeme inertiel concentre brutalement la force du porteur au moment du choc, produisant un impact devastateur.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-marteau-impact.png" alt="Marteau d'impact" loading="lazy" />
+        </figure>
+      </div>
+    </template>
+
+    <template id="hub-weapon-fouet-electrifie">
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 300 chroma</p>
+            <p><strong>Degats :</strong> 2d4 foudre</p>
+            <p><strong>Portee :</strong> 3 m</p>
+            <p><strong>Proprietes :</strong> Finesse, Allonge (3 m)</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Lorsqu&rsquo;une creature subit les degats de cette arme, sa vitesse est reduite de 3 metres jusqu&rsquo;au debut de votre prochain tour.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Le fouet electrifie est une arme de controle employee par certains agents de securite corpo, gardes d&rsquo;intervention et personnels de maintien de l&rsquo;ordre prive. Son filament conducteur permet d&rsquo;atteindre une cible a distance de melee tout en lui infligeant une decharge incapacitante legere.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-fouet-electrifie.png" alt="Fouet electrifie" loading="lazy" />
+        </figure>
+      </div>
+    </template>
+
+    <template id="hub-weapon-gantelets-myomeres">
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 500 chroma</p>
+            <p><strong>Degats :</strong> 1d6 contondant</p>
+            <p><strong>Portee :</strong> contact</p>
+            <p><strong>Proprietes :</strong> Deux mains*, Main nue</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Les attaques portees avec ces gantelets comptent comme des attaques a mains nues.</li>
+              <li>Pour les jets d&rsquo;attaque et de degats effectues avec ces gantelets, vous utilisez une Force de 19 si votre Force est inferieure a 19.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Les gantelets myomeres sont une version modifiee des gants motorises utilises dans la manutention lourde, retravailles pour le combat a mains nues. Ils vont par paire et sont consideres comme deux armes a une main, meme s&rsquo;ils occupent ensemble vos deux mains. Tres apprecies dans certains circuits de boxe plus ou moins legaux, ils embarquent des fibres artificielles et des servomecanismes concus pour amplifier brutalement la puissance des coups.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-gantelets-myomeres.png" alt="Gantelets myomeres" loading="lazy" />
+        </figure>
+      </div>
     </template>
 
     <template id="hub-weapon-lance-grenades">
-      <div class="protocol-facts">
-        <p><strong>Cout :</strong> 500 chroma</p>
-        <p><strong>Degats :</strong> 2d10 explosif</p>
-        <p><strong>Portee :</strong> 18 m / 54 m</p>
-        <p><strong>Chargeur :</strong> 4</p>
-        <p><strong>Rechargement :</strong> action complete</p>
-        <p><strong>Proprietes :</strong> A deux mains, Lourde</p>
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 500 chroma</p>
+            <p><strong>Degats :</strong> 2d10 explosif</p>
+            <p><strong>Portee :</strong> 18 m / 54 m</p>
+            <p><strong>Chargeur :</strong> 4</p>
+            <p><strong>Rechargement :</strong> action complete</p>
+            <p><strong>Proprietes :</strong> A deux mains, Lourde</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>La cible principale et toutes les creatures situees dans un rayon de 1,50 metre autour du point d&rsquo;impact subissent les degats de l&rsquo;arme.</li>
+              <li>Les creatures affectees effectuent une sauvegarde de Dexterite pour reduire les degats de moitie.</li>
+              <li>Si le jet d&rsquo;attaque contre la cible principale touche, celle-ci echoue automatiquement a sa sauvegarde.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Le lance-grenades tire un projectile explosif qui detonne a l&rsquo;impact.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-lance-grenades.png" alt="Lance-grenades" loading="lazy" />
+        </figure>
       </div>
-      <p>Le lance-grenades tire un projectile explosif qui detonne a l&rsquo;impact.</p>
-      <ul>
-        <li>La cible principale et toutes les creatures situees dans un rayon de 1,50 metre autour du point d&rsquo;impact subissent les degats de l&rsquo;arme.</li>
-        <li>Les creatures affectees effectuent une sauvegarde de Dexterite pour reduire les degats de moitie.</li>
-        <li>Si le jet d&rsquo;attaque contre la cible principale touche, celle-ci echoue automatiquement a sa sauvegarde.</li>
-      </ul>
     </template>
 
     <template id="hub-weapon-baliste-poulie">
-      <div class="protocol-facts">
-        <p><strong>Cout :</strong> 500 chroma</p>
-        <p><strong>Degats :</strong> 2d8 perforant</p>
-        <p><strong>Portee :</strong> 18 m / 72 m</p>
-        <p><strong>Chargeur :</strong> 4</p>
-        <p><strong>Rechargement :</strong> action bonus</p>
-        <p><strong>Proprietes :</strong> A deux mains, Lourde, Brutale</p>
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 500 chroma</p>
+            <p><strong>Degats :</strong> 2d8 perforant</p>
+            <p><strong>Portee :</strong> 18 m / 72 m</p>
+            <p><strong>Chargeur :</strong> 4</p>
+            <p><strong>Rechargement :</strong> action bonus</p>
+            <p><strong>Proprietes :</strong> A deux mains, Lourde, Brutale</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Lorsqu&rsquo;une creature est touchee par cette arme, elle doit reussir un jet de sauvegarde de Force.</li>
+              <li>En cas d&rsquo;echec, elle est repoussee de 1,50 metre.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">La baliste a poulie est une arme techno-mecanique de haute tension, concue pour projeter de lourds traits metalliques avec une violence extreme.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-baliste-poulie.png" alt="Baliste a poulie" loading="lazy" />
+        </figure>
       </div>
-      <p>La baliste a poulie est une arme techno-mecanique de haute tension, concue pour projeter de lourds traits metalliques avec une violence extreme.</p>
-      <ul>
-        <li>Lorsqu&rsquo;une creature est touchee par cette arme, elle doit reussir un jet de sauvegarde de Force.</li>
-        <li>En cas d&rsquo;echec, elle est repoussee de 1,50 metre.</li>
-      </ul>
+    </template>
+
+    <template id="hub-weapon-fusil-anti-materiel">
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 500 chroma</p>
+            <p><strong>Degats :</strong> 2d8 perforant</p>
+            <p><strong>Portee :</strong> 45 m / 180 m</p>
+            <p><strong>Chargeur :</strong> 4</p>
+            <p><strong>Rechargement :</strong> action bonus</p>
+            <p><strong>Proprietes :</strong> A deux mains, Lourde, Brutale</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Cette arme ignore le bonus de CA confere par la demi-couverture.</li>
+              <li>Elle inflige le double de degats aux objets et aux structures.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Le fusil anti-materiel est une arme de precision extreme pensee pour neutraliser des cibles lourdement protegees, des drones blindes, des positions retranchees et des elements de structure. Long, massif et d&rsquo;une violence disproportionnee, il transforme chaque tir en menace letale autant pour la cible que pour ce qui l&rsquo;entoure.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-fusil-anti-materiel.png" alt="Fusil anti-materiel" loading="lazy" />
+        </figure>
+      </div>
     </template>
 
     <template id="hub-weapon-fusil-arc-electrique">
-      <div class="protocol-facts">
-        <p><strong>Cout :</strong> 500 chroma</p>
-        <p><strong>Degats :</strong> 3d6 foudre</p>
-        <p><strong>Portee :</strong> 12 m / 36 m</p>
-        <p><strong>Chargeur :</strong> 4</p>
-        <p><strong>Rechargement :</strong> action bonus</p>
-        <p><strong>Proprietes :</strong> A deux mains</p>
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 400 chroma</p>
+            <p><strong>Degats :</strong> 3d6 foudre</p>
+            <p><strong>Portee :</strong> 12 m / 36 m</p>
+            <p><strong>Chargeur :</strong> 4</p>
+            <p><strong>Rechargement :</strong> action bonus</p>
+            <p><strong>Proprietes :</strong> A deux mains</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Lorsqu&rsquo;une creature subit les degats de cette arme, elle ne peut pas effectuer de reaction jusqu&rsquo;au debut de son prochain tour.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Le fusil a arc electrique projette une decharge concentree qui frappe a la fois les tissus, les implants et les systemes embarques.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-fusil-arc-electrique.png" alt="Fusil a arc electrique" loading="lazy" />
+        </figure>
       </div>
-      <p>Le fusil a arc electrique projette une decharge concentree qui frappe a la fois les tissus, les implants et les systemes embarques.</p>
-      <ul>
-        <li>Lorsqu&rsquo;une creature subit les degats de cette arme, elle ne peut pas effectuer de reaction jusqu&rsquo;au debut de son prochain tour.</li>
-      </ul>
+    </template>
+
+    <template id="hub-weapon-bfc">
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 350 chroma</p>
+            <p><strong>Degats :</strong> 1d12 perforant</p>
+            <p><strong>Portee :</strong> 9 m / 27 m</p>
+            <p><strong>Chargeur :</strong> 4</p>
+            <p><strong>Rechargement :</strong> action bonus</p>
+            <p><strong>Proprietes :</strong> Brutale</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Si votre Force est inferieure a 16, cette arme necessite deux mains pour etre utilisee.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">Le BFC (Big Fucking Calibre) est un enorme pistolet surdimensionne concu pour encaisser et restituer une puissance de feu absurde a courte portee. Trop lourd, trop brutal et trop instable pour un tireur classique, il est surtout apprecie des combattants capables de maitriser son recul au physique.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-bfc.png" alt="BFC" loading="lazy" />
+        </figure>
+      </div>
     </template>
 
     <template id="hub-weapon-sulfateuse">
-      <div class="protocol-facts">
-        <p><strong>Cout :</strong> 500 chroma</p>
-        <p><strong>Degats :</strong> 2d6 perforant</p>
-        <p><strong>Portee :</strong> 18 m / 72 m</p>
-        <p><strong>Chargeur :</strong> &mdash;</p>
-        <p><strong>Rechargement :</strong> &mdash;</p>
-        <p><strong>Proprietes :</strong> A deux mains, Lourde, Brutale</p>
+      <div class="hub-weapon-detail-layout">
+        <div class="hub-weapon-detail-copy">
+          <div class="protocol-facts hub-weapon-detail-head">
+            <p><strong>Cout :</strong> 500 chroma</p>
+            <p><strong>Degats :</strong> 2d6 perforant</p>
+            <p><strong>Portee :</strong> 18 m / 72 m</p>
+            <p><strong>Chargeur :</strong> &mdash;</p>
+            <p><strong>Rechargement :</strong> &mdash;</p>
+            <p><strong>Proprietes :</strong> A deux mains, Lourde, Brutale</p>
+          </div>
+          <div class="hub-weapon-detail-effect">
+            <p class="hub-weapon-detail-label">Effet</p>
+            <ul>
+              <li>Chaque tour consecutif durant lequel vous attaquez avec cette arme, ses degats augmentent de 1d6.</li>
+              <li>Ils montent jusqu&rsquo;a un maximum de 5d6.</li>
+              <li>Des que vous passez un tour sans attaquer avec la sulfateuse, ses degats reviennent a 2d6.</li>
+            </ul>
+          </div>
+          <p class="hub-weapon-detail-description">La sulfateuse est une arme de tir soutenu concue pour maintenir une pression continue sans se soucier d&rsquo;un chargeur classique.</p>
+        </div>
+        <figure class="hub-weapon-detail-visual">
+          <img src="assets/hub-sulfateuse.png" alt="Sulfateuse" loading="lazy" />
+        </figure>
       </div>
-      <p>La sulfateuse est une arme de tir soutenu concue pour maintenir une pression continue sans se soucier d&rsquo;un chargeur classique.</p>
-      <ul>
-        <li>Chaque tour consecutif durant lequel vous attaquez avec cette arme, ses degats augmentent de 1d6.</li>
-        <li>Ils montent jusqu&rsquo;a un maximum de 5d6.</li>
-        <li>Des que vous passez un tour sans attaquer avec la sulfateuse, ses degats reviennent a 2d6.</li>
-      </ul>
     </template>
 
     <div class="protocol-modal hub-weapon-modal" data-hub-weapon-modal hidden>
