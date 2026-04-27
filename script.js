@@ -231,8 +231,6 @@ syncFromHash();
 
 const protocolModal = document.querySelector("[data-protocol-modal]");
 const protocolTriggers = [...document.querySelectorAll("[data-protocol-trigger]")];
-const hubWeaponModal = document.querySelector("[data-hub-weapon-modal]");
-const hubWeaponTriggers = [...document.querySelectorAll("[data-hub-weapon-trigger]")];
 
 if (protocolModal && protocolTriggers.length) {
   const protocolModalCard = protocolModal.querySelector(".protocol-modal-card");
@@ -334,77 +332,6 @@ if (protocolModal && protocolTriggers.length) {
     }
 
     closeProtocolModal();
-  });
-}
-
-if (hubWeaponModal && hubWeaponTriggers.length) {
-  const hubWeaponModalCard = hubWeaponModal.querySelector(".protocol-modal-card");
-  const hubWeaponModalTitle = hubWeaponModal.querySelector("[data-hub-weapon-title]");
-  const hubWeaponModalMeta = hubWeaponModal.querySelector("[data-hub-weapon-meta]");
-  const hubWeaponModalContent = hubWeaponModal.querySelector("[data-hub-weapon-content]");
-  let lastHubWeaponTrigger = null;
-
-  const closeHubWeaponModal = () => {
-    if (hubWeaponModal.hidden) {
-      return;
-    }
-
-    hubWeaponModal.hidden = true;
-    document.body.classList.remove("protocol-modal-open");
-    hubWeaponModalContent.replaceChildren();
-    hubWeaponModalMeta.textContent = "";
-    hubWeaponModalMeta.hidden = true;
-    document.removeEventListener("keydown", handleHubWeaponModalKeydown);
-
-    if (lastHubWeaponTrigger) {
-      lastHubWeaponTrigger.focus();
-      lastHubWeaponTrigger = null;
-    }
-  };
-
-  function handleHubWeaponModalKeydown(event) {
-    if (event.key !== "Escape") {
-      return;
-    }
-
-    event.preventDefault();
-    closeHubWeaponModal();
-  }
-
-  const openHubWeaponModal = (trigger) => {
-    const templateId = trigger.dataset.hubWeaponTrigger;
-    const template = document.getElementById(templateId);
-
-    if (!template) {
-      return;
-    }
-
-    lastHubWeaponTrigger = trigger;
-    hubWeaponModalTitle.textContent = trigger.dataset.hubWeaponTitle?.trim() || "Arme du Hub";
-
-    const meta = trigger.dataset.hubWeaponMeta?.trim() || "";
-    hubWeaponModalMeta.textContent = meta;
-    hubWeaponModalMeta.hidden = !meta;
-    hubWeaponModalContent.replaceChildren(template.content.cloneNode(true));
-    hubWeaponModal.hidden = false;
-    document.body.classList.add("protocol-modal-open");
-    document.addEventListener("keydown", handleHubWeaponModalKeydown);
-    window.requestAnimationFrame(() => hubWeaponModalCard.focus());
-  };
-
-  hubWeaponTriggers.forEach((trigger) => {
-    trigger.addEventListener("click", (event) => {
-      event.preventDefault();
-      openHubWeaponModal(trigger);
-    });
-  });
-
-  hubWeaponModal.addEventListener("click", (event) => {
-    if (!event.target.closest("[data-hub-weapon-close]")) {
-      return;
-    }
-
-    closeHubWeaponModal();
   });
 }
 

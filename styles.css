@@ -1244,6 +1244,42 @@ td {
   gap: 0.55rem;
 }
 
+.weapon-image-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  justify-items: center;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.weapon-sheet-card {
+  width: min(100%, 29.4rem);
+  margin: 0;
+  min-width: 0;
+}
+
+.weapon-sheet-link {
+  display: block;
+  width: 100%;
+  cursor: zoom-in;
+}
+
+.weapon-sheet-link:focus-visible {
+  outline: 2px solid var(--weapon-accent);
+  outline-offset: 0.35rem;
+}
+
+.weapon-sheet-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: #05070a;
+  border-radius: 0.35rem;
+  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.34);
+}
+
 .weapon-card {
   position: relative;
   display: grid;
@@ -1446,15 +1482,6 @@ td {
   color: #ff9a9a;
 }
 
-.weapon-summary-row {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 0.1rem;
-}
-
 .weapon-card-hub .weapon-note {
   grid-column: auto;
   flex: 1;
@@ -1472,8 +1499,7 @@ td {
 }
 
 .weapon-card-hub .weapon-card-head,
-.weapon-card-hub .weapon-tags,
-.weapon-card-hub .weapon-summary-row {
+.weapon-card-hub .weapon-tags {
   grid-column: 1;
 }
 
@@ -1484,49 +1510,6 @@ td {
 
 .weapon-card-hub .weapon-tags {
   gap: 0.7rem;
-}
-
-.weapon-card-hub .weapon-summary-row {
-  align-items: center;
-  padding-top: 0.3rem;
-}
-
-.weapon-detail-button {
-  min-height: auto;
-  padding: 0.48rem 0.82rem 0.42rem;
-  border: 1px solid var(--weapon-accent-line);
-  background: var(--weapon-accent-soft);
-  color: #f8f1e4;
-  font-size: 0.84rem;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.weapon-detail-button:hover,
-.weapon-detail-button:focus-visible {
-  border-color: var(--weapon-accent);
-  background: rgba(255, 255, 255, 0.06);
-  outline: none;
-}
-
-.hub-weapon-modal .protocol-modal-card {
-  border-color: rgba(255, 179, 71, 0.28);
-}
-
-.hub-weapon-modal .protocol-modal-close {
-  border-color: rgba(255, 179, 71, 0.28);
-  background: rgba(255, 179, 71, 0.08);
-}
-
-.hub-weapon-modal .protocol-modal-close:hover,
-.hub-weapon-modal .protocol-modal-close:focus-visible {
-  border-color: #ffb347;
-  background: rgba(255, 179, 71, 0.14);
-}
-
-.hub-weapon-modal .protocol-modal-meta {
-  color: #ffb347;
 }
 
 .faction-list {
@@ -3391,10 +3374,6 @@ th {
     grid-column: 1;
   }
 
-  .weapon-summary-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }
 
 @media (max-width: 760px) {
