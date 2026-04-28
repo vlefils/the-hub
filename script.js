@@ -223,6 +223,49 @@ subtabs.forEach((subtabRoot) => {
   });
 });
 
+document.querySelectorAll("[data-weapon-filter-panel]").forEach((filterPanel) => {
+  const catalog = filterPanel.closest(".weapon-catalog");
+  const pills = [...filterPanel.querySelectorAll("[data-weapon-filter]")];
+  const cards = [...(catalog?.querySelectorAll("[data-weapon-tags]") || [])];
+  const groups = [...(catalog?.querySelectorAll(".weapon-group") || [])];
+  const typeFilters = ["distance", "melee", "module"];
+  const handFilters = ["one-hand", "two-hand"];
+  const tierFilters = ["tier-1", "tier-2"];
+
+  const syncWeaponFilters = () => {
+    const activeFilters = new Set(
+      pills
+        .filter((pill) => pill.getAttribute("aria-pressed") !== "false")
+        .map((pill) => pill.dataset.weaponFilter),
+    );
+
+    cards.forEach((card) => {
+      const tags = card.dataset.weaponTags.split(/\s+/).filter(Boolean);
+      const matchesFacet = (filters) => {
+        const cardFilters = filters.filter((filter) => tags.includes(filter));
+        return cardFilters.length === 0 || cardFilters.some((filter) => activeFilters.has(filter));
+      };
+      const visible = matchesFacet(typeFilters) && matchesFacet(handFilters) && matchesFacet(tierFilters);
+      card.hidden = !visible;
+    });
+
+    groups.forEach((group) => {
+      const groupCards = [...group.querySelectorAll("[data-weapon-tags]")];
+      group.hidden = groupCards.length > 0 && groupCards.every((card) => card.hidden);
+    });
+  };
+
+  pills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      const pressed = pill.getAttribute("aria-pressed") !== "false";
+      pill.setAttribute("aria-pressed", String(!pressed));
+      syncWeaponFilters();
+    });
+  });
+
+  syncWeaponFilters();
+});
+
 if (!window.location.hash) {
   history.replaceState(null, "", "#lore-the-hub");
 }

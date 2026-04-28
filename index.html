@@ -4613,51 +4613,99 @@
             <div class="weapon-catalog" data-arsenal="hub">
               <div class="weapon-catalog-head">
                 <p class="weapon-catalog-kicker">Armes speciales du Hub</p>
-                <p class="weapon-catalog-copy">Les fiches image ci-dessous regroupent directement prix, degats, portee, chargeur, rechargement et proprietes.</p>
+                <p class="weapon-catalog-copy">Prix, degats, portees, chargeurs, effets et compatibilites sont lus directement sur les fiches.</p>
+              </div>
+              <div class="weapon-filter-panel" data-weapon-filter-panel aria-label="Filtres des armes speciales du Hub">
+                <div class="weapon-filter-row">
+                  <p class="weapon-filter-label">Types</p>
+                  <div class="weapon-filter-list">
+                    <button class="weapon-filter-pill" type="button" data-weapon-filter="distance" aria-pressed="true">Distance</button>
+                    <button class="weapon-filter-pill" type="button" data-weapon-filter="melee" aria-pressed="true">M&ecirc;l&eacute;e</button>
+                    <button class="weapon-filter-pill" type="button" data-weapon-filter="module" aria-pressed="true">Module</button>
+                    <button class="weapon-filter-pill" type="button" data-weapon-filter="one-hand" aria-pressed="true">Une main</button>
+                    <button class="weapon-filter-pill" type="button" data-weapon-filter="two-hand" aria-pressed="true">Deux mains</button>
+                  </div>
+                </div>
+                <div class="weapon-filter-row">
+                  <p class="weapon-filter-label">Tiers</p>
+                  <div class="weapon-filter-list">
+                    <button class="weapon-filter-pill" type="button" data-weapon-filter="tier-1" aria-pressed="true">Tiers 1</button>
+                    <button class="weapon-filter-pill" type="button" data-weapon-filter="tier-2" aria-pressed="true">Tiers 2</button>
+                  </div>
+                </div>
               </div>
               <div class="weapon-group">
                 <div class="weapon-group-head">
-                  <p class="weapon-group-title">Fiches d&rsquo;armes</p>
+                  <p class="weapon-group-title">Distance</p>
                 </div>
                 <div class="weapon-grid weapon-image-grid">
-                  <figure class="weapon-sheet-card">
+                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/vecta-arc-9.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/vecta-arc-9.png" alt="Fiche image de l'arme Vecta ARC-9, arbalete tactique" loading="lazy" />
                     </a>
                   </figure>
-                  <figure class="weapon-sheet-card">
+                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/tianlei-ar-5.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/tianlei-ar-5.png" alt="Fiche image de l'arme Tianlei AR-5, arc rifle" loading="lazy" />
                     </a>
                   </figure>
-                  <figure class="weapon-sheet-card">
+                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/voron-kmg-6.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/voron-kmg-6.png" alt="Fiche image de l'arme Voron KMG-6, mitrailleuse legere" loading="lazy" />
                     </a>
                   </figure>
-                  <figure class="weapon-sheet-card">
+                  <figure class="weapon-sheet-card" data-weapon-tags="distance one-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/bfc.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/bfc.png" alt="Fiche image de l'arme BFC, pistolet lourd" loading="lazy" />
                     </a>
                   </figure>
-                  <figure class="weapon-sheet-card">
+                </div>
+              </div>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">M&ecirc;l&eacute;e</p>
+                </div>
+                <div class="weapon-grid weapon-image-grid">
+                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/leisuo-ls-3.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/leisuo-ls-3.png" alt="Fiche image de l'arme Leisuo LS-3, fouet electrique" loading="lazy" />
                     </a>
                   </figure>
-                  <figure class="weapon-sheet-card">
+                  <figure class="weapon-sheet-card" data-weapon-tags="melee two-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/medved-mg-19.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/medved-mg-19.png" alt="Fiche image de l'arme Medved MG-19, gantelets myomeres" loading="lazy" />
                     </a>
                   </figure>
-                  <figure class="weapon-sheet-card">
+                  <figure class="weapon-sheet-card" data-weapon-tags="melee two-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/ruptor-h-8.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/ruptor-h-8.png" alt="Fiche image de l'arme Ruptor H-8, marteau d'impact" loading="lazy" />
                     </a>
                   </figure>
-                  <figure class="weapon-sheet-card">
+                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-1">
                     <a class="weapon-sheet-link" href="assets/weapons/kage-no-ha-6.png" target="_blank" rel="noopener">
                       <img src="assets/weapons/kage-no-ha-6.png" alt="Fiche image de l'arme Kage no Ha-6, lame mono-moleculaire" loading="lazy" />
+                    </a>
+                  </figure>
+                </div>
+              </div>
+              <div class="weapon-group">
+                <div class="weapon-group-head">
+                  <p class="weapon-group-title">Modules</p>
+                </div>
+                <div class="weapon-grid weapon-image-grid weapon-image-grid--modules">
+                  <figure class="weapon-sheet-card" data-weapon-tags="module two-hand tier-1">
+                    <a class="weapon-sheet-link" href="assets/weapons/breacher-gl-1.png" target="_blank" rel="noopener">
+                      <img src="assets/weapons/breacher-gl-1.png" alt="Fiche image du module d'arme Breacher GL-1, lance-grenades sous canon" loading="lazy" />
+                    </a>
+                  </figure>
+                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-1">
+                    <a class="weapon-sheet-link" href="assets/weapons/oni-no-s-1.png" target="_blank" rel="noopener">
+                      <img src="assets/weapons/oni-no-s-1.png" alt="Fiche image du module d'arme Oni No S-1, silencieux tactique" loading="lazy" />
+                    </a>
+                  </figure>
+                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-1">
+                    <a class="weapon-sheet-link" href="assets/weapons/talon-t-2.png" target="_blank" rel="noopener">
+                      <img src="assets/weapons/talon-t-2.png" alt="Fiche image du module d'arme Talon T-2, viseur tactique" loading="lazy" />
                     </a>
                   </figure>
                 </div>
