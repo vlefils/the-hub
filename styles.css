@@ -1581,8 +1581,35 @@ td {
 
 .faction-list {
   display: grid;
-  gap: 1.15rem;
+  justify-items: center;
+  gap: clamp(1rem, 2vw, 1.6rem);
   margin-top: 1.15rem;
+}
+
+.faction-sheet-card {
+  width: min(100%, 68rem);
+  margin: 0;
+}
+
+.faction-sheet-link {
+  display: block;
+  width: 100%;
+  cursor: zoom-in;
+}
+
+.faction-sheet-link:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 0.35rem;
+}
+
+.faction-sheet-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: #05070a;
+  border-radius: 0.35rem;
+  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.34);
 }
 
 .info-card,
