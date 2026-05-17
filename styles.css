@@ -6285,3 +6285,74 @@ th {
   }
 }
 
+
+.mutation-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(1rem, 2vw, 1.6rem);
+  margin-top: 1.15rem;
+}
+
+.mutation-sheet-card {
+  width: min(100%, 68rem);
+  justify-self: center;
+  margin: 0;
+}
+
+.mutation-sheet-link {
+  display: block;
+  width: 100%;
+  cursor: zoom-in;
+}
+
+.mutation-sheet-link:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 0.35rem;
+}
+
+.mutation-sheet-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: #05070a;
+  border-radius: 0.35rem;
+  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.34);
+}
+
+.implant-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(1rem, 2vw, 1.6rem);
+  margin-top: 1.15rem;
+  margin-bottom: 1.15rem;
+}
+
+.implant-sheet-card {
+  width: min(100%, 68rem);
+  justify-self: center;
+  margin: 0;
+}
+
+.implant-sheet-link {
+  display: block;
+  width: 100%;
+  cursor: zoom-in;
+}
+
+.implant-sheet-link:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 0.35rem;
+}
+
+.implant-sheet-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: #05070a;
+  border-radius: 0.35rem;
+  box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, 0.34);
+}
