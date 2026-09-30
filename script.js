@@ -426,7 +426,10 @@ if (characterSheet) {
   const acMiscInput = characterSheet.querySelector('[name="ac_misc"]');
   const acOverrideInput = characterSheet.querySelector('[name="ac_override"]');
   const printButtons = [...document.querySelectorAll("[data-print-target]")];
+  const blankSheetButton = document.querySelector("[data-export-blank-sheet]");
   const resetButton = document.querySelector("[data-reset-sheet]");
+  let blankSheetSnapshot = null;
+  let printCleanupTimer = null;
 
   const clampLevel = (value) => Math.min(12, Math.max(1, value));
   const parseNumber = (value, fallback = 0) => {
@@ -613,11 +616,95 @@ if (characterSheet) {
     persistSheet();
   };
 
+  const restoreBlankSheet = () => {
+    if (!blankSheetSnapshot) {
+      return;
+    }
+
+    blankSheetSnapshot.controls.forEach(({ control, value, checked, selectedIndex }) => {
+      if (control.type === "checkbox") {
+        control.checked = checked;
+      } else if (control.tagName === "SELECT") {
+        control.selectedIndex = selectedIndex;
+      } else {
+        control.value = value;
+      }
+    });
+
+    blankSheetSnapshot.outputs.forEach(({ output, text }) => {
+      output.textContent = text;
+    });
+
+    blankSheetSnapshot = null;
+    document.body.classList.remove("sheet-blank-print-mode");
+  };
+
+  const prepareBlankSheet = () => {
+    const outputs = [...characterSheet.querySelectorAll("output")];
+
+    blankSheetSnapshot = {
+      controls: editableControls.map((control) => ({
+        control,
+        value: control.value,
+        checked: control.checked,
+        selectedIndex: control.selectedIndex,
+      })),
+      outputs: outputs.map((output) => ({ output, text: output.textContent })),
+    };
+
+    editableControls.forEach((control) => {
+      if (control.type === "checkbox") {
+        control.checked = false;
+      } else if (control.tagName === "SELECT") {
+        control.selectedIndex = -1;
+      } else {
+        control.value = "";
+      }
+    });
+
+    outputs.forEach((output) => {
+      output.textContent = "";
+    });
+
+    document.body.classList.add("sheet-blank-print-mode");
+  };
+
   const clearPrintMode = () => {
+    if (printCleanupTimer) {
+      window.clearTimeout(printCleanupTimer);
+      printCleanupTimer = null;
+    }
+
+    restoreBlankSheet();
     document.body.classList.remove("sheet-print-mode");
     delete document.body.dataset.printTarget;
     document.querySelectorAll(".print-target-section").forEach((element) => element.classList.remove("print-target-section"));
     document.querySelectorAll(".print-target-sheet").forEach((element) => element.classList.remove("print-target-sheet"));
+  };
+
+  const printSheet = (targetId, { blank = false } = {}) => {
+    const targetSheet = targetId ? document.getElementById(targetId) : null;
+    const targetSection = targetSheet?.closest("[data-section]");
+
+    if (!targetId || !targetSheet) {
+      return;
+    }
+
+    clearPrintMode();
+
+    if (blank) {
+      prepareBlankSheet();
+    }
+
+    document.body.classList.add("sheet-print-mode");
+    document.body.dataset.printTarget = targetId;
+    targetSheet.classList.add("print-target-sheet");
+    targetSection?.classList.add("print-target-section");
+
+    window.requestAnimationFrame(() => {
+      window.print();
+      printCleanupTimer = window.setTimeout(clearPrintMode, 1500);
+    });
   };
 
   editableControls.forEach((control) => {
@@ -648,22 +735,16 @@ if (characterSheet) {
   printButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const targetId = button.dataset.printTarget?.trim();
-      const targetSheet = targetId ? document.getElementById(targetId) : null;
-      const targetSection = targetSheet?.closest("[data-section]");
-
-      if (!targetId || !targetSheet) {
-        return;
-      }
-
-      clearPrintMode();
-      document.body.classList.add("sheet-print-mode");
-      document.body.dataset.printTarget = targetId;
-      targetSheet.classList.add("print-target-sheet");
-      targetSection?.classList.add("print-target-section");
-      window.requestAnimationFrame(() => window.print());
-      window.setTimeout(clearPrintMode, 1500);
+      printSheet(targetId);
     });
   });
+
+  if (blankSheetButton) {
+    blankSheetButton.addEventListener("click", () => {
+      const targetId = blankSheetButton.dataset.exportBlankSheet?.trim();
+      printSheet(targetId, { blank: true });
+    });
+  }
 
   window.addEventListener("afterprint", clearPrintMode);
 

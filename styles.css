@@ -3291,6 +3291,11 @@ th {
 }
 
 @media print {
+  body.sheet-blank-print-mode .character-sheet ::placeholder {
+    color: transparent !important;
+    opacity: 0 !important;
+  }
+
   body {
     min-height: auto;
     color: #111820;
