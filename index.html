@@ -15,6 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="ui-refresh.css" />
     <script src="script.js" defer></script>
     <script src="catalogue.js" defer></script>
   </head>
@@ -55,19 +56,22 @@
         <a class="brand brand-hero" href="#lore-the-hub" aria-label="The Hub">
           <img class="brand-logo" src="assets/logo.png" alt="The Hub" />
         </a>
-
-        <nav class="topbar" aria-label="Navigation principale">
-          <div class="topbar-links" id="menu-categories">
-            <a href="#lore-the-hub" data-category-link="lore">Lore</a>
-            <a href="#regles-overview" data-category-link="regles">Regles</a>
-            <a href="#personnage-overview" data-category-link="personnage">Personnage</a>
-            <a href="#outils-overview" data-category-link="outils">Outils</a>
-          </div>
-        </nav>
+        <button class="menu-toggle" type="button" aria-controls="site-navigation" aria-expanded="false">Menu <span aria-hidden="true">☰</span></button>
       </header>
 
       <div class="content-grid">
-        <aside class="sidebar panel" aria-label="Navigation secondaire">
+        <aside class="sidebar panel" id="site-navigation" aria-label="Navigation du site">
+          <div class="sidebar-mobile-head">
+            <strong>THE HUB</strong>
+            <button class="sidebar-close" type="button" aria-label="Fermer la navigation">×</button>
+          </div>
+          <nav class="topbar-links" id="menu-categories" aria-label="Navigation principale">
+            <a href="#lore-the-hub" data-category-link="lore">Lore</a>
+            <a href="#regles-overview" data-category-link="regles">Règles</a>
+            <a href="#personnage-overview" data-category-link="personnage">Personnage</a>
+            <a href="#chroma-catalogue" data-category-link="chroma">Chroma</a>
+            <a href="#outils-overview" data-category-link="outils">Outils</a>
+          </nav>
           <div class="sidebar-head">
             <p class="panel-title">Navigation</p>
             <p class="sidebar-current" data-sidebar-title>Lore</p>
@@ -141,13 +145,11 @@
               <a href="#personnage-classe-runner">Runner</a>
               <a href="#personnage-classe-neuro">Neuro</a>
             </div>
-            <div class="sidebar-group">
-              <p>Le Hub</p>
-              <a href="#personnage-hub-armes">Armes</a>
-              <a href="#personnage-hub-gadgets">Gadgets</a>
-              <a href="#personnage-hub-implants">Implants</a>
-              <a href="#personnage-hub-mutations">Mutations</a>
-            </div>
+          </nav>
+
+          <nav class="sidebar-nav" data-sidebar-nav="chroma" hidden>
+            <a href="#chroma-catalogue">Catalogue complet</a>
+            <a href="#implant-charge-rules">Charge des implants</a>
           </nav>
 
           <nav class="sidebar-nav" data-sidebar-nav="outils" hidden>
@@ -4609,77 +4611,52 @@
             </template>
           </section>
 
-          <section class="page-section panel" id="personnage-hub-armes" data-section data-category="personnage">
-            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Armes</h2></div></div>
-            <p class="shop-lead">Une attaque résout toute la séquence de tir efficace du tour. Les dégâts indiqués ne représentent pas une balle isolée.</p>
-            <div class="shop-catalogue" data-shop-catalogue="armes">
-              <div class="shop-controls" role="search" aria-label="Explorer armes">
-                <label class="shop-search-label">Rechercher
-                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
-                </label>
-                <label class="shop-select-label">Type
-                  <select data-shop-family><option value="all">Tous</option><option value="distance">Distance</option><option value="melee">Mêlée</option><option value="module">Modules</option></select>
-                </label>
-                <label class="shop-select-label">Tier
-                  <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
-                </label>
-                <label class="shop-select-label">Prise en main
-                  <select data-shop-hands><option value="all">Toutes</option><option value="Une main">Une main</option><option value="Deux mains">Deux mains</option></select>
-                </label>
-                <label class="shop-select-label">Trier
-                  <select data-shop-sort></select>
-                </label>
+          <section class="page-section panel" id="chroma-catalogue" data-section data-category="chroma">
+            <div class="section-heading">
+              <p class="section-kicker">Chroma</p>
+              <div>
+                <h2>Catalogue Chroma</h2>
+                <p class="shop-lead">Armes, gadgets, implants et mutations. Comparez les effets et ouvrez une fiche pour les règles complètes.</p>
               </div>
-              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
-              <div class="shop-table-wrap" data-shop-results></div>
             </div>
-          </section>
-
-          <section class="page-section panel" id="personnage-hub-gadgets" data-section data-category="personnage">
-            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Gadgets</h2></div></div>
-            <p class="shop-lead">Équipement spécialisé acheté en chromas. Ouvrez une fiche pour lire les limites et conditions de son effet.</p>
-            <div class="shop-catalogue" data-shop-catalogue="gadgets">
-              <div class="shop-controls" role="search" aria-label="Explorer gadgets">
-                <label class="shop-search-label">Rechercher
-                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
-                </label>
-                <label class="shop-select-label">Tier
-                  <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
-                </label>
-                <label class="shop-select-label">Trier
-                  <select data-shop-sort></select>
-                </label>
+            <div class="shop-catalogue" data-shop-catalogue="all">
+              <div data-shop-browser>
+                <div class="shop-controls" role="search" aria-label="Explorer le catalogue Chroma">
+                  <label class="shop-search-label">Rechercher
+                    <input type="search" data-shop-search placeholder="Nom, effet ou règle" autocomplete="off" />
+                  </label>
+                  <div class="shop-families" data-shop-families role="group" aria-label="Famille d'articles"></div>
+                  <label class="shop-select-label">Tier
+                    <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
+                  </label>
+                  <label class="shop-select-label">Prix
+                    <select data-shop-price><option value="all">Tous</option><option value="500">500 ou moins</option><option value="1000">501 à 1 000</option><option value="over1000">Plus de 1 000</option></select>
+                  </label>
+                  <label class="shop-select-label" data-shop-context="weapons">Type d'arme
+                    <select data-shop-type><option value="all">Tous</option><option value="distance">Distance</option><option value="melee">Mêlée</option><option value="module">Module</option></select>
+                  </label>
+                  <label class="shop-select-label" data-shop-context="weapons">Prise en main
+                    <select data-shop-hands><option value="all">Toutes</option><option value="Une main">Une main</option><option value="Deux mains">Deux mains</option></select>
+                  </label>
+                  <label class="shop-select-label" data-shop-context="implants">Zone
+                    <select data-shop-placement><option value="all">Toutes</option></select>
+                  </label>
+                  <label class="shop-select-label" data-shop-context="implants">Charge cyber
+                    <select data-shop-charge><option value="all">Toutes</option></select>
+                  </label>
+                  <label class="shop-select-label">Trier
+                    <select data-shop-sort></select>
+                  </label>
+                  <button class="shop-reset" type="button" data-shop-reset>Réinitialiser</button>
+                </div>
+                <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
+                <div class="shop-table-wrap" data-shop-results></div>
+                <div class="shop-mobile-results" data-shop-mobile-results></div>
+                <p class="shop-rules-link">Une attaque avec une arme à feu représente toute la séquence de tir efficace du tour. <a href="#implant-charge-rules" data-shop-rules-link>Comprendre la charge des implants</a></p>
               </div>
-              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
-              <div class="shop-table-wrap" data-shop-results></div>
+              <div class="shop-direct-detail" data-shop-detail hidden></div>
             </div>
-          </section>
-
-          <section class="page-section panel" id="personnage-hub-implants" data-section data-category="personnage">
-            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Implants</h2></div></div>
-            <p class="shop-lead">Les implants apportent des capacités nouvelles et augmentent la charge cybernétique. Vérifiez la charge avant chaque greffe.</p>
-            <div class="shop-catalogue" data-shop-catalogue="implants">
-              <div class="shop-controls" role="search" aria-label="Explorer implants">
-                <label class="shop-search-label">Rechercher
-                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
-                </label>
-                <label class="shop-select-label">Tier
-                  <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
-                </label>
-                <label class="shop-select-label">Zone
-                  <select data-shop-placement><option value="all">Toutes</option></select>
-                </label>
-                <label class="shop-select-label">Charge cyber
-                  <select data-shop-charge><option value="all">Toutes</option></select>
-                </label>
-                <label class="shop-select-label">Trier
-                  <select data-shop-sort></select>
-                </label>
-              </div>
-              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
-              <div class="shop-table-wrap" data-shop-results></div>
-            </div>
-            <section class="implant-rules callout" aria-label="Bloc de regles sur la charge des implants">
+            <section class="implant-rules callout" id="implant-charge-rules" aria-label="Bloc de regles sur la charge des implants">
               <div class="implant-rules-head">
                 <p class="implant-rules-kicker">Regles</p>
                 <h3>Charge des implants</h3>
@@ -4726,26 +4703,6 @@
               </div>
               <p class="implant-rules-footnote">La table des sequelles n&rsquo;est pas encore ecrite, mais cette progression pose deja une lecture claire : quelques greffes restent gerables, l&rsquo;accumulation commence vite a peser, et au-dela d&rsquo;un certain point, on joue ouvertement avec le feu.</p>
             </section>
-          </section>
-
-          <section class="page-section panel" id="personnage-hub-mutations" data-section data-category="personnage">
-            <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Mutations</h2></div></div>
-            <p class="shop-lead">Chaque mutation associe un bénéfice à une transformation visible ou à une contrepartie biologique.</p>
-            <div class="shop-catalogue" data-shop-catalogue="mutations">
-              <div class="shop-controls" role="search" aria-label="Explorer mutations">
-                <label class="shop-search-label">Rechercher
-                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
-                </label>
-                <label class="shop-select-label">Tier
-                  <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
-                </label>
-                <label class="shop-select-label">Trier
-                  <select data-shop-sort></select>
-                </label>
-              </div>
-              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
-              <div class="shop-table-wrap" data-shop-results></div>
-            </div>
           </section>
 
           <section class="page-section panel" id="outils-overview" data-section data-category="outils">

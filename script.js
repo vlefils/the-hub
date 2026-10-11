@@ -1,24 +1,11 @@
 const menuToggle = document.querySelector(".menu-toggle");
-const categoryMenu = document.querySelector("#menu-categories");
 const categoryLinks = [...document.querySelectorAll("[data-category-link]")];
 const sidebarTitle = document.querySelector("[data-sidebar-title]");
 const sidebarNavs = [...document.querySelectorAll("[data-sidebar-nav]")];
 sidebarNavs.forEach((nav) => { nav.id ||= `sidebar-nav-${nav.dataset.sidebarNav}`; });
-const sidebarLinks = [...document.querySelectorAll(".sidebar a")];
+const sidebarLinks = [...document.querySelectorAll(".sidebar-nav a")];
 const sidebar = document.querySelector('.sidebar');
-const sidebarToggle = sidebar ? document.createElement('button') : null;
-if (sidebarToggle) {
-  sidebarToggle.type = 'button';
-  sidebarToggle.className = 'sidebar-mobile-toggle';
-  sidebarToggle.textContent = 'Afficher la navigation';
-  sidebarToggle.setAttribute('aria-expanded', 'false');
-  sidebar.querySelector('.sidebar-head')?.after(sidebarToggle);
-  sidebarToggle.addEventListener('click', () => {
-    const open = sidebar.classList.toggle('sidebar-open');
-    sidebarToggle.setAttribute('aria-expanded', String(open));
-    sidebarToggle.textContent = open ? 'Masquer la navigation' : 'Afficher la navigation';
-  });
-}
+const sidebarClose = document.querySelector('.sidebar-close');
 const sections = [...document.querySelectorAll("[data-section]")];
 const subtabs = [...document.querySelectorAll("[data-subtabs]")];
 const sidebarSubgroups = [...document.querySelectorAll(".sidebar-subgroup")];
@@ -33,27 +20,65 @@ const subtabActivators = new Map();
 const sectionSubtabActivators = new Map();
 const sectionDefaultSubtabs = new Map();
 
-const closeMenu = () => {
-  if (!menuToggle || !categoryMenu) {
-    return;
-  }
-
-  categoryMenu.classList.remove("is-open");
-  menuToggle.setAttribute("aria-expanded", "false");
+const closeMenu = (restoreFocus = false) => {
+  sidebar?.classList.remove('sidebar-open');
+  document.body.classList.remove('nav-open');
+  menuToggle?.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) menuToggle?.focus();
 };
 
-if (menuToggle && categoryMenu) {
-  menuToggle.addEventListener("click", () => {
-    const isOpen = categoryMenu.classList.toggle("is-open");
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
+if (menuToggle && sidebar) {
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.add('sidebar-open');
+    sidebar.scrollTop = 0;
+    document.body.classList.add('nav-open');
+    menuToggle.setAttribute('aria-expanded', 'true');
+    sidebarClose?.focus();
+  });
+  sidebarClose?.addEventListener('click', () => closeMenu(true));
+  sidebar.addEventListener('keydown', (event) => {
+    if (!sidebar.classList.contains('sidebar-open')) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeMenu(true);
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = [...sidebar.querySelectorAll('a, button')].filter((element) => element.getClientRects().length);
+    const first = focusable[0];
+    const last = focusable.at(-1);
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+  sidebar.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href^="#"]');
+    if (link?.hash === '#chroma-catalogue') {
+      window.shopInitialFamily = 'all';
+      window.shopSetFamily?.('all');
+      if (new URLSearchParams(window.location.search).has('article')) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('article');
+        history.replaceState(null, '', url);
+        window.shopSyncDirect?.();
+      }
+    }
+    if (link && link.hash === window.location.hash && sidebar.classList.contains('sidebar-open')) closeMenu(true);
+  });
+  window.matchMedia('(min-width: 961px)').addEventListener('change', (event) => {
+    if (event.matches) closeMenu();
   });
 }
 
 const labels = {
   news: "News",
   lore: "Lore",
-  regles: "Regles",
+  regles: "Règles",
   personnage: "Personnage",
+  chroma: "Chroma",
   outils: "Outils",
 };
 
@@ -71,8 +96,6 @@ const activateCategory = (category) => {
   sidebarNavs.forEach((nav) => {
     nav.hidden = nav.dataset.sidebarNav !== category;
   });
-  sidebarToggle?.setAttribute('aria-controls', `sidebar-nav-${category}`);
-
   if (sidebarTitle) {
     sidebarTitle.textContent = labels[category] || "Navigation";
   }
@@ -125,8 +148,9 @@ const resolveSectionTarget = (id) => {
   };
 };
 
-const showSection = (id) => {
+const showSection = (id, scroll = true) => {
   const { target, activeNavId, subtabId } = resolveSectionTarget(id);
+  const fromMobileMenu = sidebar?.classList.contains('sidebar-open');
 
   sections.forEach((section) => {
     const active = section === target;
@@ -145,28 +169,56 @@ const showSection = (id) => {
   activateSidebarLink(activeNavId);
   syncSidebarSubgroups(activeNavId);
   closeMenu();
-  sidebar?.classList.remove('sidebar-open');
-  if (sidebarToggle) {
-    sidebarToggle.setAttribute('aria-expanded', 'false');
-    sidebarToggle.textContent = 'Afficher la navigation';
+  if (fromMobileMenu) {
+    const heading = target.querySelector('h1, h2');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
   }
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (scroll) window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
 };
 
 const syncFromHash = () => {
   const requestedId = window.location.hash.replace("#", "") || "lore-the-hub";
+  const oldShopFamilies = {
+    'personnage-hub-armes': 'armes',
+    'personnage-hub-gadgets': 'gadgets',
+    'personnage-hub-implants': 'implants',
+    'personnage-hub-mutations': 'mutations',
+  };
+  const shopFamily = oldShopFamilies[requestedId];
+  const legacyCatalogue = requestedId === 'personnage-hub-catalogue';
+  if (shopFamily) {
+    window.shopInitialFamily = shopFamily;
+    window.shopSetFamily?.(shopFamily);
+  }
   const id =
-    requestedId === "lore-overview"
+    shopFamily || legacyCatalogue || requestedId === 'implant-charge-rules'
+      ? 'chroma-catalogue'
+      : requestedId === "lore-overview"
       ? "lore-the-hub"
       : requestedId === "pretire-general"
         ? "outils-pretires"
         : requestedId;
 
-  if (requestedId !== id) {
+  if (requestedId !== id && requestedId !== 'implant-charge-rules') {
     history.replaceState(null, "", `#${id}`);
   }
 
-  showSection(id);
+  showSection(id, requestedId !== 'implant-charge-rules');
+  if (requestedId === 'implant-charge-rules') {
+    activateSidebarLink('implant-charge-rules');
+    requestAnimationFrame(() => {
+      const rules = document.getElementById('implant-charge-rules');
+      const heading = rules?.querySelector('h3');
+      if (heading) {
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      }
+      rules?.scrollIntoView();
+    });
+  }
 };
 
 window.addEventListener("hashchange", syncFromHash);
