@@ -2579,6 +2579,50 @@ td {
   display: none;
 }
 
+.class-intro {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 1.75rem;
+}
+
+.class-intro-copy {
+  min-width: 0;
+  max-width: 72ch;
+}
+
+.class-intro-copy p {
+  margin: 0 0 1rem;
+}
+
+.class-intro-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.class-intro-media {
+  width: min(100%, 16rem);
+  margin: 0;
+  justify-self: center;
+}
+
+.page-section .class-intro-media img {
+  width: 100%;
+  height: auto;
+  max-height: 22rem;
+  object-fit: contain;
+  background: #0f1116;
+  border: 0;
+  box-shadow: none;
+  clip-path: none;
+}
+
+@media screen and (min-width: 1181px) {
+  .class-intro {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+}
+
 .subtab-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
