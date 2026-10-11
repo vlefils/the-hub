@@ -194,7 +194,7 @@ const syncFromHash = () => {
     window.shopSetFamily?.(shopFamily);
   }
   const id =
-    shopFamily || legacyCatalogue || requestedId === 'implant-charge-rules'
+    shopFamily || legacyCatalogue
       ? 'chroma-catalogue'
       : requestedId === "lore-overview"
       ? "lore-the-hub"
@@ -202,23 +202,11 @@ const syncFromHash = () => {
         ? "outils-pretires"
         : requestedId;
 
-  if (requestedId !== id && requestedId !== 'implant-charge-rules') {
+  if (requestedId !== id) {
     history.replaceState(null, "", `#${id}`);
   }
 
-  showSection(id, requestedId !== 'implant-charge-rules');
-  if (requestedId === 'implant-charge-rules') {
-    activateSidebarLink('implant-charge-rules');
-    requestAnimationFrame(() => {
-      const rules = document.getElementById('implant-charge-rules');
-      const heading = rules?.querySelector('h3');
-      if (heading) {
-        heading.tabIndex = -1;
-        heading.focus({ preventScroll: true });
-      }
-      rules?.scrollIntoView();
-    });
-  }
+  showSection(id);
 };
 
 window.addEventListener("hashchange", syncFromHash);

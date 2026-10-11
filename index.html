@@ -4652,57 +4652,74 @@
                 <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
                 <div class="shop-table-wrap" data-shop-results></div>
                 <div class="shop-mobile-results" data-shop-mobile-results></div>
-                <p class="shop-rules-link">Une attaque avec une arme à feu représente toute la séquence de tir efficace du tour. <a href="#implant-charge-rules" data-shop-rules-link>Comprendre la charge des implants</a></p>
+                <p class="shop-rules-link">Une attaque avec une arme à feu représente toute la séquence de tir efficace du tour. <a href="#implant-charge-rules" data-shop-rules-link>Voir les règles de charge des implants</a></p>
               </div>
               <div class="shop-direct-detail" data-shop-detail hidden></div>
             </div>
-            <section class="implant-rules callout" id="implant-charge-rules" aria-label="Bloc de regles sur la charge des implants">
-              <div class="implant-rules-head">
-                <p class="implant-rules-kicker">Regles</p>
-                <h3>Charge des implants</h3>
+          </section>
+
+          <section class="page-section panel" id="implant-charge-rules" data-section data-category="chroma">
+            <div class="section-heading">
+              <p class="section-kicker">Chroma</p>
+              <div>
+                <h2>Charge des implants</h2>
+                <p class="shop-lead">Plus la charge cybernétique totale augmente, plus le jet peut atteindre les séquelles graves.</p>
               </div>
-              <p class="implant-rules-lead">Chaque implant possede une valeur de charge comprise entre 1 et 4. Cette valeur represente a quel point la greffe est intrusive, contre-nature et difficile a integrer mentalement pour un cerveau humain. Une amelioration legere d&rsquo;une fonction existante ajoutera peu de charge. A l&rsquo;inverse, un nouveau membre, une transformation tres visible ou une greffe denaturant fortement le corps ajoutera beaucoup plus de charge.</p>
+            </div>
+            <a class="implant-rules-back" href="#chroma-catalogue">← Retour au catalogue</a>
+            <div class="implant-rules">
+              <p class="implant-rules-lead">Chaque implant possède une valeur de charge. Additionnez les charges de tous les implants portés par le personnage pour connaître sa charge totale.</p>
               <div class="implant-rules-steps">
-                <p><strong>1. Additionnez</strong> la charge de tous les implants portes par le personnage pour obtenir sa charge totale.</p>
-                <p><strong>2. Verifiez</strong> dans quel palier se situe cette charge totale.</p>
-                <p><strong>3. Lancez</strong> le jet de sequelles correspondant lorsqu&rsquo;un nouveau greffon est recu.</p>
+                <p><strong>Lorsqu’un nouveau greffon est reçu :</strong> calculez la charge totale, repérez son palier, puis lancez le jet indiqué sur la table des effets secondaires.</p>
               </div>
-              <div class="implant-rules-table-wrap">
-                <p class="implant-rules-table-title">Paliers de charge cyber</p>
-                <table class="implant-rules-table">
+              <div class="implant-rules-table-wrap" aria-labelledby="implant-charge-tiers-title">
+                <h3 class="implant-rules-table-title" id="implant-charge-tiers-title">Jet selon la charge totale</h3>
+                <table class="implant-rules-table implant-rules-tiers">
                   <thead>
                     <tr>
                       <th scope="col">Charge totale</th>
                       <th scope="col">Jet</th>
-                      <th scope="col">Effet narratif</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">1 a 2</th>
-                      <td>1d8</td>
-                      <td>Quelques greffes restent encore gerables, meme si le cerveau commence deja a enregistrer l&rsquo;intrusion.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">3 a 4</th>
-                      <td>1d8 + 1d4</td>
-                      <td>Le cumul des implants commence a peser serieusement sur l&rsquo;equilibre mental et identitaire du personnage.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">5 a 6</th>
-                      <td>1d8 + 1d8</td>
-                      <td>A ce niveau, la cybernetisation devient une vraie pression chronique sur le comportement, la perception et le controle de soi.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">7 ou plus</th>
-                      <td>1d8 + 1d12</td>
-                      <td>Au-dela de ce seuil, chaque nouvelle greffe revient a jouer ouvertement avec la rupture psychologique.</td>
-                    </tr>
+                    <tr><th scope="row">1–2</th><td>1d8</td></tr>
+                    <tr><th scope="row">3–4</th><td>1d8 + 1d4</td></tr>
+                    <tr><th scope="row">5–6</th><td>1d8 + 1d8</td></tr>
+                    <tr><th scope="row">7+</th><td>1d8 + 1d12</td></tr>
                   </tbody>
                 </table>
               </div>
-              <p class="implant-rules-footnote">La table des sequelles n&rsquo;est pas encore ecrite, mais cette progression pose deja une lecture claire : quelques greffes restent gerables, l&rsquo;accumulation commence vite a peser, et au-dela d&rsquo;un certain point, on joue ouvertement avec le feu.</p>
-            </section>
+              <div class="implant-rules-table-wrap" aria-labelledby="implant-effects-title">
+                <h3 class="implant-rules-table-title" id="implant-effects-title">Effets secondaires</h3>
+                <table class="implant-rules-table implant-effects-table">
+                  <thead>
+                    <tr><th scope="col">d20</th><th scope="col">Effet secondaire</th><th scope="col">Effet mécanique</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">1</th><td>Fierté déplacée — le personnage montre ou mentionne constamment sa greffe.</td><td>Aucun effet mécanique.</td></tr>
+                    <tr><th scope="row">2</th><td>Rituel d’ajustement — il touche, ajuste, nettoie ou vérifie instinctivement son implant.</td><td>Aucun effet mécanique.</td></tr>
+                    <tr><th scope="row">3</th><td>Oubli d’intégration — il oublie régulièrement qu’il porte un implant.</td><td>Aucun effet mécanique.</td></tr>
+                    <tr><th scope="row">4</th><td>Regard décalé — attitude, posture ou mouvements légèrement inhabituels.</td><td>Aucun effet mécanique.</td></tr>
+                    <tr><th scope="row">5</th><td>Tic nerveux</td><td>−2 en Représentation</td></tr>
+                    <tr><th scope="row">6</th><td>Dysmorphie</td><td>−2 en Influence</td></tr>
+                    <tr><th scope="row">7</th><td>Membre fantôme</td><td>−1 dé au pool de dés de vie récupérables au repos court, minimum 1.</td></tr>
+                    <tr><th scope="row">8</th><td>Surcharge sensorielle</td><td>−2 en Perception</td></tr>
+                    <tr><th scope="row">9</th><td>Absence de réflexe</td><td>−2 à l’initiative</td></tr>
+                    <tr><th scope="row">10</th><td>Parasitage cognitif</td><td>−2 à toutes les compétences basées sur l’Esprit</td></tr>
+                    <tr><th scope="row">11</th><td>Instabilité mécanique</td><td>−5 en Discrétion</td></tr>
+                    <tr><th scope="row">12</th><td>Altération sociale</td><td>−4 en Influence et Tromperie</td></tr>
+                    <tr><th scope="row">13</th><td>Sommeil fracturé</td><td>Après un repos long : JDS Constitution DD 12. En cas d’échec, le personnage ne récupère que la moitié de ses PV maximum et ses dés de vie restent dépensés.</td></tr>
+                    <tr><th scope="row">14</th><td>Personnalité altérée</td><td>Charisme −1</td></tr>
+                    <tr><th scope="row">15</th><td>Rejet mental localisé</td><td>Au début de chaque combat : JDS Esprit DD 12. En cas d’échec, l’implant « décroche » ; l’effet dépend du slot concerné.</td></tr>
+                    <tr><th scope="row">16</th><td>Crise paranoïde</td><td>À chaque attaque : JDS Esprit DD 12. Échec : attaque la créature atteignable la plus proche, alliée ou ennemie.</td></tr>
+                    <tr><th scope="row">17</th><td>Douleur chronique insupportable</td><td>Constitution −4</td></tr>
+                    <tr><th scope="row">18</th><td>Rupture psychotique</td><td>Esprit −4. Au début de chaque tour : JDS Esprit DD 12 ; échec : Étourdi jusqu’à la fin du tour.</td></tr>
+                    <tr><th scope="row">19</th><td>Perte du langage</td><td>Charisme −4 et impossibilité de communiquer normalement de manière structurée, à l’oral comme à l’écrit.</td></tr>
+                    <tr><th scope="row">20</th><td>Effondrement complet de l’esprit</td><td>Esprit −10 et Charisme −10. Les règles normales s’appliquent si une caractéristique tombe à 0.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </section>
 
           <section class="page-section panel" id="outils-overview" data-section data-category="outils">

@@ -226,7 +226,7 @@
   .shop-rules-link { margin: 1.3rem 0 0; max-width: 70ch; font-size: 0.9rem; }
   .shop-rules-link a,
   .shop-charge-link { color: #a8e5ff; }
-  .implant-rules { margin-top: 2rem; scroll-margin-top: 1.5rem; }
+  .implant-rules { margin-top: 1.5rem; }
 
   .shop-dialog {
     width: min(65rem, calc(100% - 2rem));
@@ -246,7 +246,6 @@
   .shop-direct-detail { max-width: 70rem; }
   .shop-direct-detail .shop-sheet { background: #0e141d; }
   .shop-detail-active > .section-heading { display: none; }
-  .shop-detail-mode + .implant-rules { margin-top: 2rem; }
   .shop-image-error { padding: 2rem; }
 
   /* The same quiet dark surface runs through lore, rules, character and tools. */
@@ -364,11 +363,27 @@
   .implant-rules-table thead th { background: var(--ui-surface-raised); color: #d6dfe8; }
   .page-section .table-wrap :is(th, td),
   .implant-rules-table :is(th, td) { border-color: var(--ui-border); }
-  .implant-rules { border: 0; border-top: 1px solid var(--ui-border); background: transparent; padding: 1.25rem 0 0; }
+  .implant-rules { border: 0; background: transparent; padding: 0; }
   .implant-rules-kicker,
   .implant-rules-table-title { color: #b0bac7; }
-  .implant-rules-steps { border: 0; border-left: 2px solid var(--shop-violet); border-radius: 0; background: var(--ui-surface-raised); }
-  .implant-rules-table { border: 0; border-radius: 0; }
+  .implant-rules-lead { max-width: 74ch; color: var(--muted); }
+  .implant-rules-back { color: #c8d9ff; font-size: 0.92rem; }
+  .implant-rules-back:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .implant-rules-steps { max-width: 74ch; border: 0; border-left: 2px solid var(--shop-violet); border-radius: 0; background: var(--ui-surface-raised); }
+  .implant-rules-steps strong { color: var(--text); }
+  .implant-rules-table-wrap { min-width: 0; }
+  .implant-rules-table-title { margin: 0 0 0.5rem; color: var(--text); font-size: 1.4rem; letter-spacing: 0.025em; text-transform: none; }
+  .implant-rules-table { border: 0; border-radius: 0; table-layout: fixed; }
+  .implant-rules-table tbody :is(th, td) { color: var(--muted); overflow-wrap: anywhere; }
+  .implant-rules-table tbody th { color: var(--text); }
+  .implant-rules-tiers { width: min(100%, 34rem); min-width: 0; }
+  .implant-rules-tiers tbody td { color: var(--shop-violet); font-weight: 700; }
+  .implant-effects-table { min-width: 0; }
+  .implant-effects-table thead th:first-child { width: 4.5rem; }
+  .implant-effects-table thead th:nth-child(2) { width: 30%; }
+  .implant-effects-table tbody th { color: var(--shop-violet); }
+  .implant-effects-table tbody td:first-of-type { color: var(--text); font-weight: 600; }
+  .shop-charge-link { color: var(--shop-violet); }
 
   .pretired-brief,
   .pretired-directory-card { border: 0; background: var(--ui-surface-raised); clip-path: none; }
@@ -485,6 +500,29 @@
   .shop-mobile-summary { display: -webkit-box; margin: 0.25rem 0 0; overflow: hidden; color: #bdc6d2; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 }
 
+@media screen and (max-width: 760px) {
+  .implant-effects-table,
+  .implant-effects-table tbody { display: block; width: 100%; }
+  .implant-effects-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .implant-effects-table tbody tr {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.1rem 0.8rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--ui-border);
+  }
+  .implant-effects-table tbody :is(th, td) { width: auto; padding: 0; border: 0; }
+  .implant-effects-table tbody th { grid-row: 1 / span 2; }
+  .implant-effects-table tbody td:last-child { grid-column: 2; }
+}
+
 @media screen and (max-width: 680px) {
   .shop-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shop-search-label,
@@ -506,7 +544,6 @@
   .shop-sheet-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shop-direct-detail .shop-sheet-header { padding-inline: 0; }
   .shop-direct-detail .shop-sheet-body { padding-inline: 0; }
-  .implant-rules { overflow-x: auto; }
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
