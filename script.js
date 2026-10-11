@@ -20,6 +20,152 @@ const subtabActivators = new Map();
 const sectionSubtabActivators = new Map();
 const sectionDefaultSubtabs = new Map();
 
+const sectionLandmarkGroups = [
+  {
+    family: "Règles",
+    source: "assets/landmarks/rules-principles.webp",
+    alt: "Table de briefing avec un de a vingt faces, cinq marqueurs de caracteristique et une interface de contrat",
+    accent: "#67d7ff",
+    ids: [
+      "regles-overview",
+      "regles-principes-resolution",
+      "regles-principes-personnage",
+      "regles-principes-rythme",
+      "regles-principes-progression",
+    ],
+  },
+  {
+    family: "Système",
+    source: "assets/landmarks/rules-system.webp",
+    alt: "Operateur calibrant un de a vingt faces sur un scanner tactique",
+    accent: "#7dff65",
+    ids: [
+      "regles-systeme",
+      "regles-systeme-tests",
+      "regles-systeme-sauvegardes",
+      "regles-systeme-avantage",
+      "regles-systeme-fiction",
+    ],
+  },
+  {
+    family: "Combat",
+    source: "assets/landmarks/rules-combat.webp",
+    alt: "Equipe de mercenaires prise dans un echange de tirs au milieu d'un couloir industriel",
+    accent: "#ff875c",
+    ids: [
+      "regles-combat",
+      "regles-combat-initiative",
+      "regles-combat-actions",
+      "regles-combat-degats",
+      "regles-combat-survie",
+      "regles-combat-conditions",
+    ],
+  },
+  {
+    family: "Règles",
+    source: "assets/landmarks/rules-second-chance.webp",
+    alt: "Mercenaire reconstruit dans une capsule clinique sous surveillance automatisee",
+    accent: "#cf76ff",
+    ids: ["regles-seconde-chance"],
+  },
+  {
+    family: "Équipement",
+    source: "assets/landmarks/rules-equipment.webp",
+    alt: "Armurerie du Hub avec protection, fusil, kit medical, harnais et caisse d'extraction",
+    accent: "#ffc75c",
+    ids: [
+      "regles-equipement",
+      "regles-equipement-armures",
+      "regles-equipement-armes",
+      "regles-equipement-materiel",
+      "regles-equipement-charge",
+      "regles-equipement-transport",
+    ],
+  },
+  {
+    family: "Personnage",
+    source: "assets/landmarks/character-origins.webp",
+    alt: "Objets personnels evoquant plusieurs origines de survivants de Paradise",
+    accent: "#cf76ff",
+    ids: ["personnage-origines"],
+  },
+  {
+    family: "Chroma",
+    source: "assets/landmarks/chroma-catalogue.webp",
+    alt: "Comptoir securise presentant implants, modules, gadgets et echantillons biotech",
+    accent: "#ff875c",
+    ids: ["chroma-catalogue"],
+  },
+  {
+    family: "Chroma",
+    source: "assets/landmarks/chroma-implant-load.webp",
+    alt: "Banc de test montrant des modules cybernetiques passant du bleu stable a l'orange de surchauffe",
+    accent: "#67d7ff",
+    ids: ["implant-charge-rules"],
+  },
+  {
+    family: "Outils",
+    source: "assets/landmarks/tools-overview.webp",
+    alt: "Table de jeu avec fiche de personnage, tablette, des, carte tactique et imprimante",
+    accent: "#c3ff39",
+    ids: [
+      "outils-overview",
+      "outils-pretires",
+      "pretire-mara-rail-voss",
+      "outils-fiche",
+      "outils-tables",
+      "outils-mj",
+    ],
+  },
+];
+
+const injectSectionLandmarks = () => {
+  sectionLandmarkGroups.forEach((group) => {
+    group.ids.forEach((sectionId, index) => {
+      const section = document.getElementById(sectionId);
+
+      if (!section || section.querySelector(":scope > .section-landmark")) {
+        return;
+      }
+
+      const overviewHero = section.querySelector(":scope > .overview-hero");
+      const directHeading = section.querySelector(":scope > .section-heading");
+      const insertionPoint = overviewHero || directHeading;
+      const heading = section.querySelector("h1, h2");
+
+      if (!insertionPoint || !heading) {
+        return;
+      }
+
+      const figure = document.createElement("figure");
+      const image = document.createElement("img");
+      const caption = document.createElement("figcaption");
+      const code = document.createElement("span");
+      const title = document.createElement("strong");
+
+      figure.className = "section-landmark";
+      figure.style.setProperty("--landmark-accent", group.accent);
+
+      image.src = group.source;
+      image.alt = group.alt;
+      image.loading = "lazy";
+      image.decoding = "async";
+      image.width = 1600;
+      image.height = 534;
+
+      code.className = "section-landmark-code";
+      code.textContent = `${group.family} / ${String(index + 1).padStart(2, "0")}`;
+      title.textContent = heading.textContent.trim();
+
+      caption.append(code, title);
+      figure.append(image, caption);
+      insertionPoint.after(figure);
+    });
+  });
+};
+
+injectSectionLandmarks();
+
 const closeMenu = (restoreFocus = false) => {
   sidebar?.classList.remove('sidebar-open');
   document.body.classList.remove('nav-open');
