@@ -1008,7 +1008,8 @@
     "summary": "Dissimule un kit d'outils ou un objet de moins de 10 cm.",
     "rules": "Dissimule un kit d'outils ou un objet de moins de 10 cm.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/main-outil-modulaire.webp"
+    "image": "assets/catalogue/main-outil-modulaire.webp",
+    "placement": "Main"
   },
   {
     "id": "lames-de-phalanges",
@@ -1020,7 +1021,8 @@
     "summary": "Attaques à mains nues : 1d6 tranchant",
     "rules": "Attaques à mains nues : 1d6 tranchant ; armes naturelles impossibles à désarmer.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/lames-de-phalanges.webp"
+    "image": "assets/catalogue/lames-de-phalanges.webp",
+    "placement": "Main"
   },
   {
     "id": "pistolet-mitrailleur-integre",
@@ -1032,7 +1034,8 @@
     "summary": "PM d'avant-bras, renvoie au profil de l'arme",
     "rules": "PM d'avant-bras, renvoie au profil de l'arme ; déploiement sans action, impossible à désarmer.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/pistolet-mitrailleur-integre.webp"
+    "image": "assets/catalogue/pistolet-mitrailleur-integre.webp",
+    "placement": "Avant-bras"
   },
   {
     "id": "avant-bras-lame-repliable",
@@ -1044,7 +1047,8 @@
     "summary": "Lame 1d6 ; attaque avec votre action bonus après l’action Attaquer.",
     "rules": "Lame intégrée 1d6. Après l’action Attaquer, vous pouvez attaquer avec cette lame avec votre seule action bonus du tour. Cette attaque supplémentaire n’ajoute pas le modificateur de caractéristique aux dégâts, sauf aptitude contraire, et ne s’ajoute pas à une autre attaque de combat à deux armes.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/avant-bras-lame-repliable.webp"
+    "image": "assets/catalogue/avant-bras-lame-repliable.webp",
+    "placement": "Avant-bras"
   },
   {
     "id": "il-tactique",
@@ -1056,7 +1060,8 @@
     "summary": "+1 permanent aux attaques à distance retenu pour la table. Le récapitulatif textuel partagé indiquait +2",
     "rules": "+1 permanent aux attaques à distance retenu pour la table. Le récapitulatif textuel partagé indiquait +2 ; la fiche du site indique +1.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/il-tactique.webp"
+    "image": "assets/catalogue/il-tactique.webp",
+    "placement": "Œil"
   },
   {
     "id": "synthetiseur-de-voix",
@@ -1068,7 +1073,8 @@
     "summary": "Reproduit une voix entendue au moins 30 s",
     "rules": "Reproduit une voix entendue au moins 30 s ; avantage en Tromperie orale, contestable par une personne familière.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/synthetiseur-de-voix.webp"
+    "image": "assets/catalogue/synthetiseur-de-voix.webp",
+    "placement": "Voix"
   },
   {
     "id": "avant-bras-bouclier",
@@ -1080,7 +1086,8 @@
     "summary": "Une fois par round, réaction pour +2 CA contre une attaque qui vous cible, si vous n'êtes pas surpris.",
     "rules": "Une fois par round, réaction pour +2 CA contre une attaque qui vous cible, si vous n'êtes pas surpris.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/avant-bras-bouclier.webp"
+    "image": "assets/catalogue/avant-bras-bouclier.webp",
+    "placement": "Avant-bras"
   },
   {
     "id": "capteur-de-micro-expressions",
@@ -1092,7 +1099,8 @@
     "summary": "Avantage aux tests d’Influence pour lire une émotion, déceler un mensonge ou jauger une intention",
     "rules": "Avantage aux tests d’Influence pour lire une émotion, déceler un mensonge ou jauger une intention ; pas pour convaincre, commander ou séduire.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/capteur-de-micro-expressions.webp"
+    "image": "assets/catalogue/capteur-de-micro-expressions.webp",
+    "placement": "Visage"
   },
   {
     "id": "machoire-predatrice",
@@ -1104,7 +1112,8 @@
     "summary": "Maîtrise ou expertise en Intimidation",
     "rules": "Maîtrise ou expertise en Intimidation ; morsure 1d12.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/machoire-predatrice.webp"
+    "image": "assets/catalogue/machoire-predatrice.webp",
+    "placement": "Mâchoire"
   },
   {
     "id": "bras-dassaut",
@@ -1116,7 +1125,8 @@
     "summary": "+2 dégâts en mêlée avec ce bras",
     "rules": "+2 dégâts en mêlée avec ce bras ; avantage en Lutte avec ce bras.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/bras-dassaut.webp"
+    "image": "assets/catalogue/bras-dassaut.webp",
+    "placement": "Bras"
   },
   {
     "id": "lames-de-course",
@@ -1128,7 +1138,8 @@
     "summary": "Vitesse +3 m",
     "rules": "Vitesse +3 m ; avantage en Athlétisme pour courir/sauter/franchir ; chute −5 dégâts.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/lames-de-course.webp"
+    "image": "assets/catalogue/lames-de-course.webp",
+    "placement": "Jambes"
   },
   {
     "id": "pieds-dancrage",
@@ -1140,7 +1151,8 @@
     "summary": "Ignore le terrain difficile",
     "rules": "Ignore le terrain difficile ; vitesse d'escalade 3 m sur murs et plafonds.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/pieds-dancrage.webp"
+    "image": "assets/catalogue/pieds-dancrage.webp",
+    "placement": "Pieds"
   },
   {
     "id": "peau-de-camouflage-active",
@@ -1152,7 +1164,8 @@
     "summary": "Invisible immobile",
     "rules": "Invisible immobile ; avantage en Discrétion visuelle en mouvement ; l'attaque interrompt l'effet.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/peau-de-camouflage-active.webp"
+    "image": "assets/catalogue/peau-de-camouflage-active.webp",
+    "placement": "Peau"
   },
   {
     "id": "queue-prehenseuse-de-colonne",
@@ -1164,7 +1177,8 @@
     "summary": "Manipule des objets légers",
     "rules": "Manipule des objets légers ; une action bonus supplémentaire réservée à la queue, sans attaque.",
     "archive": "assets/implants/catalogue-implants-t1.png",
-    "image": "assets/catalogue/queue-prehenseuse-de-colonne.webp"
+    "image": "assets/catalogue/queue-prehenseuse-de-colonne.webp",
+    "placement": "Colonne"
   },
   {
     "id": "bras-grappin-telescopique",
@@ -1176,7 +1190,8 @@
     "summary": "Grappin en action bonus vers un point à 12 m, déplacement de 6 m sans attaque d'opportunité",
     "rules": "Grappin en action bonus vers un point à 12 m, déplacement de 6 m sans attaque d'opportunité ; avantage pour grimper avec ce bras.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/bras-grappin-telescopique.webp"
+    "image": "assets/catalogue/bras-grappin-telescopique.webp",
+    "placement": "Bras"
   },
   {
     "id": "plaques-dermiques",
@@ -1188,7 +1203,8 @@
     "summary": "+1 CA.",
     "rules": "+1 CA.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/plaques-dermiques.webp"
+    "image": "assets/catalogue/plaques-dermiques.webp",
+    "placement": "Peau"
   },
   {
     "id": "reflex-booster-peripherique",
@@ -1200,7 +1216,8 @@
     "summary": "+2 initiative",
     "rules": "+2 initiative ; impossible d'être surpris tant que vous êtes conscient.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/reflex-booster-peripherique.webp"
+    "image": "assets/catalogue/reflex-booster-peripherique.webp",
+    "placement": "Système nerveux"
   },
   {
     "id": "main-outil-polyvalente",
@@ -1212,7 +1229,8 @@
     "summary": "Deux kits ou objets de moins de 15 cm",
     "rules": "Deux kits ou objets de moins de 15 cm ; rangement/dégainage sans action ; avantage aux tests avec les kits.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/main-outil-polyvalente.webp"
+    "image": "assets/catalogue/main-outil-polyvalente.webp",
+    "placement": "Main"
   },
   {
     "id": "pm-integre-s-2-wristfire",
@@ -1224,7 +1242,8 @@
     "summary": "PM d'avant-bras, +1 attaque",
     "rules": "PM d'avant-bras, +1 attaque ; tire même mains occupées ; indésarmable, déploiement sans action.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/pm-integre-s-2-wristfire.webp"
+    "image": "assets/catalogue/pm-integre-s-2-wristfire.webp",
+    "placement": "Avant-bras"
   },
   {
     "id": "griffes-de-phalanges-mono-fil",
@@ -1236,7 +1255,8 @@
     "summary": "Mains nues 1d8 tranchant",
     "rules": "Mains nues 1d8 tranchant ; critique sur 19–20 ; indésarmables.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/griffes-de-phalanges-mono-fil.webp"
+    "image": "assets/catalogue/griffes-de-phalanges-mono-fil.webp",
+    "placement": "Main"
   },
   {
     "id": "avant-bras-lame-vibro-repliable",
@@ -1248,7 +1268,8 @@
     "summary": "Lame 1d8 ; attaque en action bonus et déplacement de 1,50 m si elle touche.",
     "rules": "Lame intégrée 1d8. Après l’action Attaquer, attaque avec votre seule action bonus du tour, sans modificateur de caractéristique aux dégâts sauf aptitude contraire. Si elle touche, déplacement gratuit de 1,50 m sans attaque d’opportunité. Remplace la lame T1.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/avant-bras-lame-vibro-repliable.webp"
+    "image": "assets/catalogue/avant-bras-lame-vibro-repliable.webp",
+    "placement": "Avant-bras"
   },
   {
     "id": "il-tactique-balistique-t2",
@@ -1260,7 +1281,8 @@
     "summary": "+2 attaques à distance",
     "rules": "+2 attaques à distance ; +2 dégâts une fois par tour si vous êtes resté immobile.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/il-tactique-balistique-t2.webp"
+    "image": "assets/catalogue/il-tactique-balistique-t2.webp",
+    "placement": "Œil"
   },
   {
     "id": "bouclier-cinetique-davant-bras",
@@ -1272,7 +1294,8 @@
     "summary": "Réaction une fois par round : +3 CA contre une attaque",
     "rules": "Réaction une fois par round : +3 CA contre une attaque ; si elle rate au contact, repousse de 1,50 m.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/bouclier-cinetique-davant-bras.webp"
+    "image": "assets/catalogue/bouclier-cinetique-davant-bras.webp",
+    "placement": "Avant-bras"
   },
   {
     "id": "machoire-broyeuse-renforcee",
@@ -1284,7 +1307,8 @@
     "summary": "Maîtrise/expertise en Intimidation",
     "rules": "Maîtrise/expertise en Intimidation ; morsure 1d12 perforant, +1d12 sur cible agrippée.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/machoire-broyeuse-renforcee.webp"
+    "image": "assets/catalogue/machoire-broyeuse-renforcee.webp",
+    "placement": "Mâchoire"
   },
   {
     "id": "jambes-de-course-raptor",
@@ -1296,7 +1320,8 @@
     "summary": "Vitesse +4,50 m",
     "rules": "Vitesse +4,50 m ; avantage pour courir/sauter/franchir ; chute −10 ; +1d6 dégâts après déplacement de 6 m.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
-    "image": "assets/catalogue/jambes-de-course-raptor.webp"
+    "image": "assets/catalogue/jambes-de-course-raptor.webp",
+    "placement": "Jambes"
   },
   {
     "id": "bras-dassaut-myomere",
@@ -1308,7 +1333,8 @@
     "summary": "+3 dégâts en mêlée avec ce bras",
     "rules": "+3 dégâts en mêlée avec ce bras ; avantage en Lutte ; portage comme Force +2 ; repousse de 1,50 m une fois par tour.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/bras-dassaut-myomere.webp"
+    "image": "assets/catalogue/bras-dassaut-myomere.webp",
+    "placement": "Bras"
   },
   {
     "id": "module-de-saut-hydraulique",
@@ -1320,7 +1346,8 @@
     "summary": "Saut triplé",
     "rules": "Saut triplé ; dégâts de chute réduits de 15. Après au moins 3 m de saut ou de chute volontaire effectivement parcourus, +1d8 dégâts à la première attaque ; un même saut ne déclenche pas une seconde fois le bonus.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/module-de-saut-hydraulique.webp"
+    "image": "assets/catalogue/module-de-saut-hydraulique.webp",
+    "placement": "Jambes"
   },
   {
     "id": "peau-de-camouflage-adaptative",
@@ -1332,7 +1359,8 @@
     "summary": "Avantage en Discrétion visuelle ; invisible jusqu’à 1 minute une fois par jour.",
     "rules": "Avantage aux tests de Discrétion visuelle en mouvement. Une fois par jour, activation en action bonus : invisible pendant au plus 1 minute. Une attaque profite de l’invisibilité, puis l’effet prend fin ; il prend aussi fin si vous imposez un JDS.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/peau-de-camouflage-adaptative.webp"
+    "image": "assets/catalogue/peau-de-camouflage-adaptative.webp",
+    "placement": "Peau"
   },
   {
     "id": "bras-bouclier-lourd-bulwark",
@@ -1344,7 +1372,8 @@
     "summary": "+1 CA",
     "rules": "+1 CA ; réaction une fois par round : +2 CA contre une attaque ou atténuation d'une zone avec JDS Dextérité.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/bras-bouclier-lourd-bulwark.webp"
+    "image": "assets/catalogue/bras-bouclier-lourd-bulwark.webp",
+    "placement": "Bras"
   },
   {
     "id": "systeme-dassaut-bilateral",
@@ -1356,7 +1385,8 @@
     "summary": "+2 dégâts avec bras/mains nues/armes à une main",
     "rules": "+2 dégâts avec bras/mains nues/armes à une main ; avantage en Force des bras ; portage Force +2 ; relance les 1 et 2 des dégâts.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/systeme-dassaut-bilateral.webp"
+    "image": "assets/catalogue/systeme-dassaut-bilateral.webp",
+    "placement": "Bras"
   },
   {
     "id": "plaques-dermiques-renforcees",
@@ -1368,7 +1398,8 @@
     "summary": "+2 CA",
     "rules": "+2 CA ; remplace les Plaques dermiques, effets non cumulables.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/plaques-dermiques-renforcees.webp"
+    "image": "assets/catalogue/plaques-dermiques-renforcees.webp",
+    "placement": "Peau"
   },
   {
     "id": "spine-jack-hyperreflexe",
@@ -1380,7 +1411,8 @@
     "summary": "+2 initiative",
     "rules": "+2 initiative ; impossible d’être surpris tant que vous êtes conscient. Deux réactions par round avec des déclencheurs différents ; une même attaque ne peut déclencher deux réactions défensives.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/spine-jack-hyperreflexe.webp"
+    "image": "assets/catalogue/spine-jack-hyperreflexe.webp",
+    "placement": "Colonne"
   },
   {
     "id": "machoire-abyssale-extensible",
@@ -1392,7 +1424,8 @@
     "summary": "Morsure 2d8 perforant",
     "rules": "Morsure 2d8 perforant ; une cible touchée fait un JDS de Force contre un DD de 8 + maîtrise + modificateur de Force ou devient entravée. La morsure inflige +1d8 à une cible déjà entravée. Avantage en Intimidation ; coût social.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/machoire-abyssale-extensible.webp"
+    "image": "assets/catalogue/machoire-abyssale-extensible.webp",
+    "placement": "Mâchoire"
   },
   {
     "id": "bras-surnumeraire-dorsal",
@@ -1404,7 +1437,8 @@
     "summary": "Tient un objet ou une arme légère",
     "rules": "Tient un objet ou une arme légère ; interaction d’objet supplémentaire. Offre une option d’action bonus pour manipuler, recharger, dégainer ou attaquer avec ce bras après l’action Attaquer. Cette attaque n’ajoute pas le modificateur de caractéristique aux dégâts sauf aptitude contraire ; elle n’accorde pas une seconde action bonus.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/bras-surnumeraire-dorsal.webp"
+    "image": "assets/catalogue/bras-surnumeraire-dorsal.webp",
+    "placement": "Dos"
   },
   {
     "id": "chassis-predateur-quadrupede",
@@ -1416,7 +1450,8 @@
     "summary": "Vitesse +6 m",
     "rules": "Vitesse +6 m ; avantage aux tests de mobilité et contre le renversement. Après une course droite de 6 m, +2d6 dégâts sur la première attaque seulement ; refaire 6 m en ligne droite pour redéclencher cet effet. Coût social conservé.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/chassis-predateur-quadrupede.webp"
+    "image": "assets/catalogue/chassis-predateur-quadrupede.webp",
+    "placement": "Corps entier"
   },
   {
     "id": "peau-cameleon-integrale",
@@ -1428,7 +1463,8 @@
     "summary": "Avantage en Discrétion ; invisible jusqu’à 1 minute, même après la première attaque.",
     "rules": "Avantage en Discrétion visuelle. Une fois par repos long, activation en action bonus : invisible pendant au plus 1 minute. La première attaque ne rompt pas l’effet ; la deuxième le rompt après résolution.",
     "archive": "assets/implants/catalogue-implants-t2.png",
-    "image": "assets/catalogue/peau-cameleon-integrale.webp"
+    "image": "assets/catalogue/peau-cameleon-integrale.webp",
+    "placement": "Peau"
   },
   {
     "id": "retine-noctifere",

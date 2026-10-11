@@ -1,6 +1,8 @@
 # Catalogue shopping du Hub
 
-Le catalogue affiché dans les rubriques **Armes**, **Gadgets**, **Implants** et **Mutations** est lu depuis [`data/catalogue.json`](data/catalogue.json). Chaque objet a un `id` unique, une `family`, un `tier`, un `name`, un `price`, un `summary`, ses `rules` et une `image`. Modifier ces champs suffit à mettre à jour la fiche au prochain chargement du site. Les champs spécialisés (`damage`, `range`, `charger`, `reload`, `hands`, `compatibility`, `charge`) alimentent les caractéristiques visibles ; `drawback` affiche immédiatement la contrepartie d'une mutation. `archive` mène à l'ancienne fiche image.
+Le catalogue affiché dans les rubriques **Armes**, **Gadgets**, **Implants** et **Mutations** est lu depuis [`data/catalogue.json`](data/catalogue.json). Chaque objet a un `id` unique, une `family`, un `tier`, un `name`, un `price`, un `summary`, ses `rules` et une `image`. Modifier ces champs suffit à mettre à jour le tableau et la fiche au prochain chargement du site. Les champs spécialisés (`damage`, `range`, `charger`, `reload`, `hands`, `compatibility`, `charge`, `placement`) alimentent les caractéristiques visibles ; `drawback` affiche la contrepartie d'une mutation. `archive` mène à l'ancienne fiche image.
+
+Le tableau permet de rechercher, filtrer et trier les articles par colonne ou par le menu « Trier ». Les implants peuvent aussi être filtrés par zone et charge cybernétique. Un clic sur une ligne ouvre la fiche complète avec l'illustration. Sur téléphone, les colonnes secondaires sont résumées sous le nom pour garder le prix et la description lisibles. `placement` décrit la zone anatomique d'un implant ; ce champ n'impose pas de limite de greffes par zone. La valeur `charge` correspond à la charge cybernétique de l'implant.
 
 Après une modification, lancer `node tools/validate-catalogue.mjs` pour vérifier les références, images et décisions de règles.
 

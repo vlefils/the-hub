@@ -17,7 +17,10 @@ for (const item of items) {
   assert.ok(item.image && existsSync(resolve(root, item.image)), `Illustration absente : ${item.id}`);
   if (item.archive) assert.ok(existsSync(resolve(root, item.archive)), `Archive absente : ${item.id}`);
   if (item.family === 'mutation') assert.ok(item.drawback, `Contrepartie absente : ${item.id}`);
-  if (item.family === 'implant') assert.ok(Number.isInteger(item.charge), `Charge absente : ${item.id}`);
+  if (item.family === 'implant') {
+    assert.ok(Number.isInteger(item.charge), `Charge absente : ${item.id}`);
+    assert.ok(item.placement, `Zone absente : ${item.id}`);
+  }
   if (item.family === 'distance') assert.ok(item.charger && item.reload, `Chargeur ou rechargement absent : ${item.id}`);
 }
 
