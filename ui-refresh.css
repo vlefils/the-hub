@@ -34,19 +34,10 @@
   }
   .brand-hero {
     margin: 0;
-    width: auto;
+    width: 11rem;
     max-width: 100%;
   }
-  .brand-logo { display: none; }
-  .brand-hero::after {
-    content: 'THE HUB';
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: clamp(2rem, 2.5vw, 2.7rem);
-    font-weight: 700;
-    letter-spacing: 0.025em;
-    line-height: 1;
-  }
+  .brand-logo { display: block; filter: none; }
   .menu-toggle,
   .sidebar-mobile-head { display: none; }
   .content-grid {
@@ -421,8 +412,7 @@
     border-bottom: 1px solid rgba(255,255,255,0.15);
     background: rgba(9,13,19,0.97);
   }
-  .brand-hero { width: auto; max-width: none; }
-  .brand-hero::after { font-size: 1.8rem; }
+  .brand-hero { width: 6.25rem; max-width: 100%; }
   .menu-toggle {
     display: inline-flex;
     align-items: center;
