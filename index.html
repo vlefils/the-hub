@@ -363,8 +363,22 @@
           </section>
 
           <section class="page-section panel" id="regles-overview" data-section data-category="regles">
-            <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Principes</h2></div></div>
-            <p>Le socle de The Hub suit la logique de D&amp;D 5e 2014 : on lance un d20 quand la situation est incertaine, on additionne les bons modificateurs, puis on laisse la fiction encaisser le resultat. Le ton change, pas l&rsquo;ossature. Cette version verrouille toutefois un canon propre a The Hub pour que les classes, la creation et les scenes tactiques parlent enfin le meme langage.</p>
+            <div class="overview-hero overview-hero--rules">
+              <div class="overview-hero-copy">
+                <div class="section-heading"><p class="section-kicker">Regles</p><div><h2>Principes</h2></div></div>
+                <p class="overview-lead">Le socle de The Hub suit la logique de D&amp;D 5e 2014 : un d20 quand l&rsquo;issue est incertaine, des choix lisibles et des consequences qui font avancer la fiction.</p>
+                <p class="overview-support">Le ton change, pas l&rsquo;ossature. Cette version verrouille un canon propre a The Hub pour que les classes, la creation et les scenes tactiques parlent le meme langage.</p>
+                <div class="overview-actions">
+                  <a class="button button-primary" href="#regles-principes-resolution">Commencer par la resolution</a>
+                  <a class="overview-text-link" href="#regles-combat">Aller au combat <span aria-hidden="true">&rarr;</span></a>
+                </div>
+              </div>
+              <dl class="overview-facts" aria-label="Fondamentaux du systeme">
+                <div><dt>Jet central</dt><dd>1d20 + caracteristique + maitrise</dd></div>
+                <div><dt>Caracteristiques</dt><dd>5 scores, dont Esprit</dd></div>
+                <div><dt>Progression</dt><dd>Niveaux 1 a 12</dd></div>
+              </dl>
+            </div>
             <div class="callout accent">
               <strong>Canon de lecture</strong>
               <ul>
@@ -374,12 +388,14 @@
                 <li>La progression de ce site va du niveau 1 au niveau 12, avec bonus de maitrise de +2 a +5.</li>
               </ul>
             </div>
-            <div class="card-grid three-up">
-              <article class="info-card"><h3>Resolution</h3><p>Quand lancer, lire une DD, distinguer test, CA et niveau de pression.</p></article>
-              <article class="info-card"><h3>Personnage en jeu</h3><p>Caracteristiques, competences, maitrise, sauvegardes et expertise.</p></article>
-              <article class="info-card"><h3>Rythme de partie</h3><p>Scene libre, exploration, combat, repos et prix du temps perdu.</p></article>
-              <article class="info-card"><h3>Progression</h3><p>Niveaux, bonus de maitrise, points de vie et changement de stature.</p></article>
-            </div>
+            <nav class="overview-link-grid" aria-label="Chapitres des regles">
+              <a class="overview-link-card" href="#regles-principes-resolution"><span class="overview-link-index">01</span><span><strong>Resolution</strong><small>Tests, DD et pression</small></span><span aria-hidden="true">&rarr;</span></a>
+              <a class="overview-link-card" href="#regles-principes-personnage"><span class="overview-link-index">02</span><span><strong>Personnage en jeu</strong><small>Caracteristiques et maitrises</small></span><span aria-hidden="true">&rarr;</span></a>
+              <a class="overview-link-card" href="#regles-principes-rythme"><span class="overview-link-index">03</span><span><strong>Rythme de partie</strong><small>Scenes, repos et temps</small></span><span aria-hidden="true">&rarr;</span></a>
+              <a class="overview-link-card" href="#regles-principes-progression"><span class="overview-link-index">04</span><span><strong>Progression</strong><small>Niveaux 1 a 12</small></span><span aria-hidden="true">&rarr;</span></a>
+              <a class="overview-link-card" href="#regles-combat"><span class="overview-link-index">05</span><span><strong>Combat</strong><small>Initiative, actions et degats</small></span><span aria-hidden="true">&rarr;</span></a>
+              <a class="overview-link-card" href="#regles-equipement"><span class="overview-link-index">06</span><span><strong>Equipement</strong><small>Armures, armes et charge</small></span><span aria-hidden="true">&rarr;</span></a>
+            </nav>
             <div class="callout">
               <strong>Glossaire rapide</strong>
               <ul>
@@ -1396,16 +1412,38 @@
           </section>
 
           <section class="page-section panel" id="personnage-overview" data-section data-category="personnage">
-            <div class="section-heading"><p class="section-kicker">Personnage</p><div><h2>Creation de personnage</h2></div></div>
-            <p>The Hub reprend la colonne vertebrale de D&amp;D5 : une classe, des caracteristiques, un bonus de maitrise, des competences, des points de vie et un historique. La difference, c&rsquo;est que le fantasy saute au profit de Paradise : on remplace les races par des origines de survie, les royaumes par des blocs, les guildes par des factions, et l&rsquo;identite du personnage se construit autant dans la dette, le chrome et les contacts que dans ses chiffres.</p>
-            <p>Sauf consigne particuliere du MJ, creez vos personnages au niveau 1. A ce stade, un PJ est deja forme, arme, identifiable et capable de prendre des contrats, mais pas encore assez ameliore pour etre sorti de la chaine alimentaire.</p>
+            <div class="overview-hero overview-hero--character">
+              <div class="overview-hero-copy">
+                <div class="section-heading"><p class="section-kicker">Personnage</p><div><h2>Creation de personnage</h2></div></div>
+                <p class="overview-lead">Construisez un operateur capable de prendre des contrats, de tenir sa place dans l&rsquo;equipe et d&rsquo;avoir quelque chose a perdre a Paradise.</p>
+                <p class="overview-support">The Hub garde la colonne vertebrale de D&amp;D5, mais remplace les races et royaumes par des origines de survie, des factions, des dettes et du chrome.</p>
+                <div class="overview-actions">
+                  <a class="button button-primary" href="#personnage-classe-brute">Explorer les classes</a>
+                  <a class="overview-text-link" href="#personnage-origines">Choisir une origine <span aria-hidden="true">&rarr;</span></a>
+                </div>
+              </div>
+              <div class="overview-cast" aria-label="Apercu de trois classes">
+                <a href="#personnage-classe-brute"><img src="assets/brute_base.png" alt="Brute" /><span>Brute</span></a>
+                <a href="#personnage-classe-gachette"><img src="assets/gachette_base.png" alt="Gachette" /><span>Gachette</span></a>
+                <a href="#personnage-classe-runner"><img src="assets/runner_base.png" alt="Runner" /><span>Runner</span></a>
+              </div>
+            </div>
 
             <div class="callout">
               <strong>Creation rapide</strong>
-              <p>Faites les choses dans cet ordre : concept, classe, origine, caracteristiques, maitrises, equipement, finitions The Hub. Si un choix bloque la fiction, priorisez toujours la fiction et adaptez la feuille ensuite.</p>
+              <p>Commencez au niveau 1 et avancez dans cet ordre : concept, classe, origine, caracteristiques, maitrises, equipement, finitions The Hub. Si un choix bloque la fiction, adaptez la feuille ensuite.</p>
             </div>
 
-            <div class="card-grid three-up">
+            <nav class="class-roster" aria-label="Classes disponibles">
+              <a href="#personnage-classe-brute"><strong>Brute</strong><span>Tenir la ligne</span></a>
+              <a href="#personnage-classe-gachette"><strong>Gachette</strong><span>Dominer a distance</span></a>
+              <a href="#personnage-classe-ferailleur"><strong>Ferrailleur</strong><span>Construire et soutenir</span></a>
+              <a href="#personnage-classe-dopeur"><strong>Dopeur</strong><span>Soigner sous pression</span></a>
+              <a href="#personnage-classe-runner"><strong>Runner</strong><span>Infiltrer et contourner</span></a>
+              <a href="#personnage-classe-neuro"><strong>Neuro</strong><span>Controler et surcharger</span></a>
+            </nav>
+
+            <div class="card-grid three-up creation-steps">
               <article class="info-card"><h3>1. Concept</h3><p>Decidez ce que votre perso fait dans une equipe : frontliner, tireur, soutien, infiltrateur, controle, bidouilleur, negociateur ou hybride sale.</p></article>
               <article class="info-card"><h3>2. Classe</h3><p>Choisissez la classe qui porte ce role sur le terrain. La classe fixe l&rsquo;ossature de combat, les points de vie, les maitrises et votre premiere grosse signature.</p></article>
               <article class="info-card"><h3>3. Origine</h3><p>Choisissez d&rsquo;ou vous venez vraiment : rue, enclave, corpo, labo, dock, zone toxique, culte, guerre privee. C&rsquo;est votre equivalent d&rsquo;historique.</p></article>
@@ -4723,8 +4761,41 @@
           </section>
 
           <section class="page-section panel" id="outils-overview" data-section data-category="outils">
-            <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Vue d'ensemble</h2></div></div>
-            <p>Reference rapide, fiches, aides de meneur et tables utilitaires pour fluidifier la partie.</p>
+            <div class="overview-hero overview-hero--tools overview-hero--compact">
+              <div class="overview-hero-copy">
+                <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Preparer la table</h2></div></div>
+                <p class="overview-lead">Passez de la lecture au jeu : choisissez un personnage pret a jouer ou ouvrez une fiche editable et imprimable.</p>
+                <p class="overview-support">Les outils disponibles fonctionnent dans le navigateur et sont penses pour rester lisibles a l&rsquo;ecran comme sur papier.</p>
+              </div>
+              <dl class="overview-facts" aria-label="Formats disponibles">
+                <div><dt>Usage</dt><dd>Preparation et jeu</dd></div>
+                <div><dt>Formats</dt><dd>Ecran et A4</dd></div>
+                <div><dt>Sauvegarde</dt><dd>Locale au navigateur</dd></div>
+              </dl>
+            </div>
+
+            <div class="tool-grid">
+              <a class="tool-card tool-card--available" href="#outils-pretires">
+                <span class="tool-card-index">01</span>
+                <span class="tool-card-copy"><strong>Personnages pre-tires</strong><small>Choisir une operatrice complete, consulter sa fiche et l&rsquo;imprimer.</small></span>
+                <span class="tool-card-action">Ouvrir <span aria-hidden="true">&rarr;</span></span>
+              </a>
+              <a class="tool-card tool-card--available" href="#outils-fiche">
+                <span class="tool-card-index">02</span>
+                <span class="tool-card-copy"><strong>Fiche PJ</strong><small>Saisir les valeurs, profiter des calculs automatiques et exporter en PDF.</small></span>
+                <span class="tool-card-action">Creer <span aria-hidden="true">&rarr;</span></span>
+              </a>
+              <article class="tool-card tool-card--pending">
+                <span class="tool-card-index">03</span>
+                <span class="tool-card-copy"><strong>Tables rapides</strong><small>Incidents, contrats et complications pour relancer une scene.</small></span>
+                <span class="tool-card-status">En preparation</span>
+              </article>
+              <article class="tool-card tool-card--pending">
+                <span class="tool-card-index">04</span>
+                <span class="tool-card-copy"><strong>Aides MJ</strong><small>Fronts, horloges et rappels pour maintenir la pression.</small></span>
+                <span class="tool-card-status">En preparation</span>
+              </article>
+            </div>
           </section>
 
           <section class="page-section panel" id="outils-pretires" data-section data-category="outils">
