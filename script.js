@@ -3,7 +3,22 @@ const categoryMenu = document.querySelector("#menu-categories");
 const categoryLinks = [...document.querySelectorAll("[data-category-link]")];
 const sidebarTitle = document.querySelector("[data-sidebar-title]");
 const sidebarNavs = [...document.querySelectorAll("[data-sidebar-nav]")];
+sidebarNavs.forEach((nav) => { nav.id ||= `sidebar-nav-${nav.dataset.sidebarNav}`; });
 const sidebarLinks = [...document.querySelectorAll(".sidebar a")];
+const sidebar = document.querySelector('.sidebar');
+const sidebarToggle = sidebar ? document.createElement('button') : null;
+if (sidebarToggle) {
+  sidebarToggle.type = 'button';
+  sidebarToggle.className = 'sidebar-mobile-toggle';
+  sidebarToggle.textContent = 'Afficher la navigation';
+  sidebarToggle.setAttribute('aria-expanded', 'false');
+  sidebar.querySelector('.sidebar-head')?.after(sidebarToggle);
+  sidebarToggle.addEventListener('click', () => {
+    const open = sidebar.classList.toggle('sidebar-open');
+    sidebarToggle.setAttribute('aria-expanded', String(open));
+    sidebarToggle.textContent = open ? 'Masquer la navigation' : 'Afficher la navigation';
+  });
+}
 const sections = [...document.querySelectorAll("[data-section]")];
 const subtabs = [...document.querySelectorAll("[data-subtabs]")];
 const sidebarSubgroups = [...document.querySelectorAll(".sidebar-subgroup")];
@@ -56,6 +71,7 @@ const activateCategory = (category) => {
   sidebarNavs.forEach((nav) => {
     nav.hidden = nav.dataset.sidebarNav !== category;
   });
+  sidebarToggle?.setAttribute('aria-controls', `sidebar-nav-${category}`);
 
   if (sidebarTitle) {
     sidebarTitle.textContent = labels[category] || "Navigation";
@@ -129,6 +145,11 @@ const showSection = (id) => {
   activateSidebarLink(activeNavId);
   syncSidebarSubgroups(activeNavId);
   closeMenu();
+  sidebar?.classList.remove('sidebar-open');
+  if (sidebarToggle) {
+    sidebarToggle.setAttribute('aria-expanded', 'false');
+    sidebarToggle.textContent = 'Afficher la navigation';
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
@@ -221,49 +242,6 @@ subtabs.forEach((subtabRoot) => {
       nextButton.focus();
     });
   });
-});
-
-document.querySelectorAll("[data-weapon-filter-panel]").forEach((filterPanel) => {
-  const catalog = filterPanel.closest(".weapon-catalog");
-  const pills = [...filterPanel.querySelectorAll("[data-weapon-filter]")];
-  const cards = [...(catalog?.querySelectorAll("[data-weapon-tags]") || [])];
-  const groups = [...(catalog?.querySelectorAll(".weapon-group") || [])];
-  const typeFilters = ["distance", "melee", "module"];
-  const handFilters = ["one-hand", "two-hand"];
-  const tierFilters = ["tier-1", "tier-2"];
-
-  const syncWeaponFilters = () => {
-    const activeFilters = new Set(
-      pills
-        .filter((pill) => pill.getAttribute("aria-pressed") !== "false")
-        .map((pill) => pill.dataset.weaponFilter),
-    );
-
-    cards.forEach((card) => {
-      const tags = card.dataset.weaponTags.split(/\s+/).filter(Boolean);
-      const matchesFacet = (filters) => {
-        const cardFilters = filters.filter((filter) => tags.includes(filter));
-        return cardFilters.length === 0 || cardFilters.some((filter) => activeFilters.has(filter));
-      };
-      const visible = matchesFacet(typeFilters) && matchesFacet(handFilters) && matchesFacet(tierFilters);
-      card.hidden = !visible;
-    });
-
-    groups.forEach((group) => {
-      const groupCards = [...group.querySelectorAll("[data-weapon-tags]")];
-      group.hidden = groupCards.length > 0 && groupCards.every((card) => card.hidden);
-    });
-  };
-
-  pills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      const pressed = pill.getAttribute("aria-pressed") !== "false";
-      pill.setAttribute("aria-pressed", String(!pressed));
-      syncWeaponFilters();
-    });
-  });
-
-  syncWeaponFilters();
 });
 
 if (!window.location.hash) {

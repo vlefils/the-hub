@@ -16,6 +16,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
+    <script src="catalogue.js" defer></script>
   </head>
   <body>
     <div class="background-scene" aria-hidden="true">
@@ -4610,492 +4611,65 @@
 
           <section class="page-section panel" id="personnage-hub-armes" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Armes</h2></div></div>
-            <div class="weapon-catalog" data-arsenal="hub">
-              <div class="weapon-catalog-head">
-                <p class="weapon-catalog-kicker">Armes speciales du Hub</p>
-                <p class="weapon-catalog-copy">Prix, degats, portees, chargeurs, effets et compatibilites sont lus directement sur les fiches.</p>
+            <p class="shop-lead">Une attaque résout toute la séquence de tir efficace du tour. Les dégâts indiqués ne représentent pas une balle isolée.</p>
+            <div class="shop-catalogue" data-shop-catalogue="armes">
+              <div class="shop-controls" role="search" aria-label="Explorer armes">
+                <label class="shop-search-label">Rechercher
+                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
+                </label>
+                <label class="shop-select-label">Type
+                  <select data-shop-family><option value="all">Tous</option><option value="distance">Distance</option><option value="melee">Mêlée</option><option value="module">Modules</option></select>
+                </label>
+                <label class="shop-select-label">Tier
+                  <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
+                </label>
+                <label class="shop-select-label">Prise en main
+                  <select data-shop-hands><option value="all">Toutes</option><option value="Une main">Une main</option><option value="Deux mains">Deux mains</option></select>
+                </label>
+                <label class="shop-select-label">Trier
+                  <select data-shop-sort><option value="category">Type / prix</option><option value="price-asc">Moins cher</option><option value="price-desc">Plus cher</option><option value="name">Nom A–Z</option></select>
+                </label>
               </div>
-              <div class="weapon-filter-panel" data-weapon-filter-panel aria-label="Filtres des armes speciales du Hub">
-                <div class="weapon-filter-row">
-                  <p class="weapon-filter-label">Types</p>
-                  <div class="weapon-filter-list">
-                    <button class="weapon-filter-pill" type="button" data-weapon-filter="distance" aria-pressed="true">Distance</button>
-                    <button class="weapon-filter-pill" type="button" data-weapon-filter="melee" aria-pressed="true">M&ecirc;l&eacute;e</button>
-                    <button class="weapon-filter-pill" type="button" data-weapon-filter="module" aria-pressed="true">Module</button>
-                    <button class="weapon-filter-pill" type="button" data-weapon-filter="one-hand" aria-pressed="true">Une main</button>
-                    <button class="weapon-filter-pill" type="button" data-weapon-filter="two-hand" aria-pressed="true">Deux mains</button>
-                  </div>
-                </div>
-                <div class="weapon-filter-row">
-                  <p class="weapon-filter-label">Tiers</p>
-                  <div class="weapon-filter-list">
-                    <button class="weapon-filter-pill" type="button" data-weapon-filter="tier-1" aria-pressed="true">Tiers 1</button>
-                    <button class="weapon-filter-pill" type="button" data-weapon-filter="tier-2" aria-pressed="true">Tiers 2</button>
-                  </div>
-                </div>
-              </div>
-              <div class="weapon-group">
-                <div class="weapon-group-head">
-                  <p class="weapon-group-title">Distance - tiers 1</p>
-                </div>
-                <div class="weapon-grid weapon-image-grid">
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/vecta-arc-9.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/vecta-arc-9.png" alt="Fiche image de l'arme Vecta ARC-9, arbalete tactique" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/tianlei-ar-5.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/tianlei-ar-5.png" alt="Fiche image de l'arme Tianlei AR-5, arc rifle" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/voron-kmg-6.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/voron-kmg-6.png" alt="Fiche image de l'arme Voron KMG-6, mitrailleuse legere" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance one-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/bfc.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/bfc.png" alt="Fiche image de l'arme BFC, pistolet lourd" loading="lazy" />
-                    </a>
-                  </figure>
-                </div>
-              </div>
-              <div class="weapon-group">
-                <div class="weapon-group-head">
-                  <p class="weapon-group-title">Distance - tiers 2</p>
-                </div>
-                <div class="weapon-grid weapon-image-grid">
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/sentinel-p-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/sentinel-p-2.png" alt="Fiche image de l'arme Sentinel P-2, pistolet lourd" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/rys-pm-4.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/rys-pm-4.png" alt="Fiche image de l'arme Rys PM-4, pistolet-mitrailleur" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/breach-sg-5.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/breach-sg-5.png" alt="Fiche image de l'arme Breach SG-5, fusil a pompe" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/huolong-f-3.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/huolong-f-3.png" alt="Fiche image de l'arme Huolong F-3, lance-flammes compact" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/doctrine-ar-7.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/doctrine-ar-7.png" alt="Fiche image de l'arme Doctrine AR-7, fusil d'assaut" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/overwatch-sr-8.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/overwatch-sr-8.png" alt="Fiche image de l'arme Overwatch SR-8, fusil de precision" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/sentinel-p-3.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/sentinel-p-3.png" alt="Fiche image de l'arme Sentinel P-3, pistolet lourd" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/tianlei-ar-9.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/tianlei-ar-9.png" alt="Fiche image de l'arme Tianlei AR-9, arc rifle militaire" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/volk-hmg-8.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/volk-hmg-8.png" alt="Fiche image de l'arme Volk HMG-8, mitrailleuse legere" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/am-12.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/am-12.png" alt="Fiche image de l'arme AM-12, fusil anti-materiel leger" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/doorbreaker-d-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/doorbreaker-d-2.png" alt="Fiche image de l'arme Doorbreaker D-2, fusil de breche" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/rys-pm-6.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/rys-pm-6.png" alt="Fiche image de l'arme Rys PM-6, pistolet-mitrailleur" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/yoru-needle.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/yoru-needle.png" alt="Fiche image de l'arme Yoru Needle, aiguille de duel" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/breach-sg-7.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/breach-sg-7.png" alt="Fiche image de l'arme Breach SG-7, fusil a pompe" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/bearstorm-hmg-9.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/bearstorm-hmg-9.png" alt="Fiche image de l'arme Bearstorm HMG-9, mitrailleuse de suppression" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/doctrine-ar-9.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/doctrine-ar-9.png" alt="Fiche image de l'arme Doctrine AR-9, fusil d'assaut" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/thunderlock-ar-11.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/thunderlock-ar-11.png" alt="Fiche image de l'arme Thunderlock AR-11, arc rifle haut voltage" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/doctrine-sar-1.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/doctrine-sar-1.png" alt="Fiche image de l'arme Doctrine SAR-1, fusil d'assaut optimise" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/vecta-arc-9a.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/vecta-arc-9a.png" alt="Fiche image de l'arme Vecta ARC-9A, arbalete automatique" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/overwatch-sr-10.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/overwatch-sr-10.png" alt="Fiche image de l'arme Overwatch SR-10, fusil de precision" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="distance two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/predator-s-12.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/predator-s-12.png" alt="Fiche image de l'arme Predator S-12, fusil anti-materiel pro" loading="lazy" />
-                    </a>
-                  </figure>
-                </div>
-              </div>
-              <div class="weapon-group">
-                <div class="weapon-group-head">
-                  <p class="weapon-group-title">M&ecirc;l&eacute;e</p>
-                </div>
-                <div class="weapon-grid weapon-image-grid">
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/leisuo-ls-3.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/leisuo-ls-3.png" alt="Fiche image de l'arme Leisuo LS-3, fouet electrique" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/medved-mg-19.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/medved-mg-19.png" alt="Fiche image de l'arme Medved MG-19, gantelets myomeres" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/ruptor-h-8.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/ruptor-h-8.png" alt="Fiche image de l'arme Ruptor H-8, marteau d'impact" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/kage-no-ha-6.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/kage-no-ha-6.png" alt="Fiche image de l'arme Kage no Ha-6, lame mono-moleculaire" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/bastion-pr-4.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/bastion-pr-4.png" alt="Fiche image de l'arme Bastion PR-4, tonfa tactique pro" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/krasnov-vk-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/krasnov-vk-2.png" alt="Fiche image de l'arme Krasnov VK-2, brise-machoire" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/tsukikage-k-9.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/tsukikage-k-9.png" alt="Fiche image de l'arme Tsukikage K-9, kunai tactique pro" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/bastion-pb-12.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/bastion-pb-12.png" alt="Fiche image de l'arme Bastion PB-12, pulse baton pro" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee one-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/bastion-gd-6.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/bastion-gd-6.png" alt="Fiche image de l'arme Bastion GD-6, guardrail" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="melee two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/kage-no-ha-9.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/kage-no-ha-9.png" alt="Fiche image de l'arme Kage no Ha-9, katana tactique pro" loading="lazy" />
-                    </a>
-                  </figure>
-                </div>
-              </div>
-              <div class="weapon-group">
-                <div class="weapon-group-head">
-                  <p class="weapon-group-title">Modules</p>
-                </div>
-                <div class="weapon-grid weapon-image-grid weapon-image-grid--modules">
-                  <figure class="weapon-sheet-card" data-weapon-tags="module two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/breacher-gl-1.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/breacher-gl-1.png" alt="Fiche image du module d'arme Breacher GL-1, lance-grenades sous canon" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/oni-no-s-1.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/oni-no-s-1.png" alt="Fiche image du module d'arme Oni No S-1, silencieux tactique" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-1">
-                    <a class="weapon-sheet-link" href="assets/weapons/talon-t-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/talon-t-2.png" alt="Fiche image du module d'arme Talon T-2, viseur tactique" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/bullbreak-m-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/bullbreak-m-2.png" alt="Fiche image du module d'arme Bullbreak M-2, compensateur lourd" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/black-tip.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/black-tip.png" alt="Fiche image du module d'arme Black Tip, munitions perforantes" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/barabank-d-8.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/barabank-d-8.png" alt="Fiche image du module d'arme Barabank D-8, chargeur tambour" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/aimbot-s-1.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/aimbot-s-1.png" alt="Fiche image du module d'arme Aimbot S-1, viseur autonome" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/vesper-1.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/vesper-1.png" alt="Fiche image du module d'arme Vesper-1, munitions neurotoxiques" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/aimbot-s-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/aimbot-s-2.png" alt="Fiche image du module d'arme Aimbot S-2, viseur autonome" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/oni-no-s-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/oni-no-s-2.png" alt="Fiche image du module d'arme Oni No S-2, silencieux avance" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/hawk-eye-t3.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/hawk-eye-t3.png" alt="Fiche image du module d'arme Hawk-Eye T3, smartlink" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/jolt-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/jolt-2.png" alt="Fiche image du module d'arme Jolt-2, module Tesla sous canon" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/aimbot-s-3.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/aimbot-s-3.png" alt="Fiche image du module d'arme Aimbot S-3, viseur autonome" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/vesper-3.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/vesper-3.png" alt="Fiche image du module d'arme Vesper-3, munitions neurotoxiques" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/siege-gl-2.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/siege-gl-2.png" alt="Fiche image du module d'arme Siege GL-2, lance-grenades renforce" loading="lazy" />
-                    </a>
-                  </figure>
-                  <figure class="weapon-sheet-card" data-weapon-tags="module one-hand two-hand tier-2">
-                    <a class="weapon-sheet-link" href="assets/weapons/turret-dock-s-4.png" target="_blank" rel="noopener">
-                      <img src="assets/weapons/turret-dock-s-4.png" alt="Fiche image du module d'arme Turret Dock S-4, socle de tir autonome" loading="lazy" />
-                    </a>
-                  </figure>
-                </div>
-              </div>
+              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
+              <div class="shop-grid" data-shop-results></div>
             </div>
           </section>
 
           <section class="page-section panel" id="personnage-hub-gadgets" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Gadgets</h2></div></div>
-            <div class="weapon-catalog" data-arsenal="hub">
-              <div class="weapon-group">
-                <div class="weapon-group-head">
-                  <p class="weapon-group-title">Prix croissant</p>
-                </div>
-                <div class="weapon-grid">
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Decodeur intrusif civil</span></h3>
-                      <p class="weapon-cost">200 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Bypass</span>
-                      <span class="weapon-tag">+3</span>
-                      <span class="weapon-tag">Civil</span>
-                    </div>
-                    <p class="weapon-note">Vous obtenez un bonus de +3 aux tests visant a ouvrir, contourner ou desactiver une serrure electronique simple, un terminal civil, une porte securisee standard ou un appareil domestique connecte. Ce gadget ne fonctionne pas sur les systemes militaires, blindes ou proteges par une securite active de haut niveau, sauf decision contraire du MJ.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Masque respiratoire tactique</span></h3>
-                      <p class="weapon-cost">200 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Filtration</span>
-                      <span class="weapon-tag">Sauvegardes</span>
-                      <span class="weapon-tag">Non militaire</span>
-                    </div>
-                    <p class="weapon-note">Vous avez l&rsquo;avantage sur les jets de sauvegarde contre les gaz legers, fumees, vapeurs toxiques communes et environnements pollues non militaires. Ce masque ne protege pas contre le vide, l&rsquo;immersion, les toxines de guerre ou les agents biologiques specialises.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Oreillette de lecture sociale</span></h3>
-                      <p class="weapon-cost">200 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Social</span>
-                      <span class="weapon-tag">+2</span>
-                      <span class="weapon-tag">Lecture</span>
-                    </div>
-                    <p class="weapon-note">Vous obtenez un bonus de +2 aux tests visant a detecter un mensonge, reperer une intention hostile ou comprendre si une negociation vous echappe.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Traqueur GPS</span></h3>
-                      <p class="weapon-cost">200 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Balise</span>
-                      <span class="weapon-tag">1 heure</span>
-                      <span class="weapon-tag">DD 20</span>
-                    </div>
-                    <p class="weapon-note">En action, vous pouvez poser ce traqueur sur une creature ou un objet a votre contact. Le traqueur reste actif pendant 1 heure. Tant qu&rsquo;il est actif, vous pouvez localiser sa position tant qu&rsquo;il se trouve sur la meme zone ou dans le meme batiment. Le traqueur est discret : il faut reussir un test de Perception DD 20 pour le detecter.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Filin de traction motorise</span></h3>
-                      <p class="weapon-cost">250 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Vertical</span>
-                      <span class="weapon-tag">+3</span>
-                      <span class="weapon-tag">Action bonus</span>
-                    </div>
-                    <p class="weapon-note">Vous obtenez un bonus de +3 aux tests lies a l&rsquo;escalade, au franchissement ou au deplacement vertical. De plus, une fois par repos court, vous pouvez utiliser une action bonus pour vous tracter jusqu&rsquo;a un point d&rsquo;ancrage visible situe a 6 metres ou moins, a condition que ce point puisse supporter votre poids. Ce deplacement doit se faire en ligne droite.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Harnais servo-assiste leger</span></h3>
-                      <p class="weapon-cost">250 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Athletisme</span>
-                      <span class="weapon-tag">Charge</span>
-                      <span class="weapon-tag">Support</span>
-                    </div>
-                    <p class="weapon-note">Vous avez l&rsquo;avantage sur les tests d&rsquo;Athletisme. De plus, votre capacite de charge est doublee.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Gantelet a impulsion</span></h3>
-                      <p class="weapon-cost">350 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Melee</span>
-                      <span class="weapon-tag">Repousse</span>
-                      <span class="weapon-tag">Large ou -</span>
-                    </div>
-                    <p class="weapon-note">Une fois par tour, lorsque vous touchez une creature avec une attaque au corps a corps, vous pouvez la repousser de 1,50 metre si elle est de taille Large ou inferieure.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Module de camouflage urbain</span></h3>
-                      <p class="weapon-cost">400 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Discretion</span>
-                      <span class="weapon-tag">Couvert</span>
-                      <span class="weapon-tag">Faible lumiere</span>
-                    </div>
-                    <p class="weapon-note">Tant que vous ne portez pas d&rsquo;armure lourde, vous obtenez un bonus de +2 aux tests de Discretion. Si vous etes immobile et a couvert, ou immobile dans une zone de lumiere faible ou d&rsquo;obscurite, ce bonus passe a +4 jusqu&rsquo;a ce que vous vous deplaciez, attaquiez ou lanciez un protocole.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Patch auto-medical regenerant</span></h3>
-                      <p class="weapon-cost">400 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Soin</span>
-                      <span class="weapon-tag">3 charges</span>
-                      <span class="weapon-tag">Repos long</span>
-                    </div>
-                    <p class="weapon-note">Ce patch dispose de 3 charges. En action bonus, vous pouvez depenser 1 charge pour recuperer 1d4 + 1 points de vie. Le patch recupere toutes ses charges apres un repos long. Vous devez etre conscient pour l&rsquo;activer sur vous-meme. Vous pouvez aussi l&rsquo;appliquer a une creature consentante ou inconsciente a votre contact en utilisant une action.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Semelles d&rsquo;inertie feutree</span></h3>
-                      <p class="weapon-cost">400 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Discretion</span>
-                      <span class="weapon-tag">Mobilite</span>
-                      <span class="weapon-tag">Terrain difficile</span>
-                    </div>
-                    <p class="weapon-note">Vous obtenez un bonus de +2 aux tests de Discretion lies au deplacement. De plus, le premier 1,50 metre de terrain difficile que vous traversez a chacun de vos tours ne vous coute pas de mouvement supplementaire.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Drone-oeil tactique</span></h3>
-                      <p class="weapon-cost">450 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Recon</span>
-                      <span class="weapon-tag">Repos court</span>
-                      <span class="weapon-tag">30 m</span>
-                    </div>
-                    <p class="weapon-note">Une fois par repos court, vous pouvez deployer le drone pendant 10 minutes. Pendant ce temps, le drone peut se deplacer jusqu&rsquo;a 9 metres par tour, doit rester a 30 metres ou moins de vous, et vous pouvez utiliser une action bonus pour voir et entendre a travers lui jusqu&rsquo;au debut de votre prochain tour. Pendant que vous percevez a travers lui, vous etes aveugle et sourd a votre propre environnement. De plus, si le drone a observe une zone, une creature ou un dispositif pendant au moins 1 round, vous obtenez l&rsquo;avantage sur le prochain test de Perception, d&rsquo;Investigation ou d&rsquo;infiltration directement lie a cette observation, tant que vous effectuez ce test dans les 10 minutes. Le drone a une CA de 13 et 1 point de vie.</p>
-                  </article>
-                  <article class="weapon-card weapon-card-hub">
-                    <div class="weapon-card-head">
-                      <h3 class="weapon-name"><span>Lentille balistique intelligente</span></h3>
-                      <p class="weapon-cost">450 chromas</p>
-                    </div>
-                    <div class="weapon-tags">
-                      <span class="weapon-tag">Tir</span>
-                      <span class="weapon-tag">1 / tour</span>
-                      <span class="weapon-tag">Longue portee</span>
-                    </div>
-                    <p class="weapon-note">Une fois par tour, quand vous effectuez une attaque a distance contre une cible situee a plus de 6 metres, vous obtenez un bonus de +1 au jet d&rsquo;attaque.</p>
-                  </article>
-                </div>
+            <p class="shop-lead">Équipement spécialisé acheté en chromas. Ouvrez une fiche pour lire les limites et conditions de son effet.</p>
+            <div class="shop-catalogue" data-shop-catalogue="gadgets">
+              <div class="shop-controls" role="search" aria-label="Explorer gadgets">
+                <label class="shop-search-label">Rechercher
+                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
+                </label>
+
+                <label class="shop-select-label">Trier
+                  <select data-shop-sort><option value="price-asc">Moins cher</option><option value="price-desc">Plus cher</option><option value="name">Nom A–Z</option></select>
+                </label>
               </div>
+              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
+              <div class="shop-grid" data-shop-results></div>
             </div>
           </section>
 
           <section class="page-section panel" id="personnage-hub-implants" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Implants</h2></div></div>
-            <p>Les implants sont la promesse et le piege du Hub. Ils donnent un vrai avantage, mais ils coutent du chroma, laissent des traces et fabriquent vite une version de vous qu&rsquo;il devient difficile d&rsquo;arreter d&rsquo;ameliorer.</p>
-            <div class="implant-list">
-              <figure class="implant-sheet-card">
-                <a class="implant-sheet-link" href="assets/implants/catalogue-implants-t1.png" target="_blank" rel="noopener">
-                  <img src="assets/implants/catalogue-implants-t1.png" alt="Catalogue cybernetique des implants, tranche T1" loading="lazy" />
-                </a>
-              </figure>
-              <figure class="implant-sheet-card">
-                <a class="implant-sheet-link" href="assets/implants/catalogue-implants-t2-1.png" target="_blank" rel="noopener">
-                  <img src="assets/implants/catalogue-implants-t2-1.png" alt="Catalogue cybernetique des implants, tranche T2, page intermediaire" loading="lazy" />
-                </a>
-              </figure>
-              <figure class="implant-sheet-card">
-                <a class="implant-sheet-link" href="assets/implants/catalogue-implants-t2.png" target="_blank" rel="noopener">
-                  <img src="assets/implants/catalogue-implants-t2.png" alt="Catalogue cybernetique des implants, tranche T2" loading="lazy" />
-                </a>
-              </figure>
+            <p class="shop-lead">Les implants apportent des capacités nouvelles et augmentent la charge cybernétique. Vérifiez la charge avant chaque greffe.</p>
+            <div class="shop-catalogue" data-shop-catalogue="implants">
+              <div class="shop-controls" role="search" aria-label="Explorer implants">
+                <label class="shop-search-label">Rechercher
+                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
+                </label>
+                <label class="shop-select-label">Tier
+                  <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
+                </label>
+                <label class="shop-select-label">Trier
+                  <select data-shop-sort><option value="price-asc">Moins cher</option><option value="price-desc">Plus cher</option><option value="name">Nom A–Z</option></select>
+                </label>
+              </div>
+              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
+              <div class="shop-grid" data-shop-results></div>
             </div>
             <section class="implant-rules callout" aria-label="Bloc de regles sur la charge des implants">
               <div class="implant-rules-head">
@@ -5148,18 +4722,21 @@
 
           <section class="page-section panel" id="personnage-hub-mutations" data-section data-category="personnage">
             <div class="section-heading"><p class="section-kicker">Le Hub</p><div><h2>Mutations</h2></div></div>
-            <p>Les mutations du Hub ne se contentent pas d&rsquo;ajouter du pouvoir : elles tordent le corps, modifient la perception de soi et laissent toujours une facture biologique visible quelque part. Ici, le bonus n&rsquo;arrive jamais seul.</p>
-            <div class="mutation-list">
-              <figure class="mutation-sheet-card">
-                <a class="mutation-sheet-link" href="assets/mutations/catalogue-mutations-t1.png" target="_blank" rel="noopener">
-                  <img src="assets/mutations/catalogue-mutations-t1.png" alt="Catalogue des mutations Helix Genomics, tranche T1" loading="lazy" />
-                </a>
-              </figure>
-              <figure class="mutation-sheet-card">
-                <a class="mutation-sheet-link" href="assets/mutations/catalogue-mutations-t2.png" target="_blank" rel="noopener">
-                  <img src="assets/mutations/catalogue-mutations-t2.png" alt="Catalogue des mutations Helix Genomics, tranche T2" loading="lazy" />
-                </a>
-              </figure>
+            <p class="shop-lead">Chaque mutation associe un bénéfice à une transformation visible ou à une contrepartie biologique.</p>
+            <div class="shop-catalogue" data-shop-catalogue="mutations">
+              <div class="shop-controls" role="search" aria-label="Explorer mutations">
+                <label class="shop-search-label">Rechercher
+                  <input type="search" data-shop-search placeholder="Nom ou effet" autocomplete="off" />
+                </label>
+                <label class="shop-select-label">Tier
+                  <select data-shop-tier><option value="all">Tous</option><option value="1">T1</option><option value="2">T2</option></select>
+                </label>
+                <label class="shop-select-label">Trier
+                  <select data-shop-sort><option value="price-asc">Moins cher</option><option value="price-desc">Plus cher</option><option value="name">Nom A–Z</option></select>
+                </label>
+              </div>
+              <p class="shop-count" data-shop-count role="status">Chargement des fiches…</p>
+              <div class="shop-grid" data-shop-results></div>
             </div>
           </section>
 
