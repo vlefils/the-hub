@@ -873,7 +873,7 @@
     "name": "Décodeur intrusif civil",
     "price": 200,
     "summary": "+3 pour contourner une sécurité électronique civile simple.",
-    "rules": "Ce décodeur aide à forcer les systèmes électroniques civils. Vous obtenez un bonus de +3 aux tests visant à ouvrir, contourner ou désactiver une serrure électronique simple, un terminal civil, une porte sécurisée standard ou un appareil domestique connecté. Il ne fonctionne pas sur les systèmes militaires, blindés ou protégés par une sécurité active de haut niveau, sauf décision contraire du MJ.",
+    "rules": "Ce décodeur aide à forcer les systèmes électroniques civils. Vous obtenez un bonus de +3 aux tests de Techno pour ouvrir, contourner ou désactiver une serrure électronique simple, un terminal civil, une porte sécurisée standard ou un appareil domestique connecté. Il ne fonctionne pas sur les systèmes militaires, blindés ou protégés par une sécurité active de haut niveau, sauf décision contraire du MJ.",
     "archive": null,
     "image": "assets/catalogue/decodeur-intrusif-civil.webp"
   },
@@ -894,8 +894,8 @@
     "tier": 1,
     "name": "Oreillette de lecture sociale",
     "price": 200,
-    "summary": "Vous obtenez un bonus de +2 aux tests visant a detecter un mensonge, reperer une intention hostile ou comprendre si une negociation vous echappe.",
-    "rules": "Cette oreillette aide à interpréter les signes d'une conversation. Vous obtenez un bonus de +2 aux tests visant à détecter un mensonge, à repérer une intention hostile ou à comprendre qu'une négociation vous échappe.",
+    "summary": "+2 aux tests d'Intuition pour déceler un mensonge, une hostilité ou une négociation défavorable.",
+    "rules": "Cette oreillette aide à interpréter les signes d'une conversation. Vous obtenez un bonus de +2 aux tests d'Intuition pour détecter un mensonge, repérer une intention hostile ou comprendre qu'une négociation vous échappe.",
     "archive": null,
     "image": "assets/catalogue/oreillette-de-lecture-sociale.webp"
   },
@@ -916,8 +916,8 @@
     "tier": 1,
     "name": "Filin de traction motorisé",
     "price": 250,
-    "summary": "+3 aux tests d’escalade ; traction de 6 m en action bonus, une fois par repos court.",
-    "rules": "Ce filin motorisé vous donne un bonus de +3 aux tests liés à l'escalade, au franchissement ou au déplacement vertical. Une fois par repos court, vous pouvez utiliser une action bonus pour vous tracter en ligne droite vers un point d'ancrage visible situé à 6 m ou moins, à condition qu'il puisse supporter votre poids.",
+    "summary": "+3 aux tests d'Athlétisme pour grimper ; traction de 6 m en action bonus, une fois par repos court.",
+    "rules": "Ce filin motorisé vous donne un bonus de +3 aux tests de Force (Athlétisme) pour grimper ou franchir un obstacle vertical. Une fois par repos court, vous pouvez utiliser une action bonus pour vous tracter en ligne droite vers un point d'ancrage visible situé à 6 m ou moins, à condition qu'il puisse supporter votre poids.",
     "archive": null,
     "image": "assets/catalogue/filin-de-traction-motorise.webp"
   },
@@ -982,8 +982,8 @@
     "tier": 1,
     "name": "Drone-œil tactique",
     "price": 450,
-    "summary": "Reconnaissance pendant 10 minutes à 30 m ; avantage à un test lié à ses observations.",
-    "rules": "Une fois par repos court, vous pouvez déployer ce drone pendant dix minutes. Il se déplace jusqu'à 9 m par tour et doit rester à 30 m ou moins de vous. Une action bonus vous permet de voir et d'entendre à travers lui jusqu'au début de votre prochain tour ; pendant ce temps, vous êtes aveugle et sourd à votre propre environnement. Si le drone observe une zone, une créature ou un dispositif pendant au moins un round, vous avez l'avantage au prochain test de Perception, d'Investigation ou d'infiltration directement lié à cette observation, à condition de l'effectuer dans les dix minutes. Le drone possède une CA de 13 et 1 PV.",
+    "summary": "Reconnaissance 10 min à 30 m ; avantage à un test de Perception, d'Investigation ou de Discrétion lié aux observations.",
+    "rules": "Une fois par repos court, vous pouvez déployer ce drone pendant dix minutes. Il se déplace jusqu'à 9 m par tour et doit rester à 30 m ou moins de vous. Une action bonus vous permet de voir et d'entendre à travers lui jusqu'au début de votre prochain tour ; pendant ce temps, vous êtes aveugle et sourd à votre propre environnement. Si le drone observe une zone, une créature ou un dispositif pendant au moins un round, vous avez l'avantage au prochain test de Perception, d'Investigation ou de Discrétion directement lié à cette observation, à condition de l'effectuer dans les dix minutes. Le drone possède une CA de 13 et 1 PV.",
     "archive": null,
     "image": "assets/catalogue/drone-il-tactique.webp"
   },
@@ -1109,8 +1109,8 @@
     "name": "Mâchoire prédatrice",
     "price": 400,
     "charge": 2,
-    "summary": "Maîtrise ou expertise en Intimidation",
-    "rules": "Cette mâchoire vous accorde la maîtrise ou l'expertise en Intimidation et vous permet de mordre pour infliger 1d12 dégâts. Elle transforme votre expression autant que votre manière de combattre.",
+    "summary": "Maîtrise en Intimidation, ou expertise si déjà maîtrisée.",
+    "rules": "Vous obtenez la maîtrise en Intimidation ; si vous maîtrisez déjà cette compétence, vous obtenez l'expertise à la place. Cette mâchoire vous permet de mordre pour infliger 1d12 dégâts. Elle transforme votre expression autant que votre manière de combattre.",
     "archive": "assets/implants/catalogue-implants-t1.png",
     "image": "assets/catalogue/machoire-predatrice.webp",
     "placement": "Mâchoire"
@@ -1304,8 +1304,8 @@
     "name": "Mâchoire broyeuse renforcée",
     "price": 1150,
     "charge": 3,
-    "summary": "Maîtrise/expertise en Intimidation",
-    "rules": "Cette mâchoire vous accorde la maîtrise ou l'expertise en Intimidation. Sa morsure inflige 1d12 dégâts perforants et ajoute 1d12 dégâts lorsque la cible est agrippée.",
+    "summary": "Maîtrise en Intimidation, ou expertise si déjà maîtrisée.",
+    "rules": "Vous obtenez la maîtrise en Intimidation ; si vous maîtrisez déjà cette compétence, vous obtenez l'expertise à la place. La morsure de cette mâchoire inflige 1d12 dégâts perforants et ajoute 1d12 dégâts lorsque la cible est agrippée.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
     "image": "assets/catalogue/machoire-broyeuse-renforcee.webp",
     "placement": "Mâchoire"
@@ -1318,7 +1318,7 @@
     "price": 1200,
     "charge": 2,
     "summary": "Vitesse +4,50 m",
-    "rules": "Ces jambes augmentent votre vitesse de 4,50 m et vous donnent l'avantage aux tests pour courir, sauter ou franchir un obstacle. Les dégâts de chute que vous subissez sont réduits de 10. Après un déplacement de 6 m, elles ajoutent 1d6 dégâts à votre attaque.",
+    "rules": "Ces jambes augmentent votre vitesse de 4,50 m et vous donnent l'avantage aux tests de Force (Athlétisme) pour courir, sauter ou franchir un obstacle. Les dégâts de chute que vous subissez sont réduits de 10. Après un déplacement de 6 m, elles ajoutent 1d6 dégâts à votre attaque.",
     "archive": "assets/implants/catalogue-implants-t2-1.png",
     "image": "assets/catalogue/jambes-de-course-raptor.webp",
     "placement": "Jambes"
@@ -1370,7 +1370,7 @@
     "price": 1400,
     "charge": 2,
     "summary": "+1 CA",
-    "rules": "Ce bras-bouclier augmente votre CA de 1. Une fois par round, vous pouvez utiliser votre réaction pour gagner 2 CA contre une attaque ou pour atténuer un effet de zone qui demande un jet de sauvegarde de Dextérité.",
+    "rules": "Ce bras-bouclier augmente votre CA de 1. Une fois par round, lorsqu'une attaque vous cible, vous pouvez utiliser votre réaction pour augmenter votre CA de 2 contre cette attaque. Vous pouvez aussi utiliser cette réaction lorsqu'un effet de zone vous impose un jet de sauvegarde de Dextérité : si vous échouez, vous ne subissez que la moitié des dégâts de cet effet ; si vous réussissez, vous n'en subissez aucun.",
     "archive": "assets/implants/catalogue-implants-t2.png",
     "image": "assets/catalogue/bras-bouclier-lourd-bulwark.webp",
     "placement": "Bras"
@@ -1422,7 +1422,7 @@
     "price": 1850,
     "charge": 4,
     "summary": "Morsure 2d8 perforant",
-    "rules": "Cette mâchoire inflige 2d8 dégâts perforants avec sa morsure. Une cible touchée effectue un jet de sauvegarde de Force contre un DD égal à 8 + votre bonus de maîtrise + votre modificateur de Force ; en cas d'échec, elle devient entravée. La morsure inflige 1d8 dégâts supplémentaires à une cible déjà entravée. Vous avez l'avantage en Intimidation, mais cette transformation a un coût social.",
+    "rules": "Cette mâchoire inflige 2d8 dégâts perforants avec sa morsure. Une cible touchée effectue un jet de sauvegarde de Force contre un DD égal à 8 + votre bonus de maîtrise + votre modificateur de Force ; en cas d'échec, elle est entravée jusqu'à la fin de votre prochain tour et ne peut pas s'éloigner volontairement de vous pendant cette durée. La morsure inflige 1d8 dégâts supplémentaires à une cible déjà entravée par elle. Vous avez l'avantage aux tests d'Intimidation, mais le désavantage aux tests d'Influence ou de Tromperie qui demandent une apparence humaine rassurante.",
     "archive": "assets/implants/catalogue-implants-t2.png",
     "image": "assets/catalogue/machoire-abyssale-extensible.webp",
     "placement": "Mâchoire"
@@ -1448,7 +1448,7 @@
     "price": 2000,
     "charge": 4,
     "summary": "Vitesse +6 m",
-    "rules": "Ce châssis augmente votre vitesse de 6 m et vous donne l'avantage aux tests de mobilité ainsi qu'aux tests pour résister au renversement. Après une course de 6 m en ligne droite, votre première attaque inflige 2d6 dégâts supplémentaires. Vous devez parcourir à nouveau 6 m en ligne droite pour redéclencher ce bonus. La transformation conserve son coût social.",
+    "rules": "Ce châssis augmente votre vitesse de 6 m. Vous avez l'avantage aux tests de Force (Athlétisme) pour courir ou sauter, ainsi qu'aux tests de Force (Athlétisme) ou de Dextérité (Acrobaties) effectués pour résister à une mise à terre. Après une course de 6 m en ligne droite, votre première attaque inflige 2d6 dégâts supplémentaires. Vous devez parcourir à nouveau 6 m en ligne droite pour redéclencher ce bonus. Vous avez le désavantage aux tests d'Influence ou de Tromperie qui demandent une apparence humaine rassurante.",
     "archive": "assets/implants/catalogue-implants-t2.png",
     "image": "assets/catalogue/chassis-predateur-quadrupede.webp",
     "placement": "Corps entier"
@@ -1472,11 +1472,11 @@
     "tier": 1,
     "name": "Rétine noctifère",
     "price": 150,
-    "summary": "Vision dans la pénombre et l'obscurité à 24 m, avantage en Perception visuelle",
-    "rules": "Cette mutation vous permet de voir dans la pénombre et l'obscurité jusqu'à 24 m et vous donne l'avantage aux tests de Perception visuelle. En contrepartie, vous avez le désavantage en forte lumière et contre les flashs ou projecteurs.",
+    "summary": "Vision dans la pénombre et l'obscurité à 24 m ; avantage aux tests de Perception fondés sur la vue.",
+    "rules": "Cette mutation vous permet de voir dans la pénombre et l'obscurité jusqu'à 24 m et vous donne l'avantage aux tests de Perception fondés sur la vue. En contrepartie, vous avez le désavantage à ces tests en forte lumière, notamment sous un flash ou un projecteur.",
     "archive": "assets/mutations/catalogue-mutations-t1.png",
     "image": "assets/catalogue/retine-noctifere.webp",
-    "drawback": "Désavantage en forte lumière et contre les flashs ou projecteurs."
+    "drawback": "Désavantage aux tests de Perception fondés sur la vue en forte lumière, notamment sous un flash ou un projecteur."
   },
   {
     "id": "reflexes-myeliniques-renforces",
@@ -1484,8 +1484,8 @@
     "tier": 1,
     "name": "Réflexes myéliniques renforcés",
     "price": 200,
-    "summary": "+5 initiative, maîtrise ou expertise en Acrobaties",
-    "rules": "Ces réflexes vous donnent un bonus de +5 à l'initiative ainsi que la maîtrise ou l'expertise en Acrobaties. Leur précision fine est moins fiable : vous avez le désavantage en Escamotage et aux tests de Médecine pour stabiliser une créature.",
+    "summary": "+5 à l'initiative ; maîtrise en Acrobaties, ou expertise si déjà maîtrisée.",
+    "rules": "Ces réflexes vous donnent un bonus de +5 à l'initiative. Vous obtenez la maîtrise en Acrobaties ; si vous maîtrisez déjà cette compétence, vous obtenez l'expertise à la place. Leur précision fine est moins fiable : vous avez le désavantage aux tests d'Escamotage et de Médecine pour stabiliser une créature.",
     "archive": "assets/mutations/catalogue-mutations-t1.png",
     "image": "assets/catalogue/reflexes-myeliniques-renforces.webp",
     "drawback": "Désavantage en Escamotage et en Médecine pour stabiliser."
@@ -1508,8 +1508,8 @@
     "tier": 1,
     "name": "Squelette densifié",
     "price": 300,
-    "summary": "Maîtrise ou expertise en Lutte",
-    "rules": "Votre squelette vous donne la maîtrise ou l'expertise en Lutte et l'avantage contre les tentatives de poussée, de chute, de mise à terre ou de déplacement forcé. Les dégâts de chute que vous subissez sont réduits de 10 ; pour résister à un déplacement forcé, vous êtes considéré comme appartenant à la catégorie de taille supérieure. En contrepartie, vous avez le désavantage en Acrobaties et votre vitesse diminue de 1,50 m.",
+    "summary": "Maîtrise en Lutte, ou expertise si déjà maîtrisée.",
+    "rules": "Vous obtenez la maîtrise en Lutte ; si vous maîtrisez déjà cette compétence, vous obtenez l'expertise à la place. Vous avez l'avantage aux tests de Force (Athlétisme) ou de Dextérité (Acrobaties), ainsi qu'aux jets de sauvegarde de Force ou de Dextérité, effectués pour résister à une poussée, à une mise à terre ou à un déplacement forcé. Les dégâts de chute que vous subissez sont réduits de 10 ; pour résister à un déplacement forcé, vous êtes considéré comme appartenant à la catégorie de taille supérieure. En contrepartie, vous avez le désavantage aux tests d'Acrobaties et votre vitesse diminue de 1,50 m.",
     "archive": "assets/mutations/catalogue-mutations-t1.png",
     "image": "assets/catalogue/squelette-densifie-v2.webp",
     "drawback": "Désavantage en Acrobaties ; vitesse réduite de 1,50 m."
@@ -1520,8 +1520,8 @@
     "tier": 1,
     "name": "Trame musculaire renforcée",
     "price": 300,
-    "summary": "Maîtrise ou expertise et avantage en Athlétisme",
-    "rules": "Cette trame vous donne la maîtrise ou l'expertise en Athlétisme, ainsi que l'avantage aux tests de cette compétence. Vos attaques de corps à corps infligent 2 dégâts supplémentaires. En contrepartie, vous avez le désavantage en Discrétion et subissez un malus de −2 aux attaques fondées sur la Dextérité.",
+    "summary": "Maîtrise en Athlétisme, ou expertise si déjà maîtrisée ; avantage aux tests.",
+    "rules": "Vous obtenez la maîtrise en Athlétisme ; si vous maîtrisez déjà cette compétence, vous obtenez l'expertise à la place. Vous avez aussi l'avantage aux tests d'Athlétisme. Vos attaques de corps à corps infligent 2 dégâts supplémentaires. En contrepartie, vous avez le désavantage aux tests de Discrétion et subissez un malus de −2 aux jets d'attaque fondés sur la Dextérité.",
     "archive": "assets/mutations/catalogue-mutations-t1.png",
     "image": "assets/catalogue/trame-musculaire-renforcee.webp",
     "drawback": "Désavantage en Discrétion ; −2 aux attaques fondées sur la Dextérité."
@@ -1532,7 +1532,7 @@
     "tier": 1,
     "name": "Peau écailleuse",
     "price": 500,
-    "summary": "+1 Constitution ; réduit une source de dégâts physiques par round du bonus de maîtrise.",
+    "summary": "+1 Constitution ; réduit une fois par round les dégâts contondants, perforants ou tranchants du bonus de maîtrise.",
     "rules": "Cette peau augmente votre Constitution de 1, sans dépasser 20. Une fois par round, elle réduit les dégâts contondants, perforants ou tranchants d'une source d'un montant égal à votre bonus de maîtrise. Vous avez le désavantage en Influence ; les soins que vous recevez sont réduits de votre bonus de maîtrise, sans descendre sous 1, et les tentatives de stabilisation médicale subissent le désavantage.",
     "archive": "assets/mutations/catalogue-mutations-t1.png",
     "image": "assets/catalogue/peau-ecailleuse-v2.webp",
@@ -1544,11 +1544,11 @@
     "tier": 1,
     "name": "Glandes d'adrénaline optimisées",
     "price": 400,
-    "summary": "+2 attaque, vitesse +3 m et avantages physiques pendant plusieurs rounds.",
-    "rules": "Une fois par repos court, vous pouvez activer ces glandes sans utiliser d'action. L'effet peut durer jusqu'à un nombre de rounds égal à votre modificateur de Constitution, avec un minimum d'un round. Pendant cette durée, vous gagnez +2 aux jets d'attaque, +3 m de vitesse et l'avantage aux tests d'Athlétisme et d'Acrobaties ainsi qu'aux jets de sauvegarde physiques. Le contrecoup dure aussi longtemps que l'effet : votre vitesse diminue de 3 m, vous ne pouvez pas utiliser de réaction et vous avez le désavantage aux attaques et aux jets de sauvegarde physiques.",
+    "summary": "+2 aux jets d'attaque, vitesse +3 m et avantage aux sauvegardes de Force, Dextérité et Constitution.",
+    "rules": "Une fois par repos court, vous pouvez activer ces glandes sans utiliser d'action. L'effet peut durer jusqu'à un nombre de rounds égal à votre modificateur de Constitution, avec un minimum d'un round. Pendant cette durée, vous gagnez +2 aux jets d'attaque, +3 m de vitesse et l'avantage aux tests d'Athlétisme et d'Acrobaties ainsi qu'aux jets de sauvegarde de Force, de Dextérité et de Constitution. Le contrecoup dure aussi longtemps que l'effet : votre vitesse diminue de 3 m, vous ne pouvez pas utiliser de réaction et vous avez le désavantage aux jets d'attaque et aux jets de sauvegarde de Force, de Dextérité et de Constitution.",
     "archive": "assets/mutations/catalogue-mutations-t1.png",
     "image": "assets/catalogue/glandes-dadrenaline-optimisees.webp",
-    "drawback": "Après l’effet : vitesse −3 m, aucune réaction, désavantage aux attaques et JDS physiques."
+    "drawback": "Après l'effet : vitesse −3 m, aucune réaction, désavantage aux jets d'attaque et aux sauvegardes de Force, de Dextérité et de Constitution."
   },
   {
     "id": "changement-dapparence",
@@ -1617,10 +1617,10 @@
     "name": "Nerfs de prédation",
     "price": 750,
     "summary": "+5 initiative ; riposte en réaction contre une attaque de mêlée ratée.",
-    "rules": "Ces nerfs vous donnent un bonus de +5 à l'initiative. Lorsqu'une créature rate une attaque de mêlée contre vous, vous pouvez l'attaquer en utilisant votre réaction, un nombre de fois égal à votre bonus de maîtrise par repos long. Vous avez toutefois le désavantage aux interactions sociales destinées à rassurer ou à négocier.",
+    "rules": "Ces nerfs vous donnent un bonus de +5 à l'initiative. Lorsqu'une créature rate une attaque de mêlée contre vous, vous pouvez l'attaquer en utilisant votre réaction, un nombre de fois égal à votre bonus de maîtrise par repos long. Vous avez toutefois le désavantage aux tests d'Influence destinés à rassurer ou à négocier.",
     "archive": "assets/mutations/catalogue-mutations-t2.png",
     "image": "assets/catalogue/nerfs-de-predation.webp",
-    "drawback": "Désavantage pour rassurer ou négocier."
+    "drawback": "Désavantage aux tests d'Influence pour rassurer ou négocier."
   },
   {
     "id": "oreille-echolocatrice",
@@ -1628,8 +1628,8 @@
     "tier": 2,
     "name": "Oreille écholocatrice",
     "price": 850,
-    "summary": "Perception aveugle de 9 m si non assourdi et avantage en Perception auditive",
-    "rules": "Tant que vous n'êtes pas assourdi, cette oreille vous donne une perception aveugle dans un rayon de 9 m et l'avantage aux tests de Perception auditive. En contrepartie, vous avez le désavantage en Discrétion face aux créatures situées à 9 m ou moins qui peuvent vous entendre.",
+    "summary": "Vision aveugle de 9 m si non assourdi et avantage aux tests de Perception fondés sur l'ouïe.",
+    "rules": "Tant que vous n'êtes pas assourdi, cette oreille vous donne la vision aveugle dans un rayon de 9 m et l'avantage aux tests de Perception fondés sur l'ouïe. En contrepartie, vous avez le désavantage aux tests de Discrétion face aux créatures situées à 9 m ou moins qui peuvent vous entendre.",
     "archive": "assets/mutations/catalogue-mutations-t2.png",
     "image": "assets/catalogue/oreille-echolocatrice.webp",
     "drawback": "Désavantage en Discrétion près des créatures capables de vous entendre."
@@ -1677,9 +1677,9 @@
     "name": "Cortex prédateur adaptatif",
     "price": 1250,
     "summary": "Analyse en action bonus : +1 attaque et +1 CA contre une cible pendant 1 minute.",
-    "rules": "Ce cortex vous donne l'avantage en Intimidation. Une fois par repos court, vous pouvez utiliser une action bonus pour analyser une cible visible pendant une minute : vous gagnez +1 aux jets d'attaque et +1 à la CA contre elle. L'effet prend fin si cette cible tombe à 0 PV. La mutation impose un régime carnivore et, lorsque la cible analysée tombe à 0 PV, vous effectuez un jet de sauvegarde de Sagesse DD 12 ; en cas d'échec, une pulsion se déclenche.",
+    "rules": "Ce cortex vous donne l'avantage aux tests d'Intimidation. Une fois par repos court, vous pouvez utiliser une action bonus pour analyser une cible visible pendant une minute : vous gagnez +1 aux jets d'attaque contre elle et +1 à la CA contre ses attaques. L'effet prend fin si cette cible tombe à 0 PV. La mutation impose un régime carnivore. Lorsque la cible analysée tombe à 0 PV, vous effectuez un jet de sauvegarde d'Esprit DD 12 ; en cas d'échec, vous devez utiliser votre prochaine action pour vous rapprocher d'elle et commencer à la dévorer, si cela est physiquement possible.",
     "archive": "assets/mutations/catalogue-mutations-t2.png",
     "image": "assets/catalogue/cortex-predateur-adaptatif.webp",
-    "drawback": "Régime carnivore ; JDS Sagesse DD 12 ou pulsion quand la cible tombe à 0 PV."
+    "drawback": "Régime carnivore ; quand la cible analysée tombe à 0 PV, sauvegarde d'Esprit DD 12 ou prochaine action consacrée à s'en approcher et à commencer à la dévorer, si possible."
   }
 ]

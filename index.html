@@ -917,7 +917,7 @@
                   <tr><td>Empoisonne</td><td>Desavantage general sur attaques et tests tant que l&rsquo;effet dure.</td></tr>
                   <tr><td>Effraye</td><td>Difficulte a s&rsquo;approcher de la source de peur et desavantage tant qu&rsquo;elle reste en vue ou dominante dans la scene.</td></tr>
                   <tr><td>Incapacite</td><td>Pas d&rsquo;action ni de reaction.</td></tr>
-                  <tr><td>Etourdi</td><td>La cible est incapacitee, bouge mal, parle mal, subit les attaques avec avantage et echoue en general a ses sauvegardes physiques de Force et Dexterite.</td></tr>
+                  <tr><td>Etourdi</td><td>La cible est incapacitee, ne peut pas se deplacer et ne parle que difficilement. Les jets d'attaque contre elle ont l'avantage ; elle echoue automatiquement aux jets de sauvegarde de Force et de Dexterite.</td></tr>
                   <tr><td>Inconscient</td><td>A terre, incapacite, sans reaction, sans perception consciente, et tres vulnerable aux attaques a portee de bras.</td></tr>
                 </tbody>
               </table>
@@ -2079,7 +2079,7 @@
                     <strong>Monstre de chair</strong>
                     <p>Vous &ecirc;tes &agrave; votre meilleur quand le combat s&rsquo;enlise et que le corps &agrave; corps devient une boucherie.</p>
                     <p>Au d&eacute;but de votre tour, si vous &ecirc;tes &agrave; 1,50 m&egrave;tre d&rsquo;une cr&eacute;ature ennemie, vous r&eacute;cup&eacute;rez un montant d&rsquo;Adr&eacute;naline &eacute;gal &agrave; votre bonus de ma&icirc;trise.</p>
-                    <p>De plus, Carnage &agrave; mains nues n&rsquo;est plus limit&eacute; &agrave; une seule fois par tour. Vous ne pouvez toutefois l&rsquo;utiliser qu&rsquo;une fois par attaque.</p>
+                    <p>Une fois par tour, lorsque vous d&eacute;clenchez Carnage &agrave; mains nues en d&eacute;pensant au moins 3 points d&rsquo;Adr&eacute;naline avec Poings de boucher, vous pouvez effectuer deux attaques &agrave; mains nues suppl&eacute;mentaires au lieu d&rsquo;une. Les attaques accord&eacute;es par Carnage &agrave; mains nues ne peuvent pas d&eacute;clencher Carnage &agrave; mains nues.</p>
                   </div>
                 </div>
               </div>
@@ -2375,7 +2375,7 @@
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Hit &amp; Run</strong>
-                    <p>Apr&egrave;s avoir effectu&eacute; une attaque en Posture ancr&eacute;e, vous pouvez imm&eacute;diatement vous d&eacute;placer de 3 m&egrave;tres.</p>
+                    <p>Une fois pendant chacun de vos tours, imm&eacute;diatement apr&egrave;s une attaque &agrave; distance effectu&eacute;e en Posture ancr&eacute;e, vous pouvez vous d&eacute;placer de 3 m&egrave;tres. Ce d&eacute;placement est possible m&ecirc;me si la posture a r&eacute;duit votre vitesse &agrave; 0. Il ne provoque pas d&rsquo;attaque d&rsquo;opportunit&eacute; de la cible de cette attaque et met fin &agrave; votre Posture ancr&eacute;e, y compris &agrave; l&rsquo;action diff&eacute;r&eacute;e qu&rsquo;elle vous accordait.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2491,14 +2491,20 @@
               <article class="info-card">
                 <strong>Points de vie</strong>
                 <p><strong>De de vie :</strong> 1d8 par niveau de Ferrailleur</p>
+                <p><strong>Niveau 1 :</strong> 8 + votre modificateur de Constitution</p>
+                <p><strong>Niveaux sup&eacute;rieurs :</strong> 1d8 (ou 5) + votre modificateur de Constitution par niveau de Ferrailleur apr&egrave;s le niveau 1</p>
               </article>
               <article class="info-card">
-                <strong>Signature de classe</strong>
+                <strong>Ma&icirc;trises</strong>
                 <p>Vous deployez un compagnon mecanique unique qui agit sur votre tour, immediatement avant ou apres vous, selon votre choix a chacun de vos tours.</p>
+                <p><strong>Armures :</strong> armures l&eacute;g&egrave;res</p>
+                <p><strong>Armes :</strong> armes de rue</p>
+                <p><strong>Jets de sauvegarde :</strong> Dext&eacute;rit&eacute;, Esprit</p>
+                <p><strong>Comp&eacute;tences :</strong> choisissez 3 parmi Techno, Investigation, Perception, M&eacute;decine, Survie, Intuition</p>
               </article>
               <article class="info-card">
                 <strong>Cadre du compagnon</strong>
-                <p>Tous les compagnons utilisent un d&eacute; de vie de d6. Quand ils doivent utiliser Esprit ou Charisme, ils prennent votre modificateur correspondant. A 0 point de vie, ils sont detruits et ne reviennent qu&rsquo;apres un repos long.</p>
+                <p>Tous les compagnons utilisent un d&eacute; de vie d6 par niveau de Ferrailleur. Leurs PV, leur CA et leurs attaques sont d&eacute;taill&eacute;s dans Compagnon m&eacute;canique. Quand ils doivent utiliser Esprit ou Charisme, ils prennent votre modificateur correspondant. &Agrave; 0 point de vie, ils sont d&eacute;truits et ne reviennent qu&rsquo;apr&egrave;s un repos long.</p>
               </article>
             </div>
             <div class="callout">
@@ -2559,7 +2565,11 @@
                     <p>Votre compagnon est une creature alliee. Il agit pendant votre tour. A chacun de vos tours, vous choisissez s&rsquo;il agit immediatement avant vous ou immediatement apres vous.</p>
                     <p>A son tour, votre compagnon peut se deplacer et effectuer une action. Il ne possede ni Esprit ni Charisme propres. Lorsqu&rsquo;un effet lui demande d&rsquo;utiliser l&rsquo;une de ces caracteristiques, il utilise votre modificateur correspondant a la place.</p>
                     <p>Si votre compagnon tombe a 0 point de vie, il est detruit. Il ne peut etre reconstruit ou remis en etat qu&rsquo;a l&rsquo;issue d&rsquo;un repos long.</p>
-                    <p>Tous les compagnons mecaniques utilisent un d&eacute; de vie de d6.</p>
+                    <p>Tous les compagnons m&eacute;caniques ont un d&eacute; de vie d6 par niveau de Ferrailleur. Au niveau 1, leurs points de vie sont &eacute;gaux &agrave; 6 + leur modificateur de Constitution. &Agrave; chaque niveau suppl&eacute;mentaire, ils gagnent 1d6 (ou 4) + leur modificateur de Constitution points de vie, avec un gain minimal de 1 point de vie. Une augmentation de leur modificateur de Constitution ajuste leurs points de vie maximum pour chaque niveau de Ferrailleur.</p>
+                    <p><strong>CA de base :</strong> 12 + le modificateur de Dext&eacute;rit&eacute; du compagnon. &Agrave; partir du niveau 2, Architecture adaptative y ajoute votre bonus de ma&icirc;trise une seule fois.</p>
+                    <p><strong>Attaque de morsure du K9 :</strong> 1d20 + votre bonus de ma&icirc;trise + le modificateur de Force du K9.</p>
+                    <p><strong>Attaque de tourelle du Recon :</strong> 1d20 + votre bonus de ma&icirc;trise + le modificateur de Dext&eacute;rit&eacute; du Recon.</p>
+                    <p><strong>DD de sauvegarde des modules :</strong> 8 + votre bonus de ma&icirc;trise + votre modificateur d&rsquo;Esprit.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2576,7 +2586,7 @@
                     <p>Votre compagnon evolue avec vous et devient une veritable extension de vos capacites.</p>
                     <p>Votre compagnon utilise votre bonus de maitrise au lieu du sien. En plus des cas ou il utiliserait normalement ce bonus, il l&rsquo;ajoute egalement a sa Classe d&rsquo;Armure et a ses jets de degats.</p>
                     <p>Votre compagnon maitrise tous les jets de sauvegarde. Il gagne egalement la maitrise de deux competences de votre choix.</p>
-                    <p>A chaque niveau gagne apres le niveau 2, votre compagnon gagne un d&eacute; de vie supplementaire et augmente ses points de vie en consequence.</p>
+                    <p>Votre compagnon conserve un d&eacute; de vie par niveau de Ferrailleur, y compris au niveau 2, et augmente ses points de vie selon la r&egrave;gle de Compagnon m&eacute;canique.</p>
                     <p>Chaque fois que vous obtenez une aptitude Amelioration de caracteristique, votre compagnon en beneficie egalement. Il peut augmenter une caracteristique de votre choix de +2, ou augmenter deux caracteristiques de votre choix de +1. Il ne peut pas augmenter une caracteristique au-dela de 20 de cette maniere, sauf indication contraire.</p>
                   </div>
                 </div>
@@ -2625,6 +2635,7 @@
                     <article class="info-card companion-card">
                       <h3>Compagnon K9</h3>
                       <p><strong>De de vie :</strong> d6</p>
+                      <p><strong>Vitesse :</strong> 9 m&egrave;tres au sol</p>
                       <p><strong>Force :</strong> 14</p>
                       <p><strong>Dexterite :</strong> 10</p>
                       <p><strong>Constitution :</strong> 12</p>
@@ -2651,7 +2662,7 @@
                       <li>niveau 8 : 1d10</li>
                       <li>niveau 11 : 1d12</li>
                     </ul>
-                    <p>Le K9 ajoute son modificateur de Force aux degats de cette attaque, ainsi que votre bonus de maitrise grace a Architecture adaptative.</p>
+                    <p>Le K9 ajoute son modificateur de Force aux d&eacute;g&acirc;ts de cette attaque. &Agrave; partir du niveau 2, il ajoute &eacute;galement votre bonus de ma&icirc;trise gr&acirc;ce &agrave; Architecture adaptative.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2686,6 +2697,7 @@
                     <article class="info-card companion-card">
                       <h3>Compagnon Recon</h3>
                       <p><strong>De de vie :</strong> d6</p>
+                      <p><strong>Vitesse :</strong> 9 m&egrave;tres en vol</p>
                       <p><strong>Force :</strong> 10</p>
                       <p><strong>Dexterite :</strong> 14</p>
                       <p><strong>Constitution :</strong> 12</p>
@@ -2708,8 +2720,8 @@
                     <p>Sauf indication contraire, l&rsquo;utilisation d&rsquo;un module demande une action du drone.</p>
                     <p><strong>Fumigene.</strong> Le drone deploie un ecran de fumee sur un point qu&rsquo;il peut voir a 9 metres ou moins. La fumee occupe une zone de 3 metres de rayon et dure jusqu&rsquo;au debut de votre prochain tour. Cette zone est fortement obscurcie.</p>
                     <p><strong>Designation laser.</strong> Choisissez une cible que le drone peut voir a 18 metres ou moins. Jusqu&rsquo;au debut de votre prochain tour, cette cible est affectee par le module. La premiere attaque portee contre elle par l&rsquo;un de vos allies beneficie d&rsquo;un avantage.</p>
-                    <p><strong>Tourelle.</strong> Le drone effectue un tir de soutien contre une cible qu&rsquo;il peut voir a portee. L&rsquo;attaque inflige 1d6 degats perforants ou energetiques. Ces degats passent a 1d8 au niveau 8, puis a 1d10 au niveau 11.</p>
-                    <p><strong>Taser.</strong> Choisissez une cible que le drone peut voir a portee. La cible doit reussir un jet de sauvegarde de Constitution contre un DD egal a 8 + votre bonus de maitrise + votre modificateur d&rsquo;Esprit, ou voir sa vitesse reduite a 0 jusqu&rsquo;au debut de votre prochain tour. En cas de reussite, sa vitesse est reduite de 3 metres a la place.</p>
+                    <p><strong>Tourelle.</strong> Le drone effectue un tir de soutien contre une cible qu&rsquo;il peut voir &agrave; 18 m&egrave;tres ou moins, avec le jet d&rsquo;attaque indiqu&eacute; dans Compagnon m&eacute;canique. L&rsquo;attaque inflige 1d6 d&eacute;g&acirc;ts perforants ou &eacute;nerg&eacute;tiques. Ces d&eacute;g&acirc;ts passent &agrave; 1d8 au niveau 8, puis &agrave; 1d10 au niveau 11.</p>
+                    <p><strong>Taser.</strong> Choisissez une cible que le drone peut voir &agrave; 9 m&egrave;tres ou moins. La cible doit r&eacute;ussir un jet de sauvegarde de Constitution contre votre DD de module, ou voir sa vitesse r&eacute;duite &agrave; 0 jusqu&rsquo;au d&eacute;but de votre prochain tour. En cas de r&eacute;ussite, sa vitesse est r&eacute;duite de 3 m&egrave;tres &agrave; la place.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2733,9 +2745,9 @@
                   <div class="callout accent">
                     <strong>Module legendaire</strong>
                     <p>Choisissez l&rsquo;un des modules suivants.</p>
-                    <p><strong>Lance-roquettes.</strong> Le drone tire une roquette sur un point qu&rsquo;il peut voir a portee. Chaque cible situee dans un rayon de 3 metres subit 4d6 degats explosifs et doit reussir un jet de sauvegarde de Dexterite ou tomber a terre.</p>
+                    <p><strong>Lance-roquettes.</strong> Le drone tire une roquette sur un point qu&rsquo;il peut voir &agrave; 36 m&egrave;tres ou moins. Chaque cible situ&eacute;e dans un rayon de 3 m&egrave;tres subit 4d6 d&eacute;g&acirc;ts explosifs et doit r&eacute;ussir un jet de sauvegarde de Dext&eacute;rit&eacute; contre votre DD de module ou tomber &agrave; terre.</p>
                     <p><strong>Phantom.</strong> Le drone devient invisible en permanence. Cette invisibilite ne prend pas fin lorsqu&rsquo;il agit ou inflige des degats.</p>
-                    <p><strong>Stase.</strong> Choisissez une cible que le drone peut voir a portee. Elle doit reussir un jet de sauvegarde contre votre DD de module ou etre etourdie jusqu&rsquo;a la fin de son prochain tour.</p>
+                    <p><strong>Stase.</strong> Choisissez une cible que le drone peut voir &agrave; 18 m&egrave;tres ou moins. Elle doit r&eacute;ussir un jet de sauvegarde de Constitution contre votre DD de module ou &ecirc;tre &eacute;tourdie jusqu&rsquo;&agrave; la fin de son prochain tour.</p>
                     <p>Si le module legendaire choisi demande une activation, une fois utilise, vous ne pouvez pas l&rsquo;utiliser de nouveau avant d&rsquo;avoir termine un repos court ou long.</p>
                   </div>
                 </div>
@@ -2747,6 +2759,7 @@
                     <article class="info-card companion-card">
                       <h3>Compagnon Medibot</h3>
                       <p><strong>De de vie :</strong> d6</p>
+                      <p><strong>Vitesse :</strong> 9 m&egrave;tres au sol</p>
                       <p><strong>Force :</strong> 10</p>
                       <p><strong>Dexterite :</strong> 12</p>
                       <p><strong>Constitution :</strong> 14</p>
@@ -2773,7 +2786,8 @@
                       <li>niveau 11 : 4d4</li>
                     </ul>
                     <p>Le Medibot ne peut utiliser le soin de cette aptitude qu&rsquo;une seule fois par tour.</p>
-                    <p>A la place, le Medibot peut utiliser son action pour tenter de stabiliser une cible a 0 point de vie situee a 1,5 metre de lui. Pour cela, il effectue un test de Medecine en utilisant votre modificateur d&rsquo;Esprit et votre bonus de maitrise.</p>
+                    <p>Le Medibot dispose d&rsquo;un nombre d&rsquo;utilisations de ce soin &eacute;gal &agrave; votre bonus de ma&icirc;trise. Il r&eacute;cup&egrave;re toutes ses utilisations &agrave; la fin d&rsquo;un repos long. Une utilisation soigne une cr&eacute;ature une fois, avec les d&eacute;s indiqu&eacute;s selon votre niveau.</p>
+                    <p>&Agrave; la place, le Medibot peut utiliser son action pour tenter de stabiliser une cible &agrave; 0 point de vie situ&eacute;e &agrave; 1,5 m&egrave;tre de lui. Pour cela, il effectue un test de M&eacute;decine en utilisant votre modificateur d&rsquo;Esprit et votre bonus de ma&icirc;trise. Cette stabilisation ne consomme aucune utilisation du soin.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2790,6 +2804,7 @@
                     <strong>Injecteur balistique</strong>
                     <p>Votre Medibot peut desormais utiliser son soin a distance, sur une cible situee a 9 metres ou moins.</p>
                     <p>Il peut egalement utiliser cette aptitude sur une cible hostile. Dans ce cas, au lieu de soigner, il inflige des degats necrotiques egaux aux des de soin de l&rsquo;aptitude.</p>
+                    <p>Cette utilisation hostile consomme une utilisation d&rsquo;Assistance d&rsquo;urgence et partage sa limite d&rsquo;une utilisation par tour.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2821,15 +2836,21 @@
 
             <div class="card-grid three-up">
               <article class="info-card">
-                <strong>Medecine de guerre</strong>
-                <p>Vos actes medicaux s&rsquo;appliquent aux creatures vivantes. En combat, ils demandent un jet de Sang-froid, c&rsquo;est-a-dire un jet de sauvegarde d&rsquo;Esprit contre un DD propre a chaque acte.</p>
+                <strong>Points de vie</strong>
+                <p><strong>D&eacute; de vie :</strong> 1d8 par niveau de Dopeur</p>
+                <p><strong>Niveau 1 :</strong> 8 + votre modificateur de Constitution</p>
+                <p><strong>Niveaux sup&eacute;rieurs :</strong> 1d8 (ou 5) + votre modificateur de Constitution par niveau de Dopeur apr&egrave;s le niveau 1</p>
               </article>
               <article class="info-card">
-                <strong>Soutien de terrain</strong>
-                <p>Le Dopeur maintient ses allies debout, releve les mourants et limite l&rsquo;usure du groupe pendant les repos courts.</p>
+                <strong>Ma&icirc;trises</strong>
+                <p><strong>Armures :</strong> armures l&eacute;g&egrave;res</p>
+                <p><strong>Armes :</strong> armes de rue</p>
+                <p><strong>Jets de sauvegarde :</strong> Constitution, Esprit</p>
+                <p><strong>Comp&eacute;tences :</strong> M&eacute;decine, puis choisissez 2 parmi Investigation, Intuition, Perception, Survie, Techno, Influence</p>
               </article>
               <article class="info-card">
-                <strong>Pratiques</strong>
+                <strong>R&ocirc;le et pratiques</strong>
+                <p>Le Dopeur maintient ses alli&eacute;s debout, rel&egrave;ve les mourants et limite l&rsquo;usure du groupe pendant les repos courts.</p>
                 <p>Scalpel pour la chirurgie de terrain, Doses pour la chimie tactique, Nerfs pour la guerre nerveuse.</p>
               </article>
             </div>
@@ -2900,6 +2921,7 @@
                   <div class="callout">
                     <strong>Medecine de guerre</strong>
                     <p>A partir du niveau 1, vous pouvez pratiquer des actes medicaux sur des creatures vivantes.</p>
+                    <p>Pratiquer un acte m&eacute;dical en combat demande une action, sauf indication contraire. Le jet de Sang-froid est effectu&eacute; pendant cette action.</p>
                     <p>En combat, un acte medical demande un jet de Sang-froid, c&rsquo;est-a-dire un jet de sauvegarde d&rsquo;Esprit contre le DD indique par l&rsquo;acte.</p>
                     <p>Hors combat, vos actes medicaux produisent automatiquement leur effet de reussite, sauf mention contraire.</p>
                     <p>Quand un acte medical soigne une creature, celle-ci depense generalement un ou plusieurs de ses des de vie, selon l&rsquo;acte et votre niveau.</p>
@@ -3584,12 +3606,18 @@
                 <p>Caster, contr&ocirc;le, d&eacute;g&acirc;ts sp&eacute;ciaux, mont&eacute;e en puissance.</p>
               </article>
               <article class="info-card">
-                <strong>Caract&eacute;ristique principale</strong>
+                <strong>Caract&eacute;ristique et ma&icirc;trises</strong>
                 <p><strong>Esprit</strong> est votre caract&eacute;ristique principale pour vos Protocoles.</p>
+                <p><strong>Armures :</strong> armures l&eacute;g&egrave;res</p>
+                <p><strong>Armes :</strong> armes de rue</p>
+                <p><strong>Jets de sauvegarde :</strong> Constitution, Esprit</p>
+                <p><strong>Comp&eacute;tences :</strong> choisissez 2 parmi Techno, Investigation, Perception, Intuition, R&eacute;f&eacute;rences</p>
               </article>
               <article class="info-card">
                 <strong>Points de vie</strong>
                 <p><strong>D&eacute; de vie :</strong> 1d8 par niveau de Neuro</p>
+                <p><strong>Niveau 1 :</strong> 8 + votre modificateur de Constitution</p>
+                <p><strong>Niveaux sup&eacute;rieurs :</strong> 1d8 (ou 5) + votre modificateur de Constitution par niveau de Neuro apr&egrave;s le niveau 1</p>
               </article>
             </div>
             <div class="callout">
@@ -3669,6 +3697,7 @@
                     <p>Votre implant g&eacute;n&egrave;re un niveau de Surcharge compris entre 1 et 20. Il est recommand&eacute; de le suivre avec un d20.</p>
                     <p>Apr&egrave;s un repos court ou long, votre Surcharge retombe &agrave; 1.</p>
                     <p><strong>Lancer un Protocole :</strong> quand vous lancez un Protocole au rang 1 ou sup&eacute;rieur, votre Surcharge augmente imm&eacute;diatement d&rsquo;un montant &eacute;gal au rang auquel il est lanc&eacute;, avant sa r&eacute;solution.</p>
+                    <p><strong>Surcharge minimale :</strong> quand un Protocole indique une Surcharge minimale, votre Surcharge actuelle doit &ecirc;tre au moins &eacute;gale &agrave; ce nombre avant de lancer le Protocole. Sinon, vous ne pouvez pas le lancer. Une fois ce pr&eacute;requis v&eacute;rifi&eacute;, augmentez votre Surcharge du rang de lancement et des &eacute;ventuels co&ucirc;ts suppl&eacute;mentaires, puis r&eacute;solvez le Protocole et son test de Surcharge. Un maintien ne demande pas de v&eacute;rifier &agrave; nouveau le pr&eacute;requis, mais augmente la Surcharge comme indiqu&eacute; par le Protocole.</p>
                     <p>Si un Protocole de rang 0 est lanc&eacute; &agrave; un rang sup&eacute;rieur, utilisez le rang auquel il est lanc&eacute; pour d&eacute;terminer la Surcharge neurale.</p>
                     <p>Un Protocole lanc&eacute; au rang 0 :</p>
                     <ul>
@@ -3676,7 +3705,7 @@
                       <li>ne d&eacute;clenche pas de test de Surcharge</li>
                       <li>ne peut pas provoquer de contrecoup neural</li>
                     </ul>
-                    <p>Si l&rsquo;activation d&rsquo;un Protocole devait faire monter votre Surcharge au-del&agrave; de 20, le Protocole est quand m&ecirc;me lanc&eacute;, mais vous &eacute;chouez automatiquement au test de Surcharge associ&eacute;.</p>
+                    <p>Si l&rsquo;activation d&rsquo;un Protocole devait faire monter votre Surcharge au-del&agrave; de 20, le Protocole est quand m&ecirc;me lanc&eacute;, votre Surcharge reste &agrave; 20 et vous &eacute;chouez automatiquement au test de Surcharge associ&eacute;.</p>
                     <p><strong>Refroidissement :</strong> &agrave; la fin de votre tour :</p>
                     <ul>
                       <li>si vous n&rsquo;avez lanc&eacute; aucun Protocole, votre Surcharge diminue de 2, jusqu&rsquo;&agrave; un minimum de 1</li>
@@ -4460,7 +4489,6 @@
                     <ul>
                       <li>augmentez votre Surcharge de 2 suppl&eacute;mentaires</li>
                       <li>ajoutez votre modificateur d&rsquo;Esprit aux d&eacute;g&acirc;ts de chaque cible affect&eacute;e</li>
-                      <li>si cette activation devait faire monter votre Surcharge au-del&agrave; de 20, le Protocole est quand m&ecirc;me lanc&eacute; et vous effectuez quand m&ecirc;me le test de Surcharge associ&eacute;</li>
                     </ul>
                     <p>Vous pouvez utiliser cette aptitude une fois par tour.</p>
                   </div>
@@ -4674,7 +4702,7 @@
               <p>Chaque cr&eacute;ature de votre choix situ&eacute;e &agrave; 1,5 m&egrave;tre ou moins de vous doit effectuer une sauvegarde d&rsquo;Agilit&eacute;.</p>
               <p>En cas d&rsquo;&eacute;chec, elle subit 3d6 d&eacute;g&acirc;ts contondants.</p>
               <p>En cas de r&eacute;ussite, elle subit la moiti&eacute; de ces d&eacute;g&acirc;ts.</p>
-              <p><strong>Surcharge minimale :</strong> 3.</p>
+              <p><strong>Surcharge minimale :</strong> 1.</p>
               <p><strong>Aux rangs sup&eacute;rieurs :</strong> lorsque vous lancez ce Protocole au rang 2 (niveau 5), ses d&eacute;g&acirc;ts deviennent des d8 au lieu de d6. Au rang 3 (niveau 8), ils deviennent des d10.</p>
             </template>
             <template id="protocol-shock-onde-rupture">
