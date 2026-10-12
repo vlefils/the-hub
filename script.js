@@ -15,6 +15,11 @@ const sectionNavRoots = new Map(
     .filter((section) => section.dataset.navRoot)
     .map((section) => [section.id, section.dataset.navRoot]),
 );
+sidebarSubgroups.forEach((group) => {
+  group.querySelectorAll('a[href^="#"]').forEach((link) => {
+    sectionNavRoots.set(link.hash.slice(1), group.dataset.contextParent);
+  });
+});
 const subtabParentSections = new Map();
 const subtabActivators = new Map();
 const sectionSubtabActivators = new Map();
@@ -144,6 +149,9 @@ const injectSectionLandmarks = () => {
       const title = document.createElement("strong");
 
       figure.className = "section-landmark";
+      if (index > 0 || section.dataset.category === "chroma" || section.hasAttribute("data-page-pending")) {
+        figure.classList.add("section-landmark--compact");
+      }
       figure.style.setProperty("--landmark-accent", group.accent);
 
       image.src = group.source;
@@ -166,10 +174,15 @@ const injectSectionLandmarks = () => {
 
 injectSectionLandmarks();
 
+const setMenuBackgroundInert = (active) => {
+  document.querySelectorAll(".site-header, main, [data-skip-content]").forEach((element) => { element.inert = active; });
+};
+
 const closeMenu = (restoreFocus = false) => {
   sidebar?.classList.remove('sidebar-open');
   document.body.classList.remove('nav-open');
   menuToggle?.setAttribute('aria-expanded', 'false');
+  setMenuBackgroundInert(false);
   if (restoreFocus) menuToggle?.focus();
 };
 
@@ -179,6 +192,7 @@ if (menuToggle && sidebar) {
     sidebar.scrollTop = 0;
     document.body.classList.add('nav-open');
     menuToggle.setAttribute('aria-expanded', 'true');
+    setMenuBackgroundInert(true);
     sidebarClose?.focus();
   });
   sidebarClose?.addEventListener('click', () => closeMenu(true));
@@ -189,7 +203,7 @@ if (menuToggle && sidebar) {
       closeMenu(true);
     }
     if (event.key !== 'Tab') return;
-    const focusable = [...sidebar.querySelectorAll('a, button')].filter((element) => element.getClientRects().length);
+    const focusable = [...sidebar.querySelectorAll('a, button, input, select')].filter((element) => element.getClientRects().length);
     const first = focusable[0];
     const last = focusable.at(-1);
     if (event.shiftKey && document.activeElement === first) {
@@ -224,8 +238,196 @@ const labels = {
   lore: "Lore",
   regles: "Règles",
   personnage: "Personnage",
-  chroma: "Chroma",
+  chroma: "Chroma Shop",
   outils: "Outils",
+};
+
+const sectionTitle = (section) => section?.querySelector("h1, h2")?.textContent.trim() || "The Hub";
+const categoryHome = (category) => categoryLinks.find((link) => link.dataset.categoryLink === category)?.hash.slice(1);
+const readerTools = document.querySelector("[data-reader-tools]");
+const breadcrumb = document.querySelector("[data-breadcrumb]");
+const readerJump = document.querySelector("[data-reader-jump]");
+const pageJump = document.querySelector("[data-page-jump]");
+let pageJumpTargets = [];
+const scrollToReadingTarget = (element) => {
+  element.tabIndex = -1;
+  element.focus({ preventScroll: true });
+  element.scrollIntoView({ block: "start", behavior: "instant" });
+};
+
+const updateReadingNavigation = (section, currentId = section.id) => {
+  const category = section.dataset.category;
+  const homeId = categoryHome(category);
+  const parentId = sectionNavRoots.get(currentId);
+  const subtab = subtabParentSections.has(currentId) ? document.getElementById(currentId) : null;
+  const currentTitle = subtab
+    ? document.getElementById(subtab.getAttribute("aria-labelledby"))?.textContent.trim()
+    : currentId === section.id ? sectionTitle(section) : sidebarLinks.find((link) => link.hash === `#${currentId}`)?.textContent.trim();
+  const title = currentTitle || sectionTitle(section);
+  document.title = title === "The Hub" ? "The Hub — Livre de règles" : `${subtab ? `${sectionTitle(section)} — ` : ""}${title} · The Hub`;
+
+  if (breadcrumb) {
+    const path = [{ id: homeId, title: labels[category] || "The Hub" }];
+    if (parentId && parentId !== homeId) path.push({ id: parentId, title: sectionTitle(document.getElementById(parentId)) });
+    if (subtab && section.id !== homeId) path.push({ id: section.id, title: sectionTitle(section) });
+    path.push({ id: currentId, title });
+    breadcrumb.replaceChildren();
+    path.forEach((entry, index) => {
+      const item = document.createElement("li");
+      const node = document.createElement(index === path.length - 1 ? "span" : "a");
+      node.textContent = entry.title;
+      if (node.tagName === "A") node.href = `#${entry.id}`;
+      else node.setAttribute("aria-current", "page");
+      item.append(node);
+      breadcrumb.append(item);
+    });
+  }
+
+  pageJumpTargets = [];
+  const addJump = (element, title) => {
+    if (element && !element.closest("[hidden]") && !pageJumpTargets.some((entry) => entry.element === element)) {
+      pageJumpTargets.push({ element, title });
+    }
+  };
+  if (section.id.startsWith("personnage-classe-")) {
+    addJump(section.querySelector(".class-intro"), "Présentation de la classe");
+    addJump(section.querySelector(".table-wrap"), "Tableau de progression");
+    addJump(section.querySelector(".subtabs-nav"), "Choisir une voie");
+    section.querySelectorAll(".subtab-panel:not([hidden]) .level-block").forEach((block) => {
+      addJump(block, [block.querySelector(".level-banner")?.textContent, block.querySelector("strong")?.textContent].filter(Boolean).join(" — "));
+    });
+    section.querySelectorAll(".subtab-panel:not([hidden]) .protocol-rank-heading").forEach((heading) => addJump(heading, heading.textContent.trim()));
+  } else if (section.id === "lore-factions") {
+    sidebarLinks.filter((link) => sectionNavRoots.get(link.hash.slice(1)) === section.id).forEach((link) => addJump(document.getElementById(link.hash.slice(1)), link.textContent.trim()));
+  } else {
+    section.querySelectorAll("h3").forEach((heading) => addJump(heading, heading.textContent.trim()));
+  }
+  if (pageJump) {
+    pageJump.replaceChildren(new Option("Aller à…", ""));
+    pageJumpTargets.forEach((entry, index) => pageJump.append(new Option(entry.title, String(index))));
+  }
+  if (readerJump) readerJump.hidden = pageJumpTargets.length < 3;
+  if (readerTools) readerTools.hidden = false;
+};
+
+pageJump?.addEventListener("change", () => {
+  if (pageJump.value === "") return;
+  const target = pageJumpTargets[Number(pageJump.value)]?.element;
+  if (target) scrollToReadingTarget(target);
+  pageJump.value = "";
+});
+document.querySelector("[data-skip-content]")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  scrollToReadingTarget(document.querySelector(".page-section.is-active h1, .page-section.is-active h2") || document.getElementById("contenu"));
+});
+
+const setupBookSearch = () => {
+  const input = document.getElementById("site-search-input");
+  const results = document.getElementById("site-search-results");
+  const status = document.getElementById("site-search-status");
+  const clear = document.querySelector("[data-clear-search]");
+  if (!input || !results || !status || !clear) return;
+  const normalize = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/œ/g, "oe");
+  const entries = [];
+  const addEntry = (id, title, context, text) => entries.push({ id, title, context, titleKey: normalize(title), textKey: normalize(`${title} ${context} ${text}`) });
+  sections.filter((section) => section.dataset.category !== "news" && !section.hasAttribute("data-page-pending")).forEach((section) => {
+    const copy = section.cloneNode(true);
+    copy.querySelectorAll(".subtabs, .section-landmark, form, nav").forEach((element) => element.remove());
+    const title = sectionTitle(section);
+    addEntry(section.id, title, labels[section.dataset.category], copy.textContent);
+    section.querySelectorAll("[data-subtab-panel]").forEach((panel) => {
+      const tabTitle = document.getElementById(panel.getAttribute("aria-labelledby"))?.textContent.trim() || "Base";
+      addEntry(panel.id, `${title} · ${tabTitle}`, labels[section.dataset.category], panel.textContent);
+    });
+  });
+  sidebarLinks.forEach((link) => {
+    const id = link.hash.slice(1);
+    const element = document.getElementById(id);
+    if (element && !element.matches("[data-section]") && !entries.some((entry) => entry.id === id)) {
+      addEntry(id, link.textContent.trim(), "Lore · Factions", element.querySelector("img")?.alt || element.textContent);
+    }
+  });
+  const reset = () => {
+    input.value = "";
+    results.replaceChildren();
+    results.hidden = true;
+    status.hidden = true;
+    clear.hidden = true;
+    sidebar.classList.remove("is-searching");
+  };
+  const render = () => {
+    const term = normalize(input.value.trim());
+    if (!term) return reset();
+    sidebar.classList.add("is-searching");
+    clear.hidden = false;
+    status.hidden = false;
+    results.hidden = false;
+    results.replaceChildren();
+    if (term.length < 2) {
+      status.textContent = "Saisissez au moins 2 caractères.";
+      return;
+    }
+    const words = term.split(/\s+/);
+    const score = (entry) => Number(entry.titleKey.includes(term)) * 100 + Number(entry.textKey.includes(term)) * 20;
+    const matches = entries.filter((entry) => words.every((word) => entry.textKey.includes(word)))
+      .sort((a, b) => score(b) - score(a) || a.title.localeCompare(b.title, "fr"));
+    status.textContent = matches.length ? `${matches.length} résultat${matches.length > 1 ? "s" : ""}${matches.length > 8 ? " · 8 premiers affichés" : ""}` : "Aucun résultat. Essayez un autre mot ou effacez la recherche.";
+    matches.slice(0, 8).forEach((entry) => {
+      const item = document.createElement("li");
+      const link = document.createElement("a");
+      const context = document.createElement("small");
+      const title = document.createElement("strong");
+      link.href = `#${entry.id}`;
+      context.textContent = entry.context;
+      title.textContent = entry.title;
+      link.append(context, title);
+      item.append(link);
+      results.append(item);
+    });
+  };
+  input.addEventListener("input", render);
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") { event.stopPropagation(); reset(); input.focus(); }
+    if (event.key === "ArrowDown") { event.preventDefault(); results.querySelector("a")?.focus(); }
+    if (event.key === "Enter") { event.preventDefault(); results.querySelector("a")?.click(); }
+  });
+  clear.addEventListener("click", () => { reset(); input.focus(); });
+  results.addEventListener("click", (event) => {
+    const link = event.target.closest("a");
+    if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const id = link.hash.slice(1);
+    reset();
+    input.focus();
+    if (window.location.hash === `#${id}`) showSection(id);
+    else window.location.hash = id;
+  });
+};
+
+const setupReadingFooters = () => {
+  for (const category of Object.keys(labels)) {
+    const pages = sections.filter((section) => section.dataset.category === category && !section.hasAttribute("data-page-pending"));
+    pages.forEach((section, index) => {
+      if (category === "news") return;
+      const nav = document.createElement("nav");
+      nav.className = "page-pager";
+      nav.setAttribute("aria-label", "Continuer la lecture");
+      [[pages[index - 1], "Page précédente"], [pages[index + 1], "Page suivante"]].forEach(([page, label], direction) => {
+        if (!page) return;
+        const link = document.createElement("a");
+        const caption = document.createElement("small");
+        const title = document.createElement("strong");
+        link.href = `#${page.id}`;
+        link.className = direction ? "page-pager-next" : "page-pager-previous";
+        caption.textContent = label;
+        title.textContent = `${direction ? "" : "← "}${sectionTitle(page)}${direction ? " →" : ""}`;
+        link.append(caption, title);
+        nav.append(link);
+      });
+      section.append(nav);
+    });
+  }
 };
 
 const activateCategory = (category) => {
@@ -285,6 +487,12 @@ const resolveSectionTarget = (id) => {
     };
   }
 
+  const anchor = document.getElementById(id);
+  const containingSection = anchor?.closest("[data-section]");
+  if (containingSection && anchor !== containingSection) {
+    return { target: containingSection, activeNavId: id, subtabId: anchor.closest("[data-subtab-panel]")?.id || null, anchor };
+  }
+
   const target = sections.find((section) => section.id === id) || defaultSection;
 
   return {
@@ -295,8 +503,9 @@ const resolveSectionTarget = (id) => {
 };
 
 const showSection = (id, scroll = true) => {
-  const { target, activeNavId, subtabId } = resolveSectionTarget(id);
+  const { target, activeNavId, subtabId, anchor } = resolveSectionTarget(id);
   const fromMobileMenu = sidebar?.classList.contains('sidebar-open');
+  const fromNavigation = fromMobileMenu || sidebar?.contains(document.activeElement) || document.activeElement?.closest("a[href], [data-page-jump]");
 
   sections.forEach((section) => {
     const active = section === target;
@@ -314,15 +523,22 @@ const showSection = (id, scroll = true) => {
   activateCategory(target.dataset.category || "news");
   activateSidebarLink(activeNavId);
   syncSidebarSubgroups(activeNavId);
+  updateReadingNavigation(target, activeNavId);
   closeMenu();
-  if (fromMobileMenu) {
+  if (fromNavigation) {
     const heading = target.querySelector('h1, h2');
     if (heading) {
       heading.tabIndex = -1;
       heading.focus({ preventScroll: true });
     }
   }
-  if (scroll) window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  if (scroll) {
+    window.requestAnimationFrame(() => {
+      if (!target.classList.contains("is-active")) return;
+      if (anchor) scrollToReadingTarget(anchor);
+      else window.scrollTo({ top: 0, behavior: "instant" });
+    });
+  }
 };
 
 const syncFromHash = () => {
@@ -399,6 +615,7 @@ subtabs.forEach((subtabRoot) => {
       activateSubtab(targetId);
       history.replaceState(null, "", `#${targetId}`);
       activateSidebarLink(targetId);
+      if (parentSection) updateReadingNavigation(parentSection, targetId);
     });
 
     button.addEventListener("keydown", (event) => {
@@ -425,6 +642,7 @@ subtabs.forEach((subtabRoot) => {
       activateSubtab(targetId);
       history.replaceState(null, "", `#${targetId}`);
       activateSidebarLink(targetId);
+      if (parentSection) updateReadingNavigation(parentSection, targetId);
       nextButton.focus();
     });
   });
@@ -434,6 +652,8 @@ if (!window.location.hash) {
   history.replaceState(null, "", "#lore-the-hub");
 }
 
+setupBookSearch();
+setupReadingFooters();
 syncFromHash();
 
 const protocolModal = document.querySelector("[data-protocol-modal]");
@@ -592,6 +812,7 @@ if (characterSheet) {
   const printButtons = [...document.querySelectorAll("[data-print-target]")];
   const blankSheetButton = document.querySelector("[data-export-blank-sheet]");
   const resetButton = document.querySelector("[data-reset-sheet]");
+  const sheetSaveStatus = document.querySelector("[data-sheet-save-status]");
   let blankSheetSnapshot = null;
   let printCleanupTimer = null;
 
@@ -653,7 +874,15 @@ if (characterSheet) {
       });
 
       window.localStorage.setItem(storageKey, JSON.stringify(payload));
+      if (sheetSaveStatus) {
+        sheetSaveStatus.textContent = "Fiche enregistrée dans ce navigateur.";
+        sheetSaveStatus.classList.remove("is-error");
+      }
     } catch (error) {
+      if (sheetSaveStatus) {
+        sheetSaveStatus.textContent = "Sauvegarde locale indisponible. Exportez votre fiche avant de quitter.";
+        sheetSaveStatus.classList.add("is-error");
+      }
       console.warn("Unable to persist character sheet", error);
     }
   };

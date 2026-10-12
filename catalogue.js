@@ -333,12 +333,21 @@ const setupShop = (root, items) => {
       mobileFragment.append(mobileRow);
     }
     if (!visible.length) {
+      const emptyState = () => {
+        const message = shopElement('div', 'shop-empty');
+        const reset = shopElement('button', 'shop-reset', 'Effacer les filtres');
+        reset.type = 'button';
+        reset.addEventListener('click', resetFilters);
+        message.append(shopElement('p', '', 'Aucun article ne correspond à ces critères.'), reset);
+        return message;
+      };
       const row = document.createElement('tr');
-      const cell = shopElement('td', 'shop-empty', 'Aucun article ne correspond à ces critères.');
+      const cell = document.createElement('td');
       cell.colSpan = shopColumns.length;
+      cell.append(emptyState());
       row.append(cell);
       fragment.append(row);
-      mobileFragment.append(shopElement('p', 'shop-empty', 'Aucun article ne correspond à ces critères.'));
+      mobileFragment.append(emptyState());
     }
     body.replaceChildren(fragment);
     mobileResults.replaceChildren(mobileFragment);
@@ -362,6 +371,9 @@ const setupShop = (root, items) => {
     const item = items.find((entry) => entry.id === id);
     if (item) {
       detail.replaceChildren(shopSheet(item, null, true));
+      document.title = item.name + ' · Chroma Shop · The Hub';
+      const currentCrumb = document.querySelector('[data-breadcrumb] [aria-current]');
+      if (currentCrumb) currentCrumb.textContent = item.name;
     } else {
       const message = shopElement('p', 'shop-empty', 'Cette fiche est introuvable.');
       const back = shopElement('a', '', 'Retour au catalogue');
@@ -373,14 +385,15 @@ const setupShop = (root, items) => {
   root.querySelectorAll('.shop-controls input, .shop-controls select').forEach((control) => {
     control.addEventListener(control === search ? 'input' : 'change', render);
   });
-  root.querySelector('[data-shop-reset]').addEventListener('click', () => {
+  const resetFilters = () => {
     search.value = '';
     tier.value = 'all';
     price.value = 'all';
     sort.value = 'name:asc';
     setFamily('all');
     search.focus();
-  });
+  };
+  root.querySelector('[data-shop-reset]').addEventListener('click', resetFilters);
   syncFamily();
   render();
   syncDirect();

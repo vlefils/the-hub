@@ -20,6 +20,7 @@
     <script src="catalogue.js" defer></script>
   </head>
   <body>
+    <a class="skip-link" href="#contenu" data-skip-content>Aller au contenu</a>
     <div class="background-scene" aria-hidden="true">
       <div class="bg-layer bg-concrete"></div>
       <div class="bg-layer bg-joints">
@@ -65,11 +66,20 @@
             <strong>THE HUB</strong>
             <button class="sidebar-close" type="button" aria-label="Fermer la navigation">×</button>
           </div>
+          <div class="site-search" role="search" aria-label="Rechercher dans le livre">
+            <label for="site-search-input">Rechercher dans le livre</label>
+            <div class="site-search-field">
+              <input id="site-search-input" type="search" placeholder="Page, classe, règle…" autocomplete="off" aria-controls="site-search-results" aria-describedby="site-search-status" />
+              <button type="button" data-clear-search aria-label="Effacer la recherche" hidden>×</button>
+            </div>
+            <p id="site-search-status" class="site-search-status" role="status" hidden></p>
+            <ul id="site-search-results" class="site-search-results" aria-label="Résultats de recherche" hidden></ul>
+          </div>
           <nav class="topbar-links" id="menu-categories" aria-label="Navigation principale">
             <a href="#lore-the-hub" data-category-link="lore">Lore</a>
             <a href="#regles-overview" data-category-link="regles">Règles</a>
             <a href="#personnage-overview" data-category-link="personnage">Personnage</a>
-            <a href="#chroma-catalogue" data-category-link="chroma">Chroma</a>
+            <a href="#chroma-catalogue" data-category-link="chroma">Chroma Shop</a>
             <a href="#outils-overview" data-category-link="outils">Outils</a>
           </nav>
           <div class="sidebar-head">
@@ -95,8 +105,8 @@
               <a href="#faction-blackridge">Blackridge Capital</a>
               <a href="#faction-velvet">Velvet</a>
             </div>
-            <a href="#lore-zones">Zones</a>
-            <a href="#lore-ton">Tonalite</a>
+            <a href="#lore-zones">Zones <small class="nav-status">Bientôt</small></a>
+            <a href="#lore-ton">Tonalite <small class="nav-status">Bientôt</small></a>
           </nav>
 
           <nav class="sidebar-nav" data-sidebar-nav="regles" hidden>
@@ -153,17 +163,24 @@
           </nav>
 
           <nav class="sidebar-nav" data-sidebar-nav="outils" hidden>
+            <a href="#outils-overview">Tous les outils</a>
             <a href="#outils-pretires">Personnages pre-tires</a>
             <div class="sidebar-group sidebar-subgroup" data-context-parent="outils-pretires" hidden>
               <a href="#pretire-mara-rail-voss">Mara &ldquo;Rail&rdquo; Voss</a>
             </div>
             <a href="#outils-fiche">Fiche PJ</a>
-            <a href="#outils-tables">Tables rapides</a>
-            <a href="#outils-mj">Aides MJ</a>
+            <a href="#outils-tables">Tables rapides <small class="nav-status">Bientôt</small></a>
+            <a href="#outils-mj">Aides MJ <small class="nav-status">Bientôt</small></a>
           </nav>
         </aside>
 
-        <main id="contenu" class="content-flow" aria-live="polite">
+        <main id="contenu" class="content-flow" tabindex="-1">
+          <div class="reader-tools" data-reader-tools hidden>
+            <nav class="reader-breadcrumb" aria-label="Fil d’Ariane"><ol data-breadcrumb></ol></nav>
+            <label class="reader-jump" data-reader-jump hidden>Dans cette page
+              <select data-page-jump aria-label="Aller à une partie de la page"><option value="">Aller à…</option></select>
+            </label>
+          </div>
           <section class="page-section panel is-active" id="news-overview" data-section data-category="news">
             <p class="eyebrow">News</p>
             <h1>The Hub</h1>
@@ -205,6 +222,12 @@
                 <h2>The Hub</h2>
               </div>
             </div>
+            <p class="home-lead">Un jeu de rôle cyberpunk où des mercenaires prennent des contrats, survivent à Paradise et reviennent au Hub pour s’équiper.</p>
+            <nav class="start-paths" aria-label="Commencer à jouer">
+              <a href="#regles-overview"><span>Découvrir le jeu</span><strong>Lire les règles <span aria-hidden="true">→</span></strong><small>Les principes, les tests et le combat.</small></a>
+              <a href="#personnage-overview"><span>Créer un personnage</span><strong>Choisir sa classe <span aria-hidden="true">→</span></strong><small>Six classes et leurs voies.</small></a>
+              <a href="#outils-overview"><span>Préparer une partie</span><strong>Ouvrir les outils <span aria-hidden="true">→</span></strong><small>Fiche éditable, export et personnage prêt à jouer.</small></a>
+            </nav>
             <img class="the-hub-hero" src="assets/the_hub.png" alt="Illustration de The Hub, le marche neutre de Paradise" />
             <article class="tablet-dossier" aria-label="Message tablette sur The Hub">
               <div class="tablet-chassis">
@@ -311,55 +334,57 @@
             <div class="faction-list">
               <figure class="faction-sheet-card" id="faction-cabinet">
                 <a class="faction-sheet-link" href="assets/factions/le-cabinet.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/le-cabinet.png" alt="Fiche faction du Cabinet, administration centrale privatisee de Paradise" loading="lazy" />
+                  <img src="assets/factions/le-cabinet.png" alt="Fiche faction du Cabinet, administration centrale privatisee de Paradise" width="1774" height="887" loading="lazy" />
                 </a>
               </figure>
               <figure class="faction-sheet-card" id="faction-bastion">
                 <a class="faction-sheet-link" href="assets/factions/bastion.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/bastion.png" alt="Fiche faction de Bastion, complexe militaro-industriel prive" loading="lazy" />
+                  <img src="assets/factions/bastion.png" alt="Fiche faction de Bastion, complexe militaro-industriel prive" width="1672" height="941" loading="lazy" />
                 </a>
               </figure>
               <figure class="faction-sheet-card" id="faction-syndicat">
                 <a class="faction-sheet-link" href="assets/factions/le-syndicat.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/le-syndicat.png" alt="Fiche faction du Syndicat, maison des mercenaires de Paradise" loading="lazy" />
+                  <img src="assets/factions/le-syndicat.png" alt="Fiche faction du Syndicat, maison des mercenaires de Paradise" width="1672" height="941" loading="lazy" />
                 </a>
               </figure>
               <figure class="faction-sheet-card" id="faction-seconde-chance">
                 <a class="faction-sheet-link" href="assets/factions/seconde-chance.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/seconde-chance.png" alt="Fiche faction de Seconde Chance, assurance de survie contractuelle" loading="lazy" />
+                  <img src="assets/factions/seconde-chance.png" alt="Fiche faction de Seconde Chance, assurance de survie contractuelle" width="1672" height="941" loading="lazy" />
                 </a>
               </figure>
               <figure class="faction-sheet-card" id="faction-helix">
                 <a class="faction-sheet-link" href="assets/factions/helix-genomics.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/helix-genomics.png" alt="Fiche faction de Helix Genomics, biotech, pharma et optimisation humaine" loading="lazy" />
+                  <img src="assets/factions/helix-genomics.png" alt="Fiche faction de Helix Genomics, biotech, pharma et optimisation humaine" width="1672" height="941" loading="lazy" />
                 </a>
               </figure>
               <figure class="faction-sheet-card" id="faction-synapse">
                 <a class="faction-sheet-link" href="assets/factions/synapse.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/synapse.png" alt="Fiche faction de Synapse, architecture numerique de Paradise" loading="lazy" />
+                  <img src="assets/factions/synapse.png" alt="Fiche faction de Synapse, architecture numerique de Paradise" width="1672" height="941" loading="lazy" />
                 </a>
               </figure>
               <figure class="faction-sheet-card" id="faction-blackridge">
                 <a class="faction-sheet-link" href="assets/factions/blackridge-capital.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/blackridge-capital.png" alt="Fiche faction de Blackridge Capital, banque d'investissement de Paradise" loading="lazy" />
+                  <img src="assets/factions/blackridge-capital.png" alt="Fiche faction de Blackridge Capital, banque d'investissement de Paradise" width="1672" height="941" loading="lazy" />
                 </a>
               </figure>
               <figure class="faction-sheet-card" id="faction-velvet">
                 <a class="faction-sheet-link" href="assets/factions/velvet.png" target="_blank" rel="noopener">
-                  <img src="assets/factions/velvet.png" alt="Fiche faction de Velvet, empire du luxe de Paradise" loading="lazy" />
+                  <img src="assets/factions/velvet.png" alt="Fiche faction de Velvet, empire du luxe de Paradise" width="1672" height="941" loading="lazy" />
                 </a>
               </figure>
             </div>
           </section>
 
-          <section class="page-section panel" id="lore-zones" data-section data-category="lore">
+          <section class="page-section panel" id="lore-zones" data-section data-category="lore" data-page-pending>
             <div class="section-heading"><p class="section-kicker">Lore</p><div><h2>Zones</h2></div></div>
-            <p>Placeholder: docks noyes, tours de diffusion, marche noir clinique, ceinture industrielle et zones franches.</p>
+            <p class="pending-message">Cette rubrique est en préparation. Les quartiers et zones de Paradise seront détaillés ici.</p>
+            <a class="overview-text-link" href="#lore-factions">Découvrir les factions de Paradise →</a>
           </section>
 
-          <section class="page-section panel" id="lore-ton" data-section data-category="lore">
+          <section class="page-section panel" id="lore-ton" data-section data-category="lore" data-page-pending>
             <div class="section-heading"><p class="section-kicker">Lore</p><div><h2>Tonalite</h2></div></div>
-            <p>Placeholder: fais respirer le style, mais garde toujours une consequence humaine derriere chaque choix technologique.</p>
+            <p class="pending-message">Cette rubrique est en préparation. Vous y trouverez les repères d’ambiance pour jouer dans Paradise.</p>
+            <a class="overview-text-link" href="#lore-the-hub">Lire l’introduction à l’univers →</a>
           </section>
 
           <section class="page-section panel" id="regles-overview" data-section data-category="regles">
@@ -5480,7 +5505,10 @@ Utilise Ruee d'acier pour coller une ligne, contourner un angle ou sortir d'un p
             <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Fiche PJ</h2></div></div>
             <p class="sheet-intro">Version imprimable A4 de la feuille de personnage The Hub. Renseignez les champs, laissez les calculs de base se mettre a jour, puis utilisez l'export PDF du navigateur.</p>
             <div class="sheet-toolbar">
-              <p class="sheet-toolbar-copy">Export sur 2 pages A4 : utilisez la fiche en cours ou generez une copie vierge sans modifier les donnees deja saisies.</p>
+              <div class="sheet-toolbar-copy">
+                <p>Export sur 2 pages A4. La copie vierge laisse votre fiche en cours intacte.</p>
+                <p class="sheet-save-status" data-sheet-save-status role="status">Sauvegarde automatique dans ce navigateur.</p>
+              </div>
               <div class="sheet-toolbar-actions">
                 <button class="button button-primary" type="button" data-export-sheet data-print-target="outils-fiche">Exporter la fiche</button>
                 <button class="button button-secondary" type="button" data-export-blank-sheet="outils-fiche">Exporter une fiche vierge</button>
@@ -6005,14 +6033,16 @@ Utilise Ruee d'acier pour coller une ligne, contourner un angle ou sortir d'un p
             </form>
           </section>
 
-          <section class="page-section panel" id="outils-tables" data-section data-category="outils">
+          <section class="page-section panel" id="outils-tables" data-section data-category="outils" data-page-pending>
             <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Tables rapides</h2></div></div>
-            <p>Placeholder: noms, incidents, contrats, complications et ambiances express.</p>
+            <p class="pending-message">Cette rubrique est en préparation. Les tables d’incidents, de contrats et de complications seront réunies ici.</p>
+            <a class="overview-text-link" href="#regles-combat-conditions">Consulter les conditions de combat →</a>
           </section>
 
-          <section class="page-section panel" id="outils-mj" data-section data-category="outils">
+          <section class="page-section panel" id="outils-mj" data-section data-category="outils" data-page-pending>
             <div class="section-heading"><p class="section-kicker">Outils</p><div><h2>Aides MJ</h2></div></div>
-            <p>Placeholder: fronts, horloges, rappels de rythme et generateur de pression.</p>
+            <p class="pending-message">Cette rubrique est en préparation. Elle regroupera les aides de rythme et de préparation pour le meneur.</p>
+            <a class="overview-text-link" href="#regles-principes-rythme">Consulter le rythme de partie →</a>
           </section>
         </main>
       </div>    </div>
