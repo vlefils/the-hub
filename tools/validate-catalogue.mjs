@@ -29,7 +29,7 @@ assert.equal(named('Black Tip').price, 400);
 assert.equal(named('Peau écailleuse').price, 500);
 assert.equal(named('Corps sans seuil').price, 1500);
 assert.match(named('Œil tactique').rules, /\+1/);
-assert.match(named('Nerfs de prédation').rules, /\+5 initiative/);
+assert.match(named('Nerfs de prédation').rules, /\+5 (?:à l')?initiative/);
 assert.match(named('Volk HMG-8').rules, /\+2d6/);
 assert.match(named('Queue préhenseuse de colonne').rules, /action bonus supplémentaire/);
 assert.match(named('Doorbreaker D-2').rules, /repoussée de 1,50 m/);
