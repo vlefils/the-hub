@@ -116,6 +116,10 @@ const shopSheet = (item, close, direct = false) => {
     if (paragraph.trim()) rules.append(shopElement('p', '', paragraph.trim()));
   }
   content.append(rules);
+  const review = window.playtestShopNotes?.[item.id];
+  if (review && window.createPlaytestNote) {
+    content.append(window.createPlaytestNote(review[0], [review[1]]));
+  }
   if (item.drawback) {
     const drawback = shopElement('section', 'shop-sheet-drawback');
     drawback.append(shopElement('h4', '', 'Contrepartie'), shopElement('p', '', item.drawback));

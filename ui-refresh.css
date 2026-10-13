@@ -280,6 +280,37 @@
   .card-grid { gap: 0.8rem; }
   .info-card h3 { font-size: 1.35rem; }
 
+  .playtest-legend {
+    margin: 0.7rem 0 1.1rem;
+    color: #a9bdc7;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .playtest-note {
+    min-width: 0;
+    padding: 0.2rem 0 0.2rem 1rem;
+    border-left: 2px solid var(--shop-cyan);
+    color: #a9edf3;
+    line-height: 1.6;
+  }
+  .playtest-note-label {
+    margin: 0 0 0.45rem;
+    color: var(--shop-cyan);
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .playtest-note p {
+    margin: 0 0 0.65rem;
+    color: inherit;
+    font-size: 0.98rem;
+    font-style: italic;
+  }
+  .playtest-note p:last-child { margin-bottom: 0; }
+  .level-block.has-playtest-note > .playtest-note { margin: 0.8rem 0 0.4rem; }
+  .shop-sheet-content > .playtest-note { margin-top: -0.2rem; }
+  #chroma-catalogue > .playtest-note { max-width: 74ch; margin: 0 0 1.2rem; }
+
   .page-section img,
   .illustration-frame,
   .media-frame {
@@ -407,6 +438,17 @@
   .shop-sheet-fact dt { color: #aebac6; }
   .shop-sheet-fact dd { color: var(--text); }
   .shop-sheet-actions a { color: #c8d9ff; }
+}
+
+@media screen and (min-width: 1180px) {
+  .level-block.has-playtest-note {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 0.9fr);
+    gap: 0.35rem 1.3rem;
+    align-items: start;
+  }
+  .level-block.has-playtest-note > .level-banner { grid-column: 1 / -1; justify-self: start; }
+  .level-block.has-playtest-note > .playtest-note { margin-top: 0.65rem; }
 }
 
 @media screen and (max-width: 1100px) {
@@ -702,6 +744,9 @@
 }
 
 @media print {
+  .playtest-note { color: #173943; border-left-color: #173943; }
+  .playtest-note-label { color: #173943; }
+  .playtest-legend { color: #34434a; }
   .skip-link,
   .site-search,
   .reader-tools,
