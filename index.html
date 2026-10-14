@@ -1131,8 +1131,8 @@
               <strong>Regles sur les armes a feu</strong>
               <ul>
                 <li>Les armes a feu de The Hub ne sont pas simulees balle par balle.</li>
-                <li>Les degats d&rsquo;une arme representent l&rsquo;ensemble des tirs, impacts ou rafales efficaces produits pendant une action d&rsquo;attaque, soit quelques secondes de combat soutenu.</li>
-                <li>La valeur de chargeur ne represente pas forcement le nombre exact de cartouches presentes dans l&rsquo;arme, mais le nombre d&rsquo;actions d&rsquo;attaque efficaces qu&rsquo;elle peut produire avant de devoir etre rechargee.</li>
+                <li>Les degats d&rsquo;une arme representent les tirs, impacts ou rafales efficaces produits pendant une attaque, soit quelques secondes de combat soutenu.</li>
+                <li>La valeur de chargeur ne represente pas forcement le nombre exact de cartouches presentes dans l&rsquo;arme, mais le nombre d&rsquo;attaques efficaces qu&rsquo;elle peut produire avant de devoir etre rechargee. Chaque attaque avec l&rsquo;arme consomme 1 usage de chargeur, qu&rsquo;elle fasse partie de l&rsquo;action Attaquer, d&rsquo;une attaque supplementaire ou d&rsquo;une reaction, sauf indication contraire.</li>
                 <li>Un chargeur de 4 ou 6 represente donc une autonomie tactique abstraite, et non un comptage litteral munition par munition.</li>
                 <li>Le rechargement indique le cout necessaire pour remettre l&rsquo;arme en etat de tirer efficacement : la plupart des armes se rechargent par une action bonus ; certaines armes plus lourdes ou plus contraignantes demandent une action complete.</li>
               </ul>
@@ -2287,17 +2287,15 @@
                     <p>La premi&egrave;re cr&eacute;ature que vous touchez avec une attaque &agrave; distance avant la fin du tour subit un d&eacute;savantage &agrave; sa prochaine attaque avant la fin de son prochain tour.</p>
                     <p><strong>Posture mobile.</strong> Pr&eacute;requis : vous vous &ecirc;tes d&eacute;plac&eacute; d&rsquo;au moins 3 m&egrave;tres pendant ce tour.</p>
                     <p>Vous ne subissez pas de d&eacute;savantage &agrave; vos attaques &agrave; distance du fait de la pr&eacute;sence d&rsquo;un ennemi &agrave; 1,50 m&egrave;tre de vous.</p>
-                    <p><strong>Posture ancr&eacute;e.</strong> Pr&eacute;requis : vous ne vous &ecirc;tes pas d&eacute;plac&eacute; pendant ce tour. Lorsque vous adoptez cette posture, votre vitesse devient 0 jusqu&rsquo;&agrave; la fin du tour.</p>
-                    <p>Jusqu&rsquo;au d&eacute;but de votre prochain tour, vous pouvez utiliser votre r&eacute;action pour effectuer une action diff&eacute;r&eacute;e sans avoir &agrave; annoncer &agrave; l&rsquo;avance de d&eacute;clencheur pr&eacute;cis.</p>
-                    <p>Cette action diff&eacute;r&eacute;e peut &ecirc;tre l&rsquo;une des suivantes :</p>
+                    <p><strong>Posture ancr&eacute;e.</strong> Pr&eacute;requis : vous ne vous &ecirc;tes pas d&eacute;plac&eacute; pendant ce tour. Lorsque vous adoptez cette posture, votre vitesse devient 0 jusqu&rsquo;&agrave; la fin du tour. Contrairement aux autres postures, la Posture ancr&eacute;e dure jusqu&rsquo;au d&eacute;but de votre prochain tour, sauf si une aptitude y met fin plus t&ocirc;t.</p>
+                    <p>&Agrave; la fin du tour d&rsquo;un adversaire, avant le d&eacute;but de votre prochain tour, vous pouvez utiliser votre r&eacute;action pour choisir une seule des r&eacute;ponses diff&eacute;r&eacute;es suivantes, en respectant leurs conditions habituelles :</p>
                     <ul>
                       <li>effectuer une attaque avec une arme &agrave; distance</li>
                       <li>lancer une grenade</li>
-                      <li>effectuer l&rsquo;action Esquiver</li>
+                      <li>effectuer l&rsquo;action Esquiver jusqu&rsquo;au d&eacute;but de votre prochain tour</li>
                       <li>vous mettre &agrave; terre ou vous plaquer &agrave; couvert</li>
-                      <li>utiliser une action bonus de classe ou d&rsquo;arme applicable</li>
                     </ul>
-                    <p>Vous ne pouvez pas vous d&eacute;placer dans le cadre de cette action diff&eacute;r&eacute;e.</p>
+                    <p>Vous ne pouvez pas vous d&eacute;placer dans le cadre de cette r&eacute;ponse. Elle consomme votre r&eacute;action, m&ecirc;me si vous choisissez normalement une action comme Attaquer ou Esquiver ; elle ne vous accorde pas d&rsquo;action bonus suppl&eacute;mentaire.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2357,7 +2355,7 @@
                   <div class="callout accent">
                     <strong>Pr&eacute;cision froide</strong>
                     <p>Quand vous &ecirc;tes en Posture ancr&eacute;e, vos attaques &agrave; distance infligent un coup critique sur un r&eacute;sultat de 19 ou 20 au d&eacute;.</p>
-                    <p>De plus, si vous utilisez votre action diff&eacute;r&eacute;e ou votre r&eacute;action pour effectuer une attaque contre une cible marqu&eacute;e, cette attaque b&eacute;n&eacute;ficie de l&rsquo;avantage.</p>
+                    <p>De plus, si vous effectuez une attaque &agrave; distance en r&eacute;action contre une cible marqu&eacute;e, cette attaque b&eacute;n&eacute;ficie de l&rsquo;avantage.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2376,7 +2374,7 @@
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Hit &amp; Run</strong>
-                    <p>Une fois pendant chacun de vos tours, imm&eacute;diatement apr&egrave;s une attaque &agrave; distance effectu&eacute;e en Posture ancr&eacute;e, vous pouvez vous d&eacute;placer de 3 m&egrave;tres. Ce d&eacute;placement est possible m&ecirc;me si la posture a r&eacute;duit votre vitesse &agrave; 0. Il ne provoque pas d&rsquo;attaque d&rsquo;opportunit&eacute; de la cible de cette attaque et met fin &agrave; votre Posture ancr&eacute;e, y compris &agrave; l&rsquo;action diff&eacute;r&eacute;e qu&rsquo;elle vous accordait.</p>
+                    <p>Une fois pendant chacun de vos tours, imm&eacute;diatement apr&egrave;s une attaque &agrave; distance effectu&eacute;e en Posture ancr&eacute;e, vous pouvez vous d&eacute;placer de 3 m&egrave;tres. Ce d&eacute;placement est possible m&ecirc;me si la posture a r&eacute;duit votre vitesse &agrave; 0. Il ne provoque pas d&rsquo;attaque d&rsquo;opportunit&eacute; de la cible de cette attaque et met fin &agrave; votre Posture ancr&eacute;e, y compris &agrave; la r&eacute;ponse diff&eacute;r&eacute;e qu&rsquo;elle vous accordait.</p>
                   </div>
                 </div>
                 <div class="level-block">
@@ -2966,7 +2964,7 @@
                     <p>Cible alliee - 0 point de vie - aucun ennemi au contact de vous ou de la cible</p>
                     <p>Effectuez un jet de Sang-froid contre un DD de 15.</p>
                     <p>Si la cible possede au moins 1 de de vie, elle en depense 1. Sinon, vous effectuez ce jet avec desavantage.</p>
-                    <p><strong>Reussite :</strong> la cible se releve avec un nombre de points de vie egal au resultat d&rsquo;1 de de vie + votre modificateur d&rsquo;Esprit.</p>
+                    <p><strong>Reussite :</strong> si la cible a depense un de de vie, elle se releve avec un nombre de points de vie egal au resultat de ce de + votre modificateur d&rsquo;Esprit, avec un minimum de 1 point de vie. Si elle n&rsquo;avait aucun de de vie a depenser, elle se releve avec 1 point de vie.</p>
                     <p><strong>Echec :</strong> la cible est stabilisee.</p>
                   </div>
                 </div>
@@ -3289,10 +3287,10 @@
                   <tr><td>1</td><td>+2</td><td>Faille, Expertise</td></tr>
                   <tr><td>2</td><td>+2</td><td>Voie de Runner</td></tr>
                   <tr><td>3</td><td>+2</td><td>Amelioration de caracteristique</td></tr>
-                  <tr><td>4</td><td>+3</td><td>Couverture et planque</td></tr>
+                  <tr><td>4</td><td>+3</td><td>Couverture et planque, maximum de 2 failles par cible</td></tr>
                   <tr><td>5</td><td>+3</td><td>Aptitude de voie</td></tr>
                   <tr><td>6</td><td>+3</td><td>Amelioration de caracteristique</td></tr>
-                  <tr><td>7</td><td>+4</td><td>Opportuniste</td></tr>
+                  <tr><td>7</td><td>+4</td><td>Opportuniste, maximum de 3 failles par cible</td></tr>
                   <tr><td>8</td><td>+4</td><td>Aptitude de voie</td></tr>
                   <tr><td>9</td><td>+4</td><td>Amelioration de caracteristique</td></tr>
                   <tr><td>10</td><td>+5</td><td>Intouchable</td></tr>
@@ -3319,19 +3317,15 @@
                   <div class="level-banner">Niveau 1</div>
                   <div class="callout">
                     <strong>Faille</strong>
-                    <p>Vous savez reperer les automatismes, les angles morts et les vulnerabilites d&rsquo;une cible avant qu&rsquo;elle ne vous identifie comme une menace immediate.</p>
-                    <p>En tant qu&rsquo;action bonus, choisissez une cible que vous voyez a 18 metres ou moins de vous, a condition :</p>
+                    <p>En combat, vous pouvez utiliser une action bonus pour verrouiller une creature que vous voyez a 18 metres ou moins de vous. Aucun jet n&rsquo;est requis et le verrouillage ne donne pas de faille immediatement.</p>
+                    <p>A la fin du tour de votre cible verrouillee, si vous pouvez la voir a 18 metres ou moins, vous gagnez 1 niveau de faille sur elle. Cette observation ne peut vous donner qu&rsquo;une faille par round. Voir la cible depuis un couvert suffit ; perdre sa vue empeche seulement ce gain.</p>
+                    <p>Votre maximum de failles sur une meme cible est de 1 aux niveaux 1 a 3, de 2 aux niveaux 4 a 6, puis de 3 a partir du niveau 7. Les failles sont personnelles a chaque Runner. Elles ne se preparent pas hors combat et disparaissent a la fin du combat ou lorsque leur cible tombe a 0 point de vie, apres la resolution d&rsquo;un eventuel effet de transfert.</p>
+                    <p>Vous ne pouvez avoir qu&rsquo;une cible verrouillee a la fois. Verrouiller une autre cible demande une action bonus et son compteur commence a 0 si vous n&rsquo;aviez pas deja des failles sur elle. Le Tueur a gages et le Hacker perdent alors les failles de leur ancienne cible ; le Fixeur conserve ses compteurs sur les autres cibles. Verrouiller de nouveau la meme cible n&rsquo;ajoute pas de faille. Le verrouillage prend fin si la cible tombe a 0 point de vie ou si le combat se termine.</p>
+                    <p>Depenser des failles reduit aussitot le compteur et les defenses qui en dependent, sans mettre fin au verrouillage. Les benefices ci-dessous sont cumulatifs contre chaque cible sur laquelle vous conservez des failles :</p>
                     <ul>
-                      <li>qu&rsquo;elle n&rsquo;ait subi aucun degat de votre part depuis le debut du combat ou de la scene</li>
-                      <li>et que vous ne soyez pas ouvertement menacant a son egard</li>
-                    </ul>
-                    <p>La cible doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, vous gagnez 1 niveau de faille sur elle, jusqu&rsquo;a un maximum de 6.</p>
-                    <p>Les niveaux de faille que vous gagnez sont personnels.</p>
-                    <p><strong>Seuils de faille.</strong> Les niveaux de faille que vous avez sur une cible vous procurent les benefices suivants contre elle :</p>
-                    <ul>
-                      <li>1 a 2 failles : vous beneficiez d&rsquo;un bonus de +1 a la CA contre les attaques de cette cible</li>
-                      <li>3 a 4 failles : cette cible a desavantage a ses attaques d&rsquo;opportunite contre vous</li>
-                      <li>5 a 6 failles : lorsqu&rsquo;elle veut vous cibler avec une attaque ou un effet hostile, elle doit d&rsquo;abord reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, elle doit choisir une autre cible si possible. Si elle ne peut pas choisir une autre cible, elle ne peut pas vous prendre pour cible pour cette attaque ou cet effet</li>
+                      <li>au moins 1 faille : vous gagnez +1 a la CA contre ses attaques</li>
+                      <li>au moins 2 failles : ses attaques d&rsquo;opportunite contre vous ont le desavantage</li>
+                      <li>3 failles : sa premiere attaque contre vous pendant chacun de ses tours a le desavantage</li>
                     </ul>
                   </div>
                 </div>
@@ -3375,17 +3369,12 @@
                   <div class="level-banner">Niveau 7</div>
                   <div class="callout">
                     <strong>Opportuniste</strong>
-                    <p>Vous savez transformer vos lectures en aide immediate pour vos allies.</p>
-                    <p>Lorsqu&rsquo;une cible sur laquelle vous avez au moins 1 niveau de faille attaque un allie que vous voyez a 9 metres ou moins de vous, vous pouvez utiliser votre reaction pour choisir l&rsquo;un des effets suivants :</p>
+                    <p>Lorsqu&rsquo;une cible sur laquelle vous avez au moins 1 faille attaque un allie que vous voyez a 9 metres ou moins de vous, vous pouvez utiliser votre reaction pour soustraire un de au jet d&rsquo;attaque de cette cible.</p>
+                    <p>Le de depend du nombre de failles que vous conservez sur elle :</p>
                     <ul>
-                      <li>imposer un malus au jet d&rsquo;attaque de la cible</li>
-                      <li>accorder un bonus a la CA de l&rsquo;allie contre cette attaque</li>
-                    </ul>
-                    <p>Le bonus ou malus depend du nombre de niveaux de faille que vous avez sur cette cible :</p>
-                    <ul>
-                      <li>1 a 2 failles : 1d6</li>
-                      <li>3 a 4 failles : 1d8</li>
-                      <li>5 a 6 failles : 1d10</li>
+                      <li>1 faille : 1d6</li>
+                      <li>2 failles : 1d8</li>
+                      <li>3 failles : 1d10</li>
                     </ul>
                     <p>Vous lancez le de apres le jet d&rsquo;attaque, mais avant que le MJ n&rsquo;annonce si l&rsquo;attaque touche ou non.</p>
                   </div>
@@ -3395,11 +3384,11 @@
                   <div class="callout">
                     <strong>Intouchable</strong>
                     <p>Votre lecture des cibles devient presque impossible a briser.</p>
-                    <p>Les benefices de votre aptitude Faille sont ameliores comme suit :</p>
+                    <p>Les benefices cumulatifs de votre aptitude Faille sont ameliores comme suit :</p>
                     <ul>
-                      <li>1 a 2 failles : vous beneficiez d&rsquo;un bonus de +2 a la CA contre les attaques de cette cible</li>
-                      <li>3 a 4 failles : cette cible a desavantage a tous ses jets d&rsquo;attaque contre vous</li>
-                      <li>5 a 6 failles : lorsqu&rsquo;elle echoue a son jet de sauvegarde d&rsquo;Esprit pour vous cibler, elle doit choisir une autre cible si possible. Si elle ne peut pas choisir une autre cible, elle perd son action, son attaque ou l&rsquo;utilisation de l&rsquo;effet hostile concerne. Dans tous les cas, elle ne peut plus vous prendre pour cible avec une attaque ou un effet hostile jusqu&rsquo;a la fin de son prochain tour</li>
+                      <li>au moins 1 faille : votre bonus a la CA contre ses attaques passe a +2</li>
+                      <li>au moins 2 failles : elle ne peut plus effectuer d&rsquo;attaque d&rsquo;opportunite contre vous</li>
+                      <li>3 failles : toutes ses attaques contre vous ont le desavantage, au lieu de la premiere de chacun de ses tours</li>
                     </ul>
                   </div>
                 </div>
@@ -3420,58 +3409,38 @@
                   <div class="level-banner">Niveau 2</div>
                   <div class="callout accent">
                     <strong>Exploitation letale</strong>
-                    <p>Une fois par tour, lorsque vous touchez une cible avec une attaque d&rsquo;arme, vous lui infligez des degats supplementaires en fonction du nombre de niveaux de faille que vous avez sur elle :</p>
-                    <ul>
-                      <li>1 a 2 failles : +1d6</li>
-                      <li>3 a 4 failles : +2d6</li>
-                      <li>5 a 6 failles : +3d6</li>
-                    </ul>
+                    <p>Une fois par tour, lorsque vous touchez votre cible verrouillee avec une attaque d&rsquo;arme, vous pouvez consommer de 1 a 3 failles que vous avez sur elle, dans la limite de celles disponibles. L&rsquo;attaque inflige 1d6 degats supplementaires par faille consommee.</p>
+                    <p>Si Predateur methodique vous donne une faille sur cette touche, ajoutez-la avant de choisir combien de failles consommer. La depense a lieu avant les degats et reduit immediatement vos defenses contre cette cible.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 2</div>
                   <div class="callout accent">
                     <strong>Predateur methodique</strong>
-                    <p>Une fois par tour, lorsque vous touchez une cible avec une attaque d&rsquo;arme, vous gagnez 1 niveau de faille sur elle.</p>
-                    <p>Vous gagnez 2 niveaux de faille a la place si au moins l&rsquo;une des conditions suivantes est remplie :</p>
-                    <ul>
-                      <li>vous aviez l&rsquo;avantage sur le jet d&rsquo;attaque</li>
-                      <li>la cible est surprise</li>
-                      <li>la cible est isolee</li>
-                    </ul>
-                    <p>Une cible est consideree comme isolee si aucun de ses allies conscients ne se trouve a 3 metres ou moins d&rsquo;elle.</p>
-                    <p>Vous ne pouvez pas gagner plus de 2 niveaux de faille par tour grace a cette aptitude sur une meme cible.</p>
+                    <p>Une fois pendant chacun de vos tours, lorsque vous touchez votre cible verrouillee avec une attaque d&rsquo;arme, vous gagnez 1 faille sur elle avant de choisir une eventuelle depense pour Exploitation letale. Cette faille ne modifie pas retroactivement le jet d&rsquo;attaque.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 5</div>
                   <div class="callout accent">
                     <strong>Mise a mort calculee</strong>
-                    <p>Vous ajoutez votre modificateur d&rsquo;Esprit a vos jets d&rsquo;attaque contre les cibles sur lesquelles vous avez au moins 1 niveau de faille.</p>
-                    <p>De plus, lorsque vous touchez une cible sur laquelle vous avez 4 niveaux de faille ou plus, vous ajoutez egalement votre modificateur d&rsquo;Esprit aux degats de l&rsquo;attaque.</p>
+                    <p>Lorsque vous consommez au moins 2 failles avec Exploitation letale, ajoutez votre modificateur d&rsquo;Esprit aux degats supplementaires de cette aptitude, une seule fois.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Meurtre violent</strong>
-                    <p>Lorsque vous reduisez a 0 point de vie une cible sur laquelle vous aviez au moins 1 niveau de faille, vous pouvez choisir une autre cible que vous voyez a 9 metres ou moins de la premiere.</p>
-                    <p>Cette cible doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, vous lui transferez un nombre de niveaux de faille egal a la moitie des niveaux de faille que vous aviez sur la cible reduite a 0, arrondi a l&rsquo;inferieur.</p>
-                    <p>Vous ne pouvez pas depasser votre maximum normal de 6 niveaux de faille sur la nouvelle cible.</p>
+                    <p>Lorsque votre Exploitation letale consomme au moins 2 failles et reduit la cible verrouillee a 0 point de vie, vous pouvez aussitot verrouiller sans action une autre creature que vous voyez a 9 metres ou moins de la cible vaincue. Vous placez 1 faille sur la nouvelle cible, ou 2 si vous aviez consomme 3 failles. Ce gain respecte votre maximum normal.</p>
+                    <p>Resolvez ce transfert avant de retirer les failles de la cible vaincue. Il remplace votre ancien verrouillage et ne demande aucun jet de sauvegarde.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 11</div>
                   <div class="callout accent">
                     <strong>Carnage methodique</strong>
-                    <p>Les degats supplementaires de votre aptitude Exploitation letale sont doubles :</p>
-                    <ul>
-                      <li>1 a 2 failles : +2d6</li>
-                      <li>3 a 4 failles : +4d6</li>
-                      <li>5 a 6 failles : +6d6</li>
-                    </ul>
-                    <p>De plus, lorsque vous reduisez a 0 point de vie une cible sur laquelle vous aviez au moins 1 niveau de faille, chaque cible de votre choix a 9 metres ou moins d&rsquo;elle doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
-                    <p>En cas d&rsquo;echec, vous transferez a chacune d&rsquo;elles un nombre de niveaux de faille egal a la moitie des niveaux de faille que vous aviez sur la cible reduite a 0, arrondi a l&rsquo;inferieur.</p>
+                    <p>Les degats supplementaires d&rsquo;Exploitation letale passent a 2d6 par faille consommee.</p>
+                    <p>De plus, si vous reduisez a 0 point de vie votre cible verrouillee avec une attaque d&rsquo;arme sans utiliser Exploitation letale, vous pouvez declencher Meurtre violent si vous aviez au moins 1 faille sur elle : vous placez alors 1 faille sur la nouvelle cible. Un meme KO ne peut declencher qu&rsquo;un seul transfert.</p>
                   </div>
                 </div>
               </div>
@@ -3491,36 +3460,31 @@
                   <div class="level-banner">Niveau 2</div>
                   <div class="callout accent">
                     <strong>Semer le doute</strong>
-                    <p>En tant qu&rsquo;action, choisissez un nombre de cibles que vous voyez a 12 metres ou moins de vous, pouvant vous voir ou vous entendre, inferieur ou egal a votre bonus de maitrise.</p>
-                    <p>Chaque cible doit reussir un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. En cas d&rsquo;echec, vous gagnez 1 niveau de faille sur elle.</p>
+                    <p>Lorsqu&rsquo;un ennemi que vous voyez a 18 metres ou moins de vous rate une attaque, vous pouvez utiliser votre reaction pour gagner 1 faille sur lui, meme s&rsquo;il n&rsquo;est pas votre cible verrouillee. Aucun jet de sauvegarde n&rsquo;est requis.</p>
+                    <p>Vous pouvez conserver des failles sur plusieurs ennemis, chacun dans la limite de votre maximum par cible. Votre verrouillage ne designe que la cible dont vous pouvez observer la fin du tour pour gagner une faille. Changer de cible verrouillee ne retire pas vos autres compteurs.</p>
+                    <p><strong>Exploitation alliee.</strong> Lorsqu&rsquo;un allie autre que vous, que vous voyez a 9 metres ou moins de vous, touche un ennemi sur lequel vous avez au moins 1 faille, il consomme automatiquement toutes vos failles sur cet ennemi. Son attaque inflige 1d4 degats supplementaires par faille consommee. La depense a lieu avant les degats, sans utiliser votre reaction ni votre action bonus. Plusieurs ennemis peuvent etre exploites pendant un meme round si leurs compteurs sont disponibles.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 5</div>
                   <div class="callout accent">
                     <strong>Ouvrez-le</strong>
-                    <p>Lorsqu&rsquo;un allie que vous voyez a 9 metres ou moins de vous attaque une cible sur laquelle vous avez 4 niveaux de faille ou plus, vous pouvez utiliser votre reaction pour lui donner l&rsquo;avantage sur ce jet d&rsquo;attaque.</p>
-                    <p>Si vous avez 6 niveaux de faille sur la cible et que l&rsquo;attaque touche, elle inflige 1d8 degats supplementaires.</p>
+                    <p>Lorsqu&rsquo;un allie consomme au moins 2 de vos failles avec Exploitation alliee, la cible touchee ne peut plus effectuer de reaction jusqu&rsquo;au debut de son prochain tour.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Paranoia</strong>
-                    <p>En tant qu&rsquo;action, choisissez une cible que vous voyez a 18 metres ou moins de vous, sur laquelle vous avez 6 niveaux de faille. La cible doit effectuer un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. Une cible immunisee a l&rsquo;etat Effraye reussit automatiquement ce jet.</p>
-                    <p>En cas d&rsquo;echec, jusqu&rsquo;a la fin de votre prochain tour, la cible ne distingue plus correctement ses allies de ses ennemis :</p>
-                    <ul>
-                      <li>chaque fois qu&rsquo;elle choisit une cible pour une attaque, une capacite ou un effet hostile, elle doit choisir cette cible au hasard parmi les cibles qu&rsquo;elle peut voir et qui sont a portee</li>
-                      <li>si une cible provoque une attaque d&rsquo;opportunite de sa part, elle doit effectuer cette attaque si elle en est capable</li>
-                    </ul>
-                    <p>Chaque fois que la cible subit des degats, elle peut repeter le jet de sauvegarde, mettant fin a l&rsquo;effet sur elle-meme en cas de reussite.</p>
+                    <p>Lorsqu&rsquo;un allie consomme 3 de vos failles avec Exploitation alliee, la cible touchee effectue un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner. Une creature immunisee a l&rsquo;etat Effraye reussit automatiquement ce jet.</p>
+                    <p>En cas d&rsquo;echec, vous designez une autre creature que la cible peut voir et attaquer. Si la cible effectue une attaque avant la fin de son prochain tour, sa premiere attaque doit viser cette creature, si elle est encore une cible legale. Cet effet ne force pas la cible a attaquer et ne change pas les cibles de ses autres effets. Si aucune autre creature n&rsquo;est une cible legale, l&rsquo;effet n&rsquo;a pas de consequence.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 11</div>
                   <div class="callout accent">
                     <strong>Finissez-le</strong>
-                    <p>Lorsque vous utilisez Ouvrez-le et que l&rsquo;attaque touche, vous pouvez consommer tout ou partie des niveaux de faille que vous avez sur la cible. Pour chaque niveau de faille consomme de cette maniere, l&rsquo;attaque inflige 1d8 degats supplementaires.</p>
+                    <p>Les degats supplementaires d&rsquo;Exploitation alliee passent a 1d8 par faille consommee, au lieu de 1d4.</p>
                   </div>
                 </div>
               </div>
@@ -3540,24 +3504,22 @@
                   <div class="level-banner">Niveau 2</div>
                   <div class="callout accent">
                     <strong>Breche assistee</strong>
-                    <p>Lorsque vous utilisez votre aptitude Faille sur une cible equipee d&rsquo;implants, de protheses, d&rsquo;armes connectees, d&rsquo;armures intelligentes, de drones lies ou de systemes numeriques integres, cette cible effectue son jet de sauvegarde avec desavantage.</p>
-                    <p>En cas d&rsquo;echec, vous gagnez 2 niveaux de faille sur elle au lieu de 1.</p>
+                    <p>En action bonus, vous pouvez analyser votre cible deja verrouillee si vous la voyez a 18 metres ou moins de vous. Vous gagnez 1 faille sur elle, sans jet de sauvegarde ni condition d&rsquo;equipement. Verrouiller une cible et l&rsquo;analyser demandent deux actions bonus distinctes.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 2</div>
                   <div class="callout accent">
                     <strong>Payload : Decharge neurale</strong>
-                    <p>En tant qu&rsquo;action, choisissez une cible que vous voyez a 18 metres ou moins de vous, sur laquelle vous avez au moins 1 niveau de faille. La cible doit effectuer un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
-                    <p>Elle subit 1d8 degats electriques ou neuraux par niveau de faille consomme, ou la moitie de ces degats en cas de reussite.</p>
-                    <p>Lorsque vous utilisez cette aptitude, vous consommez tous les niveaux de faille que vous avez sur la cible.</p>
+                    <p>En tant qu&rsquo;action, choisissez votre cible verrouillee, que vous voyez a 18 metres ou moins de vous, et consommez de 1 a 3 failles que vous avez sur elle, dans la limite de celles disponibles. La cible effectue un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
+                    <p>Elle subit 1d12 degats electriques ou neuraux, a votre choix, par faille consommee, ou la moitie de ces degats en cas de reussite. Les failles sont depensees avant le jet de sauvegarde et ne sont pas rendues si la cible reussit. Le verrouillage reste actif.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 5</div>
                   <div class="callout accent">
                     <strong>Payload : Parasite sensoriel</strong>
-                    <p>En tant qu&rsquo;action, choisissez une cible que vous voyez a 18 metres ou moins de vous, sur laquelle vous avez au moins 3 niveaux de faille. La cible doit effectuer un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
+                    <p>En tant qu&rsquo;action, choisissez votre cible verrouillee, que vous voyez a 18 metres ou moins de vous, et consommez 2 failles sur elle. La cible effectue un jet de sauvegarde d&rsquo;Esprit contre votre DD de sauvegarde du Runner.</p>
                     <p>En cas d&rsquo;echec :</p>
                     <ul>
                       <li>elle ne peut pas effectuer de reaction</li>
@@ -3566,23 +3528,22 @@
                       <li>ces effets durent jusqu&rsquo;a la fin de votre prochain tour</li>
                     </ul>
                     <p>En cas de reussite, elle ne peut quand meme pas effectuer de reaction jusqu&rsquo;a la fin de votre tour.</p>
-                    <p>Lorsque vous utilisez cette aptitude, vous consommez tous les niveaux de faille que vous avez sur la cible.</p>
+                    <p>La depense a lieu avant le jet de sauvegarde. Si vous conserviez une troisieme faille, elle continue de vous proteger.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 8</div>
                   <div class="callout accent">
                     <strong>Residu malveillant</strong>
-                    <p>Lorsque vous utilisez une aptitude Payload sur une cible, vous ne perdez pas entierement votre prise sur elle. Au lieu de perdre tous les niveaux de faille que vous aviez sur elle, vous retombez a 2 niveaux de faille sur cette cible.</p>
+                    <p>Une fois pendant chacun de vos tours, apres la resolution d&rsquo;un Payload qui a consomme au moins 2 failles, vous regagnez 1 faille sur la meme cible si elle est encore votre cible verrouillee et n&rsquo;est pas tombee a 0 point de vie. Ce gain respecte votre maximum normal et ne rembourse pas un Payload a 1 faille.</p>
                   </div>
                 </div>
                 <div class="level-block">
                   <div class="level-banner">Niveau 11</div>
                   <div class="callout accent">
-                    <strong>Payload : Explosion d&rsquo;implant</strong>
-                    <p>Lorsque vous utilisez Decharge neurale sur une cible sur laquelle vous avez 6 niveaux de faille, les degats infliges deviennent 8d8 degats electriques au lieu de l&rsquo;effet normal.</p>
-                    <p>De plus, chaque autre cible situee a 3 metres ou moins de la cible principale doit effectuer un jet de sauvegarde de Dexterite contre votre DD de sauvegarde du Runner, subissant 3d8 degats electriques en cas d&rsquo;echec, ou la moitie de ces degats en cas de reussite.</p>
-                    <p>Enfin, l&rsquo;implant memoire de la cible principale est irrecuperable.</p>
+                    <strong>Payload : Surtension en chaine</strong>
+                    <p>Lorsque vous utilisez Decharge neurale en consommant 3 failles, chaque autre creature situee a 3 metres ou moins de la cible principale doit effectuer un jet de sauvegarde de Dexterite contre votre DD de sauvegarde du Runner. Elle subit 3d8 degats electriques en cas d&rsquo;echec, ou la moitie en cas de reussite. La cible principale subit les degats normaux de Decharge neurale.</p>
+                    <p>Si la cible principale possede un implant memoire, celui-ci devient irrecuperable. Une creature sans implant peut tout de meme subir la Decharge et provoquer la surtension.</p>
                   </div>
                 </div>
               </div>
@@ -3699,6 +3660,7 @@
                     <p>Apr&egrave;s un repos court ou long, votre Surcharge retombe &agrave; 1.</p>
                     <p><strong>Lancer un Protocole :</strong> quand vous lancez un Protocole au rang 1 ou sup&eacute;rieur, votre Surcharge augmente imm&eacute;diatement d&rsquo;un montant &eacute;gal au rang auquel il est lanc&eacute;, avant sa r&eacute;solution.</p>
                     <p><strong>Surcharge minimale :</strong> quand un Protocole indique une Surcharge minimale, votre Surcharge actuelle doit &ecirc;tre au moins &eacute;gale &agrave; ce nombre avant de lancer le Protocole. Sinon, vous ne pouvez pas le lancer. Une fois ce pr&eacute;requis v&eacute;rifi&eacute;, augmentez votre Surcharge du rang de lancement et des &eacute;ventuels co&ucirc;ts suppl&eacute;mentaires, puis r&eacute;solvez le Protocole et son test de Surcharge. Un maintien ne demande pas de v&eacute;rifier &agrave; nouveau le pr&eacute;requis, mais augmente la Surcharge comme indiqu&eacute; par le Protocole.</p>
+                    <p><strong>Maintenir un Protocole :</strong> chaque maintien qui augmente votre Surcharge provoque un nouveau test de Surcharge apr&egrave;s la r&eacute;solution de ses effets, avec les m&ecirc;mes cons&eacute;quences qu&rsquo;un lancement de rang 1 ou sup&eacute;rieur. Ce maintien compte comme un lancement pour le refroidissement de fin de tour. Si la hausse devait d&eacute;passer 20, votre Surcharge reste &agrave; 20 et ce test &eacute;choue automatiquement.</p>
                     <p>Si un Protocole de rang 0 est lanc&eacute; &agrave; un rang sup&eacute;rieur, utilisez le rang auquel il est lanc&eacute; pour d&eacute;terminer la Surcharge neurale.</p>
                     <p>Un Protocole lanc&eacute; au rang 0 :</p>
                     <ul>
