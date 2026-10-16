@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMatch, simulateMatch, stepMatch } from './engine.mjs';
-import { decideTurn, teamPlan } from './ai.mjs';
+import { decideMovement, decideTurn, teamPlan } from './ai.mjs';
 import {
   assertInvariants, beginTurn, check, dealDamage, distance, giveBall, interceptionCandidates,
-  legalAction, moveAlong, movementCost, randomInt, reachableCells, resolveAction, trajectory,
+  legalAction, moveAlong, movementCost, movementView, neighbors, performAttack, provokesOpportunity, randomInt, reachableCells, resolveAction, trajectory,
 } from './rules.mjs';
 
 function fixture(ids = ['home-0', 'away-0']) {
@@ -192,6 +192,99 @@ test('agrippement interdit le mouvement ; se libérer permet de repartir', () =>
   a.skills.acrobatics = 100; resolveAction(state, a, { type: 'escape' }, events);
   assert.equal(a.grappledBy, null); assert.ok(reachableCells(state, a).length > 1);
 });
+test('lutte : déplacement couplé à demi-vitesse, prise et balle conservées', () => {
+  const { state, a, b, events } = fixture(); a.grappling = b.id; b.grappledBy = a.id;
+  a.movement = 6; giveBall(state, b, events);
+  moveAlong(state, a, [{ x: 4, y: 3 }, { x: 3, y: 3 }, { x: 2, y: 3 }], events);
+  assert.deepEqual(a.position, { x: 3, y: 3 }); assert.deepEqual(b.position, { x: 4, y: 3 });
+  assert.equal(a.movement, 0); assert.equal(a.grappling, b.id); assert.equal(b.grappledBy, a.id);
+  assert.deepEqual(state.ball.position, b.position); assert.equal(state.ball.carrierId, b.id);
+  assert.equal(events.some((e) => e.type === 'opportunity'), false); assert.ok(b.reaction);
+  assert.ok(events.some((e) => e.type === 'drag' && e.path.length === 2)); assertInvariants(state);
+});
+test('lutte : aucune opportunité du joueur entraîné dans le cas Étau / Frigo', () => {
+  const { state, a, b, events } = fixture();
+  a.position = { x: 2, y: 4 }; b.position = { x: 3, y: 3 }; a.hp = 9; a.movement = 4.5;
+  a.grappling = b.id; b.grappledBy = a.id;
+  moveAlong(state, a, [{ x: 1, y: 5 }], events);
+  assert.deepEqual(a.position, { x: 1, y: 5 }); assert.deepEqual(b.position, { x: 2, y: 4 });
+  assert.equal(a.hp, 9); assert.equal(a.grappling, b.id); assert.equal(b.grappledBy, a.id);
+  assert.ok(b.reaction); assert.equal(events.some((e) => e.type === 'opportunity'), false); assertInvariants(state);
+});
+test('lutte : un obstacle ou la paroi du côté de la cible bloque les deux joueurs', () => {
+  const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
+  const obstacle = state.players[1]; obstacle.position = { x: 6, y: 2 };
+  a.grappling = b.id; b.grappledBy = a.id;
+  moveAlong(state, a, [{ x: 5, y: 2 }], events);
+  assert.deepEqual(a.position, { x: 5, y: 3 }); assert.equal(a.movement, a.speed);
+  a.position = { x: 5, y: 6 }; b.position = { x: 5, y: 7 };
+  moveAlong(state, a, [{ x: 5, y: 7 }], events);
+  assert.deepEqual(a.position, { x: 5, y: 6 }); assert.deepEqual(b.position, { x: 5, y: 7 }); assertInvariants(state);
+});
+test('lutte : terrain difficile de la cible inclus dans le coût du trajet', () => {
+  const { state, a, b, events } = fixture();
+  a.position = { x: 2, y: 0 }; b.position = { x: 3, y: 0 }; a.grappling = b.id; b.grappledBy = a.id;
+  a.movement = 3;
+  assert.ok(!reachableCells(state, a).some((c) => c.position.x === 2 && c.position.y === 1));
+  moveAlong(state, a, [{ x: 2, y: 1 }], events); assert.deepEqual(a.position, { x: 2, y: 0 });
+  a.movement = 6; moveAlong(state, a, [{ x: 2, y: 1 }], events);
+  assert.equal(a.movement, 0); assert.deepEqual(b.position, { x: 3, y: 1 }); assertInvariants(state);
+});
+test('lutte : la cible déplacée de force ne provoque aucune opportunité extérieure', () => {
+  const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
+  const observer = state.players[1]; observer.position = { x: 7, y: 2 };
+  a.grappling = b.id; b.grappledBy = a.id;
+  moveAlong(state, a, [{ x: 4, y: 3 }], events);
+  assert.equal(distance(observer.position, b.position), 2); assert.ok(observer.reaction);
+  assert.equal(events.some((e) => e.type === 'opportunity'), false); assertInvariants(state);
+});
+test('lutte : le lutteur reste exposé aux opportunités des autres adversaires', () => {
+  const { state, a, b, events } = fixture(['home-0', 'away-0', 'away-1']);
+  const opponent = state.players[6]; opponent.position = { x: 6, y: 4 };
+  a.grappling = b.id; b.grappledBy = a.id; a.armor = 100; forceD20(state, [10]);
+  moveAlong(state, a, [{ x: 4, y: 3 }], events);
+  assert.equal(events.filter((e) => e.type === 'opportunity').length, 1);
+  assert.equal(events.find((e) => e.type === 'opportunity').playerId, opponent.id);
+  assert.ok(b.reaction); assert.equal(opponent.reaction, false); assertInvariants(state);
+});
+test('lutte : projection des actions et de la balle sur la position entraînée', () => {
+  const { state, a, b, events } = fixture(); a.grappling = b.id; b.grappledBy = a.id; giveBall(state, b, events);
+  const view = movementView(state, a, { x: 2, y: 3 });
+  assert.deepEqual(view.state.players.find((p) => p.id === b.id).position, { x: 3, y: 3 });
+  assert.deepEqual(view.state.ball.position, { x: 3, y: 3 });
+  assert.ok(legalAction(view.state, view.actor, { type: 'strip', targetId: b.id }));
+  assert.deepEqual(b.position, { x: 6, y: 3 });
+});
+test('lutte : relâcher est volontaire et gratuit ; aucun mouvement automatique après prise', () => {
+  const { state, a, b, events } = fixture(); a.grappling = b.id; b.grappledBy = a.id;
+  assert.deepEqual(decideMovement(state, a), []);
+  assert.ok(resolveAction(state, a, { type: 'release' }, events));
+  assert.equal(a.grappling, null); assert.equal(b.grappledBy, null); assert.ok(a.action);
+});
+test('bot : une prise réussie est maintenue malgré du mouvement disponible', () => {
+  const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
+  const holder = state.players[1]; holder.position = { x: 5, y: 4 }; giveBall(state, holder, events);
+  a.role = 'blocker'; a.instruction = 'cautious'; a.skills.wrestling = 100;
+  state.initiative = [a.id, b.id, holder.id]; state.turnIndex = 0;
+  const result = stepMatch(state);
+  const grappleIndex = result.events.findIndex((e) => e.type === 'grapple');
+  assert.ok(grappleIndex >= 0); assert.ok(result.state.players[0].movement > 0);
+  assert.equal(result.state.players[0].grappling, b.id);
+  assert.equal(result.events.slice(grappleIndex + 1).some((e) => ['move', 'drag', 'release'].includes(e.type)), false);
+  assert.ok(result.events.some((e) => e.type === 'hold-position'));
+});
+test('bot : garder une prise ne gaspille pas une action de mobilité sans déplacement', () => {
+  const { state, a, b } = fixture(['home-0', 'away-0', 'away-1']);
+  const holder = state.players[6]; holder.position = { x: 10, y: 6 };
+  a.position = { x: 1, y: 1 }; b.position = { x: 2, y: 1 };
+  a.grappling = b.id; b.grappledBy = a.id;
+  a.role = 'retriever'; a.instruction = 'cautious'; a.movement = a.speed;
+  state.ball = { carrierId: holder.id, position: { ...holder.position } };
+  const choice = decideTurn(state, a);
+  assert.equal(['dash', 'disengage'].includes(choice.action.type), false);
+  const view = movementView(state, a, choice.path.at(-1) ?? a.position);
+  assert.ok(legalAction(view.state, view.actor, choice.action));
+});
 test('pousser le lutteur libère sa cible sans opportunité ni perte automatique', () => {
   const { state, a, b, events } = fixture(['home-0', 'away-0', 'away-1']);
   const held = state.players[6]; held.position = { x: 6, y: 2 };
@@ -235,6 +328,68 @@ test('opportunité : une réaction, interruption avant déplacement en cas de KO
   moveAlong(state, a, [{ x: 4, y: 3 }, { x: 3, y: 3 }], events);
   assert.equal(a.hp, 0); assert.deepEqual(a.position, { x: 5, y: 3 }); assert.equal(b.reaction, false);
   assert.equal(events.filter((e) => e.type === 'opportunity').length, 1); assertInvariants(state);
+  assert.deepEqual(events.find((e) => e.type === 'opportunity').trigger, {
+    from: { x: 5, y: 3 }, to: { x: 4, y: 3 }, attackerPosition: { x: 6, y: 3 }, reach: 1,
+  });
+  assert.ok(events.some((e) => e.type === 'movement-stopped'));
+});
+test('opportunité : aucun déplacement entre cases adjacentes ne la provoque', () => {
+  let checked = 0;
+  for (const from of neighbors({ x: 6, y: 3 })) {
+    for (const to of neighbors({ x: 6, y: 3 })) {
+      if (distance(from, to) !== 1) continue;
+      const { state, a, b, events } = fixture(); a.position = { ...from }; b.role = 'blocker';
+      assert.equal(provokesOpportunity(b, a, from, to), false);
+      moveAlong(state, a, [to], events);
+      assert.deepEqual(a.position, to); assert.ok(b.reaction);
+      assert.equal(events.some((e) => e.type === 'opportunity'), false); checked++;
+    }
+  }
+  assert.ok(checked >= 20);
+});
+test('opportunité : entrer dans l’allonge ne dépense pas la réaction', () => {
+  const { state, a, b, events } = fixture(); a.position = { x: 4, y: 3 };
+  moveAlong(state, a, [{ x: 5, y: 3 }], events);
+  assert.deepEqual(a.position, { x: 5, y: 3 }); assert.ok(b.reaction);
+  assert.equal(events.some((e) => e.type === 'opportunity'), false);
+});
+test('opportunité : sortir puis revenir au contact conserve le vrai pas déclencheur', () => {
+  const { state, a, b, events } = fixture(); a.armor = 100; b.role = 'blocker';
+  moveAlong(state, a, [{ x: 4, y: 3 }, { x: 5, y: 3 }], events);
+  assert.equal(distance(a.position, b.position), 1);
+  const reactions = events.filter((e) => e.type === 'opportunity');
+  assert.equal(reactions.length, 1); assert.equal(b.reaction, false);
+  assert.deepEqual(reactions[0].trigger.from, { x: 5, y: 3 }); assert.deepEqual(reactions[0].trigger.to, { x: 4, y: 3 });
+  assert.deepEqual(events.find((e) => e.type === 'move').path, [{ x: 4, y: 3 }, { x: 5, y: 3 }]);
+});
+test('opportunité : les pas accomplis sont journalisés avant la réaction', () => {
+  const { state, a, b, events } = fixture(); a.position = { x: 5, y: 2 }; a.armor = 100; b.role = 'blocker';
+  moveAlong(state, a, [{ x: 5, y: 3 }, { x: 4, y: 3 }], events);
+  const reactionIndex = events.findIndex((e) => e.type === 'opportunity');
+  const movements = events.filter((e) => e.type === 'move');
+  assert.equal(events[0].type, 'move'); assert.ok(reactionIndex > 0); assert.equal(movements.length, 2);
+  assert.deepEqual(movements[0].position, { x: 5, y: 3 });
+  assert.deepEqual(movements[1].from, { x: 5, y: 3 });
+});
+test('opportunité : un appel direct sans sortie réelle est refusé sans effet', () => {
+  const { state, a, b, events } = fixture(); const before = structuredClone(state);
+  assert.equal(performAttack(state, b, a, events, { from: { ...a.position }, to: { x: 5, y: 2 } }), false);
+  assert.equal(performAttack(state, b, a, events, true), false);
+  assert.deepEqual(state, before); assert.equal(events.length, 0);
+});
+test('régression signalée : dernier tour, pressing et cinq bloqueurs agressifs', () => {
+  let maintained = 0;
+  const { state } = simulateMatch({ seed: 'arche-01', strategy: 'pressing',
+    players: Array.from({ length: 5 }, () => ({ role: 'blocker', instruction: 'aggressive' })) }, (s, events) => {
+    const index = events.findIndex((e) => e.type === 'grapple');
+    if (index >= 0) {
+      maintained++;
+      assert.ok(events.some((e) => e.type === 'hold-position'));
+      assert.equal(events.slice(index + 1).some((e) => e.type === 'move' || e.type === 'drag'), false);
+    }
+    assertInvariants(s);
+  });
+  assert.ok(state.finished && state.round <= 13); assert.ok(maintained > 0);
 });
 test('désengagement et déplacement forcé ne provoquent pas d’opportunité', () => {
   const { state, a, b, events } = fixture(); resolveAction(state, a, { type: 'disengage' }, events);
@@ -324,7 +479,14 @@ test('500 matchs : actions légales, invariants et terminaison ; rapport de biai
     const strategy = strategies[n % strategies.length];
     const config = { seed: `batch-${Math.floor(n / 3)}`, strategy,
       players: Array.from({ length: 5 }, () => ({ instruction: n % 2 ? 'cautious' : 'aggressive' })) };
-    const { state, events } = simulateMatch(config, (s) => assertInvariants(s));
+    const { state, events } = simulateMatch(config, (s, turnEvents) => {
+      assertInvariants(s);
+      for (const event of turnEvents.filter((e) => e.type === 'opportunity')) {
+        assert.equal(distance(event.trigger.attackerPosition, event.trigger.from), 1);
+        assert.ok(distance(event.trigger.attackerPosition, event.trigger.to) > event.trigger.reach);
+        assert.equal(distance(event.trigger.from, event.trigger.to), 1);
+      }
+    });
     assert.ok(state.round <= 13 && state.turns <= 130);
     report[state.result.winnerId ?? 'draws']++;
     report.overtime += Number(state.round > 10);

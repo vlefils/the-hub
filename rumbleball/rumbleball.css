@@ -47,6 +47,7 @@
 .rb-match-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(14rem, 1fr); gap: 1.35rem; align-items: start; }
 .rb-field-column { min-width: 0; }
 .rb-court { display: block; width: 100%; height: auto; border: 2px solid #60727c; border-radius: 4px; overflow: visible; }
+.rb-axis { fill: #bbc5d0; font: 13px 'Space Grotesk', sans-serif; }
 .rb-grid { stroke: #78929d; stroke-width: .7; opacity: .23; }
 .rb-wet { fill: #426174; }
 .rb-center-line, .rb-center-circle { stroke: #8da4af; stroke-width: 1.5; fill: none; opacity: .5; }
@@ -60,7 +61,12 @@
 .rb-ball { fill: var(--rb-ball); stroke: #17232b; stroke-width: 3; }
 .rb-ball-seam { stroke: #705224; stroke-width: 1.5; }
 .rb-move-line { fill: none; stroke: #e3f1f5; stroke-width: 3; stroke-dasharray: 5 6; opacity: .6; }
+.rb-drag-line { fill: none; stroke: #bbc5d0; stroke-width: 3; stroke-dasharray: 2 7; opacity: .7; }
+.rb-conditions { overflow-wrap: anywhere; }
 .rb-pass-line { stroke: var(--rb-ball); stroke-width: 3; stroke-dasharray: 8 6; }
+.rb-opportunity-line { stroke: var(--rb-ball); stroke-width: 4; stroke-dasharray: 5 5; }
+.rb-attempt-cell { fill: none; stroke: var(--rb-ball); stroke-width: 2; stroke-dasharray: 5 5; }
+.rb-opportunity-note { color: var(--rb-ball); font-size: .85rem; line-height: 1.55; margin-top: .6rem !important; }
 .rb-legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: .65rem 0; font-size: .74rem; color: var(--muted); }
 .rb-legend span { display: inline-flex; gap: .35rem; align-items: center; }
 .rb-swatch { display: inline-block; width: .65rem; height: .65rem; border-radius: 50%; }

@@ -2,6 +2,7 @@ import { COURT, WET_CELLS, modifier } from './data.mjs';
 
 export const distance = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 export const sameCell = (a, b) => a.x === b.x && a.y === b.y;
+export const cellLabel = (cell) => `${String.fromCharCode(65 + cell.x)}${cell.y + 1}`;
 export const inside = (p) => Number.isInteger(p.x) && Number.isInteger(p.y) && p.x >= 0 && p.x < COURT.width && p.y >= 0 && p.y < COURT.height;
 export const playerById = (state, id) => state.players.find((p) => p.id === id);
 export const active = (state) => state.players.filter((p) => p.hp > 0);
@@ -43,15 +44,58 @@ function aided(state, actor, enemyId, kind) {
 function skillCheck(state, actor, bonus, events, label) {
   return check(state, bonus, events, label, { advantage: aided(state, actor, null, 'check') }).total;
 }
-export function movementCost(actor, destination) {
-  return COURT.cell * (1 + Number(isWet(destination)) + Number(actor.prone));
+export function movementCost(actor, destination, draggedDestination = null) {
+  const difficult = isWet(destination) || Boolean(draggedDestination && isWet(draggedDestination));
+  return COURT.cell * (1 + Number(difficult) + Number(actor.prone)) * (actor.grappling ? 2 : 1);
 }
-export function canStep(state, actor, from, to) {
-  if (!inside(to) || distance(from, to) !== 1 || occupied(state, to, actor.id)) return false;
-  if (from.x !== to.x && from.y !== to.y) {
-    if (occupied(state, { x: to.x, y: from.y }, actor.id) && occupied(state, { x: from.x, y: to.y }, actor.id)) return false;
+function heldPlayer(state, actor) {
+  const target = playerById(state, actor.grappling);
+  return target?.hp > 0 && target.grappledBy === actor.id ? target : null;
+}
+// Translate both participants together, preserving their relative positions. Planning and
+// execution use this same rigid pair, including the dragged player's terrain and obstacles.
+export function movementStep(state, actor, from, to) {
+  if (actor.hp <= 0 || actor.grappledBy) return null;
+  const held = heldPlayer(state, actor);
+  const movingIds = new Set([actor.id, held?.id]);
+  const blocked = (cell) => active(state).some((p) => !movingIds.has(p.id) && sameCell(p.position, cell));
+  const clear = (a, b) => inside(a) && inside(b) && distance(a, b) === 1 && !blocked(b)
+    && !(a.x !== b.x && a.y !== b.y && blocked({ x: b.x, y: a.y }) && blocked({ x: a.x, y: b.y }));
+  if (!clear(from, to)) return null;
+  let dragged = null;
+  if (held) {
+    const offset = { x: held.position.x - actor.position.x, y: held.position.y - actor.position.y };
+    const heldFrom = { x: from.x + offset.x, y: from.y + offset.y };
+    const heldTo = { x: to.x + offset.x, y: to.y + offset.y };
+    if (!clear(heldFrom, heldTo)) return null;
+    dragged = { playerId: held.id, from: heldFrom, to: heldTo };
   }
-  return true;
+  return { cost: movementCost(actor, to, dragged?.to), dragged };
+}
+export const canStep = (state, actor, from, to) => Boolean(movementStep(state, actor, from, to));
+
+// Evaluate actions at a proposed destination with the held player and their ball in the
+// corresponding position. This prevents bots planning against a target's obsolete cell.
+export function movementView(state, actor, position) {
+  const projected = { ...actor, position: { ...position } };
+  const held = heldPlayer(state, actor);
+  if (!held) return { state, actor: projected };
+  const translated = { ...held, position: {
+    x: held.position.x + position.x - actor.position.x,
+    y: held.position.y + position.y - actor.position.y,
+  } };
+  const players = state.players.map((p) => p.id === actor.id ? projected : p.id === held.id ? translated : p);
+  const holder = players.find((p) => p.id === state.ball.carrierId);
+  return { actor: projected, state: { ...state, players, ball: holder ? { ...state.ball, position: { ...holder.position } } : state.ball } };
+}
+function releaseSeparatedGrapples(state, events) {
+  for (const p of state.players) {
+    const held = playerById(state, p.grappling);
+    if (held && distance(p.position, held.position) > 1) {
+      held.grappledBy = null; p.grappling = null;
+      emit(state, events, 'release', `La prise de ${p.name} sur ${held.name} est rompue par le déplacement forcé.`);
+    }
+  }
 }
 
 // Dijkstra on 96 cells, with occupied cells and terrain costs in the same graph used by execution.
@@ -66,8 +110,9 @@ export function reachableCells(state, actor, budget = actor.movement) {
     const current = open.shift();
     if (current !== best.get(key(current.position))) continue;
     for (const next of neighbors(current.position)) {
-      if (!canStep(state, actor, current.position, next)) continue;
-      const cost = current.cost + movementCost(actor, next);
+      const step = movementStep(state, actor, current.position, next);
+      if (!step) continue;
+      const cost = current.cost + step.cost;
       if (cost > budget || (best.get(key(next))?.cost ?? Infinity) <= cost) continue;
       const entry = { position: next, cost, path: [...current.path, next] };
       best.set(key(next), entry);
@@ -153,10 +198,25 @@ export function dealDamage(state, actor, target, amount, events) {
     else emit(state, events, 'hold', `${target.name} conserve la balle.`);
   }
 }
-export function performAttack(state, actor, target, events, opportunity = false) {
+// A reaction is provoked by a particular voluntary step, not by an entire turn's endpoints.
+// This predicate is shared by execution and the bots' assessment of a path.
+export function provokesOpportunity(actor, mover, from, to) {
+  return actor.hp > 0 && mover.hp > 0 && actor.teamId !== mover.teamId && actor.reaction
+    && actor.id !== mover.grappling
+    && !mover.disengaged && !mover.grappledBy && inside(from) && inside(to) && distance(from, to) === 1
+    && distance(actor.position, from) <= 1 && distance(actor.position, to) > 1;
+}
+export function performAttack(state, actor, target, events, opportunity = null) {
   if (actor.hp <= 0 || !target || target.hp <= 0 || actor.teamId === target.teamId || distance(actor.position, target.position) > 1 || !(opportunity ? actor.reaction : actor.action)) return false;
+  if (opportunity && (!opportunity.from || !opportunity.to || !sameCell(target.position, opportunity.from)
+    || !provokesOpportunity(actor, target, opportunity.from, opportunity.to)
+    || !canStep(state, target, opportunity.from, opportunity.to))) return false;
   if (opportunity) actor.reaction = false; else actor.action = false;
-  emit(state, events, opportunity ? 'opportunity' : 'attack', `${actor.name} ${opportunity ? 'tente une attaque d’opportunité sur' : 'attaque'} ${target.name}.`, { playerId: actor.id, targetId: target.id });
+  const trigger = opportunity ? { from: { ...opportunity.from }, to: { ...opportunity.to }, attackerPosition: { ...actor.position }, reach: 1 } : null;
+  const message = opportunity
+    ? `${actor.name} tente une attaque d’opportunité sur ${target.name} : sortie d’allonge tentée de ${cellLabel(trigger.from)} vers ${cellLabel(trigger.to)}. L’attaque précède le déplacement.`
+    : `${actor.name} attaque ${target.name}.`;
+  emit(state, events, opportunity ? 'opportunity' : 'attack', message, { playerId: actor.id, targetId: target.id, ...(trigger ? { trigger } : {}) });
   const helped = aided(state, actor, target.id, 'attack');
   const roll = check(state, actor.attack.bonus, events, `${actor.name} · attaque contre CA ${target.armor}`, {
     advantage: target.prone || helped,
@@ -179,38 +239,62 @@ export function shouldTakeOpportunity(state, actor, mover) {
 }
 export function moveAlong(state, actor, path, events) {
   if (actor.hp <= 0 || actor.grappledBy) return;
-  const start = { ...actor.position }, traversed = [];
+  let start = { ...actor.position }, traversed = [];
+  const draggedId = heldPlayer(state, actor)?.id;
+  let draggedStart = draggedId ? { ...playerById(state, draggedId).position } : null, draggedPath = [];
+  const flushMovement = () => {
+    if (!traversed.length) return;
+    emit(state, events, 'move', `${actor.name} se déplace de ${traversed.length} case${traversed.length > 1 ? 's' : ''} (${cellLabel(start)} → ${cellLabel(actor.position)}).`, {
+      playerId: actor.id, from: start, path: traversed, position: { ...actor.position },
+    });
+    if (draggedPath.length) {
+      const held = playerById(state, draggedId);
+      emit(state, events, 'drag', `${actor.name} entraîne ${held.name} (${cellLabel(draggedStart)} → ${cellLabel(held.position)}), à vitesse réduite de moitié, en maintenant la prise.`, {
+        playerId: held.id, byId: actor.id, from: draggedStart, path: draggedPath, position: { ...held.position },
+      });
+      draggedStart = { ...held.position }; draggedPath = [];
+    }
+    start = { ...actor.position }; traversed = [];
+  };
   for (const next of path) {
-    const cost = movementCost(actor, next);
-    if (actor.hp <= 0 || actor.grappledBy || cost > actor.movement || !canStep(state, actor, actor.position, next)) break;
+    const step = movementStep(state, actor, actor.position, next);
+    if (!step || step.cost > actor.movement) break;
     if (!actor.disengaged) {
-      const eligible = opponents(state, actor).filter((enemy) => enemy.reaction && distance(enemy.position, actor.position) <= 1 && distance(enemy.position, next) > 1)
+      const eligible = opponents(state, actor).filter((enemy) => provokesOpportunity(enemy, actor, actor.position, next) && shouldTakeOpportunity(state, enemy, actor))
         .sort((a, b) => state.initiative.indexOf(a.id) - state.initiative.indexOf(b.id));
+      // Publish the already completed steps before the attack that interrupts the next one.
+      if (eligible.length) flushMovement();
       for (const enemy of eligible) {
         if (actor.hp <= 0) break;
-        if (shouldTakeOpportunity(state, enemy, actor)) performAttack(state, enemy, actor, events, true);
+        performAttack(state, enemy, actor, events, { from: { ...actor.position }, to: { ...next } });
       }
     }
-    if (actor.hp <= 0) break;
-    actor.movement -= cost;
+    if (actor.hp <= 0) {
+      emit(state, events, 'movement-stopped', `${actor.name} reste en ${cellLabel(actor.position)} : le KO interrompt le déplacement avant d’atteindre ${cellLabel(next)}.`, {
+        playerId: actor.id, position: { ...actor.position }, attemptedTo: { ...next },
+      });
+      break;
+    }
+    actor.movement -= step.cost;
     actor.position = { ...next };
     if (state.ball.carrierId === actor.id) state.ball.position = { ...next };
-    if (actor.grappling) {
-      const held = playerById(state, actor.grappling);
-      if (!held || distance(actor.position, held.position) > 1) {
-        if (held) held.grappledBy = null;
-        actor.grappling = null;
-      }
+    if (step.dragged) {
+      const held = playerById(state, step.dragged.playerId);
+      held.position = { ...step.dragged.to };
+      draggedPath.push({ ...held.position });
+      if (state.ball.carrierId === held.id) state.ball.position = { ...held.position };
+      releaseSeparatedGrapples(state, events);
     }
     traversed.push({ ...next });
   }
-  if (traversed.length) emit(state, events, 'move', `${actor.name} se déplace de ${traversed.length} case${traversed.length > 1 ? 's' : ''}.`, { playerId: actor.id, from: start, path: traversed, position: { ...actor.position } });
+  flushMovement();
 }
 
 export function legalAction(state, actor, action) {
   if (!action || actor.hp <= 0) return false;
   if (action.type === 'wait') return true;
   if (action.type === 'drop') return state.ball.carrierId === actor.id;
+  if (action.type === 'release') return Boolean(actor.grappling);
   const target = playerById(state, action.targetId);
   const enemy = target && target.hp > 0 && target.teamId !== actor.teamId && distance(actor.position, target.position) <= 1;
   if (action.type === 'pickup') {
@@ -239,6 +323,10 @@ export function resolveAction(state, actor, action, events = []) {
   const target = playerById(state, action.targetId);
   if (action.type === 'wait') { actor.action = false; emit(state, events, 'wait', `${actor.name} tient sa position.`); return true; }
   if (action.type === 'drop') { dropBall(state, actor, events); return true; }
+  if (action.type === 'release') {
+    const held = playerById(state, actor.grappling); held.grappledBy = null; actor.grappling = null;
+    emit(state, events, 'release', `${actor.name} relâche volontairement ${held.name}.`); return true;
+  }
   if (action.type === 'attack') return performAttack(state, actor, target, events);
   if (action.type === 'pickup') {
     actor.pickedUp = true;
@@ -285,11 +373,7 @@ export function resolveAction(state, actor, action, events = []) {
       if (valid[0]) {
         const from = { ...target.position }; target.position = { ...valid[0] };
         if (state.ball.carrierId === target.id) state.ball.position = { ...target.position };
-        for (const p of [target, playerById(state, target.grappledBy), playerById(state, target.grappling)].filter(Boolean)) {
-          if (p.grappling && distance(p.position, playerById(state, p.grappling).position) > 1) {
-            playerById(state, p.grappling).grappledBy = null; p.grappling = null;
-          }
-        }
+        releaseSeparatedGrapples(state, events);
         emit(state, events, 'push', `${actor.name} repousse ${target.name} d’une case.`, { playerId: target.id, from, position: { ...target.position } });
       } else emit(state, events, 'hold', `${target.name} est bloqué par la paroi ou les autres joueurs.`);
     } else { target.prone = true; emit(state, events, 'prone', `${actor.name} plaque ${target.name} à terre ; la balle reste tenue.`); }

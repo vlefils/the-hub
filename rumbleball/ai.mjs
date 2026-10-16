@@ -1,6 +1,6 @@
 import {
   active, allies, carrier, distance, interceptionCandidates, legalAction,
-  opponents, playerById, reachableCells, shouldTakeOpportunity, skill,
+  movementView, opponents, playerById, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill,
 } from './rules.mjs';
 
 const nearestDistance = (players, cell) => Math.min(12, ...players.map((p) => distance(p.position, cell)));
@@ -73,16 +73,18 @@ function exposure(state, actor, path, disengaged = false) {
   const provoked = new Set();
   for (const next of path) {
     opponents(state, actor).forEach((p) => {
-      if (p.reaction && distance(p.position, last) <= 1 && distance(p.position, next) > 1 && shouldTakeOpportunity(state, p, actor)) provoked.add(p.id);
+      if (provokesOpportunity(p, actor, last, next) && shouldTakeOpportunity(state, p, actor)) provoked.add(p.id);
     });
     last = next;
   }
   return provoked.size * (state.ball.carrierId === actor.id ? 32 : actor.instruction === 'cautious' ? 22 : 13);
 }
 function evaluateCells(state, actor, plan, task, budget, disengaged = false) {
-  return reachableCells(state, actor, budget).map((entry) => ({ ...entry,
-    score: positionalScore(state, actor, entry.position, plan, task) - exposure(state, actor, entry.path, disengaged) - entry.cost * .12,
-  })).sort((a, b) => b.score - a.score || a.cost - b.cost || a.position.y - b.position.y || a.position.x - b.position.x);
+  return reachableCells(state, actor, budget).map((entry) => {
+    const view = movementView(state, actor, entry.position);
+    return { ...entry, score: positionalScore(view.state, view.actor, entry.position, plan, task)
+      - exposure(state, actor, entry.path, disengaged) - entry.cost * .12 };
+  }).sort((a, b) => b.score - a.score || a.cost - b.cost || a.position.y - b.position.y || a.position.x - b.position.x);
 }
 function explain(actor, task, type, target) {
   const intentions = {
@@ -103,13 +105,13 @@ export function decideTurn(state, actor) {
   const cells = evaluateCells(state, actor, plan, task, actor.movement);
   const candidates = [];
   const add = (entry, action, score) => {
-    const hypothetical = { ...actor, position: entry.position };
-    if (legalAction(state, hypothetical, action)) candidates.push({ path: entry.path, action, score: entry.score + score, task });
+    const view = movementView(state, actor, entry.position);
+    if (legalAction(view.state, view.actor, action)) candidates.push({ path: entry.path, action, score: entry.score + score, task });
   };
   const holder = carrier(state);
   for (const cell of cells) {
-    const actorHere = { ...actor, position: cell.position };
-    const adjacent = opponents(state, actor).filter((p) => distance(p.position, cell.position) <= 1);
+    const { actor: actorHere, state: here } = movementView(state, actor, cell.position);
+    const adjacent = opponents(here, actorHere).filter((p) => distance(p.position, cell.position) <= 1);
     if (!holder && distance(cell.position, state.ball.position) <= 1) add(cell, { type: 'pickup' }, 150 + Math.max(skill(actor, 'acrobatics'), skill(actor, 'wrestling')) * 2);
     if (actor.grappledBy) add(cell, { type: 'escape' }, state.ball.carrierId === actor.id ? 55 : 70);
     for (const enemy of adjacent) {
@@ -122,32 +124,32 @@ export function decideTurn(state, actor) {
       add(cell, { type: 'shove', targetId: enemy.id }, 17 + Number(danger) * 15 + Number(actor.role === 'blocker') * 8 + aggression * .3);
     }
     if (holder?.id === actor.id) {
-      for (const ally of allies(state, actor)) {
+      for (const ally of allies(here, actorHere)) {
         if (!ally.reaction || distance(cell.position, ally.position) > 6) continue;
-        const improvement = safety(state, actor, ally.position) - safety(state, actor, cell.position);
+        const improvement = safety(here, actorHere, ally.position) - safety(here, actorHere, cell.position);
         const preferCarrier = ally.role === 'carrier' && actor.role !== 'carrier';
         if (improvement <= 10 && !preferCarrier) continue;
-        const interceptions = interceptionCandidates(state, actorHere, ally.position);
+        const interceptions = interceptionCandidates(here, actorHere, ally.position);
         const dc = adjacent.length || actor.grappledBy ? 15 : 10;
         const success = Math.max(.05, Math.min(.95, (21 + skill(actor, 'acrobatics') - dc) / 20));
         add(cell, { type: 'pass', targetId: ally.id }, 20 + improvement * 1.8 + Number(preferCarrier) * 24 + success * 15 - interceptions.length * 16 - Number(state.round >= 9) * 10);
       }
     }
-    for (const ally of allies(state, actor)) {
+    for (const ally of allies(here, actorHere)) {
       if (distance(cell.position, ally.position) > 1) continue;
       const hasHelp = state.aids.some((a) => a.allyId === ally.id && a.kind === 'check');
       if (!hasHelp) add(cell, { type: 'help', targetId: ally.id }, ally.id === holder?.id ? 30 + Number(strategy === 'possession') * 12 : 12);
-      const foe = opponents(state, actor).find((p) => distance(p.position, cell.position) <= 1 && distance(p.position, ally.position) <= 1);
+      const foe = opponents(here, actorHere).find((p) => distance(p.position, cell.position) <= 1 && distance(p.position, ally.position) <= 1);
       if (foe && !state.aids.some((a) => a.allyId === ally.id && a.enemyId === foe.id)) add(cell, { type: 'help', targetId: ally.id, enemyId: foe.id }, 24 + Number(actor.role === 'relay') * 8);
     }
     add(cell, { type: 'dodge' }, holder?.id === actor.id ? 48 + Number(strategy === 'possession') * 12 + Number(actor.instruction === 'cautious') * 12 : 5);
-    if (adjacent.length && !actor.grappledBy) {
-      const freed = evaluateCells(state, actorHere, plan, task, Math.max(0, actor.movement - cell.cost), true)[0];
+    if (adjacent.length && !actor.grappledBy && !actor.grappling) {
+      const freed = evaluateCells(here, actorHere, plan, task, Math.max(0, actor.movement - cell.cost), true)[0];
       const gain = freed ? freed.score - positionalScore(state, actor, cell.position, plan, task) : 0;
       add(cell, { type: 'disengage' }, 8 + Math.max(0, gain) + Number(holder?.id === actor.id) * 20);
     }
   }
-  if (!actor.grappledBy) {
+  if (!actor.grappledBy && !actor.grappling) {
     const far = evaluateCells(state, actor, plan, task, actor.movement + actor.speed)[0];
     if (far && cells[0] && far.score > cells[0].score + 8) {
       candidates.push({ path: [], action: { type: 'dash' }, score: far.score + 9, task });
@@ -159,7 +161,9 @@ export function decideTurn(state, actor) {
 }
 
 export function decideMovement(state, actor) {
-  if (actor.hp <= 0 || actor.grappledBy || actor.movement < 1.5) return [];
+  // Maintaining a hold already achieves a control objective. Spare movement is optional;
+  // repositioning with a held target must be part of the next turn's deliberate plan.
+  if (actor.hp <= 0 || actor.grappledBy || actor.grappling || actor.movement < 1.5) return [];
   const plan = teamPlan(state, actor), task = taskFor(state, actor, plan);
   const cells = evaluateCells(state, actor, plan, task, actor.movement);
   const current = positionalScore(state, actor, actor.position, plan, task);

@@ -109,7 +109,10 @@ function stepMutable(state) {
         if (!resolveAction(state, actor, next, events)) throw new Error(`Action de suivi illégale : ${actor.id}`);
       }
     }
-    moveAlong(state, actor, decideMovement(state, actor), events);
+    if (actor.grappling) {
+      const held = state.players.find((p) => p.id === actor.grappling);
+      emit(state, events, 'hold-position', `${actor.name} maintient sa prise sur ${held.name} et conserve sa position ; le mouvement restant n’est pas dépensé.`);
+    } else moveAlong(state, actor, decideMovement(state, actor), events);
   }
   assertInvariants(state);
   advance(state, events);

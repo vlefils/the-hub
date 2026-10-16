@@ -1,5 +1,6 @@
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
+import { cellLabel } from './rules.mjs';
 
 const root = document.querySelector('[data-rumbleball]');
 const section = root?.closest('[data-section]');
@@ -24,7 +25,7 @@ const button = (text, cls = 'rb-button') => { const el = element('button', cls, 
 
 if (root) {
   let state = createMatch(), lastConfig = null, started = false, running = false, timer = null;
-  let selectedId = null, speed = 1, journalCount = 0;
+  let selectedId = null, speed = 1, journalCount = 0, lastTurnEvents = [];
   const visible = () => section.classList.contains('is-active') && !document.hidden;
   root.replaceChildren();
   root.classList.add('rb');
@@ -85,13 +86,18 @@ if (root) {
 
   const matchLayout = element('div', 'rb-match-layout');
   const fieldColumn = element('div', 'rb-field-column');
-  const court = svg('svg', { viewBox: '0 0 720 480', class: 'rb-court', role: 'group', 'aria-label': 'Terrain Rumbleball, 12 cases sur 8. Sélectionnez un joueur pour consulter sa fiche.' });
+  const court = svg('svg', { viewBox: '-24 -24 746 506', class: 'rb-court', role: 'group', 'aria-label': 'Terrain Rumbleball, colonnes A à L, lignes 1 à 8. Sélectionnez un joueur pour consulter sa fiche.' });
+  const definitions = svg('defs');
+  const arrow = svg('marker', { id: 'rb-opportunity-arrow', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto' });
+  arrow.append(svg('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: '#ffdb78' })); definitions.append(arrow); court.append(definitions);
   const background = svg('g', { 'aria-hidden': 'true' });
   background.append(svg('rect', { width: 720, height: 480, fill: '#14232c' }));
   for (const [x, y] of WET_CELLS) background.append(svg('rect', { x: x * 60, y: y * 60, width: 60, height: 60, class: 'rb-wet' }));
   for (let x = 0; x <= 12; x++) background.append(svg('line', { x1: x * 60, y1: 0, x2: x * 60, y2: 480, class: 'rb-grid' }));
   for (let y = 0; y <= 8; y++) background.append(svg('line', { x1: 0, y1: y * 60, x2: 720, y2: y * 60, class: 'rb-grid' }));
   background.append(svg('line', { x1: 360, y1: 0, x2: 360, y2: 480, class: 'rb-center-line' }), svg('circle', { cx: 360, cy: 240, r: 48, class: 'rb-center-circle' }));
+  for (let x = 0; x < 12; x++) background.append(svg('text', { x: x * 60 + 30, y: -10, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-axis' }, String.fromCharCode(65 + x)));
+  for (let y = 0; y < 8; y++) background.append(svg('text', { x: -12, y: y * 60 + 30, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-axis' }, String(y + 1)));
   court.append(background);
   const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { 'aria-hidden': 'true' });
   court.append(trace, pawns, ballLayer);
@@ -100,8 +106,9 @@ if (root) {
     const item = element('span'); item.append(element('i', `rb-swatch rb-swatch-${cls}`), document.createTextNode(text)); legend.append(item);
   }
   const initiative = element('div', 'rb-initiative'); initiative.setAttribute('aria-label', 'Ordre d’initiative');
+  const opportunityNote = element('p', 'rb-opportunity-note'); opportunityNote.hidden = true;
   const selected = element('div', 'rb-selected');
-  fieldColumn.append(court, legend, initiative, selected);
+  fieldColumn.append(court, legend, opportunityNote, initiative, selected);
   const journalPanel = element('section', 'rb-journal-panel');
   const journalHead = element('div', 'rb-journal-head');
   journalHead.append(element('h3', '', 'Le fil du match'));
@@ -117,9 +124,10 @@ if (root) {
   for (const text of [
     '10 rounds de 6 secondes. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.',
     'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir, intercepter et frapper en opportunité utilisent cette même réaction.',
+    'Une attaque d’opportunité est provoquée par un pas volontaire qui fait sortir de l’allonge (une case, diagonales comprises). Elle se résout avant ce pas : un KO laisse donc le joueur dans sa case de départ. Entrer dans l’allonge ou tourner autour sans en sortir ne provoque rien.',
     'Passe : action, 9 m, Acrobaties DD 10 ou 15 sous pression. Interception : résultat strictement supérieur à celui du passeur. Ramassage contesté et arrachement : tests opposés, égalité au défenseur.',
     'Après des dégâts au porteur : sauvegarde de Constitution, DD égal aux dégâts, minimum 10. Un plaquage seul ne fait pas lâcher la balle. À 0 PV : KO stable et sortie du match.',
-    'Diagonales : 1,5 m. Cases occupées bloquantes, sol humide difficile. Agripper immobilise ; pas de déplacement en traînant un adversaire. Pas de rebonds ni d’actions préparées.',
+    'Diagonales : 1,5 m. Cases occupées bloquantes, sol humide difficile. Agripper immobilise la cible ; le lutteur peut l’entraîner à demi-vitesse en maintenant la prise. Les deux joueurs doivent avoir un passage libre. Pas de rebonds ni d’actions préparées.',
     'Les profils sont ceux des Charognards, copiés pour les Recrues. Toutes les capacités spéciales sont retirées. Rôles et consignes modifient les décisions, jamais les caractéristiques.',
   ]) rulesCopy.append(element('p', '', text));
   rules.append(rulesCopy); root.append(rules);
@@ -163,7 +171,7 @@ if (root) {
     journal.append(item);
     if (follow) journal.scrollTop = journal.scrollHeight;
   }
-  function renderCourt(events = []) {
+  function renderCourt(events = lastTurnEvents) {
     // Reuse pawn nodes: preserve keyboard focus and keep SVG updates inexpensive.
     for (const p of state.players) {
       let node = pawns.querySelector(`[data-player="${p.id}"]`);
@@ -185,13 +193,29 @@ if (root) {
     const x = state.ball.position.x * 60 + 30 + (holder ? 17 : 0), y = state.ball.position.y * 60 + 30 - (holder ? 17 : 0);
     ballLayer.append(svg('circle', { cx: x, cy: y, r: holder ? 9 : 12, class: 'rb-ball' }), svg('path', { d: `M${x - 4},${y}h8 M${x},${y - 4}v8`, class: 'rb-ball-seam' }));
     trace.replaceChildren();
-    const movement = events.filter((e) => e.type === 'move').at(-1);
-    if (movement) {
+    for (const movement of events.filter((e) => e.type === 'move' || e.type === 'drag')) {
       const points = [movement.from, ...movement.path].map((p) => `${p.x * 60 + 30},${p.y * 60 + 30}`).join(' ');
-      trace.append(svg('polyline', { points, class: 'rb-move-line' }));
+      trace.append(svg('polyline', { points, class: movement.type === 'drag' ? 'rb-drag-line' : 'rb-move-line' }));
     }
     const pass = events.find((e) => e.type === 'pass');
     if (pass) trace.append(svg('line', { x1: pass.from.x * 60 + 30, y1: pass.from.y * 60 + 30, x2: pass.position.x * 60 + 30, y2: pass.position.y * 60 + 30, class: 'rb-pass-line' }));
+    const opportunities = events.filter((e) => e.type === 'opportunity' && e.trigger);
+    const departures = new Set();
+    for (const event of opportunities) {
+      const { from, to } = event.trigger;
+      const key = `${event.targetId}:${from.x},${from.y}:${to.x},${to.y}`;
+      if (departures.has(key)) continue;
+      departures.add(key);
+      const line = svg('line', { x1: from.x * 60 + 30, y1: from.y * 60 + 30, x2: to.x * 60 + 30, y2: to.y * 60 + 30, class: 'rb-opportunity-line', 'marker-end': 'url(#rb-opportunity-arrow)' });
+      line.append(svg('title', {}, `Sortie d’allonge tentée : ${cellLabel(from)} → ${cellLabel(to)}`)); trace.append(line);
+      trace.append(svg('rect', { x: to.x * 60 + 4, y: to.y * 60 + 4, width: 52, height: 52, rx: 3, class: 'rb-attempt-cell' }));
+    }
+    opportunityNote.hidden = opportunities.length === 0;
+    opportunityNote.textContent = opportunities.map((e) => {
+      const mover = state.players.find((p) => p.id === e.targetId);
+      const stopped = events.some((q) => q.type === 'movement-stopped' && q.playerId === e.targetId && q.attemptedTo.x === e.trigger.to.x && q.attemptedTo.y === e.trigger.to.y);
+      return `${mover.name} : ${cellLabel(e.trigger.from)} → ${cellLabel(e.trigger.to)}${stopped ? ' tenté, interrompu par le KO' : ', sortie d’allonge'}.`;
+    }).join(' ') + (opportunities.length ? ' La flèche jaune montre le pas déclencheur ; la réaction précède ce pas.' : '');
   }
   function selectPlayer(id) { selectedId = selectedId === id ? null : id; renderCourt(); renderSelected(); renderRosters(); }
   function renderSelected() {
@@ -200,7 +224,7 @@ if (root) {
     if (!p) { selected.append(element('p', 'rb-muted', 'Sélectionnez un pion ou un nom pour consulter ses caractéristiques.')); return; }
     const heading = element('div', 'rb-selected-heading'); heading.append(element('strong', `rb-${p.teamId}`, `${p.number} · ${p.name}`), element('span', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
     const stats = element('dl', 'rb-player-stats');
-    for (const [name, value] of [['CA', p.armor], ['PV', `${p.hp}/${p.maxHp}`], ['Vitesse', `${p.speed} m`], ['FOR', p.abilities.strength], ['DEX', p.abilities.dexterity], ['CON', p.abilities.constitution], ['Lutte', signed(p.skills.wrestling ?? modifier(p.abilities.strength))], ['Acrobaties', signed(p.skills.acrobatics ?? modifier(p.abilities.dexterity))]]) {
+    for (const [name, value] of [['CA', p.armor], ['PV', `${p.hp}/${p.maxHp}`], ['Vitesse', p.grappledBy ? '0 m · agrippé' : p.grappling ? `${p.speed / 2} m · lutte` : `${p.speed} m`], ['FOR', p.abilities.strength], ['DEX', p.abilities.dexterity], ['CON', p.abilities.constitution], ['Lutte', signed(p.skills.wrestling ?? modifier(p.abilities.strength))], ['Acrobaties', signed(p.skills.acrobatics ?? modifier(p.abilities.dexterity))]]) {
       const item = element('div'); item.append(element('dt', '', name), element('dd', '', String(value))); stats.append(item);
     }
     selected.append(heading, stats, element('p', 'rb-muted', `Attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants · aucune capacité spéciale.`));
@@ -219,7 +243,7 @@ if (root) {
         const copy = element('div'); copy.append(playerButton, element('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
         const health = element('div', 'rb-health'); health.append(element('span', '', `${p.hp}/${p.maxHp} PV`));
         const meter = element('meter'); meter.min = 0; meter.max = p.maxHp; meter.value = p.hp; meter.setAttribute('aria-label', `Points de vie de ${p.name}`); health.append(meter);
-        const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', state.ball.carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
+        const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', state.ball.carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
         const resource = element('small', 'rb-resource', p.hp === 0 ? 'Hors jeu' : p.reaction ? 'Réaction disponible' : 'Réaction dépensée');
         row.append(copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource); block.append(row);
       }
@@ -251,6 +275,7 @@ if (root) {
     actions.append(replay, adjust); resultPanel.append(actions);
   }
   function render(events = []) {
+    lastTurnEvents = events;
     const holder = state.players.find((p) => p.id === state.ball.carrierId);
     phaseText.textContent = state.finished ? 'Coup de sifflet final' : state.phase === 'final' ? 'Dernier engagement' : state.phase === 'overtime' ? `Prolongation ${state.round - 10}/2` : `Round ${state.round}/10`;
     timeText.textContent = state.finished ? '00:00' : state.round > 10 ? '+06' : `00:${String((11 - state.round) * 6).padStart(2, '0')}`;
