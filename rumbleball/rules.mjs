@@ -155,7 +155,7 @@ export function ballDefender(state, actor) {
 export function giveBall(state, actor, events, reason = 'récupère', recovery = true) {
   state.ball = { carrierId: actor.id, position: { ...actor.position } };
   if (recovery) state.stats[actor.teamId].recoveries++;
-  emit(state, events, 'possession', `${actor.name} ${reason} la balle.`, { playerId: actor.id, teamId: actor.teamId });
+  emit(state, events, 'possession', `${actor.name} ${reason} la balle.`, { playerId: actor.id, teamId: actor.teamId, reason });
 }
 function releaseGrapples(state, actor) {
   if (actor.grappling) {
@@ -178,7 +178,7 @@ export function dropBall(state, actor, events, attacker = null) {
     destination = options[0] ?? actor.position;
   }
   state.ball = { carrierId: null, position: { ...destination } };
-  emit(state, events, 'drop', `${actor.name} lâche la balle.`, { position: { ...destination } });
+  emit(state, events, 'drop', `${actor.name} lâche la balle.`, { playerId: actor.id, position: { ...destination } });
 }
 export function dealDamage(state, actor, target, amount, events) {
   const damage = Math.max(0, amount);
@@ -319,6 +319,16 @@ export function legalAction(state, actor, action) {
   }
 }
 export function resolveAction(state, actor, action, events = []) {
+  const firstEvent = events.length;
+  const context = { ...action, playerId: actor.id,
+    targetId: action?.targetId ?? (action?.type === 'release' ? actor.grappling : action?.type === 'escape' ? actor.grappledBy : undefined) };
+  const resolved = resolveActionEvents(state, actor, action, events);
+  // Mark the actual action, including replans and pickup follow-ups, on its first event.
+  // The narrative can group outcomes without parsing French messages or adding RNG calls.
+  if (resolved && events.length > firstEvent) events[firstEvent].resolvedAction = context;
+  return resolved;
+}
+function resolveActionEvents(state, actor, action, events) {
   if (!legalAction(state, actor, action)) return false;
   const target = playerById(state, action.targetId);
   if (action.type === 'wait') { actor.action = false; emit(state, events, 'wait', `${actor.name} tient sa position.`); return true; }

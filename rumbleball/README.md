@@ -15,10 +15,10 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prot
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/narration.test.mjs
 ```
 
-Les tests couvrent les règles, les décisions, la reproduction pas à pas et 500 matchs. Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
+Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs et le journal narratif (traînage, réactions, KO, passes, replanification). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
 
 ## Organisation
 
@@ -27,6 +27,7 @@ Les tests couvrent les règles, les décisions, la reproduction pas à pas et 50
 - `ai.mjs` : plan collectif et évaluation des décisions, sans modification des statistiques.
 - `engine.mjs` : initialisation et orchestration, indépendantes de l’affichage.
 - `ui.mjs` et `rumbleball.css` : préparation, terrain SVG, lecture et journal.
+- `narration.mjs` : résumé narratif des événements exécutés, sans accès au hasard ni modification de l’état. Les détails et jets originaux restent dépliables dans leur ordre chronologique. Les distances correspondent aux cases parcourues, pas au coût en mouvement.
 - `visuals.mjs` : écussons, marquages du terrain et pions SVG, indépendants des règles.
 - `assets/arena-banner.webp` : illustration d’arène (154 Ko). Le [prompt de génération](assets/README.md) est conservé avec le visuel.
 

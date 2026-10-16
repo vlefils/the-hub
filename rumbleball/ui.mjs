@@ -2,6 +2,7 @@ import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier
 import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
 import { arenaBackdrop, pawnArtwork, svg, teamCrest } from './visuals.mjs';
+import { narrateTurn } from './narration.mjs';
 
 const root = document.querySelector('[data-rumbleball]');
 const section = root?.closest('[data-section]');
@@ -102,7 +103,7 @@ if (root) {
   const journalPanel = element('section', 'rb-journal-panel');
   const journalHead = element('div', 'rb-journal-head');
   journalHead.append(element('h3', '', 'Le fil du match'));
-  const journalCaption = element('span', 'rb-muted', 'Actions et jets consultables'); journalHead.append(journalCaption);
+  const journalCaption = element('span', 'rb-muted', 'Le match raconté · détails dépliables'); journalHead.append(journalCaption);
   const journal = element('ol', 'rb-journal'); journal.setAttribute('aria-label', 'Journal chronologique du match'); journal.tabIndex = 0;
   const emptyJournal = element('li', 'rb-journal-empty', 'Le coup d’envoi approche. Préparez vos cinq joueurs, puis lancez le match.'); journal.append(emptyJournal);
   journalPanel.append(journalHead, journal); matchLayout.append(fieldColumn, journalPanel); root.append(matchLayout);
@@ -149,18 +150,19 @@ if (root) {
     const actor = state.players.find((p) => p.id === decision?.playerId);
     heading.append(element('span', actor ? `rb-${actor.teamId}` : '', actor ? actor.name : 'Arbitrage'), element('small', '', `R${first.round} · ${String(++journalCount).padStart(2, '0')}`));
     item.append(heading);
-    if (decision) item.append(element('p', 'rb-intention', decision.message.split(' · ').slice(1).join(' · ')));
-    const main = events.filter((e) => !['decision', 'roll'].includes(e.type));
-    for (const event of main) {
-      const line = element('p', ['possession', 'finish', 'ko', 'overtime', 'restart'].includes(event.type) ? 'rb-event-important' : '', event.message);
+    const narrative = narrateTurn(events, state.players);
+    if (narrative.text) item.append(element('p', 'rb-narrative', narrative.text));
+    for (const event of narrative.announcements) {
+      const line = element('p', 'rb-event-important', event.message);
       line.dataset.event = event.type; item.append(line);
     }
-    const rolls = events.filter((e) => e.type === 'roll');
-    if (rolls.length) {
-      const details = element('details', 'rb-rolls'); details.append(element('summary', '', `Voir les jets (${rolls.length})`));
-      for (const roll of rolls) details.append(element('p', '', roll.message));
-      item.append(details);
+    const details = element('details', 'rb-rolls rb-turn-details');
+    details.append(element('summary', '', 'Détails et jets'));
+    for (const event of events) {
+      const line = element('p', event.type === 'decision' ? 'rb-intention' : '', event.message);
+      line.dataset.event = event.type; details.append(line);
     }
+    item.append(details);
     journal.append(item);
     if (follow) journal.scrollTop = journal.scrollHeight;
   }

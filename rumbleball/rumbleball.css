@@ -171,6 +171,7 @@
 .rb-turn-heading { display: flex; justify-content: space-between; gap: .5rem; font-size: .9375rem; font-weight: 700; }
 .rb-turn-heading small { color: var(--muted); white-space: nowrap; font-size: .75rem; font-weight: 400; }
 .rb-turn p { color: #c4cbbf; font-size: .875rem; line-height: 1.65; margin-top: .4rem; overflow-wrap: anywhere; }
+.rb-turn .rb-narrative { color: var(--text); font-size: .9375rem; }
 .rb-turn .rb-intention { color: #9ba991; font-size: .8125rem; margin: .3rem 0 .65rem; }
 .rb-event-important { font-weight: 700; }
 .rb-turn [data-event='ko'] { color: #f4a070; }
@@ -178,6 +179,8 @@
 .rb-rolls { margin-top: .6rem; color: var(--muted); font-size: .8125rem; }
 .rb-rolls summary { cursor: pointer; }
 .rb-rolls p { font-variant-numeric: tabular-nums; }
+.rb-turn-details[open] { padding-left: .75rem; border-left: 2px solid var(--rb-line); }
+.rb-turn-details p { font-size: .8125rem; }
 .rb-result { --rb-result-accent: var(--rb-home); margin: 1.75rem 0; padding: clamp(1rem, 2vw, 1.5rem); background: #1c2b23; border-left: 4px solid var(--rb-result-accent); }
 .rb-result[data-winner='away'] { --rb-result-accent: var(--rb-away); background: #2c241e; }
 .rb-result[data-winner='draw'] { --rb-result-accent: var(--rb-ball); }
