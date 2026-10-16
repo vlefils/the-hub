@@ -3,6 +3,8 @@ import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
 import { arenaBackdrop, pawnArtwork, svg, teamCrest } from './visuals.mjs';
 import { narrateTurn } from './narration.mjs';
+import { courtPoint, createCourtPlayback } from './playback.mjs';
+import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
 
 const root = document.querySelector('[data-rumbleball]');
 const section = root?.closest('[data-section]');
@@ -92,9 +94,16 @@ if (root) {
   arrow.append(svg('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: '#ffdb78' })); definitions.append(arrow); court.append(definitions);
   court.append(arenaBackdrop(WET_CELLS));
   const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { 'aria-hidden': 'true' });
-  court.append(trace, pawns, ballLayer);
+  const links = svg('g', { class: 'rb-court-links', 'aria-hidden': 'true' });
+  const effects = svg('g', { class: 'rb-court-effects', 'aria-hidden': 'true' });
+  const pawnNodes = new Map();
+  const ballSprite = svg('g'); const ballHalo = svg('circle', { r: 20, class: 'rb-ball-halo' });
+  const ballBody = svg('ellipse', { transform: 'rotate(-35)', class: 'rb-ball' });
+  ballSprite.append(ballHalo, ballBody, svg('path', { d: 'M-4,0h8 M0,-4v8', class: 'rb-ball-seam' })); ballLayer.append(ballSprite);
+  court.append(trace, links, pawns, ballLayer, effects);
+  const courtPlayback = createCourtPlayback(renderCourtFrame);
   const legend = element('div', 'rb-legend');
-  for (const [cls, text] of [['home', 'Recrues'], ['away', 'Charognards'], ['ball', 'Ballon'], ['wet', 'Sol humide · coût ×2']]) {
+  for (const [cls, text] of [['home', 'Recrues'], ['away', 'Charognards'], ['ball', 'Ballon'], ['wet', 'Sol humide · coût ×2'], ['impact', 'Impact / dégâts'], ['grapple', 'Lutte']]) {
     const item = element('span'); item.append(element('i', `rb-swatch rb-swatch-${cls}`), document.createTextNode(text)); legend.append(item);
   }
   const initiative = element('div', 'rb-initiative'); initiative.setAttribute('aria-label', 'Ordre d’initiative');
@@ -136,6 +145,7 @@ if (root) {
   function setRunning(value) {
     running = value && started && !state.finished && visible();
     clearTimeout(timer); timer = null;
+    if (!running) courtPlayback.settle();
     pause.textContent = running ? 'Pause' : 'Reprendre';
     status.textContent = !started ? 'Prêt au coup d’envoi' : state.finished ? 'Match terminé' : running ? 'Match en cours' : 'Lecture en pause';
     if (running) timer = setTimeout(tick, TURN_DELAY_MS / speed);
@@ -170,26 +180,19 @@ if (root) {
   function renderCourt(events = lastTurnEvents) {
     // Reuse pawn nodes: preserve keyboard focus and keep SVG updates inexpensive.
     for (const p of state.players) {
-      let node = pawns.querySelector(`[data-player="${p.id}"]`);
+      let node = pawnNodes.get(p.id);
       if (!node) {
         node = svg('g', { 'data-player': p.id, role: 'button', tabindex: 0 });
         node.append(pawnArtwork(p));
         node.addEventListener('click', () => selectPlayer(p.id));
         node.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectPlayer(p.id); } });
-        pawns.append(node);
+        pawns.append(node); pawnNodes.set(p.id, node);
       }
-      node.setAttribute('transform', `translate(${p.position.x * 60 + 30} ${p.position.y * 60 + 30})`);
       node.setAttribute('class', `rb-pawn rb-${p.teamId}${p.hp === 0 ? ' is-ko' : ''}${state.activeId === p.id ? ' is-active' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
-      node.setAttribute('aria-label', `${p.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${state.ball.carrierId === p.id ? ', porte la balle' : ''}`);
+      node.setAttribute('aria-label', `${p.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${p.grappledBy ? ', agrippé' : ''}${p.prone ? ', à terre' : ''}${state.ball.carrierId === p.id ? ', porte la balle' : ''}`);
       node.setAttribute('aria-pressed', String(selectedId === p.id));
-      node.querySelector('text').textContent = p.hp === 0 ? '×' : String(p.number);
-      node.querySelector('.rb-pawn-health').setAttribute('width', String(32 * p.hp / p.maxHp));
     }
-    ballLayer.replaceChildren();
-    const holder = state.players.find((p) => p.id === state.ball.carrierId);
-    const x = state.ball.position.x * 60 + 30 + (holder ? 17 : 0), y = state.ball.position.y * 60 + 30 - (holder ? 17 : 0);
-    if (!holder) ballLayer.append(svg('circle', { cx: x, cy: y, r: 20, class: 'rb-ball-halo' }));
-    ballLayer.append(svg('ellipse', { cx: x, cy: y, rx: holder ? 11 : 15, ry: holder ? 7 : 10, transform: `rotate(-35 ${x} ${y})`, class: 'rb-ball' }), svg('path', { d: `M${x - 4},${y}h8 M${x},${y - 4}v8`, class: 'rb-ball-seam' }));
+    courtPlayback.show(state);
     trace.replaceChildren();
     for (const movement of events.filter((e) => e.type === 'move' || e.type === 'drag')) {
       const points = [movement.from, ...movement.path].map((p) => `${p.x * 60 + 30},${p.y * 60 + 30}`).join(' ');
@@ -215,7 +218,29 @@ if (root) {
       return `${mover.name} : ${cellLabel(e.trigger.from)} → ${cellLabel(e.trigger.to)}${stopped ? ' tenté, interrompu par le KO' : ', sortie d’allonge'}.`;
     }).join(' ') + (opportunities.length ? ' La flèche jaune montre le pas déclencheur ; la réaction précède ce pas.' : '');
   }
-  function selectPlayer(id) { selectedId = selectedId === id ? null : id; renderCourt(); renderSelected(); renderRosters(); }
+  function renderCourtFrame(frame) {
+    for (const p of frame.players) {
+      const node = pawnNodes.get(p.id);
+      if (!node) continue;
+      const point = courtPoint(p.position);
+      node.setAttribute('transform', `translate(${point.x} ${point.y})`);
+      node.classList.toggle('is-ko', p.hp === 0); node.classList.toggle('is-prone', p.prone);
+      node.querySelector('.rb-pawn-number').textContent = p.hp === 0 ? '×' : String(p.number);
+      node.querySelector('.rb-pawn-health').setAttribute('width', String(32 * p.hp / p.maxHp));
+    }
+    ballSprite.setAttribute('transform', `translate(${frame.ballPoint.x} ${frame.ballPoint.y})`);
+    const carried = Boolean(frame.ball.carrierId);
+    ballHalo.setAttribute('visibility', carried || frame.flying ? 'hidden' : 'visible');
+    ballBody.setAttribute('rx', carried ? 11 : 15); ballBody.setAttribute('ry', carried ? 7 : 10);
+    drawCourtLinks(links, frame.players); drawCourtEffects(effects, frame.effects);
+  }
+  function selectPlayer(id) {
+    selectedId = selectedId === id ? null : id;
+    for (const [playerId, node] of pawnNodes) {
+      node.classList.toggle('is-selected', playerId === selectedId); node.setAttribute('aria-pressed', String(playerId === selectedId));
+    }
+    renderSelected(); renderRosters();
+  }
   function renderSelected() {
     selected.replaceChildren();
     const p = state.players.find((p) => p.id === selectedId);
@@ -304,10 +329,13 @@ if (root) {
     if (focusedOrder) initiative.querySelector(`[data-rb-order="${focusedOrder}"]`)?.focus({ preventScroll: true });
     if (state.finished) renderResult();
   }
-  function advance() {
+  function advance({ animate = true } = {}) {
     try {
+      courtPlayback.settle();
+      const before = state;
       const turn = stepMatch(state); state = turn.state; appendEvents(turn.events); render(turn.events);
       if (state.finished) { setRunning(false); status.textContent = 'Match terminé'; }
+      if (animate && visible()) courtPlayback.play(before, state, turn.events, Math.min(560, TURN_DELAY_MS / speed * .78));
     } catch (error) {
       setRunning(false); errorBox.hidden = false; errorBox.textContent = `La simulation a été interrompue. Code du match : ${state.seed}. ${error.message}`;
     }
@@ -331,10 +359,10 @@ if (root) {
   });
   pause.addEventListener('click', () => setRunning(!running));
   next.addEventListener('click', () => { setRunning(false); if (started && !state.finished) advance(); });
-  speedSelect.addEventListener('change', () => { speed = Number(speedSelect.value); if (running) setRunning(true); });
+  speedSelect.addEventListener('change', () => { courtPlayback.settle(); speed = Number(speedSelect.value); if (running) setRunning(true); });
   finish.addEventListener('click', () => {
     setRunning(false);
-    while (!state.finished && errorBox.hidden) advance();
+    while (!state.finished && errorBox.hidden) advance({ animate: false });
     if (state.finished) resultPanel.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   });
   document.addEventListener('hub:sectionchange', (event) => { if (event.detail.id !== 'outils-rumbleball') setRunning(false); });

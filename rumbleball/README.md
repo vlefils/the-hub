@@ -15,10 +15,10 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prot
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/narration.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs
 ```
 
-Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs et le journal narratif (traînage, réactions, KO, passes, replanification). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
+Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
 
 ## Organisation
 
@@ -29,9 +29,13 @@ Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 
 - `ui.mjs` et `rumbleball.css` : préparation, terrain SVG, lecture et journal.
 - `narration.mjs` : résumé narratif des événements exécutés, sans accès au hasard ni modification de l’état. Les détails et jets originaux restent dépliables dans leur ordre chronologique. Les distances correspondent aux cases parcourues, pas au coût en mouvement.
 - `visuals.mjs` : écussons, marquages du terrain et pions SVG, indépendants des règles.
+- `playback.mjs` : chronologie de présentation issue des événements exécutés, interpolée avec une seule boucle d’animation. Les trajets suivent les cases réellement parcourues ; le lutteur, sa cible et leur balle se déplacent ensemble. Les effets apparaissent après l’approche, au moment de l’action.
+- `court-effects.mjs` : liens de lutte et effets SVG brefs (frappe, réaction, dégâts, raté, KO, possession et plaquage).
 - `assets/arena-banner.webp` : illustration d’arène (154 Ko). Le [prompt de génération](assets/README.md) est conservé avec le visuel.
 
 L’habillage reste limité à `#outils-rumbleball` et aux composants `rb-*`. Turquoise et orange identifient les équipes ; les pions ont également des formes différentes. Le jaune marque le ballon, la sélection et les réactions. Les PV des pions et le nombre de joueurs encore en jeu reprennent l’état de la simulation. La bannière se sépare du texte sur petit écran ; le journal passe sous le terrain. Les illustrations et marquages décoratifs sont ignorés par les lecteurs d’écran.
+
+Les séquences visuelles durent au maximum 560 ms, et restent sous 78 % de l’intervalle entre deux tours aux vitesses élevées (195 ms à ×8). Pause, changement de vitesse, navigation et masquage de l’onglet terminent la séquence à l’état réel du tour et retirent les effets. « Voir le résultat » saute les animations ; sélectionner un pion ne les relance pas. La préférence système `prefers-reduced-motion` désactive glissements et effets transitoires. Ces animations ne modifient ni l’état du moteur ni son hasard.
 
 API du moteur : `createMatch(config)` retourne un état ; `stepMatch(state)` retourne `{ state, events }` sans modifier son entrée ; `simulateMatch(config, onTurn?)` retourne le même résultat en une seule exécution. La graine et l’état du générateur aléatoire font partie de l’état du match. L’interface conserve les événements séparément et sa vitesse ne consomme jamais d’aléatoire.
 

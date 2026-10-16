@@ -56,6 +56,7 @@ export function pawnArtwork(player) {
   const shape = player.teamId === 'home' ? ['circle', { r: 19 }] : ['path', { d: 'M0-22 22 0 0 22-22 0Z' }];
   group.append(svg(shape[0], { ...shape[1], class: 'rb-pawn-disc' }), svg(shape[0], { ...shape[1], fill: 'url(#rb-pawn-metal)' }));
   group.append(svg('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-pawn-number' }, String(player.number)),
+    svg('path', { d: 'M-11 16H11M-7 12-11 16-7 20', class: 'rb-prone-mark' }),
     svg('rect', { x: -16, y: 26, width: 32, height: 3, class: 'rb-pawn-health-track' }),
     svg('rect', { x: -16, y: 26, width: 32, height: 3, class: 'rb-pawn-health' }));
   return group;

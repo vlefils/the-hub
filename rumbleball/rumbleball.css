@@ -131,6 +131,20 @@
 .rb-pawn-health { fill: currentColor; }
 .rb-pawn.is-ko { opacity: .3; }
 .rb-pawn.is-ko .rb-pawn-disc { fill: #7e8880; }
+.rb-prone-mark { display: none; fill: none; stroke: #142019; stroke-width: 2.5; }
+.rb-pawn.is-prone:not(.is-ko) .rb-prone-mark { display: block; }
+.rb-court-links, .rb-court-effects { pointer-events: none; }
+.rb-grapple-link { fill: none; stroke: #c8dcb4; stroke-width: 4; stroke-dasharray: 5 3; }
+.rb-chain-link { fill: #17201a; stroke: #c8dcb4; stroke-width: 2; }
+.rb-map-effect { color: #dce5d2; }
+.rb-effect-attack, .rb-effect-damage, .rb-effect-ko, .rb-effect-prone { color: #ff9a87; }
+.rb-effect-opportunity, .rb-effect-possession { color: var(--rb-ball); }
+.rb-effect-grapple, .rb-effect-help { color: #c8e8b0; }
+.rb-effect-ring { fill: none; stroke: currentColor; stroke-width: 3; }
+.rb-impact-line { stroke: currentColor; stroke-width: 4; stroke-linecap: round; }
+.rb-impact-slash { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; }
+.rb-effect-label { fill: currentColor; stroke: #101716; stroke-width: 4; paint-order: stroke; stroke-linejoin: round; font-family: 'Space Grotesk', Arial, sans-serif; font-size: 24px; font-weight: 700; }
+.rb-effect-damage .rb-effect-label, .rb-effect-ko .rb-effect-label { font-size: 28px; }
 .rb-ball { fill: var(--rb-ball); stroke: #18201a; stroke-width: 2.5; }
 .rb-ball-seam { stroke: #63562b; stroke-width: 1.5; }
 .rb-ball-halo { fill: none; stroke: var(--rb-ball); stroke-width: 1.5; stroke-dasharray: 3 4; }
@@ -147,6 +161,8 @@
 .rb-swatch-away { background: var(--rb-away); transform: rotate(45deg); }
 .rb-swatch-ball { background: var(--rb-ball); border-radius: 50%; }
 .rb-swatch-wet { background: #466874; }
+.rb-swatch-impact { background: #ff9a87; }
+.rb-swatch-grapple { width: .85rem; height: 0; border-top: 2px dashed #c8dcb4; }
 .rb-initiative { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin: 1rem 0; }
 .rb-initiative > span { margin-right: .25rem; }
 .rb-order-token { display: grid; place-items: center; background: #19241d; border: 1px solid #4d5c4f; border-radius: 2px; min-width: 2rem; min-height: 2rem; padding: .2rem; font: 700 .8125rem 'Space Grotesk', sans-serif; cursor: pointer; }
@@ -261,6 +277,7 @@
   .rb .rb-setup-row { grid-template-columns: minmax(0, 1fr); }
 }
 @media print {
+  .rb-court-effects { display: none; }
   .rb-hero-art, .rb-hero::after, .rb-setup, .rb-toolbar, .rb-journal-panel, .rb-rules, .rb-result .rb-controls { display: none !important; }
   #outils-rumbleball { --text: #111; --muted: #444; background: #fff; }
   .rb-hero { min-height: 0; padding: 0; border: 0; background: none; }
