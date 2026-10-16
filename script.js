@@ -300,7 +300,9 @@ const updateReadingNavigation = (section, currentId = section.id) => {
   } else if (section.id === "lore-factions") {
     sidebarLinks.filter((link) => sectionNavRoots.get(link.hash.slice(1)) === section.id).forEach((link) => addJump(document.getElementById(link.hash.slice(1)), link.textContent.trim()));
   } else {
-    section.querySelectorAll("h3").forEach((heading) => addJump(heading, heading.textContent.trim()));
+    if (!section.hasAttribute("data-reader-app")) {
+      section.querySelectorAll("h3").forEach((heading) => addJump(heading, heading.textContent.trim()));
+    }
   }
   if (pageJump) {
     pageJump.replaceChildren(new Option("Aller à…", ""));
@@ -524,6 +526,7 @@ const showSection = (id, scroll = true) => {
   activateSidebarLink(activeNavId);
   syncSidebarSubgroups(activeNavId);
   updateReadingNavigation(target, activeNavId);
+  document.dispatchEvent(new CustomEvent('hub:sectionchange', { detail: { id: target.id } }));
   closeMenu();
   if (fromNavigation) {
     const heading = target.querySelector('h1, h2');

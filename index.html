@@ -16,9 +16,11 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="ui-refresh.css" />
+    <link rel="stylesheet" href="rumbleball/rumbleball.css" />
     <script src="playtest-notes.js" defer></script>
     <script src="script.js" defer></script>
     <script src="catalogue.js" defer></script>
+    <script type="module" src="rumbleball/ui.mjs"></script>
   </head>
   <body>
     <a class="skip-link" href="#contenu" data-skip-content>Aller au contenu</a>
@@ -170,6 +172,7 @@
               <a href="#pretire-mara-rail-voss">Mara &ldquo;Rail&rdquo; Voss</a>
             </div>
             <a href="#outils-fiche">Fiche PJ</a>
+            <a href="#outils-rumbleball">Rumbleball <small class="nav-status">Prototype</small></a>
             <a href="#outils-tables">Tables rapides <small class="nav-status">Bientôt</small></a>
             <a href="#outils-mj">Aides MJ <small class="nav-status">Bientôt</small></a>
           </nav>
@@ -4826,6 +4829,11 @@
             </div>
 
             <div class="tool-grid">
+              <a class="tool-card tool-card--available" href="#outils-rumbleball">
+                <span class="tool-card-index">RB</span>
+                <span class="tool-card-copy"><strong>Rumbleball</strong><small>Préparer cinq joueurs et observer un match automatique. La balle à la sirène fait la victoire.</small></span>
+                <span class="tool-card-action">Jouer <span aria-hidden="true">&rarr;</span></span>
+              </a>
               <a class="tool-card tool-card--available" href="#outils-pretires">
                 <span class="tool-card-index">01</span>
                 <span class="tool-card-copy"><strong>Personnages pre-tires</strong><small>Choisir une operatrice complete, consulter sa fiche et l&rsquo;imprimer.</small></span>
@@ -4846,6 +4854,15 @@
                 <span class="tool-card-copy"><strong>Aides MJ</strong><small>Fronts, horloges et rappels pour maintenir la pression.</small></span>
                 <span class="tool-card-status">En preparation</span>
               </article>
+            </div>
+          </section>
+
+          <section class="page-section panel" id="outils-rumbleball" data-section data-category="outils" data-reader-app>
+            <div class="section-heading"><p class="section-kicker">Outils · Prototype</p><div><h2>Rumbleball</h2></div></div>
+            <p>Cinq contre cinq. Une minute. L’équipe qui tient la balle à la sirène remporte le match.</p>
+            <div data-rumbleball>
+              <p role="status">Chargement du terrain…</p>
+              <noscript>Activez JavaScript pour préparer votre équipe et simuler un match.</noscript>
             </div>
           </section>
 

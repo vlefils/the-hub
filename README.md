@@ -27,5 +27,7 @@ Base de site statique responsive en francais pour publier les regles d'un jeu de
 
 ## Notes
 
+- Le prototype **Outils → Rumbleball** simule des matchs à cinq contre cinq. Lancer `node tools/serve.mjs` pour l’essayer en local ; voir [sa documentation](rumbleball/README.md) pour les règles et les tests.
+
 - Les chemins sont relatifs, donc le site fonctionne directement sur GitHub Pages.
 - Sans JavaScript, tout reste charge dans la page mais la navigation par section visible ne sera pas active.
