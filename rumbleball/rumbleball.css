@@ -105,7 +105,7 @@
 .rb-controls { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 .rb-speed { display: flex; gap: .4rem; align-items: center; font-size: .8125rem; color: var(--muted); }
 .rb-speed select { width: 4.4rem; }
-.rb-playback-status { font-size: .8125rem; color: var(--muted); }
+.rb-playback-status { max-width: 100%; font-size: .875rem; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
 
 /* Code-drawn arena markings and pawns remain sharp at every viewport size. */
 .rb-match-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(17rem, 1fr); gap: 1.4rem; align-items: start; }
@@ -124,9 +124,11 @@
 .rb-pawn-disc { fill: currentColor; stroke: #111b18; stroke-width: 2; }
 .rb-pawn-number { fill: #101b17; font-family: 'Space Grotesk', Arial, sans-serif; font-size: 22px; font-weight: 700; }
 .rb-pawn-ring { fill: none; stroke: none; }
-.rb-pawn.is-active .rb-pawn-ring { stroke: #f0eee2; stroke-width: 2; stroke-dasharray: 3 5; }
 .rb-pawn.is-selected .rb-pawn-ring { stroke: var(--rb-ball); stroke-width: 3; stroke-dasharray: none; }
 .rb-pawn:focus-visible .rb-pawn-ring { stroke: var(--rb-ball); stroke-width: 3; stroke-dasharray: none; }
+.rb-turn-marker { pointer-events: none; fill: none; stroke-linejoin: round; }
+.rb-turn-marker-outline { stroke: #101716; stroke-width: 7; }
+.rb-turn-marker-corners { stroke: #f0eee2; stroke-width: 3.5; }
 .rb-pawn-health-track { fill: #0b1310; }
 .rb-pawn-health { fill: currentColor; }
 .rb-pawn.is-ko { opacity: .3; }
@@ -166,7 +168,7 @@
 .rb-initiative { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin: 1rem 0; }
 .rb-initiative > span { margin-right: .25rem; }
 .rb-order-token { display: grid; place-items: center; background: #19241d; border: 1px solid #4d5c4f; border-radius: 2px; min-width: 2rem; min-height: 2rem; padding: .2rem; font: 700 .8125rem 'Space Grotesk', sans-serif; cursor: pointer; }
-.rb-order-token.is-active { background: #3b4631; border-color: #d8dfb8; }
+.rb-order-token.is-active { background: #34413b; border-color: #f0eee2; box-shadow: inset 0 0 0 1px #f0eee2; }
 .rb-order-token.is-ko { opacity: .3; }
 .rb-selected { min-height: 3.5rem; padding: 1rem 0; border-top: 1px solid var(--rb-line); }
 .rb-selected-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem; margin-bottom: .8rem; }

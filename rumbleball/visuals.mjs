@@ -49,6 +49,13 @@ export function arenaBackdrop(wetCells) {
   return background;
 }
 
+export function turnMarkerArtwork() {
+  const marker = svg('g', { class: 'rb-turn-marker', 'aria-hidden': 'true', visibility: 'hidden' });
+  const corners = 'M-28-16V-28H-16M16-28H28V-16M28 16V28H16M-16 28H-28V16';
+  marker.append(svg('path', { d: corners, class: 'rb-turn-marker-outline' }), svg('path', { d: corners, class: 'rb-turn-marker-corners' }));
+  return marker;
+}
+
 export function pawnArtwork(player) {
   const group = svg('g', { 'aria-hidden': 'true' });
   group.append(svg('circle', { r: 27, class: 'rb-pawn-ring' }),

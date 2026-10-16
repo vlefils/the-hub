@@ -1,7 +1,7 @@
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
-import { arenaBackdrop, pawnArtwork, svg, teamCrest } from './visuals.mjs';
+import { arenaBackdrop, pawnArtwork, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
 import { narrateTurn } from './narration.mjs';
 import { courtPoint, createCourtPlayback, nextCourtTurnDelay } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
@@ -95,11 +95,12 @@ if (root) {
   const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { 'aria-hidden': 'true' });
   const links = svg('g', { class: 'rb-court-links', 'aria-hidden': 'true' });
   const effects = svg('g', { class: 'rb-court-effects', 'aria-hidden': 'true' });
+  const turnMarker = turnMarkerArtwork();
   const pawnNodes = new Map();
   const ballSprite = svg('g'); const ballHalo = svg('circle', { r: 20, class: 'rb-ball-halo' });
   const ballBody = svg('ellipse', { transform: 'rotate(-35)', class: 'rb-ball' });
   ballSprite.append(ballHalo, ballBody, svg('path', { d: 'M-4,0h8 M0,-4v8', class: 'rb-ball-seam' })); ballLayer.append(ballSprite);
-  court.append(trace, links, pawns, ballLayer, effects);
+  court.append(trace, links, pawns, turnMarker, ballLayer, effects);
   const courtPlayback = createCourtPlayback(renderCourtFrame);
   const legend = element('div', 'rb-legend');
   for (const [cls, text] of [['home', 'Recrues'], ['away', 'Charognards'], ['ball', 'Ballon'], ['wet', 'Sol humide · coût ×2'], ['impact', 'Impact / dégâts'], ['grapple', 'Lutte']]) {
@@ -146,8 +147,16 @@ if (root) {
     clearTimeout(timer); timer = null;
     if (!running) courtPlayback.settle();
     pause.textContent = running ? 'Pause' : 'Reprendre';
-    status.textContent = !started ? 'Prêt au coup d’envoi' : state.finished ? 'Match terminé' : running ? 'Match en cours' : 'Lecture en pause';
+    renderPlaybackStatus();
     if (running) scheduleNextTurn();
+  }
+  function renderPlaybackStatus() {
+    const actor = state.players.find((p) => p.id === state.activeId);
+    if (!started || state.finished || !actor) {
+      status.textContent = !started ? 'Prêt au coup d’envoi' : state.finished ? 'Match terminé' : running ? 'Match en cours' : 'Lecture en pause';
+      return;
+    }
+    status.replaceChildren(document.createTextNode(running ? 'Tour de ' : 'Pause · tour de '), element('strong', `rb-${actor.teamId}`, actor.name));
   }
   function scheduleNextTurn() {
     timer = setTimeout(tick, nextCourtTurnDelay(courtPlayback.remaining(), speed));
@@ -191,7 +200,8 @@ if (root) {
         pawns.append(node); pawnNodes.set(p.id, node);
       }
       node.setAttribute('class', `rb-pawn rb-${p.teamId}${p.hp === 0 ? ' is-ko' : ''}${state.activeId === p.id ? ' is-active' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
-      node.setAttribute('aria-label', `${p.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${p.grappledBy ? ', agrippé' : ''}${p.prone ? ', à terre' : ''}${state.ball.carrierId === p.id ? ', porte la balle' : ''}`);
+      node.setAttribute('aria-label', `${p.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${p.grappledBy ? ', agrippé' : ''}${p.prone ? ', à terre' : ''}${state.ball.carrierId === p.id ? ', porte la balle' : ''}${state.activeId === p.id ? ', tour en cours' : ''}`);
+      node.setAttribute('aria-current', String(state.activeId === p.id));
       node.setAttribute('aria-pressed', String(selectedId === p.id));
     }
     courtPlayback.show(state);
@@ -221,6 +231,12 @@ if (root) {
     }).join(' ') + (opportunities.length ? ' La flèche jaune montre le pas déclencheur ; la réaction précède ce pas.' : '');
   }
   function renderCourtFrame(frame) {
+    const actor = frame.players.find((p) => p.id === state.activeId);
+    turnMarker.setAttribute('visibility', actor ? 'visible' : 'hidden');
+    if (actor) {
+      const point = courtPoint(actor.position);
+      turnMarker.setAttribute('transform', `translate(${point.x} ${point.y})`);
+    }
     for (const p of frame.players) {
       const node = pawnNodes.get(p.id);
       if (!node) continue;
@@ -304,6 +320,7 @@ if (root) {
   }
   function render(events = []) {
     lastTurnEvents = events;
+    renderPlaybackStatus();
     const holder = state.players.find((p) => p.id === state.ball.carrierId);
     phaseText.textContent = state.finished ? 'Coup de sifflet final' : state.phase === 'final' ? 'Dernier engagement' : state.phase === 'overtime' ? `Prolongation ${state.round - 10}/2` : `Round ${state.round}/10`;
     timeText.textContent = state.finished ? '00:00' : state.round > 10 ? '+06' : `00:${String((11 - state.round) * 6).padStart(2, '0')}`;
@@ -324,7 +341,8 @@ if (root) {
     for (const id of state.initiative) {
       const p = state.players.find((q) => q.id === id);
       const chip = button(String(p.number), `rb-order-token rb-${p.teamId}${p.id === state.activeId ? ' is-active' : ''}${p.hp === 0 ? ' is-ko' : ''}`);
-      chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${p.id === state.activeId ? ', dernier joueur actif' : ''}`); chip.title = `${p.name} · initiative ${p.initiative}`;
+      chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${p.id === state.activeId ? ', tour en cours' : ''}`); chip.title = `${p.name} · initiative ${p.initiative}`;
+      chip.setAttribute('aria-current', String(p.id === state.activeId));
       chip.dataset.rbOrder = p.id;
       chip.addEventListener('click', () => selectPlayer(p.id)); initiative.append(chip);
     }
