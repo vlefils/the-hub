@@ -27,6 +27,10 @@ Les tests couvrent les règles, les décisions, la reproduction pas à pas et 50
 - `ai.mjs` : plan collectif et évaluation des décisions, sans modification des statistiques.
 - `engine.mjs` : initialisation et orchestration, indépendantes de l’affichage.
 - `ui.mjs` et `rumbleball.css` : préparation, terrain SVG, lecture et journal.
+- `visuals.mjs` : écussons, marquages du terrain et pions SVG, indépendants des règles.
+- `assets/arena-banner.webp` : illustration d’arène (154 Ko). Le [prompt de génération](assets/README.md) est conservé avec le visuel.
+
+L’habillage reste limité à `#outils-rumbleball` et aux composants `rb-*`. Turquoise et orange identifient les équipes ; les pions ont également des formes différentes. Le jaune marque le ballon, la sélection et les réactions. Les PV des pions et le nombre de joueurs encore en jeu reprennent l’état de la simulation. La bannière se sépare du texte sur petit écran ; le journal passe sous le terrain. Les illustrations et marquages décoratifs sont ignorés par les lecteurs d’écran.
 
 API du moteur : `createMatch(config)` retourne un état ; `stepMatch(state)` retourne `{ state, events }` sans modifier son entrée ; `simulateMatch(config, onTurn?)` retourne le même résultat en une seule exécution. La graine et l’état du générateur aléatoire font partie de l’état du match. L’interface conserve les événements séparément et sa vitesse ne consomme jamais d’aléatoire.
 

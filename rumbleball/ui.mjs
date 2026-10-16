@@ -1,20 +1,14 @@
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
+import { arenaBackdrop, pawnArtwork, svg, teamCrest } from './visuals.mjs';
 
 const root = document.querySelector('[data-rumbleball]');
 const section = root?.closest('[data-section]');
-const SVG_NS = 'http://www.w3.org/2000/svg';
 const teamLabel = (id) => id === 'home' ? 'Les Recrues' : 'Les Charognards';
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
   if (cls) el.className = cls;
-  if (text !== undefined) el.textContent = text;
-  return el;
-};
-const svg = (tag, attributes = {}, text) => {
-  const el = document.createElementNS(SVG_NS, tag);
-  for (const [key, value] of Object.entries(attributes)) el.setAttribute(key, value);
   if (text !== undefined) el.textContent = text;
   return el;
 };
@@ -33,7 +27,7 @@ if (root) {
   const setup = element('form', 'rb-setup');
   const setupHead = element('div', 'rb-setup-head');
   const setupCopy = element('div');
-  setupCopy.append(element('h3', '', 'Préparer les Recrues'), element('p', 'rb-muted', 'Deux équipes de même niveau. Vos consignes font la différence.'));
+  setupCopy.append(element('p', 'rb-eyebrow', 'Le vestiaire'), element('h3', '', 'Préparer les Recrues'), element('p', 'rb-muted', 'Choisissez leur rôle. Donnez le ton. Ils feront le reste sur le terrain.'));
   const strategyLabel = element('label', 'rb-field', 'Plan collectif');
   const strategySelect = element('select'); strategySelect.name = 'rb-strategy'; strategySelect.append(...options(STRATEGIES, 'balanced'));
   strategyLabel.append(strategySelect); setupHead.append(setupCopy, strategyLabel); setup.append(setupHead);
@@ -67,12 +61,16 @@ if (root) {
 
   const scoreboard = element('div', 'rb-scoreboard');
   const homeScore = element('div', 'rb-team-name rb-home');
-  homeScore.append(element('strong', '', 'Les Recrues'), element('small', '', 'Votre équipe'));
+  const homeCopy = element('div', 'rb-team-copy');
+  homeCopy.append(element('strong', '', 'Les Recrues'), element('small', '', 'Votre équipe'), element('span', 'rb-team-count'));
+  homeScore.append(teamCrest('home'), homeCopy);
   const timebox = element('div', 'rb-timebox');
   const phaseText = element('span', 'rb-phase'); const timeText = element('strong', 'rb-clock'); const possessionText = element('span', 'rb-possession');
   timebox.append(phaseText, timeText, possessionText);
   const awayScore = element('div', 'rb-team-name rb-away');
-  awayScore.append(element('strong', '', 'Les Charognards'), element('small', '', 'Plan équilibré'));
+  const awayCopy = element('div', 'rb-team-copy');
+  awayCopy.append(element('strong', '', 'Les Charognards'), element('small', '', 'Plan équilibré'), element('span', 'rb-team-count'));
+  awayScore.append(teamCrest('away'), awayCopy);
   scoreboard.append(homeScore, timebox, awayScore); root.append(scoreboard);
 
   const toolbar = element('div', 'rb-toolbar');
@@ -86,19 +84,11 @@ if (root) {
 
   const matchLayout = element('div', 'rb-match-layout');
   const fieldColumn = element('div', 'rb-field-column');
-  const court = svg('svg', { viewBox: '-24 -24 746 506', class: 'rb-court', role: 'group', 'aria-label': 'Terrain Rumbleball, colonnes A à L, lignes 1 à 8. Sélectionnez un joueur pour consulter sa fiche.' });
+  const court = svg('svg', { viewBox: '-30 -38 780 544', class: 'rb-court', role: 'group', 'aria-label': 'Terrain Rumbleball, colonnes A à L, lignes 1 à 8. Sélectionnez un joueur pour consulter sa fiche.' });
   const definitions = svg('defs');
   const arrow = svg('marker', { id: 'rb-opportunity-arrow', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto' });
   arrow.append(svg('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: '#ffdb78' })); definitions.append(arrow); court.append(definitions);
-  const background = svg('g', { 'aria-hidden': 'true' });
-  background.append(svg('rect', { width: 720, height: 480, fill: '#14232c' }));
-  for (const [x, y] of WET_CELLS) background.append(svg('rect', { x: x * 60, y: y * 60, width: 60, height: 60, class: 'rb-wet' }));
-  for (let x = 0; x <= 12; x++) background.append(svg('line', { x1: x * 60, y1: 0, x2: x * 60, y2: 480, class: 'rb-grid' }));
-  for (let y = 0; y <= 8; y++) background.append(svg('line', { x1: 0, y1: y * 60, x2: 720, y2: y * 60, class: 'rb-grid' }));
-  background.append(svg('line', { x1: 360, y1: 0, x2: 360, y2: 480, class: 'rb-center-line' }), svg('circle', { cx: 360, cy: 240, r: 48, class: 'rb-center-circle' }));
-  for (let x = 0; x < 12; x++) background.append(svg('text', { x: x * 60 + 30, y: -10, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-axis' }, String.fromCharCode(65 + x)));
-  for (let y = 0; y < 8; y++) background.append(svg('text', { x: -12, y: y * 60 + 30, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-axis' }, String(y + 1)));
-  court.append(background);
+  court.append(arenaBackdrop(WET_CELLS));
   const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { 'aria-hidden': 'true' });
   court.append(trace, pawns, ballLayer);
   const legend = element('div', 'rb-legend');
@@ -161,7 +151,10 @@ if (root) {
     item.append(heading);
     if (decision) item.append(element('p', 'rb-intention', decision.message.split(' · ').slice(1).join(' · ')));
     const main = events.filter((e) => !['decision', 'roll'].includes(e.type));
-    for (const event of main) item.append(element('p', ['possession', 'finish', 'ko', 'overtime', 'restart'].includes(event.type) ? 'rb-event-important' : '', event.message));
+    for (const event of main) {
+      const line = element('p', ['possession', 'finish', 'ko', 'overtime', 'restart'].includes(event.type) ? 'rb-event-important' : '', event.message);
+      line.dataset.event = event.type; item.append(line);
+    }
     const rolls = events.filter((e) => e.type === 'roll');
     if (rolls.length) {
       const details = element('details', 'rb-rolls'); details.append(element('summary', '', `Voir les jets (${rolls.length})`));
@@ -177,7 +170,7 @@ if (root) {
       let node = pawns.querySelector(`[data-player="${p.id}"]`);
       if (!node) {
         node = svg('g', { 'data-player': p.id, role: 'button', tabindex: 0 });
-        node.append(svg('circle', { r: 21, class: 'rb-pawn-disc' }), svg('text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-pawn-number' }, String(p.number)));
+        node.append(pawnArtwork(p));
         node.addEventListener('click', () => selectPlayer(p.id));
         node.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectPlayer(p.id); } });
         pawns.append(node);
@@ -187,11 +180,13 @@ if (root) {
       node.setAttribute('aria-label', `${p.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${state.ball.carrierId === p.id ? ', porte la balle' : ''}`);
       node.setAttribute('aria-pressed', String(selectedId === p.id));
       node.querySelector('text').textContent = p.hp === 0 ? '×' : String(p.number);
+      node.querySelector('.rb-pawn-health').setAttribute('width', String(32 * p.hp / p.maxHp));
     }
     ballLayer.replaceChildren();
     const holder = state.players.find((p) => p.id === state.ball.carrierId);
     const x = state.ball.position.x * 60 + 30 + (holder ? 17 : 0), y = state.ball.position.y * 60 + 30 - (holder ? 17 : 0);
-    ballLayer.append(svg('circle', { cx: x, cy: y, r: holder ? 9 : 12, class: 'rb-ball' }), svg('path', { d: `M${x - 4},${y}h8 M${x},${y - 4}v8`, class: 'rb-ball-seam' }));
+    if (!holder) ballLayer.append(svg('circle', { cx: x, cy: y, r: 20, class: 'rb-ball-halo' }));
+    ballLayer.append(svg('ellipse', { cx: x, cy: y, rx: holder ? 11 : 15, ry: holder ? 7 : 10, transform: `rotate(-35 ${x} ${y})`, class: 'rb-ball' }), svg('path', { d: `M${x - 4},${y}h8 M${x},${y - 4}v8`, class: 'rb-ball-seam' }));
     trace.replaceChildren();
     for (const movement of events.filter((e) => e.type === 'move' || e.type === 'drag')) {
       const points = [movement.from, ...movement.path].map((p) => `${p.x * 60 + 30},${p.y * 60 + 30}`).join(' ');
@@ -224,7 +219,8 @@ if (root) {
     if (!p) { selected.append(element('p', 'rb-muted', 'Sélectionnez un pion ou un nom pour consulter ses caractéristiques.')); return; }
     const heading = element('div', 'rb-selected-heading'); heading.append(element('strong', `rb-${p.teamId}`, `${p.number} · ${p.name}`), element('span', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
     const stats = element('dl', 'rb-player-stats');
-    for (const [name, value] of [['CA', p.armor], ['PV', `${p.hp}/${p.maxHp}`], ['Vitesse', p.grappledBy ? '0 m · agrippé' : p.grappling ? `${p.speed / 2} m · lutte` : `${p.speed} m`], ['FOR', p.abilities.strength], ['DEX', p.abilities.dexterity], ['CON', p.abilities.constitution], ['Lutte', signed(p.skills.wrestling ?? modifier(p.abilities.strength))], ['Acrobaties', signed(p.skills.acrobatics ?? modifier(p.abilities.dexterity))]]) {
+    const speedText = (p.grappling ? p.speed / 2 : p.speed).toLocaleString('fr-FR');
+    for (const [name, value] of [['CA', p.armor], ['PV', `${p.hp}/${p.maxHp}`], ['Vitesse', p.grappledBy ? '0 m · agrippé' : `${speedText} m${p.grappling ? ' · lutte' : ''}`], ['FOR', p.abilities.strength], ['DEX', p.abilities.dexterity], ['CON', p.abilities.constitution], ['Lutte', signed(p.skills.wrestling ?? modifier(p.abilities.strength))], ['Acrobaties', signed(p.skills.acrobatics ?? modifier(p.abilities.dexterity))]]) {
       const item = element('div'); item.append(element('dt', '', name), element('dd', '', String(value))); stats.append(item);
     }
     selected.append(heading, stats, element('p', 'rb-muted', `Attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants · aucune capacité spéciale.`));
@@ -234,8 +230,9 @@ if (root) {
     const focusedId = rosters.contains(document.activeElement) ? document.activeElement.dataset.rbPlayer : null;
     rosters.replaceChildren();
     for (const team of state.teams) {
-      const block = element('section', 'rb-roster'); const header = element('div', 'rb-roster-heading');
-      header.append(element('h3', `rb-${team.id}`, team.name), element('span', 'rb-muted', `${state.players.filter((p) => p.teamId === team.id && p.hp > 0).length}/5 en jeu`)); block.append(header);
+      const block = element('section', `rb-roster rb-roster-${team.id}`); const header = element('div', 'rb-roster-heading');
+      const teamTitle = element('div', 'rb-roster-title'); teamTitle.append(teamCrest(team.id), element('h3', `rb-${team.id}`, team.name));
+      header.append(teamTitle, element('span', 'rb-muted', `${state.players.filter((p) => p.teamId === team.id && p.hp > 0).length}/5 en jeu`)); block.append(header);
       for (const p of state.players.filter((p) => p.teamId === team.id)) {
         const row = element('div', `rb-roster-row${p.hp === 0 ? ' is-ko' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
         const playerButton = button(`${p.number} · ${p.name}`, 'rb-player-name'); playerButton.setAttribute('aria-pressed', String(selectedId === p.id)); playerButton.addEventListener('click', () => selectPlayer(p.id));
@@ -257,6 +254,7 @@ if (root) {
     resultPanel.replaceChildren();
     const winner = state.teams.find((t) => t.id === state.result.winnerId);
     const holder = state.players.find((p) => p.id === state.result.carrierId);
+    resultPanel.dataset.winner = winner?.id ?? 'draw';
     resultPanel.append(element('p', 'rb-eyebrow', 'À la sirène'), element('h3', '', winner ? `${winner.name} remportent le match` : 'Match nul'),
       element('p', '', holder ? `${holder.name} tient la balle à la fin du round ${state.result.round}.` : 'La balle reste libre après le dernier engagement.'));
     const table = element('table', 'rb-stats-table');
@@ -283,6 +281,10 @@ if (root) {
     possessionText.textContent = holder ? `${holder.name} · ${holder.teamId === 'home' ? 'Recrues' : 'Charognards'}` : 'Balle libre';
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     homeScore.querySelector('small').textContent = `${STRATEGIES[state.teams[0].strategy]} · votre équipe`;
+    for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) {
+      const count = state.players.filter((p) => p.teamId === teamId && p.hp > 0).length;
+      score.querySelector('.rb-team-count').textContent = `${count} / 5 en jeu`;
+    }
     setup.hidden = started;
     toolbar.hidden = !started || state.finished;
     next.disabled = state.finished; finish.disabled = state.finished; pause.disabled = state.finished;
