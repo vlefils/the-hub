@@ -3,12 +3,11 @@ import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
 import { arenaBackdrop, pawnArtwork, svg, teamCrest } from './visuals.mjs';
 import { narrateTurn } from './narration.mjs';
-import { courtPoint, createCourtPlayback } from './playback.mjs';
+import { courtPoint, createCourtPlayback, nextCourtTurnDelay } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
 
 const root = document.querySelector('[data-rumbleball]');
 const section = root?.closest('[data-section]');
-const TURN_DELAY_MS = 2000;
 const teamLabel = (id) => id === 'home' ? 'Les Recrues' : 'Les Charognards';
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
@@ -148,7 +147,10 @@ if (root) {
     if (!running) courtPlayback.settle();
     pause.textContent = running ? 'Pause' : 'Reprendre';
     status.textContent = !started ? 'Prêt au coup d’envoi' : state.finished ? 'Match terminé' : running ? 'Match en cours' : 'Lecture en pause';
-    if (running) timer = setTimeout(tick, TURN_DELAY_MS / speed);
+    if (running) scheduleNextTurn();
+  }
+  function scheduleNextTurn() {
+    timer = setTimeout(tick, nextCourtTurnDelay(courtPlayback.remaining(), speed));
   }
   function appendEvents(events) {
     if (!events.length) return;
@@ -335,12 +337,12 @@ if (root) {
       const before = state;
       const turn = stepMatch(state); state = turn.state; appendEvents(turn.events); render(turn.events);
       if (state.finished) { setRunning(false); status.textContent = 'Match terminé'; }
-      if (animate && visible()) courtPlayback.play(before, state, turn.events, Math.min(560, TURN_DELAY_MS / speed * .78));
+      if (animate && visible()) courtPlayback.play(before, state, turn.events, { speed });
     } catch (error) {
       setRunning(false); errorBox.hidden = false; errorBox.textContent = `La simulation a été interrompue. Code du match : ${state.seed}. ${error.message}`;
     }
   }
-  function tick() { timer = null; if (!visible()) { setRunning(false); return; } advance(); if (running) timer = setTimeout(tick, TURN_DELAY_MS / speed); }
+  function tick() { timer = null; if (!visible()) { setRunning(false); return; } advance(); if (running) scheduleNextTurn(); }
   function launch(configuration) {
     setRunning(false); lastConfig = structuredClone(configuration); state = createMatch(lastConfig);
     started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;

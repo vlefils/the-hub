@@ -30,11 +30,14 @@ const reconcile = (view) => {
   }
 };
 
-export function buildCourtPlayback(before, after, events, budget = 560) {
+// Keep the familiar minimum cadence, but leave every action time to finish.
+export const nextCourtTurnDelay = (remaining = 0, speed = 1) => Math.max(2000 / speed, remaining + 300 / speed);
+
+export function buildCourtPlayback(before, after, events, { speed = 1 } = {}) {
   const initial = snapshot(before), final = snapshot(after);
   const stages = [], effects = [];
   // A new kickoff is a reset, not a trip across the court.
-  if (budget <= 0 || events.some((e) => e.type === 'restart')) return { initial, final, stages, effects, duration: 0 };
+  if (events.some((e) => e.type === 'restart')) return { initial, final, stages, effects, duration: 0 };
   let view = initial, cursor = 0, action = null, attack = null;
   const stage = (duration, update = () => {}, flight = false) => {
     const next = copy(view); update(next); reconcile(next);
@@ -43,10 +46,17 @@ export function buildCourtPlayback(before, after, events, budget = 560) {
   };
   const effect = (kind, id, label = '', extra = {}) => {
     const p = player(view, id);
-    if (p) effects.push({ kind, playerId: id, position: { ...p.position }, label, start: cursor, duration: 320, ...extra });
+    if (p) effects.push({ kind, playerId: id, position: { ...p.position }, label, start: cursor, duration: 900, ...extra });
+  };
+  const finishBeat = () => {
+    const end = Math.max(cursor, ...effects.map((e) => e.start + e.duration));
+    if (end > cursor) stage(end - cursor);
   };
   for (let i = 0; i < events.length; i++) {
     const e = events[i];
+    // Read an action's result before the next action, reaction or movement.
+    // In particular, several opportunity attacks get separate beats.
+    if (e.resolvedAction || ['move', 'attack', 'opportunity'].includes(e.type)) finishBeat();
     if (e.resolvedAction) action = e.resolvedAction;
     switch (e.type) {
       case 'move': {
@@ -60,30 +70,30 @@ export function buildCourtPlayback(before, after, events, budget = 560) {
       }
       case 'attack': case 'opportunity':
         attack = { playerId: e.playerId, targetId: e.targetId };
-        effect(e.type, e.targetId, '', { source: { ...player(view, e.playerId).position } });
-        stage(65); break;
+        effect(e.type, e.targetId, '', { source: { ...player(view, e.playerId).position }, duration: 420 });
+        stage(220); break;
       case 'damage':
-        effect('damage', e.playerId, `−${e.amount}`, { duration: 380 });
-        stage(50, (next) => { const p = player(next, e.playerId); p.hp = Math.max(0, p.hp - e.amount); }); break;
-      case 'miss': effect('miss', attack?.targetId, 'Raté'); stage(45); break;
+        effect('damage', e.playerId, `−${e.amount}`);
+        stage(650, (next) => { const p = player(next, e.playerId); p.hp = Math.max(0, p.hp - e.amount); }); break;
+      case 'miss': effect('miss', attack?.targetId, 'Raté'); stage(650); break;
       case 'ko':
-        effect('ko', e.playerId, 'KO', { duration: 400 });
-        stage(15, (next) => { const p = player(next, e.playerId); p.hp = 0; p.prone = true; release(next, p.id); }); break;
+        effect('ko', e.playerId, 'KO');
+        stage(650, (next) => { const p = player(next, e.playerId); p.hp = 0; p.prone = true; release(next, p.id); }); break;
       case 'grapple':
         effect('grapple', action?.targetId, 'Prise');
-        stage(55, (next) => { player(next, action.playerId).grappling = action.targetId; player(next, action.targetId).grappledBy = action.playerId; }); break;
+        stage(650, (next) => { player(next, action.playerId).grappling = action.targetId; player(next, action.targetId).grappledBy = action.playerId; }); break;
       case 'escape':
-        effect('grapple', action?.playerId, 'Libre'); stage(55, (next) => release(next, action.playerId)); break;
+        effect('grapple', action?.playerId, 'Libre'); stage(650, (next) => release(next, action.playerId)); break;
       case 'release':
         if (action?.type === 'release') stage(0, (next) => release(next, action.playerId));
         break;
       case 'prone':
-        effect('prone', action?.targetId, 'Au sol'); stage(55, (next) => { player(next, action.targetId).prone = true; }); break;
-      case 'stand': stage(35, (next) => { player(next, e.actorId).prone = false; }); break;
+        effect('prone', action?.targetId, 'Au sol'); stage(650, (next) => { player(next, action.targetId).prone = true; }); break;
+      case 'stand': stage(180, (next) => { player(next, e.actorId).prone = false; }); break;
       case 'push': stage(100, (next) => { player(next, e.playerId).position = { ...e.position }; }); break;
       case 'possession':
         effect('possession', e.playerId, e.reason === 'intercepte' ? 'Intercept.' : e.reason === 'arrache' ? 'Volée' : 'Balle');
-        stage(45, (next) => { next.ball = { carrierId: e.playerId, position: { ...player(next, e.playerId).position } }; }); break;
+        stage(650, (next) => { next.ball = { carrierId: e.playerId, position: { ...player(next, e.playerId).position } }; }); break;
       case 'pass': {
         // The flight ends at the actual receiver/interceptor, or at the fumble cell.
         const outcome = events.slice(i + 1).find((event) => event.type === 'possession' || event.type === 'drop');
@@ -95,17 +105,17 @@ export function buildCourtPlayback(before, after, events, budget = 560) {
         break;
       }
       case 'drop': stage(100, (next) => { next.ball = { carrierId: null, position: { ...e.position } }; }, true); break;
-      case 'dodge': effect('dodge', action?.playerId, 'Esquive'); stage(40); break;
-      case 'help': effect('help', action?.targetId, 'Aide'); stage(40); break;
+      case 'dodge': effect('dodge', action?.playerId, 'Esquive'); stage(650); break;
+      case 'help': effect('help', action?.targetId, 'Aide'); stage(650); break;
       case 'failure':
-        if (['grapple', 'strip', 'shove'].includes(action?.type)) { effect('miss', action.targetId, 'Résiste'); stage(40); }
+        if (['grapple', 'strip', 'shove'].includes(action?.type)) { effect('miss', action.targetId, 'Résiste'); stage(650); }
         break;
     }
   }
-  const duration = Math.max(cursor, 0, ...effects.map((e) => e.start + e.duration));
-  if (duration > cursor) stages.push({ start: cursor, end: duration, from: view, to: view, flight: false });
-  const scale = duration ? Math.min(1, budget / duration) : 1;
-  return { initial, final, duration: duration * scale,
+  finishBeat();
+  // Only the chosen playback speed scales time, never the turn's complexity.
+  const scale = 1 / speed;
+  return { initial, final, duration: cursor * scale,
     stages: stages.map((s) => ({ ...s, start: s.start * scale, end: s.end * scale })),
     effects: effects.map((e) => ({ ...e, start: e.start * scale, duration: e.duration * scale })) };
 }
@@ -126,21 +136,22 @@ export function createCourtPlayback(draw, {
   now = () => performance.now(), request = (callback) => requestAnimationFrame(callback),
   cancel = (id) => cancelAnimationFrame(id), reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
 } = {}) {
-  let requestId = null, generation = 0, final = null;
+  let requestId = null, generation = 0, final = null, endsAt = 0;
   const stop = () => {
     generation++;
     if (requestId !== null) cancel(requestId);
-    requestId = null;
+    requestId = null; endsAt = 0;
   };
   const settle = () => {
     stop();
     if (final) draw({ ...final, ballPoint: ballPoint(final), effects: [] });
   };
   const show = (state) => { stop(); final = snapshot(state); draw({ ...final, ballPoint: ballPoint(final), effects: [] }); };
-  const play = (before, after, events, budget) => {
+  const play = (before, after, events, options) => {
     stop(); final = snapshot(after);
-    if (reducedMotion()) { settle(); return; }
-    const plan = buildCourtPlayback(before, after, events, budget), started = now(), token = generation;
+    if (reducedMotion()) { settle(); return 0; }
+    const plan = buildCourtPlayback(before, after, events, options), started = now(), token = generation;
+    endsAt = started + plan.duration;
     const tick = (time) => {
       if (token !== generation) return;
       if (time - started >= plan.duration || reducedMotion()) { settle(); return; }
@@ -148,6 +159,7 @@ export function createCourtPlayback(draw, {
       requestId = request(tick);
     };
     tick(started);
+    return plan.duration;
   };
-  return { show, play, settle };
+  return { show, play, settle, remaining: () => Math.max(0, endsAt - now()) };
 }

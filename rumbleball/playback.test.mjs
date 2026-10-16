@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMatch, simulateMatch } from './engine.mjs';
 import { moveAlong, resolveAction } from './rules.mjs';
-import { buildCourtPlayback, courtPoint, createCourtPlayback, sampleCourtPlayback } from './playback.mjs';
+import { buildCourtPlayback, courtPoint, createCourtPlayback, nextCourtTurnDelay, sampleCourtPlayback } from './playback.mjs';
 
 const p = (frame, id) => frame.players.find((p) => p.id === id);
 const event = (type, data = {}) => ({ type, ...data });
@@ -17,6 +17,16 @@ function fixture() {
   return { before, after: structuredClone(before), a, b };
 }
 const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-8, `${a} ≠ ${b}`);
+function multiReactionFixture() {
+  const { before, a } = fixture(), events = [];
+  before.players.slice(5, 8).forEach((attacker, index) => {
+    attacker.hp = attacker.maxHp; attacker.position = { x: 3, y: index + 1 };
+    events.push(event('opportunity', { playerId: attacker.id, targetId: a.id }), event('damage', { playerId: a.id, amount: 2 }));
+  });
+  const after = structuredClone(before), move = event('move', { playerId: a.id, path: [{ x: 1, y: 3 }] });
+  p(after, a.id).position = move.path[0]; p(after, a.id).hp -= 6;
+  return { before, after, events: [...events, move], a };
+}
 
 test('glissement : suit chaque segment réel du trajet, sans couper le virage', () => {
   const { before, after, a } = fixture();
@@ -108,15 +118,39 @@ test('perte de balle : la balle rejoint la case de chute puis reste libre', () =
   assert.deepEqual(sampleCourtPlayback(plan, plan.duration).ballPoint, courtPoint(after.ball.position));
 });
 
-test('vitesse x8 : la chronologie tient avant le prochain tour et conserve les positions finales', () => {
-  const { before, after, a, b } = fixture();
-  const events = [event('move', { playerId: a.id, path: [{ x: 2, y: 3 }, { x: 3, y: 3 }, { x: 4, y: 3 }] }),
-    event('attack', { playerId: a.id, targetId: b.id }), event('damage', { playerId: b.id, amount: 4 })];
-  const slow = buildCourtPlayback(before, after, events, 560), fast = buildCourtPlayback(before, after, events, 195);
-  assert.ok(fast.duration <= 195); assert.ok(slow.duration > fast.duration);
-  const s = sampleCourtPlayback(slow, slow.duration * .3), f = sampleCourtPlayback(fast, fast.duration * .3);
-  close(p(s, a.id).position.x, p(f, a.id).position.x); close(p(s, a.id).position.y, p(f, a.id).position.y);
-  assert.deepEqual(sampleCourtPlayback(slow, slow.duration), sampleCourtPlayback(fast, fast.duration));
+test('tour complexe : chaque réaction a son temps de lecture, le glissement garde sa vitesse', () => {
+  const { before, after, events, a } = multiReactionFixture();
+  const plan = buildCourtPlayback(before, after, events);
+  const movementOnly = buildCourtPlayback(before, after, [events.at(-1)]);
+  const movement = plan.stages.find((s) => p(s.from, a.id).position.x !== p(s.to, a.id).position.x);
+  close(movement.end - movement.start, movementOnly.duration);
+  assert.equal(movementOnly.duration, 95);
+  const reactions = plan.effects.filter((e) => e.kind === 'opportunity'), damage = plan.effects.filter((e) => e.kind === 'damage');
+  assert.equal(reactions.length, 3);
+  for (let i = 0; i < damage.length; i++) {
+    assert.equal(damage[i].duration, 900);
+    assert.ok(damage[i].start > reactions[i].start);
+    if (i) assert.ok(reactions[i].start >= damage[i - 1].start + damage[i - 1].duration);
+  }
+  assert.ok(movement.start >= damage.at(-1).start + damage.at(-1).duration);
+  assert.ok(plan.duration > 2000);
+  assert.ok(nextCourtTurnDelay(plan.duration) >= plan.duration + 300);
+  assert.equal(nextCourtTurnDelay(movementOnly.duration), 2000);
+});
+
+test('vitesses x2, x4, x8 : accélèrent la même séquence complète, sans plafonner les tours complexes', () => {
+  const { before, after, events, a } = multiReactionFixture();
+  const slow = buildCourtPlayback(before, after, events);
+  for (const speed of [2, 4, 8]) {
+    const fast = buildCourtPlayback(before, after, events, { speed });
+    close(slow.duration / speed, fast.duration);
+    assert.ok(fast.duration > 2000 / speed);
+    assert.ok(nextCourtTurnDelay(fast.duration, speed) >= fast.duration + 300 / speed);
+    for (const effect of fast.effects) assert.ok(effect.start + effect.duration <= fast.duration);
+    const s = sampleCourtPlayback(slow, slow.duration * .3), f = sampleCourtPlayback(fast, fast.duration * .3);
+    close(p(s, a.id).position.x, p(f, a.id).position.x); close(p(s, a.id).position.y, p(f, a.id).position.y);
+    assert.deepEqual(sampleCourtPlayback(slow, slow.duration), sampleCourtPlayback(fast, fast.duration));
+  }
 });
 
 test('un dernier engagement replace immédiatement les pions, sans traverser le terrain', () => {
@@ -135,36 +169,56 @@ function clock() {
 test('pause : termine le glissement à la bonne case et retire tous les effets', () => {
   const { before, after, a } = fixture(); p(after, a.id).position = { x: 2, y: 3 };
   const c = clock(), frames = [], playback = createCourtPlayback((f) => frames.push(f), { ...c, reducedMotion: () => false });
-  playback.play(before, after, [event('move', { playerId: a.id, path: [{ x: 2, y: 3 }] })], 560);
+  playback.play(before, after, [event('move', { playerId: a.id, path: [{ x: 2, y: 3 }] })]);
   c.step(25); assert.notDeepEqual(p(frames.at(-1), a.id).position, p(after, a.id).position);
-  playback.settle(); assert.equal(c.pending.size, 0);
+  playback.settle(); assert.equal(c.pending.size, 0); assert.equal(playback.remaining(), 0);
   assert.deepEqual(p(frames.at(-1), a.id).position, p(after, a.id).position); assert.deepEqual(frames.at(-1).effects, []);
+});
+
+test('lecture automatique : attend les réactions restantes au-delà des deux secondes habituelles', () => {
+  const { before, after, events, a } = multiReactionFixture();
+  const c = clock(), frames = [], playback = createCourtPlayback((f) => frames.push(f), { ...c, reducedMotion: () => false });
+  const duration = playback.play(before, after, events);
+  assert.equal(playback.remaining(), duration);
+  const nextTurnAt = nextCourtTurnDelay(playback.remaining());
+  c.step(2000);
+  assert.equal(c.pending.size, 1); assert.ok(frames.at(-1).effects.length);
+  assert.equal(playback.remaining(), duration - 2000);
+  assert.notDeepEqual(p(frames.at(-1), a.id).position, p(after, a.id).position);
+  c.step(nextTurnAt);
+  assert.equal(c.pending.size, 0); assert.equal(playback.remaining(), 0);
+  assert.deepEqual(p(frames.at(-1), a.id).position, p(after, a.id).position);
+  assert.deepEqual(frames.at(-1).effects, []);
 });
 
 test('rejouer / résultat immédiat : un ancien rappel ne ressuscite aucune animation', () => {
   const { before, after, a } = fixture(); p(after, a.id).position = { x: 2, y: 3 };
   const c = clock(), frames = [], playback = createCourtPlayback((f) => frames.push(f), { ...c, reducedMotion: () => false });
-  playback.play(before, after, [event('move', { playerId: a.id, path: [{ x: 2, y: 3 }] })], 560);
+  playback.play(before, after, [event('move', { playerId: a.id, path: [{ x: 2, y: 3 }] })]);
   const oldCallback = [...c.pending.values()][0]; playback.show(before);
   const count = frames.length; oldCallback(500);
-  assert.equal(frames.length, count); assert.equal(c.pending.size, 0);
+  assert.equal(frames.length, count); assert.equal(c.pending.size, 0); assert.equal(playback.remaining(), 0);
   assert.deepEqual(p(frames.at(-1), a.id).position, a.position);
 });
 
 test('animations réduites : aucune image planifiée ni effet flottant', () => {
   const { before, after, a } = fixture();
   const c = clock(), frames = [], playback = createCourtPlayback((f) => frames.push(f), { ...c, reducedMotion: () => true });
-  playback.play(before, after, [event('damage', { playerId: a.id, amount: 4 })], 560);
+  assert.equal(playback.play(before, after, [event('damage', { playerId: a.id, amount: 4 })]), 0);
+  assert.equal(playback.remaining(), 0);
   assert.equal(c.pending.size, 0); assert.deepEqual(frames.at(-1).effects, []);
 });
 
-test('match complet : animations bornées, balle et états finaux exacts, entrées inchangées', () => {
+test('match complet à x8 : aucun effet coupé, balle et états finaux exacts, entrées inchangées', () => {
   const config = { seed: 'arche-01', strategy: 'pressing', players: Array.from({ length: 5 }, () => ({ role: 'blocker', instruction: 'aggressive' })) };
-  let before = createMatch(config), count = 0;
+  let before = createMatch(config), count = 0, extendedTurns = 0;
   simulateMatch(config, (after, events) => {
     const unchanged = structuredClone({ before, after, events });
-    const plan = buildCourtPlayback(before, after, events, 195);
-    assert.ok(plan.duration <= 195 + 1e-8);
+    const plan = buildCourtPlayback(before, after, events, { speed: 8 });
+    assert.ok(Number.isFinite(plan.duration) && plan.duration >= 0);
+    assert.ok(nextCourtTurnDelay(plan.duration, 8) >= plan.duration + 300 / 8);
+    for (const effect of plan.effects) assert.ok(effect.start + effect.duration <= plan.duration + 1e-8);
+    if (plan.duration > 250) extendedTurns++;
     for (const fraction of [0, .25, .5, .75, 1]) {
       const frame = sampleCourtPlayback(plan, plan.duration * fraction);
       for (const p of frame.players) {
@@ -178,6 +232,6 @@ test('match complet : animations bornées, balle et états finaux exacts, entré
     assert.deepEqual({ before, after, events }, unchanged);
     before = structuredClone(after); count++;
   });
-  assert.ok(count > 40);
+  assert.ok(count > 40); assert.ok(extendedTurns > 0);
 });
 function playerPosition(frame, id) { return frame.players.find((p) => p.id === id).position; }
