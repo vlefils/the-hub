@@ -74,12 +74,12 @@ test('ramassage libre : interaction, une fois par tour', () => {
   resolveAction(state, a, { type: 'drop' }, events);
   assert.equal(legalAction(state, a, { type: 'pickup' }), false);
 });
-test('ramassage contesté : action et égalité au défenseur', () => {
+test('ramassage contesté : interaction, action conservée et égalité au défenseur', () => {
   const { state, a, b, events } = fixture();
   a.skills = { wrestling: 0, acrobatics: 0 }; b.skills = { wrestling: 0, acrobatics: 0 };
   forceD20(state, [10, 10]);
   assert.ok(resolveAction(state, a, { type: 'pickup' }, events));
-  assert.equal(a.action, false); assert.ok(a.interaction); assert.equal(state.ball.carrierId, null);
+  assert.equal(a.action, true); assert.equal(a.interaction, false); assert.equal(state.ball.carrierId, null);
 });
 test('Lutte pour arracher, Athlétisme pour défendre un agrippement', () => {
   const { state, a, b, events } = fixture(); giveBall(state, b, events);

@@ -468,7 +468,7 @@ export function legalAction(state, actor, action) {
   if (action.type === 'pickup') {
     if (state.ball.carrierId || actor.pickedUp || distance(actor.position, state.ball.position) > 1) return false;
     if (isCenterBall(state)) return state.version >= 4 ? actor.reaction : actor.action;
-    return ballDefender(state, actor) ? actor.action : actor.interaction;
+    return state.version >= 5 ? actor.interaction : ballDefender(state, actor) ? actor.action : actor.interaction;
   }
   const reactionPass = action.type === 'pass' && action.reaction === true;
   if (reactionPass && !(readiedPasser(state)?.id === actor.id && state.activeId === target?.id && openPassReceiver(state, actor, target))) return false;
@@ -516,6 +516,8 @@ function resolveActionEvents(state, actor, action, events) {
     if (state.version >= 4 && isCenterBall(state)) return resolveCenterEngagement(state, events);
     actor.pickedUp = true;
     const defender = ballDefender(state, actor);
+    const groundInteraction = state.version >= 5 && !isCenterBall(state);
+    if (groundInteraction) actor.interaction = false;
     if (!defender && isCenterBall(state)) {
       actor.action = false;
       const attempt = skillCheck(state, actor, Math.max(skill(actor, 'wrestling'), skill(actor, 'acrobatics')), events, `${actor.name} · prise au centre DD 10`);
@@ -524,7 +526,7 @@ function resolveActionEvents(state, actor, action, events) {
     }
     else if (!defender) { actor.interaction = false; giveBall(state, actor, events); }
     else {
-      actor.action = false;
+      if (!groundInteraction) actor.action = false;
       const attempt = skillCheck(state, actor, Math.max(skill(actor, 'wrestling'), skill(actor, 'acrobatics')), events, `${actor.name} · ramassage contesté`);
       const defense = skillCheck(state, defender, Math.max(skill(defender, 'wrestling'), skill(defender, 'acrobatics')), events, `${defender.name} · opposition au ramassage`);
       if (attempt > defense) giveBall(state, actor, events, isCenterBall(state) ? 'attrape' : 'récupère');

@@ -25,10 +25,10 @@ test('tempo : combat jusqu’au round 6 inclus, ballon dès le 7 et pendant les 
   }
 });
 
-test('tempo : le porteur peut se battre sans abandonner sa balle pendant la première phase', () => {
+test('tempo : le porteur sécurise sa balle pendant que ses partenaires combattent', () => {
   const { state, actor } = contest(); state.round = 6; giveBall(state, actor, []);
   const before = structuredClone(state), decision = decideTurn(state, actor);
-  assert.equal(decision.task, 'fight'); assert.equal(decision.action.type, 'attack');
+  assert.equal(decision.task, 'carry'); assert.equal(decision.action.type, 'dodge');
   assert.equal(state.ball.carrierId, actor.id); assert.deepEqual(state, before);
 });
 

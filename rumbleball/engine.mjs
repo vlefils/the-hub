@@ -1,5 +1,5 @@
 import { clone, PROFILES, STARTS, ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
-import { decideClassAction, decideMovement, decideTurn } from './ai.mjs';
+import { decideClassAction, decideGroundPickup, decideMovement, decideTurn } from './ai.mjs';
 import { ARCHETYPES, initialClassState } from './classes.mjs';
 import { matchKits } from './appearance.mjs';
 import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
@@ -155,6 +155,11 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
         const next = legalAction(state, actor, followup.action) ? followup.action : legalAction(state, actor, basic) ? basic : { type: 'dodge' };
         if (!resolveAction(state, actor, next, events)) throw new Error(`Action de suivi illégale : ${actor.id}`);
       }
+    }
+    // Damage or a failed pass can leave the ball at the actor's feet after the
+    // action. Use the remaining interaction once, without restoring any budget.
+    if (!actor.action && actor.hp > 0 && decideGroundPickup(state, actor)) {
+      if (!resolveAction(state, actor, { type: 'pickup' }, events)) throw new Error(`Ramassage de suivi illégal : ${actor.id}`);
     }
     if (actor.grappling) {
       const held = state.players.find((p) => p.id === actor.grappling);

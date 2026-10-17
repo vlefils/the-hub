@@ -1,0 +1,43 @@
+{
+  "baseline": "cffafe0",
+  "scenarios": 24,
+  "workingSourcesSha256": {
+    "ai.mjs": "caae567980788dc5de7270669f13e4b9572c2876b4560b9dc10b396abaecacd6",
+    "rules.mjs": "10cb9f862e99d6c4e51233cff85b2f007bfee9b8d0dc27ae847e283b95cb8287"
+  },
+  "measurements": {
+    "cffafe0": {
+      "matches": 24,
+      "freePickups": 21,
+      "afterFreePickup": {
+        "dodge": 9,
+        "ready-pass": 9,
+        "disengage": 1,
+        "dash": 1
+      },
+      "turns": 1471,
+      "immediateFreePickupsAvailable": 74,
+      "ignoredOrDeferred": 69,
+      "ignoredOrDeferredEarly": 68,
+      "immediateGroundPickupsAvailable": 379,
+      "ignoredOrDeferredGround": 344
+    },
+    "working": {
+      "matches": 24,
+      "freePickups": 47,
+      "afterFreePickup": {
+        "pass": 6,
+        "dodge": 3,
+        "ready-pass": 12,
+        "dash": 2,
+        "attack": 1
+      },
+      "turns": 1614,
+      "immediateFreePickupsAvailable": 12,
+      "ignoredOrDeferred": 0,
+      "ignoredOrDeferredEarly": 0,
+      "immediateGroundPickupsAvailable": 60,
+      "ignoredOrDeferredGround": 0
+    }
+  }
+}

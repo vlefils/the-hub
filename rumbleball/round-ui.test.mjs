@@ -28,7 +28,9 @@ test('UI simultanée : dix tours résolus, douze secondes affichées, plusieurs 
   const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
   globalThis.matchMedia = () => ({ matches: false });
   const view = mountMatch(e.root, { onTurn: (state) => { saved.push(structuredClone(state)); return true; } });
-  view.load({ config: {}, state: createMatch({ openings: { home: 'wings', away: 'wings' } }), turns: [] }, true); c.elapse(0);
+  // Stable legacy tactics provide independent runs; the marker-rendering test
+  // must not require a particular opening from the current AI.
+  view.load({ config: {}, state: createMatch({ rulesVersion: 4, openings: { home: 'wings', away: 'wings' } }), turns: [] }, true); c.elapse(0);
   assert.equal(saved.at(-1).round, 2); assert.equal(saved.at(-1).turns, 10);
   assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00'); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 1/10');
   let overlap = false;

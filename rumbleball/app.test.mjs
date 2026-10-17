@@ -5,6 +5,7 @@ import { createCareer, confirmDraft } from './career.mjs';
 import { exportCareer } from './career-storage.mjs';
 import { environment, TestNode, descendants, classNode, button } from './test-support/dom.mjs';
 import { mountApp } from './app.mjs';
+import { stepMatch } from './engine.mjs';
 
 const source = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 function club() {
@@ -79,7 +80,11 @@ test('page autonome : carrière existante, lecture automatique sans section du l
   assert.equal(clock.pending.size, 0, 'Une reprise reste en pause.');
   assert.equal(loaded.saved().current.state.turns, 10);
   assert.equal(loaded.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
-  await button(loaded.root, 'Round suivant').click(); assert.equal(loaded.saved().current.state.turns, 20);
+  let expected = loaded.saved().current.state;
+  const round = expected.round;
+  while (!expected.finished && expected.round === round) expected = stepMatch(expected, { stopAtRoundEnd: true }).state;
+  await button(loaded.root, 'Round suivant').click();
+  assert.deepEqual(loaded.saved().current.state, expected, 'La reprise joue exactement le round suivant, y compris les créneaux KO sautés.');
   await button(loaded.root, 'Retour au club · mettre en pause').click();
   assert.equal(classNode(loaded.root, 'rb-match-area').hidden, true);
 });

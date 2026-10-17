@@ -4,6 +4,7 @@ import {
 } from './rules.mjs';
 import { isRunner } from './classes.mjs';
 import { OPENINGS, openingPlan } from './openings.mjs';
+import { isCenterBall } from './deployment.mjs';
 
 const nearestDistance = (players, cell) => Math.min(12, ...players.map((p) => distance(p.position, cell)));
 const order = (a, b) => a.id.localeCompare(b.id);
@@ -13,7 +14,7 @@ const turnsUntil = (state, id) => {
 };
 export const strategyOf = (state, actor) => state.teams.find((t) => t.id === actor.teamId).strategy;
 export const matchPriority = (state) => state.version >= 5 ? state.round <= 6 ? 'combat' : 'ball' : null;
-const combatActionBonus = { attack: 60, grapple: 20, shove: 20, pickup: -80, strip: -80, pass: -80, 'ready-pass': -80 };
+const combatActionBonus = { attack: 60, grapple: 20, shove: 20, strip: -80 };
 
 function supportFormation(state, holder, players, protector) {
   const strategy = strategyOf(state, holder);
@@ -192,15 +193,17 @@ function stripValue(state, actor, holder, task, aggression, exploit = false) {
     - Number(!assigned) * 18 - Number(actor.role === 'blocker' && !assigned) * 12;
 }
 function taskFor(state, actor, plan) {
-  // First weaken the opposition. From round seven onward, use the existing
-  // recovery, possession and prepared-pass assignments without extra bonuses.
-  if (matchPriority(state) === 'combat' && opponents(state, actor).length) return 'fight';
   if (state.ball.carrierId === actor.id) return 'carry';
-  if (state.version >= 5 && plan.mode === 'own') {
+  // A loose ball is an opportunity now, including during the combat rounds.
+  // The holder secures it; teammates answer a real prepared pass or keep fighting.
+  if (state.version >= 5 && plan.mode === 'free' && actor.id === plan.primary) return 'recover';
+  const combat = matchPriority(state) === 'combat' && opponents(state, actor).length > 0;
+  if (state.version >= 5 && plan.mode === 'own' && (!combat || plan.passer)) {
     if (actor.id === plan.protector) return 'protect';
     if (!plan.passer) return actor.role === 'blocker' ? 'screen' : 'standby';
     return plan.supports.has(actor.id) ? 'relay' : 'screen';
   }
+  if (combat) return 'fight';
   if (plan.opening && plan.mode !== 'enemy') {
     if (plan.opening.receivers.includes(actor.id)) return state.version >= 5 ? 'standby' : 'opening-relay';
     if (plan.mode === 'free') return plan.opening.contenders.includes(actor.id) ? 'recover' : 'screen';
@@ -304,7 +307,20 @@ function explain(actor, task, type, target) {
   return `${intentions[type] ?? 'Se replace'} · ${actor.instruction === 'cautious' ? 'prudent' : actor.instruction === 'aggressive' ? 'agressif' : 'normal'}.`;
 }
 
+export function decideGroundPickup(state, actor) {
+  // Attempt a nearby ground ball with the interaction before spending an action
+  // or moving away. The engine chooses the follow-up after the real contest.
+  if (state.version >= 5 && !state.ball.carrierId && !isCenterBall(state)
+    && legalAction(state, actor, { type: 'pickup' })) {
+    return { path: [], action: { type: 'pickup' }, score: 150, task: 'recover',
+      reason: 'Récupère la balle au sol avec son interaction et conserve son action.' };
+  }
+  return null;
+}
+
 export function decideTurn(state, actor) {
+  const pickup = decideGroundPickup(state, actor);
+  if (pickup) return pickup;
   const plan = teamPlan(state, actor), task = taskFor(state, actor, plan);
   const strategy = strategyOf(state, actor);
   const supporting = state.version >= 4 && task === 'relay' && plan.supports?.has(actor.id);
@@ -334,7 +350,7 @@ export function decideTurn(state, actor) {
     const view = movementView(state, actor, entry.position);
     view.actor = { ...view.actor, chargeRun: chargeRun(actor, entry.path) };
     if (!legalAction(view.state, view.actor, action)) return;
-    const objectiveBonus = matchPriority(state) === 'combat' ? (combatActionBonus[action.type] ?? 0)
+    const objectiveBonus = task === 'fight' ? (combatActionBonus[action.type] ?? 0)
       + Number(action.type === 'attack' && action.targetId === state.ball.carrierId) * 40 : 0;
     const target = playerById(view.state, action.targetId);
     if (action.type === 'pass') {
@@ -375,11 +391,11 @@ export function decideTurn(state, actor) {
     const enhanced = { ...action, technique };
     if (technique && legalAction(view.state, view.actor, enhanced)) candidates.push({ path: entry.path, action: enhanced, score: entry.score + score + gain + objectiveBonus, task });
   };
-  const holder = carrier(state);
+  const holder = carrier(state), groundPickup = state.version >= 5 && !isCenterBall(state);
   for (const cell of cells) {
     const { actor: actorHere, state: here } = movementView(state, actor, cell.position);
     const adjacent = opponents(here, actorHere).filter((p) => distance(p.position, cell.position) <= 1);
-    if (!holder && (!plan.opening || plan.opening.contenders.includes(actor.id)) && distance(cell.position, state.ball.position) <= 1) add(cell, { type: 'pickup' }, 150 + Math.max(skill(actor, 'acrobatics'), skill(actor, 'wrestling')) * 2);
+    if (!holder && (groundPickup || !plan.opening || plan.opening.contenders.includes(actor.id)) && distance(cell.position, state.ball.position) <= 1) add(cell, { type: 'pickup' }, 150 + Math.max(skill(actor, 'acrobatics'), skill(actor, 'wrestling')) * 2);
     if (actor.grappledBy) add(cell, { type: 'escape' }, state.ball.carrierId === actor.id ? 55 : 70);
     for (const enemy of adjacent) {
       const danger = holder?.teamId === actor.teamId && holder.id !== actor.id && distance(enemy.position, holder.position) <= (plan.opening ? enemy.speed / 1.5 + 1 : 2);
@@ -426,7 +442,7 @@ export function decideTurn(state, actor) {
   }
   candidates.sort((a, b) => b.score - a.score || a.path.length - b.path.length || a.action.type.localeCompare(b.action.type) || (a.action.targetId ?? '').localeCompare(b.action.targetId ?? ''));
   const chosen = candidates[0] ?? { path: [], action: { type: 'wait' }, score: 0, task };
-  const priority = matchPriority(state);
+  const priority = state.version >= 5 && ['carry', 'recover', 'relay'].includes(task) ? 'ball' : matchPriority(state);
   return { ...chosen, reason: `${priority ? priority === 'combat' ? 'Priorité combat : ' : 'Priorité ballon : ' : ''}${plan.opening ? `${OPENINGS[plan.opening.id].name} : ` : ''}${explain(actor, task, chosen.action.type, playerById(state, chosen.action.targetId))}` };
 }
 
