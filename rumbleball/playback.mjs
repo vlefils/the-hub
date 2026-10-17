@@ -162,7 +162,7 @@ export function sampleCourtPlayback(plan, elapsed) {
       .map((e) => ({ ...e, progress: (elapsed - e.start) / e.duration })) };
 }
 
-export const ROUND_DURATION = 6000;
+export const ROUND_DURATION = 12000;
 
 // Whole turns are independent tracks. Reserve the people, ball and traversed
 // cells they actually use, so an interaction cannot overtake its prerequisites.

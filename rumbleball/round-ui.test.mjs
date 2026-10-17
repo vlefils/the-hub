@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createMatch, stepMatch } from './engine.mjs';
+import { createMatch } from './engine.mjs';
 import { createCareer, confirmDraft } from './career.mjs';
 import { CAREER_KEY, exportCareer } from './career-storage.mjs';
 import { mountCareer } from './career-ui.mjs';
@@ -24,45 +24,45 @@ function clock(t) {
   } };
 }
 
-test('UI simultanée : dix tours résolus, six secondes affichées, plusieurs repères et pause exacte', async (t) => {
+test('UI simultanée : dix tours résolus, douze secondes affichées, plusieurs repères et pause exacte', async (t) => {
   const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
   globalThis.matchMedia = () => ({ matches: false });
   const view = mountMatch(e.root, { onTurn: (state) => { saved.push(structuredClone(state)); return true; } });
   view.load({ config: {}, state: createMatch(), turns: [] }, true); c.elapse(0);
   assert.equal(saved.at(-1).round, 2); assert.equal(saved.at(-1).turns, 10);
-  assert.equal(classNode(e.root, 'rb-clock').textContent, '01:00'); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 1/10');
-  c.elapse(1500);
+  assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00'); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 1/10');
+  c.elapse(3000);
   assert.ok(e.root.querySelectorAll('.rb-turn-marker').filter((n) => n.getAttribute('visibility') === 'visible').length > 1);
   assert.ok(e.root.querySelectorAll('.rb-pawn').filter((n) => n.getAttribute('aria-current') === 'true').length > 1);
-  c.elapse(1500); assert.equal(saved.length, 10); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:57');
+  c.elapse(3000); assert.equal(saved.length, 10); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:54');
   await button(e.root, 'Pause').click();
-  assert.equal(c.frames.size, 0); assert.equal(c.timers.size, 0); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:54');
+  assert.equal(c.frames.size, 0); assert.equal(c.timers.size, 0); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:48');
   assert.match(classNode(e.root, 'rb-playback-status').textContent, /Pause · round 2/);
   const reading = classNode(e.root, 'rb-reading-mode'); reading.value = 'turn'; await reading.emit('change');
   await button(e.root, 'Tour suivant').click(); assert.equal(saved.length, 11); view.pause();
 });
 
-test('animations réduites : la cadence de six secondes est conservée sans aucun geste planifié', async (t) => {
+test('animations réduites : la cadence de douze secondes est conservée sans aucun geste planifié', async (t) => {
   const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
   const view = mountMatch(e.root, { onTurn: (state) => { saved.push(state); return true; } });
   view.load({ config: {}, state: createMatch(), turns: [] }, true); c.elapse(0);
   assert.equal(saved.at(-1).round, 2); assert.equal(c.frames.size, 0); const count = saved.length;
-  c.elapse(5999); assert.equal(saved.length, count); c.elapse(1); assert.equal(saved.at(-1).round, 3); view.pause();
+  c.elapse(11999); assert.equal(saved.length, count); c.elapse(1); assert.equal(saved.at(-1).round, 3); view.pause();
 });
 
-test('UI : ×8 attend 750 ms par round et le résultat reste caché jusqu’à la fin de la dernière animation', async (t) => {
+test('UI : ×8 attend 1 500 ms par round et le résultat reste caché jusqu’à la fin de la dernière animation', async (t) => {
   const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
   globalThis.matchMedia = () => ({ matches: false });
   const view = mountMatch(e.root, { onTurn: (state) => { saved.push(state); return true; } });
   const speed = descendants(e.root).find((n) => n.getAttribute('aria-label') === 'Vitesse de lecture'); speed.value = '8'; await speed.emit('change');
   view.load({ config: {}, state: createMatch(), turns: [] }, true); c.elapse(0); assert.equal(saved.at(-1).round, 2);
-  const count = saved.length; c.elapse(375); assert.equal(saved.length, count); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:57');
-  c.elapse(375); assert.equal(saved.at(-1).round, 3); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 2/10');
-  let last = createMatch(); for (;;) { const next = stepMatch(last); if (next.state.finished) break; last = next.state; }
-  view.load({ config: {}, state: last, turns: [] }, true); c.elapse(0);
+  const count = saved.length; c.elapse(750); assert.equal(saved.length, count); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:54');
+  c.elapse(750); assert.equal(saved.at(-1).round, 3); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 2/10');
+  // Ten 1.5-second rounds at ×8 represent exactly two minutes at ×1.
+  for (let round = 3; round <= 10; round++) c.elapse(1500);
   assert.equal(saved.at(-1).finished, true); assert.equal(classNode(e.root, 'rb-result').hidden, true);
   assert.equal(classNode(e.root, 'rb-toolbar').hidden, false);
-  c.elapse(750); assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:00');
+  c.elapse(1500); assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:00');
   assert.equal(c.frames.size, 0); assert.equal(c.timers.size, 0); view.pause();
 });
 

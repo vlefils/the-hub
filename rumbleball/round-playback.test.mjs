@@ -24,11 +24,11 @@ function round(before) {
   return turns;
 }
 
-test('round simultané : deux courses indépendantes se chevauchent dans une fenêtre exacte de six secondes', () => {
+test('round simultané : deux courses indépendantes se chevauchent dans une fenêtre exacte de douze secondes', () => {
   const a = moved(fixture(), 'home-0', [{ x: 2, y: 1 }]), b = moved(a.after, 'away-0', [{ x: 8, y: 6 }]);
   const original = structuredClone([a, b]), plan = buildRoundPlayback([a, b]);
-  assert.equal(plan.duration, 6000); assert.equal(plan.turns[0].start, 0); assert.equal(plan.turns[1].start, 0);
-  const frame = sampleRoundPlayback(plan, 3000); assert.ok(p(frame, 'home-0').position.x > 1 && p(frame, 'home-0').position.x < 2);
+  assert.equal(plan.duration, 12000); assert.equal(plan.turns[0].start, 0); assert.equal(plan.turns[1].start, 0);
+  const frame = sampleRoundPlayback(plan, 6000); assert.ok(p(frame, 'home-0').position.x > 1 && p(frame, 'home-0').position.x < 2);
   close(p(frame, 'home-0').position.x - 1, 9 - p(frame, 'away-0').position.x);
   assert.deepEqual(frame.activeIds, ['home-0', 'away-0']); assert.ok(p(frame, 'home-0').walking && p(frame, 'away-0').walking);
   assert.deepEqual([a, b], original);
@@ -41,7 +41,7 @@ test('contact : la cible reste en place pendant la frappe, puis son propre tour 
   const b = moved(after, 'away-0', [{ x: 3, y: 1 }]), plan = buildRoundPlayback([a, b]);
   assert.ok(plan.turns[1].start >= plan.turns[0].end);
   for (const time of [0, plan.turns[0].end / 2]) assert.deepEqual(p(sampleRoundPlayback(plan, time), 'away-0').position, { x: 2, y: 1 });
-  assert.equal(p(sampleRoundPlayback(plan, 6000), 'away-0').hp, p(after, 'away-0').hp);
+  assert.equal(p(sampleRoundPlayback(plan, 12000), 'away-0').hp, p(after, 'away-0').hp);
 });
 
 test('oppositions ratées : le défenseur et l’intercepteur restent identifiés et attendent la fin de la tentative', () => {
@@ -77,7 +77,7 @@ test('ballon : passe, réception puis course du receveur ; un troisième joueur 
   const plan = buildRoundPlayback([a, b, c]); assert.equal(plan.turns[1].start, 0); assert.ok(plan.turns[2].start >= plan.turns[0].end);
   assert.equal(sampleRoundPlayback(plan, 0).ball.carrierId, null); // No possession is displayed before the ball arrives.
   assert.ok(sampleRoundPlayback(plan, plan.turns[0].scale * 75).flying);
-  const final = sampleRoundPlayback(plan, 6000); assert.equal(final.ball.carrierId, 'home-1'); close(final.ballPoint.x, 5 * 60 + 30 + 17);
+  const final = sampleRoundPlayback(plan, 12000); assert.equal(final.ball.carrierId, 'home-1'); close(final.ballPoint.x, 5 * 60 + 30 + 17);
 });
 
 test('trajectoire du ballon : une course traversant le couloir de passe attend sa réception', () => {
@@ -93,7 +93,7 @@ test('lutte : les deux corps restent couplés, la balle suit le joueur entraîn�
   a.grappling = b.id; b.grappledBy = a.id; before.ball = { carrierId: b.id, position: { ...b.position } };
   const after = structuredClone(before), events = []; moveAlong(after, p(after, a.id), [{ x: 1, y: 0 }, { x: 0, y: 0 }], events); after.activeId = a.id; after.turns++;
   const other = moved(after, 'away-0', [{ x: 8, y: 6 }]), plan = buildRoundPlayback([{ before, after, events }, other]);
-  for (let t = 0; t <= 6000; t += 100) {
+  for (let t = 0; t <= 12000; t += 200) {
     const frame = sampleRoundPlayback(plan, t); close(p(frame, b.id).position.x - p(frame, a.id).position.x, 1);
     close(frame.ballPoint.x, p(frame, b.id).position.x * 60 + 47); assert.ok(!p(frame, b.id).walking);
   }
@@ -105,23 +105,23 @@ test('opportunité et KO : le déplacement interrompu n’est pas inventé ; auc
   const events = [e('opportunity', { playerId: 'away-0', targetId: 'home-0' }), e('damage', { playerId: 'home-0', amount: 99 }), e('ko', { playerId: 'home-0' }), e('movement-stopped', { playerId: 'home-0', attemptedTo: { x: 0, y: 1 } })];
   const b = moved(after, 'away-0', [{ x: 3, y: 1 }]), plan = buildRoundPlayback([{ before, after, events }, b]);
   assert.ok(plan.turns[1].start >= plan.turns[0].end);
-  for (let t = 0; t <= 6000; t += 100) assert.deepEqual(p(sampleRoundPlayback(plan, t), 'home-0').position, { x: 1, y: 1 });
+  for (let t = 0; t <= 12000; t += 200) assert.deepEqual(p(sampleRoundPlayback(plan, t), 'home-0').position, { x: 1, y: 1 });
 });
 
 test('dernier engagement : le dernier tour reste animé, puis le placement est réinitialisé à la fin', () => {
   const turn = moved(fixture(), 'home-0', [{ x: 2, y: 1 }]); turn.after.round = 13; turn.after.phase = 'final';
   p(turn.after, 'home-0').position = { x: 1, y: 1 }; turn.events.push(e('restart'));
-  const plan = buildRoundPlayback([turn]); assert.equal(sampleRoundPlayback(plan, 3000).round, 1);
-  assert.ok(p(sampleRoundPlayback(plan, 3000), 'home-0').position.x > 1);
-  assert.deepEqual(p(sampleRoundPlayback(plan, 6000), 'home-0').position, { x: 1, y: 1 }); assert.equal(sampleRoundPlayback(plan, 6000).round, 13);
+  const plan = buildRoundPlayback([turn]); assert.equal(sampleRoundPlayback(plan, 6000).round, 1);
+  assert.ok(p(sampleRoundPlayback(plan, 6000), 'home-0').position.x > 1);
+  assert.deepEqual(p(sampleRoundPlayback(plan, 12000), 'home-0').position, { x: 1, y: 1 }); assert.equal(sampleRoundPlayback(plan, 12000).round, 13);
 });
 
-test('vitesses : même chorégraphie en 6 / 3 / 1,5 / 0,75 secondes', () => {
+test('vitesses : même chorégraphie en 12 / 6 / 3 / 1,5 secondes', () => {
   const turns = round(createMatch()), normal = buildRoundPlayback(turns);
   for (const speed of [1, 2, 4, 8]) {
-    const fast = buildRoundPlayback(turns, { speed }); assert.equal(fast.duration, 6000 / speed);
+    const fast = buildRoundPlayback(turns, { speed }); assert.equal(fast.duration, 12000 / speed);
     for (const fraction of [0, .2, .5, .8, 1]) {
-      const a = sampleRoundPlayback(normal, 6000 * fraction), b = sampleRoundPlayback(fast, fast.duration * fraction);
+      const a = sampleRoundPlayback(normal, 12000 * fraction), b = sampleRoundPlayback(fast, fast.duration * fraction);
       assert.equal(a.ball.carrierId, b.ball.carrierId); assert.deepEqual(a.activeIds, b.activeIds);
       for (const q of a.players) { close(q.position.x, p(b, q.id).position.x); close(q.position.y, p(b, q.id).position.y); assert.equal(q.hp, p(b, q.id).hp); }
     }
@@ -152,11 +152,11 @@ for (const config of [
   while (!state.finished) {
     const turns = round(state), original = structuredClone(turns), plan = buildRoundPlayback(turns);
     overlap ||= plan.turns.some((t, i) => plan.turns.slice(i + 1).some((u) => t.start < u.end && u.start < t.end));
-    for (let t = 0; t < 6000; t += 40) {
+    for (let t = 0; t < 12000; t += 80) {
       const frame = sampleRoundPlayback(plan, t), active = frame.players.filter((p) => p.hp > 0);
       for (let i = 0; i < active.length; i++) for (const q of active.slice(i + 1)) assert.ok(Math.hypot(active[i].position.x - q.position.x, active[i].position.y - q.position.y) > .25, `Collision à R${state.round}, ${t} ms : ${active[i].id}/${q.id}`);
     }
-    const final = sampleRoundPlayback(plan, 6000); state = turns.at(-1).after;
+    const final = sampleRoundPlayback(plan, 12000); state = turns.at(-1).after;
     for (const q of state.players) { assert.deepEqual(p(final, q.id).position, q.position); assert.equal(p(final, q.id).hp, q.hp); }
     assert.equal(final.ball.carrierId, state.ball.carrierId); assert.deepEqual(turns, original); events.push(...turns.flatMap((t) => t.events));
   }
@@ -167,8 +167,8 @@ test('lecteur : pause, annulation et animations réduites terminent exactement l
   const turns = round(createMatch()), pending = new Map(), frames = []; let time = 0, id = 0;
   const clock = { now: () => time, request: (cb) => { pending.set(++id, cb); return id; }, cancel: (id) => pending.delete(id), reducedMotion: () => false };
   const reader = createCourtPlayback((frame) => frames.push(frame), clock);
-  assert.equal(reader.playRound(turns), 6000); const callback = [...pending.values()][0]; time = 3000; pending.clear(); callback(time);
-  assert.equal(reader.remaining(), 3000); assert.equal(frames.at(-1).animating, true);
+  assert.equal(reader.playRound(turns), 12000); const callback = [...pending.values()][0]; time = 6000; pending.clear(); callback(time);
+  assert.equal(reader.remaining(), 6000); assert.equal(frames.at(-1).animating, true);
   reader.settle(); assert.equal(pending.size, 0); assert.deepEqual(frames.at(-1).effects, []); assert.equal(frames.at(-1).animating, undefined);
   for (const q of turns.at(-1).after.players) assert.deepEqual(p(frames.at(-1), q.id).position, q.position);
   const count = frames.length; callback(5000); assert.equal(frames.length, count);

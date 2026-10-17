@@ -98,7 +98,7 @@ export function mountMatch(root, callbacks = {}) {
   const controls = element('div', 'rb-controls');
   const pause = button('Pause'); const next = button('Round suivant'); const finish = button('Voir le résultat');
   const modeLabel = element('label', 'rb-speed rb-reading', 'Lecture'), modeSelect = element('select', 'rb-reading-mode');
-  modeSelect.setAttribute('aria-label', 'Mode de lecture'); modeSelect.append(...options({ round: 'Round simultané · 6 s à ×1', turn: 'Détail des tours' }, 'round')); modeLabel.append(modeSelect);
+  modeSelect.setAttribute('aria-label', 'Mode de lecture'); modeSelect.append(...options({ round: `Round simultané · ${ROUND_DURATION / 1000} s à ×1`, turn: 'Détail des tours' }, 'round')); modeLabel.append(modeSelect);
   const speedLabel = element('label', 'rb-speed', 'Vitesse'); const speedSelect = element('select');
   speedSelect.setAttribute('aria-label', 'Vitesse de lecture'); speedSelect.append(...options({ 1: '×1', 2: '×2', 4: '×4', 8: '×8' }, '1')); speedLabel.append(speedSelect);
   controls.append(pause, next, modeLabel, speedLabel, finish);
@@ -143,8 +143,8 @@ export function mountMatch(root, callbacks = {}) {
   const rules = element('details', 'rb-rules'); rules.append(element('summary', '', 'Règles et conventions de ce prototype'));
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
-    '10 rounds de 6 secondes. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.',
-    'Lecture simultanée : un round dure six secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.',
+    `10 rounds de ${ROUND_DURATION / 1000} secondes, soit deux minutes à ×1. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.`,
+    `Lecture simultanée : un round dure ${ROUND_DURATION / 1000} secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.`,
     'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir, intercepter et frapper en opportunité utilisent cette même réaction.',
     'Une attaque d’opportunité est provoquée par un pas volontaire qui fait sortir de l’allonge (une case, diagonales comprises). Elle se résout avant ce pas : un KO laisse donc le joueur dans sa case de départ. Entrer dans l’allonge ou tourner autour sans en sortir ne provoque rien.',
     'Passe : action, 9 m, Acrobaties DD 10 ou 15 sous pression. Interception : résultat strictement supérieur à celui du passeur. Ramassage contesté et arrachement : tests opposés, égalité au défenseur.',
@@ -174,7 +174,7 @@ export function mountMatch(root, callbacks = {}) {
   function renderPlaybackStatus() {
     if (playbackMode === 'round' && started && !state.finished) {
       const active = displayFrame?.animating;
-      const text = active ? `Round ${displayFrame.round} · actions simultanées` : `${running ? 'Lecture' : 'Pause'} · round ${state.round} · 6 s à ×1`;
+      const text = active ? `Round ${displayFrame.round} · actions simultanées` : `${running ? 'Lecture' : 'Pause'} · round ${state.round} · ${ROUND_DURATION / 1000} s à ×1`;
       if (status.textContent !== text) status.textContent = text;
       return;
     }
@@ -291,9 +291,11 @@ export function mountMatch(root, callbacks = {}) {
       chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${active ? ', action en cours' : ''}`);
     }
     const holder = frame.players.find((p) => p.id === frame.ball.carrierId), name = (id) => state.players.find((p) => p.id === id)?.name;
-    const remaining = Math.max(0, (11 - frame.round) * 6 - (frame.roundProgress ?? 0) * 6);
+    const roundSeconds = ROUND_DURATION / 1000;
+    const remaining = Math.max(0, (11 - frame.round) * roundSeconds - (frame.roundProgress ?? 0) * roundSeconds);
+    const seconds = Math.ceil(remaining);
     phaseText.textContent = frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
-    timeText.textContent = frame.finished ? '00:00' : frame.round > 10 ? `+${String(Math.ceil(6 * (1 - (frame.roundProgress ?? 0)))).padStart(2, '0')}` : remaining > 59 ? '01:00' : `00:${String(Math.ceil(remaining)).padStart(2, '0')}`;
+    timeText.textContent = frame.finished ? '00:00' : frame.round > 10 ? `+${String(Math.ceil(roundSeconds * (1 - (frame.roundProgress ?? 0)))).padStart(2, '0')}` : `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
     possessionText.textContent = frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : 'Balle libre';
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) score.querySelector('.rb-team-count').textContent = `${frame.players.filter((p) => p.teamId === teamId && p.hp > 0).length} / 5 en jeu`;
