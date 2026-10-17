@@ -6,6 +6,8 @@ La page dédiée conserve la même origine et la même clé de sauvegarde : une 
 
 Au lancement d’une nouvelle rencontre, « 3, 2, 1, START » précède le premier tour. Le ballon est masqué pendant la préparation et le décompte, puis arrive au centre sur START ; les actions commencent après sa courte arrivée. L’intro dure 3,5 secondes, indépendamment de la vitesse choisie, sans avancer le chrono, les jets ou la carrière. Pause conserve le décompte restant ; une étape manuelle ou le résultat immédiat le passe. Reprendre une rencontre sauvegardée ne rejoue pas l’intro. Les animations réduites conservent les repères sans zoom ni chute animée.
 
+En Exhibition, **Lancer le match** est disponible en haut du vestiaire, avant les fiches et le déploiement, puis à nouveau après les réglages. Sur téléphone, le bouton du haut occupe toute la largeur ; les deux boutons utilisent la même validation du formulaire et les consignes courantes.
+
 ## Carrière
 
 Fonder un club donne 2 400 chromas. Choisir cinq à huit des douze candidats, puis valider les contrats en une fois. Les vues **Effectif**, **Recrutement**, **Équipement** et **Ligue** donnent accès à la composition, aux consignes, aux achats et au calendrier. Composition, consignes et placement sont enregistrés automatiquement ; choisir un titulaire déjà présent échange les deux positions. Dans **Déploiement**, choisir le joueur puis cliquer une case de sa moitié ; une case occupée échange les deux joueurs. Les flèches parcourent les cases et Entrée valide le placement. La même interface existe en Exhibition. Les cinq adversaires disposent de sept joueurs fixes, progressent et font tourner leurs titulaires en fonction de leur fatigue ; aucune adaptation à la puissance du club.

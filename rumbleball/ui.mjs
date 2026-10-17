@@ -35,8 +35,9 @@ export function mountMatch(root, callbacks = {}) {
 
   const setup = element('form', 'rb-setup');
   const setupHead = element('div', 'rb-setup-head');
-  const setupCopy = element('div');
+  const setupCopy = element('div', 'rb-setup-copy');
   setupCopy.append(element('p', 'rb-eyebrow', 'Le vestiaire'), element('h3', '', 'Préparer les Recrues'), element('p', 'rb-muted', 'Quatre archétypes, cinq joueurs. Choisissez leurs rôles et leurs consignes ; les bots gèrent leurs techniques et leurs ressources.'));
+  const quickStart = button('Lancer le match', 'rb-button rb-button-primary rb-setup-start'); quickStart.type = 'submit'; setupCopy.append(quickStart);
   const strategyLabel = element('label', 'rb-field', 'Plan collectif');
   const strategySelect = element('select'); strategySelect.name = 'rb-strategy'; strategySelect.append(...options(STRATEGIES, 'balanced'));
   strategyLabel.append(strategySelect);

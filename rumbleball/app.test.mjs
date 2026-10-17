@@ -84,11 +84,17 @@ test('page autonome : carrière existante, lecture automatique sans section du l
   assert.equal(classNode(loaded.root, 'rb-match-area').hidden, true);
 });
 
-test('page autonome : première visite et Exhibition utilisables sans carrière', async (t) => {
+test('page autonome : lancement d’Exhibition en haut du vestiaire et après les réglages, sans carrière', async (t) => {
   const e = standalone(), clock = timers(t); mountApp(e.root);
   assert.ok(classNode(e.root, 'rb-career-welcome')); assert.ok(classNode(e.root, 'rb-career-create'));
-  await button(e.root, 'Exhibition').click(); assert.equal(classNode(e.root, 'rb-setup').hidden, false);
-  await classNode(e.root, 'rb-setup').emit('submit'); clock.until(() => classNode(e.root, 'rb-journal').children.length > 1);
+  await button(e.root, 'Exhibition').click();
+  const setup = classNode(e.root, 'rb-setup'), quickStart = button(setup, 'Lancer le match'), order = descendants(setup);
+  assert.equal(setup.hidden, false); assert.equal(quickStart.type, 'submit'); assert.equal(quickStart.closest('form'), setup);
+  assert.ok(classNode(setup, 'rb-setup-head').contains(quickStart));
+  assert.ok(order.indexOf(quickStart) < order.indexOf(classNode(setup, 'rb-preparation')), 'Le lancement précède les fiches et le déploiement.');
+  const bottomStart = button(classNode(setup, 'rb-setup-foot'), 'Lancer le match');
+  assert.equal(bottomStart.type, 'submit'); assert.equal(bottomStart.closest('form'), setup, 'Les deux boutons partagent le même formulaire et la même validation.');
+  await setup.emit('submit', { submitter: quickStart }); clock.until(() => classNode(e.root, 'rb-journal').children.length > 1);
   assert.equal(classNode(e.root, 'rb-setup').hidden, true);
   assert.ok(classNode(e.root, 'rb-journal').children.length > 1);
   await button(e.root, 'Carrière').click(); assert.equal(clock.pending.size, 0);

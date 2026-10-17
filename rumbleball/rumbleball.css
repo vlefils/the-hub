@@ -28,6 +28,8 @@
 .rb-setup-head { display: flex; justify-content: space-between; align-items: start; gap: 1.25rem; margin-bottom: 1.25rem; }
 .rb-setup-head p { margin-top: .4rem; }
 .rb-setup-head .rb-eyebrow { margin: 0 0 .5rem; }
+.rb-setup-copy { min-width: 0; }
+.rb-setup-start { margin-top: 1rem; }
 .rb-setup-head > .rb-kit-options { flex: 0 1 21rem; }
 .rb-field { display: flex; flex-direction: column; gap: .35rem; min-width: 0; font-size: .8125rem; color: var(--muted); }
 .rb select, .rb input { width: 100%; min-height: 2.75rem; min-width: 0; border: 1px solid #4a5950; border-radius: 2px; background: #101815; color: var(--text); padding: .5rem .65rem; font: inherit; font-size: .9375rem; }
@@ -250,6 +252,7 @@
 @media (max-width: 960px) { .rb-setup, .rb-scoreboard, .rb-result { scroll-margin-top: 7.5rem; } }
 @media (max-width: 640px) {
   .rb-setup-head { flex-direction: column; }
+  .rb-setup-copy, .rb-setup-start { width: 100%; }
   .rb-setup-head > .rb-kit-options { flex-basis: auto; width: 100%; }
   .rb .rb-setup-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
   .rb-identity { grid-column: 1/-1; }
