@@ -1,7 +1,8 @@
 import {
-  active, allies, carrier, distance, interceptionCandidates, legalAction,
+  active, allies, armorAgainst, carrier, chargeRun, collectiveOpening, distance, hasCheckHelp, hasPassCall, interceptionCandidates, legalAction, legalClassAction,
   movementView, opponents, playerById, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill,
 } from './rules.mjs';
+import { isRunner } from './classes.mjs';
 
 const nearestDistance = (players, cell) => Math.min(12, ...players.map((p) => distance(p.position, cell)));
 const order = (a, b) => a.id.localeCompare(b.id);
@@ -73,6 +74,7 @@ function exposure(state, actor, path, disengaged = false) {
   const provoked = new Set();
   for (const next of path) {
     opponents(state, actor).forEach((p) => {
+      if (actor.archetype === 'escamoteur' && actor.classState.flaw === 1 && actor.classState.targetId === p.id) return;
       if (provokesOpportunity(p, actor, last, next) && shouldTakeOpportunity(state, p, actor)) provoked.add(p.id);
     });
     last = next;
@@ -106,7 +108,19 @@ export function decideTurn(state, actor) {
   const candidates = [];
   const add = (entry, action, score) => {
     const view = movementView(state, actor, entry.position);
-    if (legalAction(view.state, view.actor, action)) candidates.push({ path: entry.path, action, score: entry.score + score, task });
+    view.actor = { ...view.actor, chargeRun: chargeRun(actor, entry.path) };
+    if (!legalAction(view.state, view.actor, action)) return;
+    const target = playerById(view.state, action.targetId);
+    const opening = target && ['strip', 'grapple', 'shove'].includes(action.type) && collectiveOpening(view.state, view.actor, target);
+    candidates.push({ path: entry.path, action, score: entry.score + score + (opening ? 7 : 0), task });
+    let technique, gain = 0;
+    if (action.type === 'strip' && !hasCheckHelp(state, actor)) { technique = 'exploitation'; gain = 9; }
+    if (action.type === 'attack' && !actor.grappling && !target.grappledBy) { technique = 'percussion'; gain = 5; }
+    if (action.type === 'pass' && !hasCheckHelp(state, actor) && !hasPassCall(state, actor)
+      && (state.round >= 8 || opponents(view.state, view.actor).some((p) => distance(p.position, entry.position) <= 1)
+        || interceptionCandidates(view.state, view.actor, target.position).length)) { technique = 'precision'; gain = 8; }
+    const enhanced = { ...action, technique };
+    if (technique && legalAction(view.state, view.actor, enhanced)) candidates.push({ path: entry.path, action: enhanced, score: entry.score + score + gain, task });
   };
   const holder = carrier(state);
   for (const cell of cells) {
@@ -117,7 +131,7 @@ export function decideTurn(state, actor) {
     for (const enemy of adjacent) {
       const danger = holder?.teamId === actor.teamId && distance(enemy.position, holder.position) <= 2;
       add(cell, { type: 'strip', targetId: enemy.id }, 106 + skill(actor, 'wrestling') * 3 + Number(actor.role === 'retriever') * 16 + aggression * .3);
-      const hitChance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - enemy.armor) / 20));
+      const hitChance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
       const ko = enemy.hp <= actor.attack.die / 2 + .5 + actor.attack.flat;
       add(cell, { type: 'attack', targetId: enemy.id }, 18 + hitChance * 18 + Number(enemy.id === holder?.id) * 28 + Number(danger) * 18 + Number(ko) * 20 + aggression);
       add(cell, { type: 'grapple', targetId: enemy.id }, 20 + Number(danger) * 38 + Number(actor.role === 'blocker') * 15 + Number(enemy.id === holder?.id) * 8 + aggression * .2);
@@ -132,7 +146,8 @@ export function decideTurn(state, actor) {
         const interceptions = interceptionCandidates(here, actorHere, ally.position);
         const dc = adjacent.length || actor.grappledBy ? 15 : 10;
         const success = Math.max(.05, Math.min(.95, (21 + skill(actor, 'acrobatics') - dc) / 20));
-        add(cell, { type: 'pass', targetId: ally.id }, 20 + improvement * 1.8 + Number(preferCarrier) * 24 + success * 15 - interceptions.length * 16 - Number(state.round >= 9) * 10);
+        add(cell, { type: 'pass', targetId: ally.id }, 20 + improvement * 1.8 + Number(preferCarrier) * 24 + success * 15
+          + Number(hasPassCall(state, actor)) * 12 - interceptions.length * 16 - Number(state.round >= 9) * 10);
       }
     }
     for (const ally of allies(here, actorHere)) {
@@ -158,6 +173,43 @@ export function decideTurn(state, actor) {
   candidates.sort((a, b) => b.score - a.score || a.path.length - b.path.length || a.action.type.localeCompare(b.action.type) || (a.action.targetId ?? '').localeCompare(b.action.targetId ?? ''));
   const chosen = candidates[0] ?? { path: [], action: { type: 'wait' }, score: 0, task };
   return { ...chosen, reason: explain(actor, task, chosen.action.type, playerById(state, chosen.action.targetId)) };
+}
+
+// One bounded bonus choice at each execution boundary, using public state only.
+export function decideClassAction(state, actor, path = []) {
+  if (actor.hp <= 0 || !actor.classState) return null;
+  const r = actor.classState, target = playerById(state, r.targetId);
+  if (actor.archetype === 'escamoteur' && target && r.flaw) {
+    let from = actor.position;
+    for (const to of path) {
+      if (provokesOpportunity(target, actor, from, to) && shouldTakeOpportunity(state, target, actor)) {
+        const feint = { type: 'feint', targetId: target.id };
+        if (legalClassAction(state, actor, feint)) return feint;
+      }
+      from = to;
+    }
+  }
+  if (!actor.bonusAction || !isRunner(actor)) return null;
+  const holder = carrier(state);
+  if (actor.archetype === 'capitaine' && holder?.teamId === actor.teamId && holder.id !== actor.id
+    && !hasCheckHelp(state, holder)) {
+    const call = { type: 'call', targetId: holder.id };
+    const canRelay = allies(state, holder).some((p) => p.reaction && distance(p.position, holder.position) <= 6
+      && (safety(state, holder, p.position) > safety(state, holder, holder.position) + 10 || p.role === 'carrier' && holder.role !== 'carrier'));
+    if (canRelay && legalClassAction(state, actor, call)) {
+      const preview = { ...state, calls: [...state.calls, { sourceId: actor.id, targetId: holder.id }] };
+      const nextHolder = { ...holder, action: true, interaction: true, pickedUp: false, movement: holder.grappledBy ? 0 : holder.speed };
+      if (decideTurn(preview, nextHolder).action.type === 'pass') return call;
+    }
+  }
+  const enemies = opponents(state, actor).filter((p) => distance(p.position, actor.position) <= 6)
+    .sort((a, b) => Number(b.id === holder?.id) - Number(a.id === holder?.id)
+      || distance(a.position, holder?.position ?? actor.position) - distance(b.position, holder?.position ?? actor.position) || order(a, b));
+  const preferred = enemies[0];
+  if (target?.hp > 0 && distance(target.position, actor.position) <= 6
+    && (r.flaw || target.id === preferred?.id)) return null;
+  const lock = { type: 'lock', targetId: preferred?.id };
+  return legalClassAction(state, actor, lock) ? lock : null;
 }
 
 export function decideMovement(state, actor) {

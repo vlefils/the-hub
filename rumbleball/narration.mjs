@@ -1,7 +1,8 @@
 import { COURT } from './data.mjs';
 
 const announcements = new Set(['finish', 'overtime', 'restart']);
-const boundary = (event) => event.resolvedAction || ['move', 'drag', 'opportunity', 'stand', 'hold-position', 'movement-stopped', 'round-end', 'finish', 'overtime', 'restart'].includes(event.type);
+const boundary = (event) => event.resolvedAction || (event.type === 'class' && ['lock', 'call', 'feint', 'observe'].includes(event.ability))
+  || ['move', 'drag', 'opportunity', 'stand', 'hold-position', 'movement-stopped', 'round-end', 'finish', 'overtime', 'restart'].includes(event.type);
 const metres = (steps) => {
   const distance = steps * COURT.cell;
   return `${distance.toLocaleString('fr-FR')} ${distance < 2 ? 'mètre' : 'mètres'}`;
@@ -101,6 +102,8 @@ export function narrateTurn(events, players) {
     }
     // Forced separation during an action remains visible; routine hold-position does not.
     for (const release of group.filter((e) => e.type === 'release' && action.type !== 'release')) sentences.push(release.message);
+    for (const technique of group.filter((e) => e.type === 'class')) sentences.push(technique.message);
+    for (const push of group.filter((e) => e.type === 'push' && action.type === 'attack')) sentences.push(`${name(push.playerId)} a reculé sous la percussion.`);
   };
   for (let i = 0; i < events.length;) {
     const event = events[i];
@@ -134,6 +137,7 @@ export function narrateTurn(events, players) {
     if (announcements.has(event.type)) { flushMovement(); notices.push({ type: event.type, message: event.message }); }
     else if (event.type === 'stand') { flushMovement(); sentences.push(`${name(event.actorId)} a repris ses appuis.`); }
     else if (event.type === 'release') { flushMovement(); sentences.push(event.message); }
+    else if (event.type === 'class') { flushMovement(); sentences.push(event.message); }
     i++;
   }
   flushMovement();

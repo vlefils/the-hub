@@ -5,6 +5,7 @@ import { arenaBackdrop, pawnArtwork, svg, teamCrest, turnMarkerArtwork } from '.
 import { narrateTurn } from './narration.mjs';
 import { courtPoint, createCourtPlayback, nextCourtTurnDelay } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
+import { ARCHETYPES, archetypeLabel, classResources } from './classes.mjs';
 
 const root = document.querySelector('[data-rumbleball]');
 const section = root?.closest('[data-section]');
@@ -30,7 +31,7 @@ if (root) {
   const setup = element('form', 'rb-setup');
   const setupHead = element('div', 'rb-setup-head');
   const setupCopy = element('div');
-  setupCopy.append(element('p', 'rb-eyebrow', 'Le vestiaire'), element('h3', '', 'Préparer les Recrues'), element('p', 'rb-muted', 'Choisissez leur rôle. Donnez le ton. Ils feront le reste sur le terrain.'));
+  setupCopy.append(element('p', 'rb-eyebrow', 'Le vestiaire'), element('h3', '', 'Préparer les Recrues'), element('p', 'rb-muted', 'Quatre archétypes, cinq joueurs. Choisissez leurs rôles et leurs consignes ; les bots gèrent leurs techniques et leurs ressources.'));
   const strategyLabel = element('label', 'rb-field', 'Plan collectif');
   const strategySelect = element('select'); strategySelect.name = 'rb-strategy'; strategySelect.append(...options(STRATEGIES, 'balanced'));
   strategyLabel.append(strategySelect); setupHead.append(setupCopy, strategyLabel); setup.append(setupHead);
@@ -39,7 +40,7 @@ if (root) {
     const row = element('div', 'rb-setup-row');
     const identity = element('div', 'rb-identity');
     identity.append(element('span', 'rb-number rb-home', String(p.number)));
-    const copy = element('div'); copy.append(element('strong', '', p.name), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString('fr-FR')} m · attaque +${p.attack.bonus}, 1d${p.attack.die}+${p.attack.flat}`));
+    const copy = element('div'); copy.append(element('strong', '', p.name), element('span', 'rb-archetype', archetypeLabel(p)), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString('fr-FR')} m · attaque +${p.attack.bonus}, 1d${p.attack.die}+${p.attack.flat}`));
     identity.append(copy);
     const roleLabel = element('label', 'rb-field', 'Rôle'); const role = element('select'); role.name = `rb-role-${index}`;
     role.setAttribute('aria-label', `Rôle de ${p.name}`); role.append(...options(ROLES, p.role)); roleLabel.append(role);
@@ -60,7 +61,18 @@ if (root) {
   const start = button('Lancer le match', 'rb-button rb-button-primary'); start.type = 'submit';
   setupFoot.append(seedLabel, reroll, start);
   const seedHelp = element('p', 'rb-muted', 'Même code et mêmes consignes : le match sera identique. Les consignes sont fixées au coup d’envoi.'); seedHelp.id = 'rb-seed-help';
-  setup.append(setupFoot, seedHelp); root.append(setup);
+  setup.append(setupFoot, seedHelp);
+  const classGuide = element('details', 'rb-rules rb-class-guide');
+  classGuide.append(element('summary', '', 'Les classes et leurs techniques de rumbleball'));
+  const classGuideCopy = element('div', 'rb-rules-copy');
+  for (const archetype of Object.values(ARCHETYPES)) {
+    const block = element('section'); block.append(element('h4', '', `${archetype.className} · ${archetype.name}`), element('p', 'rb-muted', archetype.description));
+    for (const [name, description] of archetype.abilities) {
+      const line = element('p'); line.append(element('strong', '', `${name}. `), document.createTextNode(description)); block.append(line);
+    }
+    classGuideCopy.append(block);
+  }
+  classGuide.append(classGuideCopy); setup.append(classGuide); root.append(setup);
 
   const scoreboard = element('div', 'rb-scoreboard');
   const homeScore = element('div', 'rb-team-name rb-home');
@@ -129,7 +141,7 @@ if (root) {
     'Passe : action, 9 m, Acrobaties DD 10 ou 15 sous pression. Interception : résultat strictement supérieur à celui du passeur. Ramassage contesté et arrachement : tests opposés, égalité au défenseur.',
     'Après des dégâts au porteur : sauvegarde de Constitution, DD égal aux dégâts, minimum 10. Un plaquage seul ne fait pas lâcher la balle. À 0 PV : KO stable et sortie du match.',
     'Diagonales : 1,5 m. Cases occupées bloquantes, sol humide difficile. Agripper immobilise la cible ; le lutteur peut l’entraîner à demi-vitesse en maintenant la prise. Les deux joueurs doivent avoir un passage libre. Pas de rebonds ni d’actions préparées.',
-    'Les profils sont ceux des Charognards, copiés pour les Recrues. Toutes les capacités spéciales sont retirées. Rôles et consignes modifient les décisions, jamais les caractéristiques.',
+    'Trois classes, quatre archétypes : Brute Bélier, Runner Escamoteur, Runner Capitaine et Gâchette Passeur de précision. Une action bonus par tour ; les ressources de classe ne reviennent pas pendant le match. Aucun soin ni retour en jeu après un KO. Rôles et consignes orientent les décisions des bots.',
   ]) rulesCopy.append(element('p', '', text));
   rules.append(rulesCopy); root.append(rules);
   const errorBox = element('p', 'rb-error'); errorBox.setAttribute('role', 'alert'); errorBox.hidden = true; root.prepend(errorBox);
@@ -269,7 +281,16 @@ if (root) {
     for (const [name, value] of [['CA', p.armor], ['PV', `${p.hp}/${p.maxHp}`], ['Vitesse', p.grappledBy ? '0 m · agrippé' : `${speedText} m${p.grappling ? ' · lutte' : ''}`], ['FOR', p.abilities.strength], ['DEX', p.abilities.dexterity], ['CON', p.abilities.constitution], ['Lutte', signed(p.skills.wrestling ?? modifier(p.abilities.strength))], ['Acrobaties', signed(p.skills.acrobatics ?? modifier(p.abilities.dexterity))]]) {
       const item = element('div'); item.append(element('dt', '', name), element('dd', '', String(value))); stats.append(item);
     }
-    selected.append(heading, stats, element('p', 'rb-muted', `Attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants · aucune capacité spéciale.`));
+    selected.append(heading, element('p', 'rb-archetype', archetypeLabel(p)), stats,
+      element('p', 'rb-muted', `Attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants.`));
+    const classCopy = element('div', 'rb-class-details');
+    classCopy.append(element('p', 'rb-class-resource', classResources(p, state.players)));
+    for (const [name, description] of ARCHETYPES[p.archetype]?.abilities ?? []) {
+      const line = element('p'); line.append(element('strong', '', `${name}. `), document.createTextNode(description)); classCopy.append(line);
+    }
+    const call = state.calls.find((c) => c.targetId === p.id);
+    if (call) classCopy.append(element('p', 'rb-ball-text', `Appel de ${state.players.find((q) => q.id === call.sourceId).name} : prochaine passe avec avantage.`));
+    selected.append(classCopy);
   }
   function signed(value) { return value >= 0 ? `+${value}` : String(value); }
   function renderRosters() {
@@ -283,12 +304,13 @@ if (root) {
         const row = element('div', `rb-roster-row${p.hp === 0 ? ' is-ko' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
         const playerButton = button(`${p.number} · ${p.name}`, 'rb-player-name'); playerButton.setAttribute('aria-pressed', String(selectedId === p.id)); playerButton.addEventListener('click', () => selectPlayer(p.id));
         playerButton.dataset.rbPlayer = p.id;
-        const copy = element('div'); copy.append(playerButton, element('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
+        const copy = element('div'); copy.append(playerButton, element('small', 'rb-archetype', archetypeLabel(p)), element('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
         const health = element('div', 'rb-health'); health.append(element('span', '', `${p.hp}/${p.maxHp} PV`));
         const meter = element('meter'); meter.min = 0; meter.max = p.maxHp; meter.value = p.hp; meter.setAttribute('aria-label', `Points de vie de ${p.name}`); health.append(meter);
         const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', state.ball.carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
         const resource = element('small', 'rb-resource', p.hp === 0 ? 'Hors jeu' : p.reaction ? 'Réaction disponible' : 'Réaction dépensée');
-        row.append(copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource); block.append(row);
+        row.append(copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource,
+          element('small', 'rb-class-resource', classResources(p, state.players))); block.append(row);
       }
       rosters.append(block);
     }

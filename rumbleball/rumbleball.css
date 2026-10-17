@@ -73,6 +73,13 @@
 .rb-identity strong { font-size: 1rem; }
 .rb-identity strong, .rb-identity small { display: block; overflow-wrap: anywhere; }
 .rb-identity small { color: var(--muted); margin-top: .2rem; }
+.rb-archetype { display: block; margin: .25rem 0 .4rem !important; color: #c8dcb4; font-size: .875rem; line-height: 1.45; overflow-wrap: anywhere; }
+.rb-class-guide { margin-top: 1rem; }
+.rb-class-guide section + section { margin-top: 1.25rem; }
+.rb-class-guide h4 { margin: 0 0 .4rem; font-size: 1rem; }
+.rb-class-details { margin-top: .75rem; font-size: .875rem; line-height: 1.6; }
+.rb-class-details p + p { margin-top: .5rem; }
+.rb-class-resource { grid-column: 1 / -1; color: #c8dcb4; overflow-wrap: anywhere; }
 .rb-number { display: grid; place-items: center; flex: 0 0 2rem; height: 2.35rem; border: 1px solid #4d7668; border-bottom: 3px solid var(--rb-home); background: #202f29; font: 700 1.3rem 'Rajdhani', sans-serif; }
 .rb-role-description { grid-column: 1/-1; padding-left: 2.75rem; color: var(--muted); font-size: .8125rem; line-height: 1.5; }
 .rb-setup-foot { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-top: .75rem; }
@@ -142,6 +149,8 @@
 .rb-effect-attack, .rb-effect-damage, .rb-effect-ko, .rb-effect-prone { color: #ff9a87; }
 .rb-effect-opportunity, .rb-effect-possession { color: var(--rb-ball); }
 .rb-effect-grapple, .rb-effect-help { color: #c8e8b0; }
+.rb-effect-class { color: #a6e2d3; }
+.rb-effect-absorb { color: #f0eee2; }
 .rb-effect-ring { fill: none; stroke: currentColor; stroke-width: 3; }
 .rb-impact-line { stroke: currentColor; stroke-width: 4; stroke-linecap: round; }
 .rb-impact-slash { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; }

@@ -1,6 +1,7 @@
 import { clone, PROFILES, STARTS, ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
-import { decideMovement, decideTurn } from './ai.mjs';
-import { assertInvariants, beginTurn, carrier, emit, legalAction, moveAlong, randomInt, resolveAction, stat } from './rules.mjs';
+import { decideClassAction, decideMovement, decideTurn } from './ai.mjs';
+import { ARCHETYPES, initialClassState } from './classes.mjs';
+import { assertInvariants, beginTurn, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, stat } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
 export function seedHash(seed) {
@@ -18,16 +19,18 @@ function centerBall(state) {
 export function createMatch(config = {}) {
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const state = {
-    version: 1, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
-    phase: 'regular', finished: false, result: null, turns: 0, aids: [], lastDecision: null,
+    version: 2, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
+    phase: 'regular', finished: false, result: null, turns: 0, aids: [], calls: [], lastDecision: null,
     teams: [
       { id: 'home', name: 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced' },
       { id: 'away', name: 'Les Charognards', strategy: 'balanced' },
     ],
     stats: { home: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 }, away: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 } },
     players: ['home', 'away'].flatMap((teamId) => PROFILES.map((profile, index) => {
-      const assigned = teamId === 'home' ? config.players?.[index] : null;
+      const assigned = (teamId === 'home' ? config.players : config.awayPlayers)?.[index];
+      const archetype = config.classes === false ? null : Object.hasOwn(ARCHETYPES, assigned?.archetype) ? assigned.archetype : profile.archetype;
       return { ...clone(profile), id: `${teamId}-${index}`, teamId, number: index + 1,
+        archetype, classState: initialClassState(archetype), bonusAction: true, chargeRun: null, feintTargetId: null,
         name: teamId === 'home' ? profile.trainingName : profile.name,
         role: Object.hasOwn(ROLES, assigned?.role) ? assigned.role : profile.role,
         instruction: Object.hasOwn(INSTRUCTIONS, assigned?.instruction) ? assigned.instruction : 'normal',
@@ -45,6 +48,8 @@ export function createMatch(config = {}) {
 }
 function finish(state, events, winner) {
   state.finished = true;
+  state.calls = [];
+  for (const p of state.players) { p.classState.targetId = null; p.classState.flaw = 0; }
   state.result = { winnerId: winner?.teamId ?? null, carrierId: winner?.id ?? null, round: state.round,
     reason: winner ? 'possession' : 'draw' };
   const team = state.teams.find((t) => t.id === winner?.teamId);
@@ -59,9 +64,10 @@ function endRound(state, events) {
   state.turnIndex = 0;
   if (state.round === 11) { state.phase = 'overtime'; emit(state, events, 'overtime', 'Balle libre à la sirène : deux rounds de prolongation. Une possession en fin de round suffit.'); }
   if (state.round === 13) {
-    state.phase = 'final'; centerBall(state); state.aids = [];
+    state.phase = 'final'; centerBall(state); state.aids = []; state.calls = [];
     for (const p of state.players) {
       p.position = startPosition(p.teamId, p.number - 1); p.grappling = null; p.grappledBy = null; p.dodging = false;
+      p.classState.targetId = null; p.classState.flaw = 0;
     }
     emit(state, events, 'restart', 'Dernier engagement au centre : un round pour contrôler la balle. PV et KO conservés.');
   }
@@ -85,14 +91,23 @@ function stepMutable(state) {
   state.activeId = actor.id;
   state.turns++;
   beginTurn(state, actor, events);
+  const useClassAction = (path = []) => {
+    const choice = decideClassAction(state, actor, path);
+    if (choice) resolveClassAction(state, actor, choice, events);
+  };
+  useClassAction();
   const decision = decideTurn(state, actor);
   state.lastDecision = { playerId: actor.id, reason: decision.reason, action: decision.action.type };
   emit(state, events, 'decision', `${actor.name} · ${decision.reason}`, { playerId: actor.id, action: decision.action.type });
-  moveAlong(state, actor, decision.path, events);
+  useClassAction(decision.path); moveAlong(state, actor, decision.path, events); useClassAction();
   if (actor.hp > 0) {
     // A reaction may remove possession during movement. Reconsider only actions legal
     // at the reached cell; a fresh full-turn plan could require another unexecuted path.
     let action = decision.action;
+    if (action.technique && !legalAction(state, actor, action)) {
+      const basic = { ...action }; delete basic.technique;
+      if (legalAction(state, actor, basic)) action = basic;
+    }
     if (!legalAction(state, actor, action)) {
       const revised = decideTurn(state, { ...actor, movement: 0 });
       action = revised.action;
@@ -103,17 +118,21 @@ function stepMutable(state) {
     // An uncontested pickup is an interaction, so the actor still has their action.
     if (actor.action && actor.hp > 0) {
       const followup = decideTurn(state, actor);
-      moveAlong(state, actor, followup.path, events);
+      useClassAction(followup.path); moveAlong(state, actor, followup.path, events); useClassAction();
       if (actor.hp > 0) {
-        const next = legalAction(state, actor, followup.action) ? followup.action : { type: 'dodge' };
+        const basic = { ...followup.action }; delete basic.technique;
+        const next = legalAction(state, actor, followup.action) ? followup.action : legalAction(state, actor, basic) ? basic : { type: 'dodge' };
         if (!resolveAction(state, actor, next, events)) throw new Error(`Action de suivi illégale : ${actor.id}`);
       }
     }
     if (actor.grappling) {
       const held = state.players.find((p) => p.id === actor.grappling);
       emit(state, events, 'hold-position', `${actor.name} maintient sa prise sur ${held.name} et conserve sa position ; le mouvement restant n’est pas dépensé.`);
-    } else moveAlong(state, actor, decideMovement(state, actor), events);
+    } else {
+      const path = decideMovement(state, actor); useClassAction(path); moveAlong(state, actor, path, events);
+    }
   }
+  endTurn(state, actor, events);
   assertInvariants(state);
   advance(state, events);
   assertInvariants(state);

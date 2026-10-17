@@ -56,9 +56,14 @@ export function buildCourtPlayback(before, after, events, { speed = 1 } = {}) {
     const e = events[i];
     // Read an action's result before the next action, reaction or movement.
     // In particular, several opportunity attacks get separate beats.
-    if (e.resolvedAction || ['move', 'attack', 'opportunity'].includes(e.type)) finishBeat();
+    if (e.resolvedAction || ['move', 'attack', 'opportunity'].includes(e.type)
+      || (e.type === 'class' && ['lock', 'call', 'feint', 'observe'].includes(e.ability))) finishBeat();
     if (e.resolvedAction) action = e.resolvedAction;
     switch (e.type) {
+      case 'class':
+        effect(e.ability === 'absorb' ? 'absorb' : 'class', e.visualId ?? e.playerId, e.label,
+          { duration: e.ability === 'observe' ? 600 : 900 });
+        stage(e.ability === 'absorb' ? 180 : 450); break;
       case 'move': {
         const drag = events[i + 1]?.type === 'drag' && events[i + 1].byId === e.playerId ? events[++i] : null;
         const duration = Math.min(250, 70 + e.path.length * 25);

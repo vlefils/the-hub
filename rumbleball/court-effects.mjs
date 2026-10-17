@@ -35,7 +35,9 @@ export function drawCourtEffects(layer, effects) {
     if (e.label) {
       const slot = slots.get(e.playerId) ?? 0; slots.set(e.playerId, slot + 1);
       const y = point.y < 85 ? point.y + 43 + slot * 24 : point.y - 33 - slot * 24;
-      group.append(svg('text', { x: point.x, y: Math.max(-14, Math.min(487, y - progress * 10)), 'text-anchor': 'middle', class: 'rb-effect-label' }, e.label));
+      const nearLeft = point.x < 100, nearRight = point.x > 620;
+      group.append(svg('text', { x: nearLeft ? Math.max(5, point.x - 25) : nearRight ? Math.min(715, point.x + 25) : point.x,
+        y: Math.max(-14, Math.min(487, y - progress * 10)), 'text-anchor': nearLeft ? 'start' : nearRight ? 'end' : 'middle', class: 'rb-effect-label' }, e.label));
     }
     layer.append(group);
   }

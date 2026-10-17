@@ -35,7 +35,7 @@ function finishFrom(state) {
   return { state: current, events };
 }
 
-test('profils symétriques, sans capacités ni effets de charge', () => {
+test('profils préfaits symétriques, statistiques et positions de départ', () => {
   const state = createMatch();
   for (let i = 0; i < 5; i++) {
     const a = state.players[i], b = state.players[i + 5];

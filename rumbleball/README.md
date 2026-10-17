@@ -1,6 +1,6 @@
-# Rumbleball — prototype V1
+# Rumbleball — prototype avec classes
 
-Accessible dans **Outils → Rumbleball** (`#outils-rumbleball`). Deux équipes fixes, rôles et consignes avant le match, puis simulation automatique. Pas de recrutement, de progression ni de capacités spéciales.
+Accessible dans **Outils → Rumbleball** (`#outils-rumbleball`). Deux équipes fixes avec quatre archétypes sportifs, rôles et consignes avant le match, puis simulation automatique. Aucun recrutement, progression, soin ou retour en jeu après un KO.
 
 ## Essayer en local
 
@@ -15,14 +15,17 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prot
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs
 ```
 
-Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
+Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
+
+Campagne initiale du 17 octobre 2026 : 242 victoires des Recrues, 258 des Charognards, 22 prolongations sur les 500 matchs. Les 30 matchs de compositions donnent 13 victoires des Recrues et 17 des Charognards. Les passes restent occasionnelles (295 tentatives sur les 500 matchs), donc les capacités de Gâchette sont moins fréquentes que celles du contact. Les tests contrôlés vérifient aussi la concentration partagée et les interceptions. Ces relevés servent de point de départ aux essais d’équilibrage.
 
 ## Organisation
 
 - `data.mjs` : profils, rôles, consignes et terrain.
+- `classes.mjs` : les quatre archétypes, leurs techniques, ressources initiales et textes partagés avec l’interface.
 - `rules.mjs` : actions légales, jets, réactions, mouvements et invariants.
 - `ai.mjs` : plan collectif et évaluation des décisions, sans modification des statistiques.
 - `engine.mjs` : initialisation et orchestration, indépendantes de l’affichage.
@@ -43,7 +46,22 @@ API du moteur : `createMatch(config)` retourne un état ; `stepMatch(state)` ret
 
 ## Règles retenues
 
-Source : `scenario/la-troisieme-mi-temps/04-match.md`. Les profils des Charognards sont transcrits dans les données pour que le jeu ne dépende pas du dossier de scénario à l’exécution. Les Recrues en sont des copies mécaniques. Retraits explicites : Capitaine, Pas de côté, Lecture de trajectoire et effet supplémentaire de Charge d’épaule. L’attaque du Frigo garde son +5 et son 1d8+3.
+Source du socle : `scenario/la-troisieme-mi-temps/04-match.md`. Les profils des Charognards sont transcrits dans les données pour que le jeu ne dépende pas du dossier de scénario à l’exécution. Les Recrues en sont des copies mécaniques. Les capacités particulières du scénario sont remplacées par les adaptations sportives ci-dessous ; elles ne modifient pas les classes du livre. L’attaque du Frigo garde son +5 et son 1d8+3.
+
+## Classes de rumbleball
+
+La classe définit les techniques, le rôle définit les priorités du bot. Les profils préfaits sont symétriques : Nora/Suze — Capitaine ; Brique/Frigo et Étau/Raf — Bélier ; Zip/Miette — Escamoteur ; Vigie/Pépé — Passeur de précision. Les caractéristiques de base restent celles des profils existants.
+
+| Archétype | Ressources et règles |
+|---|---|
+| **Brute — Bélier d’arène** | 6 Adrénaline par match. **Dur au mal** absorbe automatiquement jusqu’à 3 dégâts par impact, point pour point, sans réaction. Les dégâts restants déterminent KO et DD de tenue ; un impact entièrement absorbé ne provoque pas de test de tenue. **Percussion** coûte 2 Adrénaline dès la tentative d’attaque, après deux pas réellement effectués consécutivement dans la même direction. Sur touche, cible encore en jeu : JS FOR DD 13 ; échec, poussée d’une case. Pas de dégâts supplémentaires ni de lâcher automatique. |
+| **Runner — Escamoteur** | **Lecture de cible** : action bonus, ennemi à 9 m. Une faille est acquise à la fin du tour de la cible si elle est encore en jeu et à portée ; maximum une en réserve et une acquisition par round. Conserver la faille donne +1 CA contre cette cible. **Exploitation sportive** dépense la faille pour un arrachement avec avantage, ou une feinte qui évite les seules opportunités de cette cible jusqu’à la fin du tour. Aucun coût d’action supplémentaire ; l’arrachement utilise l’action normale. |
+| **Runner — Capitaine** | Même lecture et protection personnelle. **Ouverture collective** : le premier test d’arrachement, d’agrippement ou de plaquage d’un allié contre la cible consomme sa faille pour donner l’avantage. Le capitaine doit être en jeu et à 9 m de sa cible. Il ne consomme pas sa propre ouverture. Un seul capitaine contribue à un test, et une aide déjà présente préserve la faille. **Appel de jeu** : action bonus, autre allié à 9 m, 2 par match ; avantage à sa prochaine passe avant le début du prochain tour du capitaine. |
+| **Gâchette — Passeur de précision** | 2 concentration par match, partagées entre **Passe ajustée** (avantage à son jet de passe, dans l’action normale) et **Lecture de trajectoire** (avantage à une interception avec sa réaction habituelle). Le bot réserve la passe ajustée aux situations difficiles ou à la fin du match et n’utilise pas de concentration quand une aide ou un appel donne déjà l’avantage. |
+
+Toutes les tentatives spéciales dépensent leur ressource avant le jet, même en cas d’échec. Les avantages ne se cumulent pas. Verrouillage et appel partagent l’unique action bonus du tour ; la feinte consomme seulement une faille. Les ressources persistent entre les rounds et pendant les prolongations. Changer de cible efface l’ancienne faille sans remettre à zéro la limite d’observation du round. Un KO efface ses verrouillages et les appels le concernant. Le dernier engagement efface les cibles et appels, sans restaurer les ressources.
+
+L’API accepte `players[i].archetype` et `awayPlayers[i].archetype` pour les essais de compositions ; les valeurs invalides retombent sur l’archétype préfait. `classes: false` désactive les classes pour comparer le socle. Le vestiaire conserve les archétypes préfaits et laisse modifier les rôles et consignes. Ces options n’ajoutent pas de progression.
 
 Une minute représente dix rounds. La possession en fin de round 10 gagne ; sinon deux rounds de prolongation, avec victoire au premier contrôle de fin de round. Si la balle reste libre, un dernier engagement d’un round conserve initiative, PV et KO ; il replace les joueurs et supprime les agrippements. Sans contrôle à la fin du round 13, match nul. Les KO seuls ne décident jamais du vainqueur.
 
@@ -61,6 +79,6 @@ Conventions du prototype :
 - À terre : attaques de contact reçues avec avantage, attaques effectuées avec désavantage, déplacement coûteux et relevé à moitié de la vitesse. Esquive : désavantage aux attaques reçues jusqu’au prochain tour, suspendu si agrippé.
 - Agripper immobilise la cible. Le lutteur peut l’entraîner en maintenant leur position relative : chaque pas coûte le double, avec terrain difficile si l’un des deux traverse du sol humide. Les parois et obstacles sont vérifiés pour les deux joueurs ; aucun ne se déplace si le passage est bloqué. La cible est déplacée de force et ne provoque pas d’opportunité ; le lutteur reste exposé aux autres adversaires, mais pas à sa propre cible qui reste au contact.
 - Une prise ne se termine que par libération réussie, relâchement volontaire gratuit, KO ou éloignement dû à un déplacement forcé. Après un agrippement réussi, le bot conserve sa position et la prise ; il ne dépense pas son mouvement restant pour se replacer. Aux tours suivants, un entraînement éventuel est évalué avec le coût et la position des deux joueurs.
-- Aucun rebond, capacité spéciale, pouvoir, action préparée ou inventaire dans cette V1.
+- Aucun rebond, protocole Neuro, compagnon, soin, action préparée ou inventaire dans cette version.
 
 Les bots utilisent un score local explicable par rôle et une coordination recalculée à chaque tour. Ils n’effectuent pas de recherche tactique sur plusieurs tours ; la qualité compétitive et les stratégies de conservation restent à éprouver en jeu.

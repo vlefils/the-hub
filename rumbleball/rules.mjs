@@ -1,4 +1,5 @@
 import { COURT, WET_CELLS, modifier } from './data.mjs';
+import { ARCHETYPES, isRunner } from './classes.mjs';
 
 export const distance = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 export const sameCell = (a, b) => a.x === b.x && a.y === b.y;
@@ -41,8 +42,84 @@ function aided(state, actor, enemyId, kind) {
   state.aids.splice(index, 1);
   return true;
 }
-function skillCheck(state, actor, bonus, events, label) {
-  return check(state, bonus, events, label, { advantage: aided(state, actor, null, 'check') }).total;
+function skillCheck(state, actor, bonus, events, label, advantage = false) {
+  const help = aided(state, actor, null, 'check');
+  return check(state, bonus, events, label, { advantage: help || advantage }).total;
+}
+
+export const hasCheckHelp = (state, actor) => state.aids.some((a) => a.allyId === actor.id && a.kind === 'check');
+export const hasPassCall = (state, actor) => state.calls?.some((c) => c.targetId === actor.id && playerById(state, c.sourceId)?.hp > 0) ?? false;
+export const armorAgainst = (target, attacker) => target.armor + Number(isRunner(target) && target.classState?.flaw === 1 && target.classState.targetId === attacker.id);
+export const classEvent = (state, events, ability, actor, message, extra = {}) =>
+  emit(state, events, 'class', message, { ability, playerId: actor.id, ...extra });
+
+export function legalClassAction(state, actor, action) {
+  if (!action || actor.hp <= 0 || !actor.classState) return false;
+  const target = playerById(state, action.targetId), r = actor.classState;
+  if (action.type === 'feint') return actor.archetype === 'escamoteur' && r.flaw === 1
+    && target?.hp > 0 && target.id === r.targetId && !actor.feintTargetId;
+  if (!actor.bonusAction || !target || target.hp <= 0 || distance(actor.position, target.position) > 6) return false;
+  if (action.type === 'lock') return isRunner(actor) && target.teamId !== actor.teamId && r.targetId !== target.id;
+  if (action.type === 'call') return actor.archetype === 'capitaine' && r.calls > 0 && target.teamId === actor.teamId
+    && target.id !== actor.id && !state.calls.some((c) => c.targetId === target.id);
+  return false;
+}
+export function resolveClassAction(state, actor, action, events = []) {
+  if (!legalClassAction(state, actor, action)) return false;
+  const target = playerById(state, action.targetId), r = actor.classState;
+  if (action.type !== 'feint') actor.bonusAction = false;
+  if (action.type === 'lock') {
+    r.targetId = target.id; r.flaw = 0;
+    classEvent(state, events, 'lock', actor, `${actor.name} observe ${target.name} pour préparer une ouverture.`, { targetId: target.id, label: 'Observe' });
+  } else if (action.type === 'feint') {
+    r.flaw = 0; actor.feintTargetId = target.id;
+    classEvent(state, events, 'feint', actor, `${actor.name} exploite sa lecture de ${target.name} pour éviter ses opportunités ce tour.`, { targetId: target.id, label: 'Feinte' });
+  } else {
+    r.calls--; state.calls.push({ sourceId: actor.id, targetId: target.id });
+    classEvent(state, events, 'call', actor, `${actor.name} prépare la prochaine passe de ${target.name} par un appel de jeu.`, { targetId: target.id, visualId: target.id, label: 'Appel' });
+  }
+  return true;
+}
+export function endTurn(state, actor, events) {
+  for (const observer of state.players.filter((p) => p.hp > 0 && isRunner(p))) {
+    const r = observer.classState;
+    if (actor.hp > 0 && r.targetId === actor.id && !r.flaw && r.observedRound !== state.round && distance(observer.position, actor.position) <= 6) {
+      r.flaw = 1; r.observedRound = state.round;
+      classEvent(state, events, 'observe', observer, `${observer.name} repère une faille chez ${actor.name}.`, { targetId: actor.id, label: 'Faille +1' });
+    }
+  }
+  actor.feintTargetId = null;
+}
+function clearClassLinks(state, target) {
+  state.calls = (state.calls ?? []).filter((c) => c.sourceId !== target.id && c.targetId !== target.id);
+  for (const p of state.players) {
+    if (p.classState?.targetId === target.id || p.id === target.id) {
+      p.classState.targetId = null; p.classState.flaw = 0;
+    }
+  }
+}
+export function collectiveOpening(state, actor, target) {
+  if (hasCheckHelp(state, actor)) return null;
+  return allies(state, actor).filter((p) => p.archetype === 'capitaine' && p.classState.flaw === 1
+    && p.classState.targetId === target.id && distance(p.position, target.position) <= 6).sort((a, b) => a.id.localeCompare(b.id))[0] ?? null;
+}
+export function chargeRun(actor, path = []) {
+  let run = actor.chargeRun, from = actor.position;
+  for (const to of path) {
+    const dx = to.x - from.x, dy = to.y - from.y;
+    run = run?.dx === dx && run?.dy === dy ? { dx, dy, steps: run.steps + 1 } : { dx, dy, steps: 1 };
+    from = to;
+  }
+  return run;
+}
+function pushAway(state, actor, target, events) {
+  const valid = neighbors(target.position).filter((p) => !occupied(state, p) && distance(p, actor.position) > distance(target.position, actor.position));
+  valid.sort((a, b) => distance(b, actor.position) - distance(a, actor.position) || a.y - b.y || a.x - b.x);
+  if (!valid[0]) { emit(state, events, 'hold', `${target.name} est bloqué par la paroi ou les autres joueurs.`); return; }
+  const from = { ...target.position }; target.position = { ...valid[0] }; target.chargeRun = null;
+  if (state.ball.carrierId === target.id) state.ball.position = { ...target.position };
+  releaseSeparatedGrapples(state, events);
+  emit(state, events, 'push', `${actor.name} repousse ${target.name} d’une case.`, { playerId: target.id, from, position: { ...target.position } });
 }
 export function movementCost(actor, destination, draggedDestination = null) {
   const difficult = isWet(destination) || Boolean(draggedDestination && isWet(draggedDestination));
@@ -181,13 +258,19 @@ export function dropBall(state, actor, events, attacker = null) {
   emit(state, events, 'drop', `${actor.name} lâche la balle.`, { playerId: actor.id, position: { ...destination } });
 }
 export function dealDamage(state, actor, target, amount, events) {
-  const damage = Math.max(0, amount);
+  let damage = Math.max(0, amount);
+  const absorbed = target.hp > 0 && target.archetype === 'belier' ? Math.min(3, damage, target.classState.adrenaline) : 0;
+  if (absorbed) {
+    target.classState.adrenaline -= absorbed; damage -= absorbed;
+    classEvent(state, events, 'absorb', target, `${target.name} absorbe ${absorbed} dégâts grâce à son Adrénaline.`, { amount: absorbed, label: `Absorbe ${absorbed}` });
+  }
   target.hp = Math.max(0, target.hp - damage);
   emit(state, events, 'damage', `${target.name} subit ${damage} dégâts (${target.hp}/${target.maxHp} PV).`, { playerId: target.id, amount: damage });
   if (target.hp === 0) {
     dropBall(state, target, events);
     releaseGrapples(state, target);
     target.reaction = false; target.action = false; target.prone = true; target.dodging = false;
+    target.bonusAction = false; clearClassLinks(state, target);
     state.aids = state.aids.filter((a) => a.helperId !== target.id && a.allyId !== target.id);
     state.stats[actor.teamId].knockouts++;
     emit(state, events, 'ko', `${target.name} est KO, stable et hors du match.`, { playerId: target.id });
@@ -202,33 +285,44 @@ export function dealDamage(state, actor, target, amount, events) {
 // This predicate is shared by execution and the bots' assessment of a path.
 export function provokesOpportunity(actor, mover, from, to) {
   return actor.hp > 0 && mover.hp > 0 && actor.teamId !== mover.teamId && actor.reaction
-    && actor.id !== mover.grappling
+    && actor.id !== mover.grappling && actor.id !== mover.feintTargetId
     && !mover.disengaged && !mover.grappledBy && inside(from) && inside(to) && distance(from, to) === 1
     && distance(actor.position, from) <= 1 && distance(actor.position, to) > 1;
 }
-export function performAttack(state, actor, target, events, opportunity = null) {
+export function performAttack(state, actor, target, events, opportunity = null, technique = null) {
   if (actor.hp <= 0 || !target || target.hp <= 0 || actor.teamId === target.teamId || distance(actor.position, target.position) > 1 || !(opportunity ? actor.reaction : actor.action)) return false;
   if (opportunity && (!opportunity.from || !opportunity.to || !sameCell(target.position, opportunity.from)
     || !provokesOpportunity(actor, target, opportunity.from, opportunity.to)
     || !canStep(state, target, opportunity.from, opportunity.to))) return false;
-  if (opportunity) actor.reaction = false; else actor.action = false;
+  if (technique && (opportunity || technique !== 'percussion' || actor.archetype !== 'belier' || actor.classState.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2)) return false;
+  if (opportunity) actor.reaction = false; else { actor.action = false; actor.chargeRun = null; }
+  if (technique) {
+    actor.classState.adrenaline -= 2;
+    classEvent(state, events, 'percussion', actor, `${actor.name} lance une percussion sur ${target.name}.`, { targetId: target.id, label: 'Percussion' });
+  }
   const trigger = opportunity ? { from: { ...opportunity.from }, to: { ...opportunity.to }, attackerPosition: { ...actor.position }, reach: 1 } : null;
   const message = opportunity
     ? `${actor.name} tente une attaque d’opportunité sur ${target.name} : sortie d’allonge tentée de ${cellLabel(trigger.from)} vers ${cellLabel(trigger.to)}. L’attaque précède le déplacement.`
     : `${actor.name} attaque ${target.name}.`;
   emit(state, events, opportunity ? 'opportunity' : 'attack', message, { playerId: actor.id, targetId: target.id, ...(trigger ? { trigger } : {}) });
   const helped = aided(state, actor, target.id, 'attack');
-  const roll = check(state, actor.attack.bonus, events, `${actor.name} · attaque contre CA ${target.armor}`, {
+  const armor = armorAgainst(target, actor);
+  const roll = check(state, actor.attack.bonus, events, `${actor.name} · attaque contre CA ${armor}`, {
     advantage: target.prone || helped,
     disadvantage: actor.prone || (target.dodging && !target.grappledBy),
   });
-  if (roll.natural === 1 || (roll.natural !== 20 && roll.total < target.armor)) {
+  if (roll.natural === 1 || (roll.natural !== 20 && roll.total < armor)) {
     emit(state, events, 'miss', `${actor.name} manque ${target.name}.`);
     return true;
   }
   const dice = Array.from({ length: roll.natural === 20 ? 2 : 1 }, () => randomInt(state, actor.attack.die) + 1);
   emit(state, events, 'roll', `${roll.natural === 20 ? 'Critique ! ' : ''}Dégâts : ${dice.join(' + ')} + ${actor.attack.flat}`, { dice, critical: roll.natural === 20 });
   dealDamage(state, actor, target, dice.reduce((a, b) => a + b, actor.attack.flat), events);
+  if (technique && target.hp > 0) {
+    const save = check(state, stat(target, 'strength'), events, `${target.name} · résister à la percussion, DD 13`).total;
+    if (save < 13) pushAway(state, actor, target, events);
+    else emit(state, events, 'hold', `${target.name} résiste à la percussion.`);
+  }
   return true;
 }
 export function shouldTakeOpportunity(state, actor, mover) {
@@ -275,6 +369,7 @@ export function moveAlong(state, actor, path, events) {
       });
       break;
     }
+    actor.chargeRun = chargeRun(actor, [next]);
     actor.movement -= step.cost;
     actor.position = { ...next };
     if (state.ball.carrierId === actor.id) state.ball.position = { ...next };
@@ -292,6 +387,16 @@ export function moveAlong(state, actor, path, events) {
 
 export function legalAction(state, actor, action) {
   if (!action || actor.hp <= 0) return false;
+  if (action.technique) {
+    const r = actor.classState;
+    if (action.technique === 'percussion') {
+      if (action.type !== 'attack' || actor.archetype !== 'belier' || r.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2) return false;
+    } else if (action.technique === 'precision') {
+      if (action.type !== 'pass' || actor.archetype !== 'passeur' || r.focus <= 0) return false;
+    } else if (action.technique === 'exploitation') {
+      if (action.type !== 'strip' || actor.archetype !== 'escamoteur' || r.flaw !== 1 || r.targetId !== action.targetId) return false;
+    } else return false;
+  }
   if (action.type === 'wait') return true;
   if (action.type === 'drop') return state.ball.carrierId === actor.id;
   if (action.type === 'release') return Boolean(actor.grappling);
@@ -337,7 +442,8 @@ function resolveActionEvents(state, actor, action, events) {
     const held = playerById(state, actor.grappling); held.grappledBy = null; actor.grappling = null;
     emit(state, events, 'release', `${actor.name} relâche volontairement ${held.name}.`); return true;
   }
-  if (action.type === 'attack') return performAttack(state, actor, target, events);
+  if (action.type === 'attack') return performAttack(state, actor, target, events, null, action.technique);
+  actor.chargeRun = null;
   if (action.type === 'pickup') {
     actor.pickedUp = true;
     const defender = ballDefender(state, actor);
@@ -369,8 +475,17 @@ function resolveActionEvents(state, actor, action, events) {
     else emit(state, events, 'failure', `${actor.name} reste agrippé.`);
   }
   if (['strip', 'grapple', 'shove'].includes(action.type)) {
+    const own = action.technique === 'exploitation';
+    const captain = own ? null : collectiveOpening(state, actor, target);
+    if (own || captain) {
+      const source = captain ?? actor; source.classState.flaw = 0;
+      classEvent(state, events, own ? 'exploit' : 'opening', source,
+        own ? `${actor.name} exploite sa lecture de ${target.name} pour tenter l’arrachement.`
+          : `${source.name} ouvre une brèche pour ${actor.name} contre ${target.name}.`,
+        { targetId: target.id, beneficiaryId: actor.id, visualId: actor.id, label: own ? 'Exploitation' : 'Ouverture' });
+    }
     const defenseBonus = action.type === 'strip' ? Math.max(skill(target, 'wrestling'), skill(target, 'acrobatics')) : Math.max(skill(target, 'athletics'), skill(target, 'acrobatics'));
-    const attack = skillCheck(state, actor, skill(actor, 'wrestling'), events, `${actor.name} · ${action.type === 'strip' ? 'arrachement' : action.type === 'grapple' ? 'agrippement' : 'plaquage'}`);
+    const attack = skillCheck(state, actor, skill(actor, 'wrestling'), events, `${actor.name} · ${action.type === 'strip' ? 'arrachement' : action.type === 'grapple' ? 'agrippement' : 'plaquage'}`, own || Boolean(captain));
     const defense = skillCheck(state, target, defenseBonus, events, `${target.name} · défense`);
     if (attack <= defense) emit(state, events, 'failure', `${target.name} résiste à ${actor.name}${attack === defense ? ' (égalité au défenseur)' : ''}.`);
     else if (action.type === 'strip') giveBall(state, actor, events, 'arrache');
@@ -378,21 +493,24 @@ function resolveActionEvents(state, actor, action, events) {
       actor.grappling = target.id; target.grappledBy = actor.id;
       emit(state, events, 'grapple', `${actor.name} agrippe ${target.name} : vitesse nulle.`);
     } else if (action.mode === 'push') {
-      const valid = neighbors(target.position).filter((p) => !occupied(state, p) && distance(p, actor.position) > distance(target.position, actor.position));
-      valid.sort((a, b) => distance(b, actor.position) - distance(a, actor.position) || a.y - b.y || a.x - b.x);
-      if (valid[0]) {
-        const from = { ...target.position }; target.position = { ...valid[0] };
-        if (state.ball.carrierId === target.id) state.ball.position = { ...target.position };
-        releaseSeparatedGrapples(state, events);
-        emit(state, events, 'push', `${actor.name} repousse ${target.name} d’une case.`, { playerId: target.id, from, position: { ...target.position } });
-      } else emit(state, events, 'hold', `${target.name} est bloqué par la paroi ou les autres joueurs.`);
+      pushAway(state, actor, target, events);
     } else { target.prone = true; emit(state, events, 'prone', `${actor.name} plaque ${target.name} à terre ; la balle reste tenue.`); }
   }
   if (action.type === 'pass') {
+    const precision = action.technique === 'precision', called = hasPassCall(state, actor);
+    if (precision) {
+      actor.classState.focus--;
+      classEvent(state, events, 'precision', actor, `${actor.name} ajuste sa passe avec concentration.`, { label: 'Passe ajustée' });
+    }
+    if (called) {
+      const caller = playerById(state, state.calls.find((c) => c.targetId === actor.id).sourceId);
+      state.calls = state.calls.filter((c) => c.targetId !== actor.id);
+      classEvent(state, events, 'call-used', actor, `${actor.name} suit l’appel de ${caller.name} pour sa passe.`, { label: 'Passe guidée' });
+    }
     state.stats[actor.teamId].passesAttempted++;
     const dc = actor.grappledBy || opponents(state, actor).some((p) => distance(actor.position, p.position) <= 1) ? 15 : 10;
     emit(state, events, 'pass', `${actor.name} passe à ${target.name} (DD ${dc}).`, { playerId: actor.id, targetId: target.id, from: { ...actor.position }, position: { ...target.position } });
-    const total = skillCheck(state, actor, skill(actor, 'acrobatics'), events, `${actor.name} · passe`);
+    const total = skillCheck(state, actor, skill(actor, 'acrobatics'), events, `${actor.name} · passe`, precision || called);
     if (total < dc) {
       const line = trajectory(actor.position, target.position);
       state.ball = { carrierId: null, position: { ...line[Math.floor((line.length - 1) / 2)] } };
@@ -402,7 +520,12 @@ function resolveActionEvents(state, actor, action, events) {
       let intercepted = false;
       if (interceptor) {
         interceptor.reaction = false;
-        const result = skillCheck(state, interceptor, skill(interceptor, 'acrobatics'), events, `${interceptor.name} · interception contre ${total}`);
+        const reading = interceptor.archetype === 'passeur' && interceptor.classState.focus > 0 && !hasCheckHelp(state, interceptor) && total < 20 + skill(interceptor, 'acrobatics');
+        if (reading) {
+          interceptor.classState.focus--;
+          classEvent(state, events, 'intercept-read', interceptor, `${interceptor.name} anticipe la trajectoire de la passe.`, { label: 'Anticipation' });
+        }
+        const result = skillCheck(state, interceptor, skill(interceptor, 'acrobatics'), events, `${interceptor.name} · interception contre ${total}`, reading);
         if (result > total) { giveBall(state, interceptor, events, 'intercepte'); intercepted = true; }
         else emit(state, events, 'failure', `${interceptor.name} manque l’interception et dépense sa réaction.`);
       }
@@ -422,7 +545,9 @@ function resolveActionEvents(state, actor, action, events) {
 }
 
 export function beginTurn(state, actor, events) {
-  actor.action = true; actor.interaction = true; actor.pickedUp = false;
+  actor.action = true; actor.bonusAction = true; actor.interaction = true; actor.pickedUp = false;
+  actor.chargeRun = null; actor.feintTargetId = null;
+  state.calls = (state.calls ?? []).filter((c) => c.sourceId !== actor.id);
   actor.movement = actor.speed; actor.dodging = false; actor.disengaged = false;
   state.aids = state.aids.filter((a) => a.helperId !== actor.id);
   if (actor.prone && !actor.grappledBy) {
@@ -436,6 +561,15 @@ export function assertInvariants(state) {
   if (new Set(alive.map((p) => `${p.position.x},${p.position.y}`)).size !== alive.length) throw new Error('Superposition de joueurs actifs');
   for (const p of state.players) {
     if (!inside(p.position) || p.hp < 0 || p.hp > p.maxHp || p.movement < 0) throw new Error(`État invalide : ${p.id}`);
+    const r = p.classState;
+    if (r) {
+      for (const [key, maximum] of [['adrenaline', p.archetype === 'belier' ? 6 : 0], ['focus', p.archetype === 'passeur' ? 2 : 0], ['calls', p.archetype === 'capitaine' ? 2 : 0], ['flaw', isRunner(p) ? 1 : 0]]) {
+        if (!Number.isInteger(r[key]) || r[key] < 0 || r[key] > maximum) throw new Error(`Ressource invalide : ${p.id}/${key}`);
+      }
+      const locked = playerById(state, r.targetId);
+      if ((r.flaw && !r.targetId) || (r.targetId && (!isRunner(p) || !locked || locked.hp <= 0 || locked.teamId === p.teamId))) throw new Error('Verrouillage invalide');
+      if (p.archetype && !ARCHETYPES[p.archetype]) throw new Error('Archétype invalide');
+    }
     if (p.grappledBy) {
       const holder = playerById(state, p.grappledBy);
       if (!holder || holder.hp <= 0 || holder.grappling !== p.id || distance(holder.position, p.position) > 1) throw new Error('Agrippement incohérent');
@@ -444,6 +578,12 @@ export function assertInvariants(state) {
       const held = playerById(state, p.grappling);
       if (!held || p.hp <= 0 || held.hp <= 0 || held.grappledBy !== p.id || distance(held.position, p.position) > 1) throw new Error('Prise incohérente');
     }
+  }
+  const recipients = new Set();
+  for (const c of state.calls ?? []) {
+    const source = playerById(state, c.sourceId), target = playerById(state, c.targetId);
+    if (!source || !target || source.hp <= 0 || target.hp <= 0 || source.archetype !== 'capitaine' || source.id === target.id || source.teamId !== target.teamId || recipients.has(target.id)) throw new Error('Appel de jeu invalide');
+    recipients.add(target.id);
   }
   if (state.ball.carrierId) {
     const holder = carrier(state);
