@@ -1,6 +1,20 @@
-# Rumbleball — prototype avec classes
+# Rumbleball Manager — carrière V1 et exhibition
 
-Accessible dans **Outils → Rumbleball** (`#outils-rumbleball`). Deux équipes fixes avec quatre archétypes sportifs, rôles et consignes avant le match, puis simulation automatique. Aucun recrutement, progression, soin ou retour en jeu après un KO.
+Accessible dans **Outils → Rumbleball** (`#outils-rumbleball`). Une carrière locale permet de recruter, composer cinq titulaires, acheter des protections et implants et disputer une ligue de six clubs. Le mode **Exhibition** conserve les équipes préfaites et reste indépendant de la carrière. Aucun soin, remplacement ou retour en jeu après un KO pendant une rencontre.
+
+## Carrière
+
+Fonder un club donne 2 400 chromas. Choisir cinq à huit des douze candidats, puis valider les contrats en une fois. Les vues **Effectif**, **Recrutement**, **Équipement** et **Ligue** donnent accès à la composition, aux consignes, aux achats et au calendrier. Composition et consignes sont enregistrées automatiquement ; choisir un titulaire déjà présent échange les deux positions. Les cinq adversaires disposent de sept joueurs fixes, progressent et font tourner leurs titulaires en fonction de leur fatigue ; aucune adaptation à la puissance du club.
+
+Dix journées aller-retour par saison. Les salaires de tout l’effectif sont prélevés une seule fois au lancement, même si le solde devient négatif. Seuls les salaires permettent le découvert : les achats restent bloqués jusqu’au remboursement par primes ou ventes. Prime de match : défaite 200, nul 275, victoire 350 ; classement : 600 / 400 / 200 / 100 / 100 / 100. La nouvelle saison conserve argent, dette, joueurs et équipement et remet la fatigue à zéro.
+
+Niveaux 1 à 5, seuils cumulés 0 / 20 / 50 / 90 / 140 XP. Titulaire : 10 XP, +2 fatigue (+1 en cas de KO). Remplaçant : 4 XP, −3 fatigue. Chaque niveau donne +2 PV ; niveaux 2 et 4 : compétence d’archétype ; niveaux 3 et 5 : réserves ou vitesse d’archétype. À fatigue 3, −1,5 m ; à fatigue 5, également −1 aux trois compétences sportives. Un régulateur réduit seulement la fatigue de participation. Les caractéristiques affichées et utilisées par le moteur viennent du même compilateur, sans modification des profils de base.
+
+Une protection transférable et revendable à moitié prix, un implant attaché au joueur. Remplacer un implant nécessite la confirmation explicite de sa destruction. Les acquisitions n’affectent pas le catalogue du JDR.
+
+La clé navigateur `the-hub.rumbleball.career.v1` contient une seule carrière. Sauvegarde après chaque transition de gestion et chaque tour complet, reprise en pause. Les identifiants des rencontres empêchent le double prélèvement et le double règlement. Marché, calendrier et matchs utilisent des domaines de graines séparés. Export/import JSON avec validation avant remplacement ; un échec d’écriture conserve la sauvegarde précédente et propose de réessayer ou exporter l’état en mémoire. Les sauvegardes locales dépendent de l’origine du site : localhost, 127.0.0.1, les différents ports et GitHub Pages ont chacun leur stockage. Utiliser l’export/import pour transférer une carrière.
+
+Limites : une carrière, huit joueurs, cinq niveaux, aucun intérêt bancaire, blessure permanente, entraînement payant, bâtiment, sponsor négociable, multijoueur ou transfert entre clubs.
 
 ## Essayer en local
 
@@ -15,10 +29,12 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prot
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs
 ```
 
 Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
+
+Les tests de carrière couvrent aussi trois saisons, une saison de défaites avec huit joueurs coûteux endettés, la progression des adversaires, l’équipement, les sauvegardes corrompues et les erreurs de stockage. Les tests d’événements d’interface utilisent un petit DOM en mémoire et le vrai lecteur de match : ils vérifient les transitions et les erreurs, sans prétendre vérifier le rendu ou le responsive dans un navigateur.
 
 Campagne initiale du 17 octobre 2026 : 242 victoires des Recrues, 258 des Charognards, 22 prolongations sur les 500 matchs. Les 30 matchs de compositions donnent 13 victoires des Recrues et 17 des Charognards. Les passes restent occasionnelles (295 tentatives sur les 500 matchs), donc les capacités de Gâchette sont moins fréquentes que celles du contact. Les tests contrôlés vérifient aussi la concentration partagée et les interceptions. Ces relevés servent de point de départ aux essais d’équilibrage.
 
@@ -26,6 +42,10 @@ Campagne initiale du 17 octobre 2026 : 242 victoires des Recrues, 258 des Charog
 
 - `data.mjs` : profils, rôles, consignes et terrain.
 - `classes.mjs` : les quatre archétypes, leurs techniques, ressources initiales et textes partagés avec l’interface.
+- `progression.mjs` : compilation pure, niveaux, fatigue, salaires et catalogue sportif.
+- `career.mjs` : transitions pures de carrière, finances, calendrier et règlement des journées.
+- `career-storage.mjs` : validation, sauvegarde atomique et export/import JSON.
+- `career-ui.mjs` : gestion du club ; utilise le lecteur de match de `ui.mjs` pour préserver terrain, animations et journal.
 - `rules.mjs` : actions légales, jets, réactions, mouvements et invariants.
 - `ai.mjs` : plan collectif et évaluation des décisions, sans modification des statistiques.
 - `engine.mjs` : initialisation et orchestration, indépendantes de l’affichage.
@@ -61,7 +81,7 @@ La classe définit les techniques, le rôle définit les priorités du bot. Les 
 
 Toutes les tentatives spéciales dépensent leur ressource avant le jet, même en cas d’échec. Les avantages ne se cumulent pas. Verrouillage et appel partagent l’unique action bonus du tour ; la feinte consomme seulement une faille. Les ressources persistent entre les rounds et pendant les prolongations. Changer de cible efface l’ancienne faille sans remettre à zéro la limite d’observation du round. Un KO efface ses verrouillages et les appels le concernant. Le dernier engagement efface les cibles et appels, sans restaurer les ressources.
 
-L’API accepte `players[i].archetype` et `awayPlayers[i].archetype` pour les essais de compositions ; les valeurs invalides retombent sur l’archétype préfait. `classes: false` désactive les classes pour comparer le socle. Le vestiaire conserve les archétypes préfaits et laisse modifier les rôles et consignes. Ces options n’ajoutent pas de progression.
+L’API accepte `players[i].archetype` et `awayPlayers[i].archetype` pour les essais de compositions ; les valeurs invalides retombent sur l’archétype préfait. `classes: false` désactive les classes pour comparer le socle. En Exhibition, le vestiaire conserve les archétypes préfaits et laisse modifier les rôles et consignes. La carrière fournit `rosters.home` et `rosters.away` (cinq profils compilés chacun), `teamNames`, `strategy` et `awayStrategy`. `playerId` reste permanent ; `id` appartient au terrain. Les plafonds et descriptions de ressources s’adaptent au niveau, sans changer les coûts des techniques.
 
 Une minute représente dix rounds. La possession en fin de round 10 gagne ; sinon deux rounds de prolongation, avec victoire au premier contrôle de fin de round. Si la balle reste libre, un dernier engagement d’un round conserve initiative, PV et KO ; il replace les joueurs et supprime les agrippements. Sans contrôle à la fin du round 13, match nul. Les KO seuls ne décident jamais du vainqueur.
 
@@ -79,6 +99,6 @@ Conventions du prototype :
 - À terre : attaques de contact reçues avec avantage, attaques effectuées avec désavantage, déplacement coûteux et relevé à moitié de la vitesse. Esquive : désavantage aux attaques reçues jusqu’au prochain tour, suspendu si agrippé.
 - Agripper immobilise la cible. Le lutteur peut l’entraîner en maintenant leur position relative : chaque pas coûte le double, avec terrain difficile si l’un des deux traverse du sol humide. Les parois et obstacles sont vérifiés pour les deux joueurs ; aucun ne se déplace si le passage est bloqué. La cible est déplacée de force et ne provoque pas d’opportunité ; le lutteur reste exposé aux autres adversaires, mais pas à sa propre cible qui reste au contact.
 - Une prise ne se termine que par libération réussie, relâchement volontaire gratuit, KO ou éloignement dû à un déplacement forcé. Après un agrippement réussi, le bot conserve sa position et la prise ; il ne dépense pas son mouvement restant pour se replacer. Aux tours suivants, un entraînement éventuel est évalué avec le coût et la position des deux joueurs.
-- Aucun rebond, protocole Neuro, compagnon, soin, action préparée ou inventaire dans cette version.
+- Aucun rebond, protocole Neuro, compagnon, soin, action préparée ou objet consommable pendant le match.
 
 Les bots utilisent un score local explicable par rôle et une coordination recalculée à chaque tour. Ils n’effectuent pas de recherche tactique sur plusieurs tours ; la qualité compétitive et les stratégies de conservation restent à éprouver en jeu.

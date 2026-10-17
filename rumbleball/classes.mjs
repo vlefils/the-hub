@@ -1,4 +1,4 @@
-// Sporting adaptations of The Hub classes; no level progression or healing.
+// Sporting adaptations of The Hub classes; level changes reserves, never technique costs.
 export const ARCHETYPES = {
   belier: { className: 'Brute', name: 'Bélier d’arène',
     description: 'Encaisse les chocs et ouvre un passage au contact.',
@@ -29,19 +29,33 @@ export const ARCHETYPES = {
 export const isRunner = (p) => ['escamoteur', 'capitaine'].includes(p.archetype);
 export const archetypeLabel = (p) => ARCHETYPES[p.archetype]
   ? `${ARCHETYPES[p.archetype].className} · ${ARCHETYPES[p.archetype].name}` : 'Sans classe';
-export function initialClassState(archetype) {
-  return { adrenaline: archetype === 'belier' ? 6 : 0, focus: archetype === 'passeur' ? 2 : 0,
-    calls: archetype === 'capitaine' ? 2 : 0, targetId: null, flaw: 0, observedRound: 0 };
+export function classCaps(p) {
+  const tiers = Number((p.level ?? 1) >= 3) + Number((p.level ?? 1) >= 5);
+  return { adrenaline: p.archetype === 'belier' ? 6 + 2 * tiers : 0,
+    focus: p.archetype === 'passeur' ? 2 + tiers : 0,
+    calls: p.archetype === 'capitaine' ? 2 + tiers : 0, flaw: isRunner(p) ? 1 : 0 };
+}
+export function classAbilities(p) {
+  const caps = classCaps(p);
+  return (ARCHETYPES[p.archetype]?.abilities ?? []).map(([name, description]) => [name, description
+    .replace('6 Adrénaline', `${caps.adrenaline} Adrénaline`)
+    .replace('2 appels par match', `${caps.calls} appels par match`)
+    .replace('2 points de concentration', `${caps.focus} points de concentration`)]);
+}
+export function initialClassState(archetype, level = 1) {
+  const { flaw, ...resources } = classCaps({ archetype, level });
+  return { ...resources, targetId: null, flaw: 0, observedRound: 0 };
 }
 export function classResources(p, players = []) {
   const r = p.classState;
   if (!r) return '';
-  if (p.archetype === 'belier') return `Adrénaline ${r.adrenaline}/6`;
-  if (p.archetype === 'passeur') return `Concentration ${r.focus}/2`;
+  const caps = classCaps(p);
+  if (p.archetype === 'belier') return `Adrénaline ${r.adrenaline}/${caps.adrenaline}`;
+  if (p.archetype === 'passeur') return `Concentration ${r.focus}/${caps.focus}`;
   if (isRunner(p)) {
     const target = players.find((q) => q.id === r.targetId);
     return [`Faille ${r.flaw}/1${target ? ` sur ${target.name}` : ' · aucune cible'}`,
-      p.archetype === 'capitaine' ? `Appels ${r.calls}/2` : ''].filter(Boolean).join(' · ');
+      p.archetype === 'capitaine' ? `Appels ${r.calls}/${caps.calls}` : ''].filter(Boolean).join(' · ');
   }
   return '';
 }

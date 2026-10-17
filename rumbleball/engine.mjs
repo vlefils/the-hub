@@ -22,23 +22,27 @@ export function createMatch(config = {}) {
     version: 2, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
     phase: 'regular', finished: false, result: null, turns: 0, aids: [], calls: [], lastDecision: null,
     teams: [
-      { id: 'home', name: 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced' },
-      { id: 'away', name: 'Les Charognards', strategy: 'balanced' },
+      { id: 'home', name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced' },
+      { id: 'away', name: config.teamNames?.away ?? 'Les Charognards', strategy: Object.hasOwn(STRATEGIES, config.awayStrategy) ? config.awayStrategy : 'balanced' },
     ],
     stats: { home: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 }, away: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 } },
-    players: ['home', 'away'].flatMap((teamId) => PROFILES.map((profile, index) => {
-      const assigned = (teamId === 'home' ? config.players : config.awayPlayers)?.[index];
-      const archetype = config.classes === false ? null : Object.hasOwn(ARCHETYPES, assigned?.archetype) ? assigned.archetype : profile.archetype;
-      return { ...clone(profile), id: `${teamId}-${index}`, teamId, number: index + 1,
-        archetype, classState: initialClassState(archetype), bonusAction: true, chargeRun: null, feintTargetId: null,
-        name: teamId === 'home' ? profile.trainingName : profile.name,
-        role: Object.hasOwn(ROLES, assigned?.role) ? assigned.role : profile.role,
-        instruction: Object.hasOwn(INSTRUCTIONS, assigned?.instruction) ? assigned.instruction : 'normal',
-        hp: profile.maxHp, position: startPosition(teamId, index), movement: profile.speed,
-        reaction: true, action: true, interaction: true, pickedUp: false, prone: false,
-        dodging: false, disengaged: false, grappledBy: null, grappling: null,
-      };
-    })),
+    players: ['home', 'away'].flatMap((teamId) => {
+      const profiles = config.rosters?.[teamId] ?? PROFILES;
+      if (!Array.isArray(profiles) || profiles.length !== 5) throw new Error('Cinq titulaires sont nécessaires.');
+      return profiles.map((profile, index) => {
+        const assigned = (teamId === 'home' ? config.players : config.awayPlayers)?.[index] ?? (config.rosters?.[teamId] ? profile : undefined);
+        const archetype = config.classes === false ? null : Object.hasOwn(ARCHETYPES, assigned?.archetype) ? assigned.archetype : profile.archetype;
+        return { ...clone(profile), id: `${teamId}-${index}`, teamId, number: index + 1,
+          archetype, classState: initialClassState(archetype, profile.level), bonusAction: true, chargeRun: null, feintTargetId: null,
+          name: config.rosters?.[teamId] ? profile.name : teamId === 'home' ? profile.trainingName : profile.name,
+          role: Object.hasOwn(ROLES, assigned?.role) ? assigned.role : profile.role,
+          instruction: Object.hasOwn(INSTRUCTIONS, assigned?.instruction) ? assigned.instruction : 'normal',
+          hp: profile.maxHp, position: startPosition(teamId, index), movement: profile.speed,
+          reaction: true, action: true, interaction: true, pickedUp: false, prone: false,
+          dodging: false, disengaged: false, grappledBy: null, grappling: null,
+        };
+      });
+    }),
   };
   centerBall(state);
   for (const p of state.players) { p.initiativeDie = randomInt(state, 20) + 1; p.initiative = p.initiativeDie + stat(p, 'dexterity'); p.initiativeTie = randomInt(state, 1000000); }

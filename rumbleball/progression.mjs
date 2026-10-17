@@ -1,0 +1,51 @@
+import { PROFILES, clone, modifier } from './data.mjs';
+import { classCaps } from './classes.mjs';
+
+export const XP_THRESHOLDS = [0, 20, 50, 90, 140];
+export const levelOf = (p) => XP_THRESHOLDS.filter((xp) => p.xp >= xp).length;
+export const recruitmentPrice = (p) => 300 + 150 * (levelOf(p) - 1);
+export const salary = (p) => 15 + 5 * (levelOf(p) - 1);
+export const CATALOGUE = {
+  vest: { name: 'Plastron léger', slot: 'protection', price: 100, effect: '+3 PV maximum', maxHp: 3 },
+  armor: { name: 'Armure renforcée', slot: 'protection', price: 150, effect: '+1 CA · −1,5 m', armor: 1, speed: -1.5 },
+  gloves: { name: 'Gants de lutte', slot: 'protection', price: 150, effect: '+1 Lutte', wrestling: 1 },
+  soles: { name: 'Semelles adhérentes', slot: 'protection', price: 150, effect: '+1 Acrobaties', acrobatics: 1 },
+  legs: { name: 'Jambes augmentées', slot: 'implant', price: 300, effect: '+1,5 m', speed: 1.5 },
+  fibers: { name: 'Fibres contractiles', slot: 'implant', price: 300, effect: '+1 Lutte', wrestling: 1 },
+  interface: { name: 'Interface visuomotrice', slot: 'implant', price: 300, effect: '+1 Acrobaties', acrobatics: 1 },
+  regulator: { name: 'Régulateur d’effort', slot: 'implant', price: 300, effect: 'Participation : +1 fatigue au lieu de +2 ; KO : +1 conservé' },
+};
+
+// Always start from immutable base data; never recompile an already modified profile.
+export function compilePlayer(player, inventory = []) {
+  const base = clone(PROFILES[player.profile]);
+  if (!base) throw new Error('Profil de joueur inconnu.');
+  const level = levelOf(player), tiers = Number(level >= 3) + Number(level >= 5);
+  const result = { ...base, name: player.name, playerId: player.id, level,
+    role: player.role, instruction: player.instruction, fatigue: player.fatigue };
+  result.maxHp += (level - 1) * 2;
+  for (const key of ['wrestling', 'athletics', 'acrobatics']) {
+    result.skills[key] ??= modifier(base.abilities[key === 'acrobatics' ? 'dexterity' : 'strength']);
+  }
+  const skill = ['belier', 'capitaine'].includes(base.archetype) ? 'wrestling' : 'acrobatics';
+  result.skills[skill] += Number(level >= 2) + Number(level >= 4);
+  if (base.archetype === 'escamoteur') result.speed += 1.5 * tiers;
+  const protection = inventory.find((item) => item.playerId === player.id);
+  for (const id of [protection?.itemId, player.implant]) {
+    const item = CATALOGUE[id];
+    if (!item) continue;
+    for (const key of ['maxHp', 'armor', 'speed']) result[key] += item[key] ?? 0;
+    for (const key of ['wrestling', 'acrobatics']) result.skills[key] += item[key] ?? 0;
+  }
+  if (player.fatigue >= 3) result.speed -= 1.5;
+  if (player.fatigue >= 5) for (const key of ['wrestling', 'athletics', 'acrobatics']) result.skills[key]--;
+  result.caps = classCaps(result);
+  return result;
+}
+
+export function progressPlayer(player, starter, ko = false) {
+  const beforeLevel = levelOf(player), beforeFatigue = player.fatigue;
+  player.xp += starter ? 10 : 4;
+  player.fatigue = starter ? Math.min(6, player.fatigue + (player.implant === 'regulator' ? 1 : 2) + Number(ko)) : Math.max(0, player.fatigue - 3);
+  return { playerId: player.id, name: player.name, xp: starter ? 10 : 4, beforeLevel, level: levelOf(player), beforeFatigue, fatigue: player.fatigue, ko };
+}

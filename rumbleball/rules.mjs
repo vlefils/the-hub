@@ -1,5 +1,5 @@
 import { COURT, WET_CELLS, modifier } from './data.mjs';
-import { ARCHETYPES, isRunner } from './classes.mjs';
+import { ARCHETYPES, classCaps, isRunner } from './classes.mjs';
 
 export const distance = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 export const sameCell = (a, b) => a.x === b.x && a.y === b.y;
@@ -563,7 +563,7 @@ export function assertInvariants(state) {
     if (!inside(p.position) || p.hp < 0 || p.hp > p.maxHp || p.movement < 0) throw new Error(`État invalide : ${p.id}`);
     const r = p.classState;
     if (r) {
-      for (const [key, maximum] of [['adrenaline', p.archetype === 'belier' ? 6 : 0], ['focus', p.archetype === 'passeur' ? 2 : 0], ['calls', p.archetype === 'capitaine' ? 2 : 0], ['flaw', isRunner(p) ? 1 : 0]]) {
+      for (const [key, maximum] of Object.entries(classCaps(p))) {
         if (!Number.isInteger(r[key]) || r[key] < 0 || r[key] > maximum) throw new Error(`Ressource invalide : ${p.id}/${key}`);
       }
       const locked = playerById(state, r.targetId);

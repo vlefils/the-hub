@@ -5,11 +5,9 @@ import { arenaBackdrop, pawnArtwork, svg, teamCrest, turnMarkerArtwork } from '.
 import { narrateTurn } from './narration.mjs';
 import { courtPoint, createCourtPlayback, nextCourtTurnDelay } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
-import { ARCHETYPES, archetypeLabel, classResources } from './classes.mjs';
+import { ARCHETYPES, archetypeLabel, classResources, classAbilities } from './classes.mjs';
+import { mountCareer } from './career-ui.mjs';
 
-const root = document.querySelector('[data-rumbleball]');
-const section = root?.closest('[data-section]');
-const teamLabel = (id) => id === 'home' ? 'Les Recrues' : 'Les Charognards';
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
   if (cls) el.className = cls;
@@ -21,10 +19,13 @@ const options = (values, selected) => Object.entries(values).map(([value, label]
 });
 const button = (text, cls = 'rb-button') => { const el = element('button', cls, text); el.type = 'button'; return el; };
 
-if (root) {
+export function mountMatch(root, callbacks = {}) {
+  const section = root.closest('[data-section]');
   let state = createMatch(), lastConfig = null, started = false, running = false, timer = null;
+  let context = 'exhibition';
+  const teamLabel = (id) => state.teams.find((t) => t.id === id)?.name ?? '';
   let selectedId = null, speed = 1, journalCount = 0, lastTurnEvents = [];
-  const visible = () => section.classList.contains('is-active') && !document.hidden;
+  const visible = () => !root.closest('[hidden]') && section.classList.contains('is-active') && !document.hidden;
   root.replaceChildren();
   root.classList.add('rb');
 
@@ -285,7 +286,7 @@ if (root) {
       element('p', 'rb-muted', `Attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants.`));
     const classCopy = element('div', 'rb-class-details');
     classCopy.append(element('p', 'rb-class-resource', classResources(p, state.players)));
-    for (const [name, description] of ARCHETYPES[p.archetype]?.abilities ?? []) {
+    for (const [name, description] of classAbilities(p)) {
       const line = element('p'); line.append(element('strong', '', `${name}. `), document.createTextNode(description)); classCopy.append(line);
     }
     const call = state.calls.find((c) => c.targetId === p.id);
@@ -327,15 +328,19 @@ if (root) {
       element('p', '', holder ? `${holder.name} tient la balle à la fin du round ${state.result.round}.` : 'La balle reste libre après le dernier engagement.'));
     const table = element('table', 'rb-stats-table');
     const caption = element('caption', 'rb-sr-only', 'Bilan des deux équipes'); table.append(caption);
-    const thead = element('thead'), tr = element('tr'); for (const name of ['Bilan', 'Recrues', 'Charognards']) { const th = element('th', '', name); th.scope = 'col'; tr.append(th); } thead.append(tr); table.append(thead);
+    const thead = element('thead'), tr = element('tr'); for (const name of ['Bilan', ...state.teams.map((t) => t.name)]) { const th = element('th', '', name); th.scope = 'col'; tr.append(th); } thead.append(tr); table.append(thead);
     const tbody = element('tbody');
     for (const [label, key] of [['Passes réussies / tentées', 'passes'], ['Récupérations', 'recoveries'], ['KO infligés', 'knockouts']]) {
       const row = element('tr'); const th = element('th', '', label); th.scope = 'row'; row.append(th);
       for (const id of ['home', 'away']) { const stats = state.stats[id]; row.append(element('td', '', key === 'passes' ? `${stats.passesCompleted} / ${stats.passesAttempted}` : String(stats[key]))); }
       tbody.append(row);
     }
-    table.append(tbody); resultPanel.append(table);
+    table.append(tbody); const statsWrap = element('div', 'rb-table-scroll'); statsWrap.append(table); resultPanel.append(statsWrap);
     const actions = element('div', 'rb-controls');
+    if (context === 'career') {
+      const back = button('Voir le bilan de la journée', 'rb-button rb-button-primary'); back.addEventListener('click', () => { setRunning(false); callbacks.onReturn?.(); });
+      actions.append(back); resultPanel.append(actions); return;
+    }
     const replay = button('Rejouer ce match', 'rb-button rb-button-primary'); replay.addEventListener('click', () => launch(lastConfig));
     const adjust = button('Ajuster les consignes'); adjust.addEventListener('click', prepareAgain);
     actions.append(replay, adjust); resultPanel.append(actions);
@@ -347,9 +352,12 @@ if (root) {
     phaseText.textContent = state.finished ? 'Coup de sifflet final' : state.phase === 'final' ? 'Dernier engagement' : state.phase === 'overtime' ? `Prolongation ${state.round - 10}/2` : `Round ${state.round}/10`;
     timeText.textContent = state.finished ? '00:00' : state.round > 10 ? '+06' : `00:${String((11 - state.round) * 6).padStart(2, '0')}`;
     if (!state.finished && state.round === 1) timeText.textContent = '01:00';
-    possessionText.textContent = holder ? `${holder.name} · ${holder.teamId === 'home' ? 'Recrues' : 'Charognards'}` : 'Balle libre';
+    possessionText.textContent = holder ? `${holder.name} · ${teamLabel(holder.teamId)}` : 'Balle libre';
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     homeScore.querySelector('small').textContent = `${STRATEGIES[state.teams[0].strategy]} · votre équipe`;
+    awayScore.querySelector('small').textContent = `Plan ${STRATEGIES[state.teams[1].strategy]}`;
+    for (const [index, score] of [homeScore, awayScore].entries()) score.querySelector('strong').textContent = state.teams[index].name;
+    for (const [index, id] of ['home', 'away'].entries()) legend.children[index].lastChild.textContent = teamLabel(id);
     for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) {
       const count = state.players.filter((p) => p.teamId === teamId && p.hp > 0).length;
       score.querySelector('.rb-team-count').textContent = `${count} / 5 en jeu`;
@@ -372,10 +380,14 @@ if (root) {
     if (state.finished) renderResult();
   }
   function advance({ animate = true } = {}) {
+    if (!errorBox.hidden) return;
     try {
       courtPlayback.settle();
       const before = state;
-      const turn = stepMatch(state); state = turn.state; appendEvents(turn.events); render(turn.events);
+      const turn = stepMatch(state); state = turn.state;
+      const saved = context !== 'career' || callbacks.onTurn?.(state, turn.events) !== false;
+      appendEvents(turn.events); render(turn.events);
+      if (!saved) { setRunning(false); errorBox.hidden = false; errorBox.textContent = 'Progression non enregistrée. Revenez au club pour réessayer la sauvegarde ou exporter votre carrière.'; }
       if (state.finished) { setRunning(false); status.textContent = 'Match terminé'; }
       if (animate && visible()) courtPlayback.play(before, state, turn.events, { speed });
     } catch (error) {
@@ -384,6 +396,7 @@ if (root) {
   }
   function tick() { timer = null; if (!visible()) { setRunning(false); return; } advance(); if (running) scheduleNextTurn(); }
   function launch(configuration) {
+    context = 'exhibition';
     setRunning(false); lastConfig = structuredClone(configuration); state = createMatch(lastConfig);
     started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
     render(); setRunning(true);
@@ -410,4 +423,17 @@ if (root) {
   document.addEventListener('hub:sectionchange', (event) => { if (event.detail.id !== 'outils-rumbleball') setRunning(false); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) setRunning(false); });
   render(); setRunning(false);
+  return {
+    pause: () => setRunning(false),
+    exhibition() { context = 'exhibition'; prepareAgain(); },
+    load(current, autoplay = false) {
+      setRunning(false); context = 'career'; lastConfig = structuredClone(current.config); state = structuredClone(current.state);
+      started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
+      for (const events of current.turns) appendEvents(events);
+      render(current.turns.at(-1) ?? []); setRunning(autoplay);
+    },
+  };
 }
+
+const root = document.querySelector('[data-rumbleball]');
+if (root) mountCareer(root, mountMatch);
