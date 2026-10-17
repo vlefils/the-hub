@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mountCareer } from './career-ui.mjs';
 import { CAREER_KEY, importCareer } from './career-storage.mjs';
+import { createCareer, confirmDraft, buyItem, launchCareerMatch, saveCareerTurn } from './career.mjs';
+import { simulateMatch } from './engine.mjs';
+import { exportCareer } from './career-storage.mjs';
+import { xpProgress } from './career-components.mjs';
 
 import { descendants, button, classNode, environment } from './test-support/dom.mjs';
 
@@ -15,14 +19,16 @@ async function foundClub(root) {
 test('parcours UI : création, échange de titulaires, consignes, équipement et lecture seule en match', async () => {
   const e = environment(); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await foundClub(e.root);
   let c = e.saved(); assert.equal(c.balance, 900); assert.equal(c.lineup.length, 5);
+  assert.ok(classNode(e.root, 'rb-fixture-hero')); assert.equal(classNode(e.root, 'rb-lineup-form'), null);
+  await button(e.root, 'Préparer le match').click();
   const form = classNode(e.root, 'rb-lineup-form'), slots = descendants(classNode(e.root, 'rb-lineup-slots')).filter((n) => n.tagName === 'select');
   const [first, second] = c.lineup; slots[0].value = second; await slots[0].emit('change');
   c = e.saved(); assert.deepEqual(c.lineup.slice(0, 2), [second, first]);
   const strategy = form.querySelector('select'); strategy.value = 'pressing'; await strategy.emit('change'); assert.equal(e.saved().clubs[0].strategy, 'pressing');
   await button(e.root, 'Équipement').click();
-  const buyVest = descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Acheter pour') && n.textContent.endsWith('100 chromas'));
+  const buyVest = descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Acheter et équiper') && n.textContent.endsWith('100 chromas'));
   await buyVest.click(); assert.equal(e.saved().inventory.length, 1); assert.equal(e.saved().balance, 800);
-  const play = descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')); await play.click();
+  await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
   assert.equal(e.saved().balance, 725); assert.equal(e.saved().current.state.turns, 0);
   // The real match reader receives the club names and compiled stats.
   assert.match(classNode(e.root, 'rb-scoreboard').textContent, /Un nom de club/);
@@ -30,11 +36,13 @@ test('parcours UI : création, échange de titulaires, consignes, équipement et
   await button(e.root, 'Tour suivant').click(); assert.equal(e.saved().current.state.turns, 1);
   await button(e.root, 'Retour au club · mettre en pause').click();
   assert.match(classNode(e.root, 'rb-next-match').textContent, /lecture seule/);
-  assert.ok(descendants(classNode(e.root, 'rb-shop')).filter((n) => n.tagName === 'button').every((n) => n.disabled));
+  await button(e.root, 'Équipement').click();
+  assert.ok(descendants(e.root).filter((n) => n.tagName === 'button' && n.textContent.startsWith('Acheter et équiper')).every((n) => n.disabled));
   await button(e.root, 'Reprendre la rencontre').click(); assert.equal(e.saved().balance, 725);
   assert.match(classNode(e.root, 'rb-playback-status').textContent, /Pause/);
   await button(e.root, 'Voir le résultat').click(); c = e.saved(); assert.equal(c.current.settled, true); assert.equal(c.day, 1);
   const rewarded = c.balance; await button(e.root, 'Voir le bilan de la journée').click();
+  assert.ok(classNode(e.root, 'rb-career-summary'));
   await button(e.root, 'Revoir le terrain et le fil du match · sans récompense supplémentaire').click(); assert.equal(e.saved().balance, rewarded);
   await button(e.root, 'Voir le bilan de la journée').click(); await button(e.root, 'Exhibition').click();
   assert.equal(classNode(e.root, 'rb-setup').hidden, false); assert.equal(e.saved().balance, rewarded);
@@ -43,7 +51,7 @@ test('parcours UI : création, échange de titulaires, consignes, équipement et
 
 test('UI : échec de sauvegarde visible, reprise en pause et remplacement JSON explicite', async () => {
   const e = environment(); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await foundClub(e.root);
-  let play = descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')); await play.click();
+  await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
   const valid = e.storage.getItem(CAREER_KEY); e.storage.failing = true;
   await button(e.root, 'Round suivant').click(); assert.equal(e.storage.getItem(CAREER_KEY), valid);
   assert.match(classNode(e.root, 'rb-career-notice').textContent, /Progression non enregistrée/); assert.match(classNode(e.root, 'rb-error').textContent, /non enregistrée/);
@@ -67,14 +75,77 @@ test('UI : couleur du club de la création au terrain, sauvegarde et lecture seu
   color.value = '#b83050'; await color.emit('input');
   assert.equal(creation.querySelector('.rb-person-jersey').getAttribute('fill'), '#b83050');
   await foundClub(e.root); assert.equal(e.saved().clubs[0].kitColor, '#b83050');
-  const form = classNode(e.root, 'rb-lineup-form'), input = form.querySelector('.rb-kit-color');
+  const input = classNode(e.root, 'rb-kit-color'); input.parentNode.parentNode.open = true;
   input.focus(); input.value = '#2255bb'; await input.emit('change');
-  assert.equal(e.saved().clubs[0].kitColor, '#2255bb'); assert.equal(document.activeElement, input);
-  assert.ok(form.querySelectorAll('.rb-person-jersey').every((n) => n.getAttribute('fill') === '#2255bb'));
-  await descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')).click();
+  assert.equal(e.saved().clubs[0].kitColor, '#2255bb'); assert.equal(document.activeElement, classNode(e.root, 'rb-kit-color'));
+  assert.ok(classNode(e.root, 'rb-fixture-hero').querySelectorAll('.rb-person-jersey').every((n) => n.getAttribute('fill') === '#2255bb'));
+  await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
   assert.equal(e.saved().current.state.teams[0].kitColor, '#2255bb');
   await button(e.root, 'Retour au club · mettre en pause').click();
-  assert.equal(classNode(e.root, 'rb-lineup-form').querySelector('.rb-kit-color').disabled, true);
+  await button(e.root, 'Club').click(); assert.equal(classNode(e.root, 'rb-kit-color').disabled, true);
   const restored = environment(e.storage.getItem(CAREER_KEY)); mountCareer(restored.root, mountMatch);
-  assert.equal(classNode(restored.root, 'rb-lineup-form').querySelector('.rb-kit-color').value, '#2255bb');
+  assert.equal(classNode(restored.root, 'rb-kit-color').value, '#2255bb');
+});
+
+test('effectif : comparaison sans formulaire, fiche liée à l’équipement et XP par palier', async () => {
+  let c = createCareer('Les Cartographes', 'ui-roster'); c = confirmDraft(c, c.market.slice(0, 7).map((p) => p.id));
+  c.clubs[0].players[1].xp = 20; c.clubs[0].players[1].fatigue = 5;
+  const e = environment(exportCareer(c)); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  await button(e.root, 'Équipe').click();
+  assert.ok(classNode(e.root, 'rb-roster-table')); assert.equal(classNode(e.root, 'rb-lineup-form'), null);
+  assert.match(classNode(e.root, 'rb-roster-table').textContent, /compétences physiques/);
+  const pick = descendants(e.root).find((n) => n.dataset.focusKey === `player-${c.clubs[0].players[1].id}`); await pick.click();
+  const detail = classNode(e.root, 'rb-player-detail'), xp = detail.querySelector('progress'); assert.equal(xp.value, '0'); assert.equal(xp.max, 30);
+  await button(e.root, 'Gérer son équipement').click(); assert.equal(descendants(e.root).find((n) => n.dataset.focusKey === 'equipment-player').value, c.clubs[0].players[1].id);
+  const max = xpProgress({ name: 'Maximum', xp: 200, fatigue: 0 }); assert.equal(max.querySelector('progress').value, '1'); assert.match(max.textContent, /Maximum/);
+});
+
+test('préparation : sélection liée au terrain, rotation, retour sur une ouverture et focus conservé', async () => {
+  let c = createCareer('Les Tacticiens', 'ui-tactics'); c = confirmDraft(c, c.market.slice(0, 7).map((p) => p.id));
+  const e = environment(exportCareer(c)); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await button(e.root, 'Préparer le match').click();
+  const formation = structuredClone(e.saved().clubs[0].deployment), opening = classNode(e.root, 'rb-opening-select'); opening.value = 'wings'; await opening.emit('change');
+  await button(e.root, 'Rétablir le placement précédent').click(); assert.deepEqual(e.saved().clubs[0].deployment, formation); assert.equal(e.saved().clubs[0].opening, c.clubs[0].opening);
+  const selector = classNode(e.root, 'rb-deployment-player'); selector.value = '2'; await selector.emit('change');
+  assert.match(classNode(e.root, 'rb-tactical-player').textContent, new RegExp(c.clubs[0].players[2].name));
+  const role = descendants(e.root).find((n) => n.dataset.focusKey === 'active-role'); role.focus(); role.value = 'defender'; await role.emit('change');
+  assert.equal(e.saved().clubs[0].players[2].role, 'defender'); assert.equal(document.activeElement, role);
+  const substitute = c.clubs[0].players[5]; await button(e.root, `Faire entrer ${substitute.name}`).click(); assert.equal(e.saved().lineup[2], substitute.id); assert.deepEqual(e.saved().clubs[0].deployment, formation);
+  assert.equal(classNode(e.root, 'rb-deployment-player').value, '2');
+});
+
+test('équipement : matériel possédé avant magasin, transfert sans argent et comparaison de fatigue', async () => {
+  let c = createCareer('Les Équipés', 'ui-gear'); c = confirmDraft(c, c.market.slice(0, 7).map((p) => p.id));
+  c = buyItem(c, 'armor', c.lineup[0]); c = buyItem(c, 'vest', c.lineup[1]); assert.equal(c.balance, 50);
+  const e = environment(exportCareer(c)); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await button(e.root, 'Équipement').click();
+  const manager = classNode(e.root, 'rb-career'); assert.ok(manager.textContent.indexOf('Protections du club') < manager.textContent.indexOf('Magasin'));
+  assert.match(manager.textContent, /Fatigue de participation/);
+  const assignment = descendants(e.root).find((n) => n.dataset.focusKey === `gear-${c.inventory[0].id}`); assignment.focus(); assignment.value = c.lineup[1]; await assignment.emit('change');
+  assert.equal(e.saved().balance, 50); assert.equal(e.saved().inventory[0].playerId, c.lineup[1]); assert.equal(e.saved().inventory[1].playerId, null);
+  assert.equal(document.activeElement.dataset.focusKey, assignment.dataset.focusKey);
+  assert.ok(descendants(e.root).filter((n) => n.tagName === 'button' && n.textContent.startsWith('Acheter et équiper')).every((n) => n.disabled));
+});
+
+test('journées : bilan dédié, résumé compact et nouvelle préparation sans double paiement', async () => {
+  const e = environment(); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await foundClub(e.root);
+  for (let day = 1; day <= 2; day++) {
+    await button(e.root, day === 1 ? 'Préparer le match' : 'Préparer la prochaine rencontre').click(); await button(e.root, 'Lancer la rencontre').click();
+    await button(e.root, 'Voir le résultat').click(); await button(e.root, 'Voir le bilan de la journée').click();
+    assert.equal(e.saved().day, day); assert.ok(classNode(e.root, 'rb-career-summary'));
+    const balance = e.saved().balance, mobileNav = descendants(e.root).find((n) => n.dataset.focusKey === 'mobile-section'); assert.equal(mobileNav.value, 'Bilan'); mobileNav.value = 'Club'; await mobileNav.emit('change');
+    assert.equal(classNode(e.root, 'rb-career-summary'), null); assert.ok(classNode(e.root, 'rb-last-result'));
+    await button(e.root, 'Voir le bilan').click(); assert.equal(e.saved().balance, balance);
+  }
+  assert.equal(e.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 2);
+});
+
+test('impayés : achats bloqués, préparation accessible et cession qui rembourse la dette', async () => {
+  let c = createCareer('Les Endettés', 'ui-debt'); c = confirmDraft(c, c.market.slice(0, 8).map((p) => p.id));
+  for (const p of c.clubs[0].players) p.xp = 140;
+  c = launchCareerMatch(c); const game = simulateMatch(c.current.config); game.state.result.winnerId = 'away'; c = saveCareerTurn(c, game.state, game.events); assert.equal(c.balance, -80);
+  const e = environment(exportCareer(c)); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  assert.match(classNode(e.root, 'rb-career-debt').textContent, /Vous pouvez jouer/);
+  await button(e.root, 'Recrutement').click(); assert.ok(descendants(e.root).filter((n) => n.tagName === 'button' && n.textContent.startsWith('Recruter ·')).every((n) => n.disabled));
+  await button(e.root, 'Préparer le match').click(); assert.equal(button(e.root, 'Lancer la rencontre').disabled, false);
+  await button(e.root, 'Effectif').click(); await button(e.root, 'Céder · 450 chromas').click(); await button(e.root, 'Confirmer').click();
+  assert.equal(e.saved().balance, 370); assert.equal(e.saved().clubs[0].players.length, 7); assert.equal(classNode(e.root, 'rb-career-debt'), null);
 });

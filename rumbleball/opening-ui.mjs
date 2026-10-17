@@ -12,5 +12,5 @@ export function openingPicker({ value = DEFAULT_OPENING, disabled = false, onCha
   select.setAttribute('aria-describedby', description.id); label.append(select); root.append(label, description, note);
   const render = () => { description.textContent = OPENINGS[select.value].description; };
   select.addEventListener('change', () => { if (!select.disabled) { render(); onChange(select.value); } }); render();
-  return { root, get value() { return select.value; } };
+  return { root, get value() { return select.value; }, update(value) { if (validOpening(value)) { select.value = value; render(); } } };
 }

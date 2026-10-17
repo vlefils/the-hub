@@ -76,7 +76,7 @@ test('UI : ×8 attend 1 500 ms par round et le résultat reste caché jusqu’à
 test('carrière : sauvegarde après chaque tour du lot, arrêt sur erreur intermédiaire et reprise sans doublon', async () => {
   let career = createCareer('Les Synchrones'); career = confirmDraft(career, career.market.slice(0, 5).map((p) => p.id));
   const e = environment(exportCareer(career)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
-  await descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')).click();
+  await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
   const write = e.storage.setItem.bind(e.storage); let writes = 0;
   e.storage.setItem = (key, value) => { if (++writes === 3) throw new Error('QuotaExceededError'); write(key, value); };
   await button(e.root, 'Round suivant').click(); assert.equal(writes, 3); assert.equal(e.saved().current.state.turns, 2);
@@ -157,7 +157,7 @@ test('coup d’envoi : étape manuelle, résultat immédiat et retour au vestiai
 test('carrière : intro seulement au lancement, animations réduites et reprise sans nouveau décompte ni salaire', async (t) => {
   let career = createCareer('Les Engagés'); career = confirmDraft(career, career.market.slice(0, 5).map((p) => p.id));
   const e = environment(exportCareer(career)), { mountMatch } = await import('./ui.mjs'), c = clock(t); mountCareer(e.root, mountMatch);
-  await descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')).click();
+  await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
   assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3'); assert.equal(e.saved().current.state.turns, 0);
   c.elapse(1000); c.elapse(1000); c.elapse(1000); assert.equal(c.frames.size, 0);
   assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'inline');

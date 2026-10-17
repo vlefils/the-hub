@@ -8,8 +8,8 @@ let instance = 0;
 
 // Shared by career and exhibition. A native selector and buttons work by touch,
 // click or keyboard; choosing an occupied cell swaps the two starting positions.
-export function deploymentEditor({ players, positions = defaultDeployment(), color = KIT_COLORS[0], disabled = false, onChange = () => {} }) {
-  let cells = positions.map((p) => ({ ...p })), selected = 0, focusIndex = 0;
+export function deploymentEditor({ players, positions = defaultDeployment(), color = KIT_COLORS[0], disabled = false, selectedPlayerId = null, onSelect = () => {}, onChange = () => {} }) {
+  let cells = positions.map((p) => ({ ...p })), selected = Math.max(0, players.findIndex((p) => (p.playerId ?? p.id) === selectedPlayerId)), focusIndex = 0;
   const root = el('section', 'rb-deployment'), title = el('h4', '', 'Déploiement dans votre moitié'), help = el('p', 'rb-muted', 'Choisissez un titulaire puis sa case. Une case occupée échange les deux positions. Flèches pour parcourir le terrain, Entrée pour placer.');
   help.id = `rb-deployment-help-${++instance}`;
   const layout = el('div', 'rb-deployment-layout'), controls = el('div', 'rb-deployment-controls'), field = el('label', 'rb-field', 'Joueur à placer'), select = el('select', 'rb-deployment-player');
@@ -68,10 +68,12 @@ export function deploymentEditor({ players, positions = defaultDeployment(), col
       } else button.replaceChildren(el('span', 'rb-deployment-empty', '·'));
     }
   }
-  select.addEventListener('change', () => { selected = Number(select.value); render(); });
+  select.addEventListener('change', () => { selected = Number(select.value); render(); onSelect(players[selected].playerId ?? players[selected].id); });
   render();
   return { root, get value() { return cells.map((p) => ({ ...p })); }, update(next) {
     if (next.positions !== undefined) { if (!validDeployment(next.positions)) throw new Error('Déploiement invalide.'); cells = next.positions.map((p) => ({ ...p })); }
-    players = next.players ?? players; color = next.color ?? color; disabled = next.disabled ?? disabled; render();
+    players = next.players ?? players; color = next.color ?? color; disabled = next.disabled ?? disabled;
+    if (next.selectedPlayerId !== undefined) { const index = players.findIndex((p) => (p.playerId ?? p.id) === next.selectedPlayerId); if (index >= 0) selected = index; }
+    render();
   } };
 }

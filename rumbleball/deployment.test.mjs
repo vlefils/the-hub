@@ -141,11 +141,12 @@ test('éditeur : clic, échange, clavier, contenu variable et lecture seule cons
 
 test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le terrain et la reprise sont cohérents', async () => {
   const e = environment(exportCareer(club())), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  await button(e.root, 'Préparer le match').click();
   const form = classNode(e.root, 'rb-lineup-form'), editor = classNode(form, 'rb-deployment');
   await cell(editor, 0, 0).click(); assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 });
   const slots = descendants(classNode(form, 'rb-lineup-slots')).filter((n) => n.tagName === 'select'); slots[0].value = slots[1].value; await slots[0].emit('change');
   assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 }); assert.match(editor.querySelector('select').children[0].textContent, /Brique/);
-  await descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')).click();
+  await button(e.root, 'Lancer la rencontre').click();
   assert.deepEqual(e.saved().current.state.players[0].position, { x: 0, y: 0 }); assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'hidden');
   assert.match(classNode(e.root, 'rb-possession').textContent, /Ballon attendu au centre/);
   await button(e.root, 'Retour au club · mettre en pause').click();

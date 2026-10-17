@@ -119,13 +119,14 @@ test('carrière : ouverture sauvegardée, figée au lancement et protégée cont
 
 test('interface : choisir une ouverture applique le placement, puis les ajustements et la sauvegarde restent stables', async () => {
   const e = environment(exportCareer(club())); mountCareer(e.root, mountMatch);
+  await button(e.root, 'Préparer le match').click();
   const select = classNode(e.root, 'rb-opening-select'); select.value = 'fallback'; await select.emit('change');
   assert.equal(e.saved().clubs[0].opening, 'fallback'); assert.deepEqual(e.saved().clubs[0].deployment, openingDeployment('fallback'));
   const cell = descendants(classNode(e.root, 'rb-deployment')).find((n) => n.dataset.cell === '0,7'); await cell.click();
   const custom = e.saved().clubs[0].deployment; assert.deepEqual(custom[0], { x: 0, y: 7 });
   const strategy = classNode(e.root, 'rb-lineup-form').querySelector('select'); strategy.value = 'pressing'; await strategy.emit('change');
   assert.deepEqual(e.saved().clubs[0].deployment, custom); assert.equal(e.saved().clubs[0].opening, 'fallback');
-  await descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')).click();
+  await button(e.root, 'Lancer la rencontre').click();
   await button(e.root, 'Retour au club · mettre en pause').click(); assert.equal(classNode(e.root, 'rb-opening-select').disabled, true);
   await button(e.root, 'Exhibition').click(); const exhibition = classNode(classNode(e.root, 'rb-setup'), 'rb-opening-select'); exhibition.value = 'cage'; await exhibition.emit('change');
   assert.match(classNode(e.root, 'rb-scoreboard').textContent, new RegExp(OPENINGS.cage.name));

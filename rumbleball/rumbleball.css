@@ -223,6 +223,8 @@
 .rb-stats-table :is(th, td) { padding: .6rem .4rem; border: 0; border-bottom: 1px solid #44513f; text-align: right; background: transparent; }
 .rb-stats-table :is(th, td):first-child { text-align: left; }
 .rb-stats-table th { font-weight: 500; color: var(--muted); }
+.rb-table-scroll { overflow-x: auto; max-width: 100%; }
+.rb-table-scroll th:first-child { min-width: 9rem; max-width: 25rem; overflow-wrap: anywhere; }
 .rb-rosters { grid-area: rosters; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem; margin-top: 1.75rem; }
 .rb-roster { --rb-team-colour: var(--rb-home); min-width: 0; }
 .rb-roster-away { --rb-team-colour: var(--rb-away); }
@@ -286,64 +288,9 @@
 @media (max-width: 400px) {
   .rb .rb-setup-row { grid-template-columns: minmax(0, 1fr); }
 }
-/* Career: the club's finances and next fixture lead; management stays secondary. */
-.rb-career-top, .rb-club-header, .rb-next-match, .rb-draft-total, .rb-inventory-row, .rb-career-player-head {
-  display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;
-}
-.rb-career-top { margin-bottom: 1.25rem; }
-.rb-career-top .rb-controls, .rb-match-back { flex-wrap: wrap; }
+/* Shared selected controls and player appearance; management lives in career.css. */
 .rb [aria-pressed="true"].rb-button { color: var(--rb-accent); border-color: var(--rb-accent); background: #273027; }
-.rb-career { display: grid; gap: 1.25rem; min-width: 0; }
-.rb-career h4 { margin: 0; font-size: 1.05rem; line-height: 1.4; overflow-wrap: anywhere; }
-.rb-club-header { padding-bottom: 1.25rem; border-bottom: 1px solid var(--rb-line); align-items: start; }
-.rb-club-header h3 { margin-top: .5rem; overflow-wrap: anywhere; }
-.rb-career-finances { display: flex; flex-wrap: wrap; gap: 1rem 2rem; margin: 0; }
-.rb-career-finances dt { margin-bottom: .25rem; }
-.rb-career-finances dd { margin: 0; font-weight: 700; font-size: 1.1rem; }
-.rb-next-match { padding: 1rem 0; }
-.rb-next-match > :first-child { flex: 1 1 20rem; line-height: 1.6; overflow-wrap: anywhere; }
-.rb-career-notice, .rb-career-debt { padding: .85rem 1rem; background: #31271f; color: #ffcd9d; line-height: 1.6; }
-.rb-career-notice { margin-bottom: 1rem !important; }
-.rb-career-import, .rb-career-create { display: grid; gap: 1.25rem; padding: clamp(1rem, 2vw, 1.5rem); background: #18201e; margin-bottom: 1.25rem; }
-.rb-career-create { max-width: 45rem; }
-.rb-career-tabs { display: flex; flex-wrap: wrap; gap: .5rem; border-bottom: 1px solid var(--rb-line); padding-bottom: 1rem; }
-.rb-candidate-list, .rb-career-roster, .rb-shop { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.5rem; }
-.rb-candidate { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .9rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--rb-line); cursor: pointer; }
-.rb-candidate input[type="checkbox"], .rb-career-create input[type="checkbox"] { width: 1.2rem; height: 1.2rem; min-height: 1.2rem; padding: 0; accent-color: var(--rb-home); }
-.rb-candidate strong, .rb-candidate small { display: block; overflow-wrap: anywhere; }
-.rb-candidate > span { font-size: .875rem; }
-.rb-draft-total { padding: 1.25rem 0; border-top: 1px solid var(--rb-line); }
-.rb-lineup-form { display: grid; gap: 1.25rem; min-width: 0; }
-.rb-lineup-form > .rb-field { max-width: 24rem; }
-.rb-lineup-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; }
-.rb-career-player { display: flex; flex-direction: column; align-items: start; gap: .65rem; padding: 1rem 0 1.25rem; border-bottom: 1px solid var(--rb-line); min-width: 0; }
-.rb-career-player > * { max-width: 100%; }
-.rb-career-player-head { width: 100%; align-items: start; }
-.rb-career-player-head > strong { color: var(--rb-accent); white-space: nowrap; }
-.rb-career-player progress { display: block; width: 100%; max-width: 22rem; height: .5rem; accent-color: var(--rb-home); }
-.rb-career-player .rb-controls { flex-wrap: wrap; align-items: end; gap: .75rem; width: 100%; }
-.rb-career-player .rb-controls .rb-field { flex: 1 1 9rem; min-width: 0; }
-.rb-career-player .rb-button { margin-top: auto; }
-.rb-player-techniques { line-height: 1.6; }
-.rb-player-techniques summary, .rb-calendar-day summary, .rb-career-summary summary { cursor: pointer; font-weight: 600; padding: .5rem 0; }
-.rb-player-techniques p { margin-top: .65rem; }
-.rb-inventory-row { border-bottom: 1px solid var(--rb-line); padding: 1rem 0; }
-.rb-inventory-row > div { flex: 1 1 15rem; max-width: 30rem; }
-.rb-inventory-row .rb-field { margin-top: .65rem; }
-.rb-career-summary { padding: 1rem; background: #18201e; border-top: 2px solid var(--rb-home); }
-.rb-career-summary > :not(summary) { margin-top: .8rem; }
-.rb-calendar-day { border-bottom: 1px solid var(--rb-line); padding-bottom: .6rem; min-width: 0; }
-.rb-calendar-day p { margin-top: .75rem; line-height: 1.6; overflow-wrap: anywhere; }
-.rb-calendar-day h4 { margin-top: 1.25rem; }
-.rb-table-scroll { overflow-x: auto; max-width: 100%; }
-.rb-table-scroll .rb-stats-table { width: 100%; }
-.rb-table-scroll th:first-child { min-width: 9rem; max-width: 25rem; overflow-wrap: anywhere; }
-.rb-career-dialog { max-width: min(34rem, calc(100% - 2rem)); color: var(--text); background: #18201e; border: 1px solid var(--rb-line); padding: 1.5rem; line-height: 1.6; }
-.rb-career-dialog::backdrop { background: #080d0bcc; }
-.rb-career-dialog .rb-controls { margin-top: 1.25rem; flex-wrap: wrap; }
 .rb-match-back { margin-bottom: 1rem; }
-.rb-career select, .rb-career input:not([type="checkbox"]) { width: 100%; min-width: 0; max-width: 100%; }
-.rb-career .rb-button, .rb-career-dialog .rb-button { white-space: normal; overflow-wrap: anywhere; text-align: left; }
 .rb-team-copy { min-width: 0; overflow-wrap: anywhere; }
 .rb-result h3, .rb-roster h3 { overflow-wrap: anywhere; }
 .rb-player-portrait { display: block; width: 4rem; height: auto; flex: 0 0 4rem; overflow: visible; pointer-events: none; }
@@ -359,18 +306,8 @@
 .rb-kit-preview { display: flex; gap: .5rem; flex-wrap: wrap; }
 .rb input.rb-kit-color { width: 5rem; height: 2.75rem; padding: .25rem; cursor: pointer; }
 .rb input.rb-kit-color:disabled { cursor: default; }
-.rb-candidate .rb-player-portrait { width: 3.25rem; flex-basis: 3.25rem; }
 @media (max-width: 680px) {
-  .rb-candidate-list, .rb-career-roster, .rb-shop { grid-template-columns: minmax(0, 1fr); }
-  .rb-club-header { display: grid; }
-  .rb-career-finances { gap: 1rem; }
-  .rb-career-finances > div:first-child { flex-basis: 100%; }
-  .rb-career-finances > div:first-child dd { font-size: 1.5rem; }
-  .rb-career-tabs .rb-button { flex: 1 1 8rem; }
-  .rb-next-match .rb-button { width: 100%; }
   .rb-setup-head .rb-kit-options { width: 100%; }
-  .rb-candidate { grid-template-columns: auto minmax(0, 1fr); }
-  .rb-candidate > span { grid-column: 2; }
 }
 @media print {
   .rb-court-effects { display: none; }

@@ -26,12 +26,6 @@ body { margin: 0; min-height: 100vh; min-height: 100svh; font-family: 'Space Gro
 .rb-career-top > .rb-controls:first-child .rb-button { padding-inline: 1.2rem; background: transparent; border-color: transparent; font-size: 1rem; }
 .rb-career-top > .rb-controls:first-child [aria-pressed='true'] { border-bottom: 2px solid var(--rb-accent); border-radius: 0; }
 .rb-career-top > .rb-controls:last-child .rb-button { background: transparent; font-weight: 500; }
-.rb-app .rb-career { max-width: 118rem; margin-inline: auto; }
-.rb-app .rb-club-header h3 { font: 700 clamp(1.8rem, 3vw, 2.6rem)/1.1 'Rajdhani', sans-serif; }
-.rb-app .rb-career-finances dd { font-variant-numeric: tabular-nums; }
-.rb-app .rb-career-finances > div:first-child dd { font-size: 1.5rem; }
-.rb-app .rb-career-roster, .rb-app .rb-shop, .rb-app .rb-candidate-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr)); gap: 1.25rem 2rem; }
-.rb-team-controls { display: grid; gap: 1.5rem; align-content: start; min-width: 0; }
 .rb-app .rb-preparation { display: grid; gap: 1.5rem 2.5rem; align-items: start; }
 .rb-app .rb-preparation > .rb-deployment { margin-block: 0; padding-top: 1rem; border-top: 1px solid var(--rb-line); }
 .rb-app .rb-deployment-board { max-width: 26rem; }
@@ -74,7 +68,6 @@ body { margin: 0; min-height: 100vh; min-height: 100svh; font-family: 'Space Gro
 @media (min-width: 1100px) {
   .rb-career-welcome { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 5vw, 6rem); }
   .rb-app .rb-preparation { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
-  .rb-app .rb-team-controls .rb-lineup-slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rb-app .rb-match-layout { grid-template-columns: minmax(0, 1fr) clamp(19rem, 23vw, 25rem); grid-template-areas: 'field journal' 'rosters rosters'; gap: 1.5rem; }
   .rb-app .rb-journal-panel { border-left: 1px solid var(--rb-line); border-top: 0; padding: 0 0 0 1.25rem; }
   .rb-app .rb-journal-head { flex-direction: column; }
@@ -100,7 +93,6 @@ body { margin: 0; min-height: 100vh; min-height: 100svh; font-family: 'Space Gro
   .rb-app .rb-career-top .rb-button { padding-inline: .7rem; }
   .rb-career-introduction::before, .rb-career-steps { display: none; }
   .rb-career-introduction h2 { max-width: none; }
-  .rb-app .rb-career-roster, .rb-app .rb-shop, .rb-app .rb-candidate-list { grid-template-columns: minmax(0, 1fr); }
   .rb-app .rb-match-layout { gap: 1rem; }
   .rb-app .rb-journal { max-height: 22rem; }
   .rb-app .rb-toolbar > .rb-controls { gap: .5rem; width: 100%; }

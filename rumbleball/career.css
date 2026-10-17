@@ -1,0 +1,294 @@
+/* Club management: shared rhythm, comparable data and one decision per workspace. */
+.rb-app .rb-career {
+  --rb-surface: #18221f;
+  --rb-surface-soft: #141d1a;
+  --rb-good: #a4dec2;
+  --rb-warning: #efc786;
+  --rb-bad: #f3ac98;
+  max-width: 100rem;
+  margin-inline: auto;
+  display: grid;
+  min-width: 0;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
+}
+.rb-career-top, .rb-club-header, .rb-next-match, .rb-draft-total, .rb-inventory-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.rb-career h4 { margin: 0; font-size: 1.05rem; line-height: 1.4; }
+.rb-career .rb-button, .rb-career-dialog .rb-button { white-space: normal; overflow-wrap: anywhere; text-align: left; }
+.rb-career select, .rb-career input:not([type='checkbox']) { width: 100%; min-width: 0; max-width: 100%; }
+.rb-club-header { border-bottom: 1px solid var(--rb-line); }
+.rb-club-header h3 { margin-top: .5rem; overflow-wrap: anywhere; }
+.rb-career-finances { display: flex; flex-wrap: wrap; margin: 0; }
+.rb-career-finances dt { margin-bottom: .25rem; }
+.rb-career-finances dd { margin: 0; font-weight: 700; font-size: 1.1rem; }
+.rb-next-match > :first-child { flex: 1 1 20rem; line-height: 1.6; overflow-wrap: anywhere; }
+.rb-career-notice, .rb-career-debt { padding: .85rem 1rem; background: #31271f; color: #ffcd9d; line-height: 1.6; }
+.rb-career-notice { margin-bottom: 1rem !important; }
+.rb-career-import, .rb-career-create { display: grid; gap: 1.25rem; padding: clamp(1rem, 2vw, 1.5rem); background: #18201e; margin-bottom: 1.25rem; }
+.rb-candidate-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr)); gap: 1.25rem 2rem; }
+.rb-candidate { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .9rem; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--rb-line); cursor: pointer; }
+.rb-candidate input[type='checkbox'], .rb-career-create input[type='checkbox'] { width: 1.2rem; height: 1.2rem; min-height: 1.2rem; padding: 0; accent-color: var(--rb-home); }
+.rb-candidate strong, .rb-candidate small { display: block; overflow-wrap: anywhere; }
+.rb-candidate > span { font-size: .875rem; }
+.rb-candidate .rb-player-portrait { width: 3.25rem; flex-basis: 3.25rem; }
+.rb-draft-total { padding: 1.25rem 0; border-top: 1px solid var(--rb-line); }
+.rb-lineup-form, .rb-lineup-slots, .rb-team-controls { display: grid; min-width: 0; }
+.rb-team-controls { align-content: start; }
+.rb-career-roster, .rb-shop { display: grid; }
+.rb-career-player { display: flex; flex-direction: column; align-items: start; border-bottom: 1px solid var(--rb-line); min-width: 0; }
+.rb-career-player > * { max-width: 100%; }
+.rb-inventory-row { border-bottom: 1px solid var(--rb-line); }
+.rb-inventory-row > div { flex: 1 1 15rem; }
+.rb-inventory-row .rb-field { margin-top: .65rem; }
+.rb-career-dialog { max-width: min(34rem, calc(100% - 2rem)); color: var(--text); background: #18201e; border: 1px solid var(--rb-line); padding: 1.5rem; line-height: 1.6; }
+.rb-career-dialog::backdrop { background: #080d0bcc; }
+.rb-career-dialog .rb-controls { margin-top: 1.25rem; flex-wrap: wrap; }
+.rb-career :is(section, nav, form, dl, table, details), .rb-career :is(section, nav, form, dl, table, details) > * { min-width: 0; }
+.rb-app .rb-career-top { align-items: center; margin-bottom: 1.5rem; }
+.rb-save-status { font-size: .8125rem; color: var(--muted); }
+.rb-career-top > .rb-controls:last-child { gap: .5rem 1.25rem; }
+.rb-app .rb-career-disclosure { border-top: 1px solid var(--rb-line); padding-block: .5rem; }
+.rb-career-disclosure > summary { cursor: pointer; padding-block: .75rem; font-size: .9375rem; font-weight: 500; }
+.rb-career-disclosure > :not(summary) { margin-top: .75rem; }
+.rb-career-disclosure > h4 { margin-top: 1.25rem; }
+.rb-career-top .rb-career-disclosure { border: 0; max-width: 27rem; }
+.rb-career-top .rb-career-disclosure > summary { padding: .5rem 0; }
+.rb-app .rb-club-header { padding: .5rem 0 1.25rem; align-items: center; gap: 1.5rem 3rem; }
+.rb-app .rb-club-header h3 { max-width: 27ch; font: 700 clamp(1.8rem, 3vw, 2.75rem)/1.1 'Rajdhani', sans-serif; }
+.rb-club-header > :first-child { flex: 1 1 20rem; }
+.rb-header-actions { display: flex; flex-wrap: wrap; justify-content: end; align-items: center; gap: 1rem 2rem; }
+.rb-app .rb-career-finances { gap: .75rem 2rem; }
+.rb-career-finances dt { font-size: .8125rem; }
+.rb-app .rb-career-finances > div:first-child dd { font-size: 1.5rem; }
+.rb-career-finances dd { font-variant-numeric: tabular-nums; }
+.rb-app .rb-next-match { padding: 1rem 1.25rem; background: var(--rb-surface); border-left: 3px solid var(--rb-accent); }
+.rb-app .rb-career-tabs, .rb-team-tabs { display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; padding: 0; border-bottom: 1px solid var(--rb-line); }
+.rb-career-tabs .rb-button, .rb-team-tabs .rb-button { border: 0; border-bottom: 2px solid transparent; padding: .85rem .15rem; border-radius: 0; background: transparent; color: var(--muted); font-weight: 500; }
+.rb-career-tabs .rb-button[aria-current='page'], .rb-team-tabs .rb-button[aria-current='page'] { color: var(--text); border-bottom-color: var(--rb-accent); }
+.rb-team-tabs { width: fit-content; gap: 1.5rem; }
+.rb-team-tabs .rb-button { padding-top: .25rem; min-height: 2.75rem; }
+.rb-career .rb-mobile-nav { display: none; }
+.rb-section-heading { display: grid; gap: .5rem; max-width: 65ch; }
+.rb-career .rb-section-heading h3 { font: 600 clamp(1.5rem, 2vw, 1.9rem)/1.15 'Rajdhani', sans-serif; }
+.rb-career .rb-section-heading p { line-height: 1.65; }
+.rb-career .rb-muted { line-height: 1.6; }
+.rb-career .rb-button { font-weight: 500; }
+.rb-career .rb-button-primary { font-weight: 700; }
+.rb-career .rb-gain { color: var(--rb-good); }
+.rb-career .rb-loss { color: var(--rb-bad); }
+.rb-career :is(h4, strong, dd, td, th, .rb-metric) { overflow-wrap: anywhere; }
+.rb-career .rb-person-identity > div { min-width: 0; }
+.rb-career .rb-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Club: the upcoming fixture leads; season and recent history remain quiet. */
+.rb-club-overview { display: grid; gap: 2rem; grid-template-columns: minmax(0, 2.2fr) minmax(15rem, 1fr); }
+.rb-fixture-hero { padding: clamp(1.25rem, 3vw, 2.5rem); display: grid; align-content: start; gap: 1rem; background: linear-gradient(90deg, #18251ff5 15%, #18251fdb), url('assets/arena-banner.webp') center / cover; }
+.rb-career .rb-fixture-hero h4 { max-width: 24ch; font: 700 clamp(2rem, 4vw, 3.75rem)/1.05 'Rajdhani', sans-serif; }
+.rb-fixture-hero > .rb-button { justify-self: start; margin-block: .5rem; }
+.rb-fixture-hero > .rb-muted { max-width: 55ch; }
+.rb-team-preview { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; margin-top: .5rem; }
+.rb-team-preview .rb-button { display: grid; justify-items: center; align-content: start; gap: .35rem; min-width: 0; border: 0; background: transparent; padding: .5rem .1rem; text-align: center; }
+.rb-team-preview .rb-player-portrait { width: clamp(2.5rem, 5vw, 4rem); }
+.rb-team-preview small { font-size: .8125rem; }
+.rb-season-overview { display: grid; align-content: center; justify-items: start; gap: 1rem; }
+.rb-metric { display: grid; gap: .35rem; font-variant-numeric: tabular-nums; }
+.rb-metric > strong { font: 600 clamp(1.75rem, 3vw, 2.5rem)/1.1 'Rajdhani', sans-serif; }
+.rb-season-overview .rb-metric > strong { font-size: clamp(3rem, 5vw, 4.5rem); }
+.rb-career progress { width: 100%; height: .4rem; border: 0; accent-color: var(--rb-home); border-radius: 0; background: var(--rb-line); }
+.rb-career progress::-webkit-progress-bar { background: var(--rb-line); }
+.rb-career progress::-webkit-progress-value { background: var(--rb-home); }
+.rb-career progress::-moz-progress-bar { background: var(--rb-home); }
+.rb-season-overview progress { max-width: 20rem; }
+.rb-club-attention { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1.5rem; padding-block: .5rem; }
+.rb-club-attention p { flex: 1 1 20rem; }
+.rb-last-result { display: grid; gap: .65rem; padding-block: 1.25rem; border-block: 1px solid var(--rb-line); }
+.rb-last-result .rb-button { justify-self: start; }
+.rb-finance-overview, .rb-summary-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem 2rem; margin-block: 1rem 1.5rem; }
+.rb-career-disclosure .rb-kit-color { max-width: 9rem; }
+
+/* Roster: consistent columns with a selected-player detail view. */
+.rb-roster-toolbar, .rb-market-controls { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; }
+.rb-roster-toolbar .rb-field, .rb-market-controls .rb-field { flex: 0 1 21rem; }
+.rb-roster-workspace { display: grid; grid-template-columns: minmax(0, 2.7fr) minmax(18rem, 1fr); gap: 2rem; align-items: start; }
+.rb-career .rb-stats-table { font-size: .875rem; width: 100%; font-variant-numeric: tabular-nums; }
+.rb-career .rb-stats-table :is(th, td) { padding: 1rem .65rem; vertical-align: middle; }
+.rb-career .rb-stats-table thead th { color: var(--muted); font-size: .75rem; font-weight: 500; text-align: left; }
+.rb-career .rb-stats-table :is(td, th):not(:first-child) { text-align: right; }
+.rb-career .rb-roster-table .rb-stats-table :is(td, th) { text-align: left; padding-inline: .5rem; }
+.rb-roster-table .rb-stats-table th:first-child { width: 29%; min-width: 11rem; }
+.rb-roster-table .rb-stats-table th:nth-child(2) { width: 13%; }
+.rb-roster-table .rb-stats-table th:nth-child(3) { width: 19%; }
+.rb-roster-table .rb-stats-table th:nth-child(4) { width: 23%; }
+.rb-roster-table .rb-stats-table th:nth-child(5) { width: 16%; }
+.rb-career .rb-roster-table .rb-button { padding: .5rem .35rem; width: 100%; border: 0; border-left: 2px solid transparent; border-radius: 0; background: transparent; color: var(--text); font-weight: 500; }
+.rb-career .rb-roster-table .rb-button[aria-pressed='true'] { border-left-color: var(--rb-accent); background: #d8e58b0a; color: var(--text); }
+.rb-roster-table .rb-person-identity { gap: .5rem; }
+.rb-roster-table .rb-player-portrait { width: 2.5rem; flex-basis: 2.5rem; }
+.rb-player-status { font-size: .8125rem; }
+.rb-salary { display: block; font-variant-numeric: tabular-nums; }
+.rb-player-xp { display: grid; gap: .35rem; font-size: .875rem; width: 100%; max-width: 20rem; }
+.rb-player-xp > span { font-weight: 500; }
+.rb-player-xp > small { font-size: .75rem; }
+.rb-fatigue { display: grid; gap: .35rem; font-size: .875rem; width: fit-content; font-variant-numeric: tabular-nums; }
+.rb-fatigue-meter { display: flex; gap: 3px; }
+.rb-fatigue-meter i { display: block; width: .65rem; height: .35rem; background: var(--rb-line); }
+.rb-fatigue-meter i.is-filled { background: var(--muted); }
+.rb-fatigue.is-tired .rb-fatigue-meter i.is-filled { background: var(--rb-warning); }
+.rb-fatigue.is-exhausted .rb-fatigue-meter i.is-filled { background: var(--rb-bad); }
+.rb-fatigue > small { max-width: 22ch; font-size: .75rem; }
+.rb-player-detail { display: grid; gap: 1.25rem; padding: 1.5rem; background: var(--rb-surface); }
+.rb-player-detail > .rb-person-identity { align-items: center; }
+.rb-player-detail > .rb-person-identity .rb-player-portrait { width: 5rem; flex-basis: 5rem; }
+.rb-career .rb-player-detail > .rb-person-identity h4 { font: 600 1.65rem/1.15 'Rajdhani', sans-serif; }
+.rb-player-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 0; width: 100%; }
+.rb-player-stats dt { font-size: .75rem; }
+.rb-player-stats dd { margin: .2rem 0 0; font-size: 1rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.rb-equipment-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 0; padding-block: 1rem; border-block: 1px solid var(--rb-line); }
+.rb-equipment-slots dd { margin: .35rem 0 0; font-size: .875rem; }
+.rb-equipment-slots dt { font-size: .8125rem; }
+.rb-stat-comparison { display: grid; gap: .5rem; width: 100%; margin: 0; }
+.rb-stat-comparison > div { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem 1rem; font-size: .875rem; }
+.rb-stat-comparison dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.rb-career .rb-quiet-action { background: transparent; border-color: transparent; color: var(--muted); justify-self: start; padding-inline: 0; }
+.rb-career .rb-detail-back { display: none; }
+
+/* Tactics: a generous court, five consistent slots, controls for one player. */
+.rb-career .rb-lineup-form { gap: 1.5rem; }
+.rb-team-plans { display: grid; grid-template-columns: minmax(12rem, 1fr) minmax(0, 2fr); gap: .5rem 2rem; align-items: start; }
+.rb-team-plans > .rb-muted { grid-column: 1; }
+.rb-team-plans .rb-opening-picker { grid-column: 2; grid-row: 1 / span 3; }
+.rb-team-plans > .rb-button { justify-self: start; }
+.rb-app .rb-career .rb-preparation { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 2rem; }
+.rb-app .rb-career .rb-preparation > .rb-deployment { padding: 0; border: 0; }
+.rb-career .rb-deployment-layout { display: grid; grid-template-columns: minmax(0, 1fr); }
+.rb-app .rb-career .rb-deployment-board { max-width: 36rem; }
+.rb-career .rb-deployment-controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+.rb-career .rb-deployment-controls .rb-field { max-width: 27rem; }
+.rb-career .rb-deployment-status:empty { display: none; }
+.rb-career .rb-team-controls { gap: 1rem; }
+.rb-app .rb-career .rb-lineup-slots { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.rb-lineup-slot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: center; gap: .75rem; padding: .75rem 0; border-bottom: 1px solid var(--rb-line); }
+.rb-lineup-slot.is-selected { border-bottom-color: #87956e; }
+.rb-slot-copy { display: grid; gap: .35rem; }
+.rb-slot-copy .rb-person-identity { gap: .35rem; }
+.rb-slot-copy .rb-player-portrait { width: 2rem; flex-basis: 2rem; }
+.rb-slot-copy .rb-fatigue { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .5rem; }
+.rb-slot-copy .rb-fatigue > small { display: none; }
+.rb-career .rb-slot-select { background: transparent; padding: .5rem; font-size: .8125rem; }
+.rb-tactical-player { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem 1rem; padding: 1rem; background: var(--rb-surface); }
+.rb-tactical-player > :is(h4, p) { grid-column: 1 / -1; }
+.rb-bench { display: grid; gap: .75rem; }
+.rb-bench-player { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding-block: .5rem; }
+.rb-bench-player .rb-person-identity { flex: 1 1 10rem; }
+.rb-bench-player .rb-fatigue { flex: 0 1 7rem; }
+.rb-bench-player .rb-fatigue small { display: none; }
+.rb-bench-player .rb-button { font-size: .8125rem; }
+.rb-form-status { color: var(--muted); font-size: .875rem; }
+.rb-launch-bar { position: sticky; z-index: 3; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; padding: 1.25rem 0 max(1.25rem, env(safe-area-inset-bottom)); background: #101716f5; border-top: 1px solid var(--rb-line); }
+.rb-launch-bar > div { flex: 1 1 22rem; }
+.rb-launch-bar p { margin-top: .4rem; max-width: 75ch; }
+
+/* Economic decisions: owned equipment before the shop, consequences beside actions. */
+.rb-app .rb-career .rb-career-roster, .rb-app .rb-career .rb-shop { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem 2.5rem; }
+.rb-career .rb-career-player { gap: .85rem; padding-block: 1rem 1.5rem; }
+.rb-career .rb-career-player > .rb-person-identity .rb-player-portrait { width: 3.5rem; flex-basis: 3.5rem; }
+.rb-career .rb-career-player .rb-button { margin-top: 0; }
+.rb-career .rb-career-player > .rb-button:last-of-type { margin-top: auto; }
+.rb-purchase-projection { font-size: .8125rem; color: var(--muted); line-height: 1.6; }
+.rb-empty-state { padding: 1.25rem 0; color: var(--muted); line-height: 1.65; }
+.rb-equipment-player { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 2rem; align-items: center; padding-block: .5rem 1.5rem; }
+.rb-equipment-player .rb-player-portrait { width: 5rem; flex-basis: 5rem; }
+.rb-club-inventory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 2.5rem; }
+.rb-career .rb-inventory-row { gap: 1rem; padding-block: .75rem; }
+.rb-career .rb-inventory-row > div { max-width: none; }
+.rb-career .rb-draft-total { position: sticky; z-index: 2; bottom: 0; background: #101716f5; padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+.rb-draft-total > strong { flex: 1 1 30rem; font-size: .9375rem; font-weight: 500; line-height: 1.65; }
+
+/* League and debrief: real results, progression and a clear next action. */
+.rb-league-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+.rb-league-layout > section { display: grid; gap: 1.25rem; }
+.rb-career .rb-own-club { background: #79decb0a; }
+.rb-career .rb-own-club th { color: var(--rb-home); }
+.rb-fixture-row { padding-block: 1rem; border-bottom: 1px solid var(--rb-line); display: grid; gap: .5rem; }
+.rb-fixture-row.is-own { padding-left: 1rem; border-left: 2px solid var(--rb-home); }
+.rb-app .rb-career-summary { padding: clamp(1rem, 3vw, 2rem); background: var(--rb-surface); border: 0; display: grid; gap: 1.5rem; }
+.rb-career .rb-career-summary > * { margin: 0; }
+.rb-career .rb-result-title { font: 700 clamp(2.5rem, 5vw, 4.5rem)/1 'Rajdhani', sans-serif; }
+.rb-level-gain { display: grid; gap: .75rem; padding-block: 1.25rem; border-top: 1px solid var(--rb-line); }
+.rb-level-gain > .rb-stat-comparison { max-width: 24rem; }
+
+@media (max-width: 1250px) {
+  .rb-roster-workspace { grid-template-columns: minmax(0, 1fr); }
+  .rb-career .rb-player-detail { display: none; }
+  .rb-roster-workspace.is-detail-open > .rb-player-detail { display: grid; max-width: 45rem; width: 100%; margin-inline: auto; }
+  .rb-roster-workspace.is-detail-open > .rb-roster-table { display: none; }
+  .rb-career .rb-detail-back { display: inline-flex; justify-self: start; }
+  .rb-app .rb-career .rb-career-roster, .rb-app .rb-career .rb-shop { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rb-equipment-player { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rb-equipment-player > .rb-player-stats { grid-column: 1 / -1; max-width: 40rem; }
+}
+@media (max-width: 1000px) {
+  .rb-app .rb-career .rb-preparation { grid-template-columns: minmax(0, 1fr); }
+  .rb-career .rb-deployment-layout { grid-template-columns: minmax(0, 1fr) minmax(0, .7fr); }
+  .rb-club-overview, .rb-league-layout { grid-template-columns: minmax(0, 1fr); }
+  .rb-season-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; }
+  .rb-season-overview .rb-metric { grid-column: 1; grid-row: 2 / span 3; }
+  .rb-season-overview > .rb-eyebrow { grid-column: 1 / -1; }
+  .rb-header-actions { justify-content: start; }
+}
+@media (max-width: 640px) {
+  .rb-app .rb-career { gap: 1.25rem; }
+  .rb-save-status { font-size: .75rem; }
+  .rb-app .rb-career-top { margin-bottom: 1rem; align-items: start; }
+  .rb-career-top > .rb-controls:last-child { gap: .25rem 1rem; }
+  .rb-career-top .rb-career-disclosure { max-width: 100%; }
+  .rb-app .rb-club-header { gap: 1rem; padding-top: 0; }
+  .rb-app .rb-club-header h3 { font-size: 1.9rem; }
+  .rb-app .rb-career-finances > div:first-child { flex-basis: auto; }
+  .rb-header-actions { width: 100%; }
+  .rb-header-actions > .rb-button { width: 100%; }
+  .rb-career .rb-mobile-nav { display: flex; }
+  .rb-app .rb-career-tabs { display: none; }
+  .rb-next-match .rb-button { width: 100%; }
+  .rb-candidate { grid-template-columns: auto minmax(0, 1fr); }
+  .rb-candidate > span { grid-column: 2; }
+  .rb-team-tabs { margin-top: -.25rem; }
+  .rb-fixture-hero { padding: 1.25rem; }
+  .rb-team-preview { gap: .15rem; }
+  .rb-finance-overview, .rb-summary-metrics { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+  .rb-metric > strong { font-size: 2rem; }
+  .rb-roster-toolbar > .rb-field { flex-basis: 100%; }
+  .rb-roster-table .rb-stats-table, .rb-roster-table tbody { display: block; }
+  .rb-roster-table thead { display: none; }
+  .rb-roster-table tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .75rem 1rem; padding-block: 1rem; border-top: 1px solid var(--rb-line); }
+  .rb-career .rb-roster-table .rb-stats-table :is(th, td) { display: block; width: auto; min-width: 0; border: 0; padding: 0; }
+  .rb-roster-table tr > th { grid-column: 1 / -1; }
+  .rb-roster-table td:nth-child(2) { grid-column: 1 / -1; }
+  .rb-roster-table td:nth-child(4)::before { content: 'Fatigue'; display: block; font-size: .75rem; color: var(--muted); margin-bottom: .35rem; }
+  .rb-roster-table td:nth-child(5)::before { content: 'Salaire / journée'; display: block; font-size: .75rem; color: var(--muted); margin-bottom: .35rem; }
+  .rb-career .rb-player-detail { padding: 1rem; }
+  .rb-player-detail .rb-controls > .rb-button { width: 100%; }
+  .rb-team-plans { grid-template-columns: minmax(0, 1fr); gap: .75rem; }
+  .rb-team-plans .rb-opening-picker { grid-column: 1; grid-row: auto; margin-top: .5rem; }
+  .rb-career .rb-deployment-layout { grid-template-columns: minmax(0, 1fr); }
+  .rb-lineup-slot { grid-template-columns: minmax(0, 1fr) auto; }
+  .rb-slot-copy { grid-column: 1; }
+  .rb-lineup-slot > .rb-slot-select { grid-column: 2; grid-row: 1 / span 2; }
+  .rb-slot-copy { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+  .rb-tactical-player { padding: 1rem; }
+  .rb-bench-player > .rb-button { flex-basis: 100%; }
+  .rb-launch-bar { gap: .75rem; padding-block: 1rem max(1rem, env(safe-area-inset-bottom)); }
+  .rb-launch-bar > .rb-button { width: 100%; text-align: center; }
+  .rb-launch-bar p { font-size: .8125rem; }
+  .rb-app .rb-career .rb-career-roster, .rb-app .rb-career .rb-shop, .rb-equipment-player, .rb-club-inventory { grid-template-columns: minmax(0, 1fr); }
+  .rb-equipment-player { gap: 1.25rem; }
+  .rb-career .rb-inventory-row > .rb-button { padding-inline: 0; background: transparent; border: 0; }
+  .rb-career-summary > .rb-controls > .rb-button { width: 100%; }
+  .rb-career .rb-stats-table :is(th, td) { padding: .75rem .4rem; }
+  .rb-career .rb-table-scroll th:first-child { min-width: 7rem; }
+  .rb-league-layout .rb-stats-table { font-size: .8125rem; }
+}
+@media print {
+  .rb-career-tabs, .rb-team-tabs, .rb-mobile-nav, .rb-launch-bar { display: none !important; }
+  .rb-career :is(.rb-fixture-hero, .rb-player-detail, .rb-career-summary) { background: transparent; }
+}
