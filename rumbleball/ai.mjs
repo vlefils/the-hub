@@ -12,6 +12,8 @@ const turnsUntil = (state, id) => {
   return gap > 0 ? gap : gap + state.initiative.length;
 };
 export const strategyOf = (state, actor) => state.teams.find((t) => t.id === actor.teamId).strategy;
+export const matchPriority = (state) => state.version >= 5 ? state.round <= 6 ? 'combat' : 'ball' : null;
+const combatActionBonus = { attack: 60, grapple: 20, shove: 20, pickup: -80, strip: -80, pass: -80, 'ready-pass': -80 };
 
 function supportFormation(state, holder, players, protector) {
   const strategy = strategyOf(state, holder);
@@ -190,6 +192,9 @@ function stripValue(state, actor, holder, task, aggression, exploit = false) {
     - Number(!assigned) * 18 - Number(actor.role === 'blocker' && !assigned) * 12;
 }
 function taskFor(state, actor, plan) {
+  // First weaken the opposition. From round seven onward, use the existing
+  // recovery, possession and prepared-pass assignments without extra bonuses.
+  if (matchPriority(state) === 'combat' && opponents(state, actor).length) return 'fight';
   if (state.ball.carrierId === actor.id) return 'carry';
   if (state.version >= 5 && plan.mode === 'own') {
     if (actor.id === plan.protector) return 'protect';
@@ -214,6 +219,11 @@ function taskFor(state, actor, plan) {
 }
 function positionalScore(state, actor, cell, plan, task) {
   const ball = carrier(state)?.position ?? state.ball.position;
+  if (task === 'fight') {
+    const holder = carrier(state);
+    const gap = holder && holder.teamId !== actor.teamId ? distance(cell, holder.position) : nearestDistance(opponents(state, actor), cell);
+    return 35 - Math.max(0, gap - 1) * 12;
+  }
   if (task === 'carry') {
     let score = possessionSafety(state, actor, cell) * carryWeight(state, actor);
     if (plan.supports?.size) {
@@ -324,6 +334,8 @@ export function decideTurn(state, actor) {
     const view = movementView(state, actor, entry.position);
     view.actor = { ...view.actor, chargeRun: chargeRun(actor, entry.path) };
     if (!legalAction(view.state, view.actor, action)) return;
+    const objectiveBonus = matchPriority(state) === 'combat' ? (combatActionBonus[action.type] ?? 0)
+      + Number(action.type === 'attack' && action.targetId === state.ball.carrierId) * 40 : 0;
     const target = playerById(view.state, action.targetId);
     if (action.type === 'pass') {
       const spent = new Set(); let from = actor.position;
@@ -342,18 +354,18 @@ export function decideTurn(state, actor) {
       const runValue = receiverRuns.get(target.id);
       const normal = passScore(view.state, view.actor, target, false, plan.opening, runValue);
       const direct = !entry.path.length && plan.opening?.receivers.includes(target.id) ? 24 : 0;
-      if (normal !== null) candidates.push({ path: entry.path, action, score: entry.score + normal + direct, task });
+      if (normal !== null) candidates.push({ path: entry.path, action, score: entry.score + normal + direct + objectiveBonus, task });
       const difficult = view.actor.grappledBy || opponents(view.state, view.actor).some((p) => distance(p.position, entry.position) <= 1)
         || interceptionCandidates(view.state, view.actor, target.position).length > 0;
       const enhanced = { ...action, technique: 'precision' };
       if ((difficult || state.round >= 8) && !hasCheckHelp(state, actor) && !hasPassCall(state, actor) && legalAction(view.state, view.actor, enhanced)) {
         const adjusted = passScore(view.state, view.actor, target, true, plan.opening, runValue);
-        if (adjusted !== null) candidates.push({ path: entry.path, action: enhanced, score: entry.score + adjusted + direct, task });
+        if (adjusted !== null) candidates.push({ path: entry.path, action: enhanced, score: entry.score + adjusted + direct + objectiveBonus, task });
       }
       return;
     }
     const opening = target && ['strip', 'grapple', 'shove'].includes(action.type) && collectiveOpening(view.state, view.actor, target);
-    candidates.push({ path: entry.path, action, score: entry.score + score + (opening ? 7 : 0), task });
+    candidates.push({ path: entry.path, action, score: entry.score + score + (opening ? 7 : 0) + objectiveBonus, task });
     let technique, gain = 0;
     if (action.type === 'strip' && !hasCheckHelp(state, actor)) {
       technique = 'exploitation';
@@ -361,7 +373,7 @@ export function decideTurn(state, actor) {
     }
     if (action.type === 'attack' && !actor.grappling && !target.grappledBy) { technique = 'percussion'; gain = 5; }
     const enhanced = { ...action, technique };
-    if (technique && legalAction(view.state, view.actor, enhanced)) candidates.push({ path: entry.path, action: enhanced, score: entry.score + score + gain, task });
+    if (technique && legalAction(view.state, view.actor, enhanced)) candidates.push({ path: entry.path, action: enhanced, score: entry.score + score + gain + objectiveBonus, task });
   };
   const holder = carrier(state);
   for (const cell of cells) {
@@ -414,7 +426,8 @@ export function decideTurn(state, actor) {
   }
   candidates.sort((a, b) => b.score - a.score || a.path.length - b.path.length || a.action.type.localeCompare(b.action.type) || (a.action.targetId ?? '').localeCompare(b.action.targetId ?? ''));
   const chosen = candidates[0] ?? { path: [], action: { type: 'wait' }, score: 0, task };
-  return { ...chosen, reason: `${plan.opening ? `${OPENINGS[plan.opening.id].name} : ` : ''}${explain(actor, task, chosen.action.type, playerById(state, chosen.action.targetId))}` };
+  const priority = matchPriority(state);
+  return { ...chosen, reason: `${priority ? priority === 'combat' ? 'Priorité combat : ' : 'Priorité ballon : ' : ''}${plan.opening ? `${OPENINGS[plan.opening.id].name} : ` : ''}${explain(actor, task, chosen.action.type, playerById(state, chosen.action.targetId))}` };
 }
 
 // One bounded bonus choice at each execution boundary, using public state only.

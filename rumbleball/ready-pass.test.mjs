@@ -15,7 +15,7 @@ function fixture(version = 5) {
   state.players.forEach((p) => { if (![a, b, c, enemy].includes(p)) { p.hp = 0; p.reaction = false; } });
   a.position = { x: 2, y: 3 }; b.position = { x: 5, y: 3 }; c.position = { x: 5, y: 6 }; enemy.position = { x: 11, y: 0 };
   a.skills.acrobatics = b.skills.acrobatics = 100;
-  state.round = 3; state.activeId = a.id; giveBall(state, a, []);
+  state.round = 7; state.activeId = a.id; giveBall(state, a, []);
   return { state, a, b, c, enemy, events: [] };
 }
 const ready = (state, actor, events = []) => resolveAction(state, actor, { type: 'ready-pass' }, events);
@@ -24,7 +24,7 @@ test('préparer : action dépensée, mouvement et réaction conservés, aucun je
   const { state, a, events } = fixture(), rng = state.rng, movement = a.movement;
   assert.equal(ready(state, a, events), true); assert.equal(a.action, false); assert.equal(a.reaction, true);
   assert.equal(a.movement, movement); assert.equal(a.interaction, true); assert.equal(a.dodging, false); assert.equal(state.rng, rng);
-  assert.deepEqual(a.readiedPass, { round: 3, turn: 0 }); assertInvariants(state);
+  assert.deepEqual(a.readiedPass, { round: 7, turn: 0 }); assertInvariants(state);
   const before = structuredClone(state); assert.equal(ready(state, a), false); assert.deepEqual(state, before);
 });
 

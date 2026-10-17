@@ -77,10 +77,10 @@ test('relai arrière : reste en retrait, réserve sa réaction, libère le plan 
   giveBall(state, state.players[5], []); assert.equal(openingPlan(state, rear), null); assert.equal(shouldTakeOpportunity(state, rear, state.players[5]), true);
 });
 
-test('fuite et cage : le porteur fuit derrière les écrans ou garde ses partenaires proches', () => {
+test('ancienne v4, fuite et cage : le porteur fuit derrière les écrans ou garde ses partenaires proches', () => {
   const ends = {};
   for (const opening of ['breakaway', 'cage']) {
-    const state = createMatch({ openings: { home: opening, away: 'none' } }); clearOpponents(state);
+    const state = createMatch({ rulesVersion: 4, openings: { home: opening, away: 'none' } }); clearOpponents(state);
     const holder = state.players[2]; giveBall(state, holder, []); holder.action = false;
     const path = decideMovement(state, holder); ends[opening] = path.at(-1) ?? holder.position;
     if (opening === 'cage') assert.ok(Math.min(...state.players.filter((p) => p.teamId === 'home' && p.id !== holder.id).map((p) => distance(p.position, ends[opening]))) <= 1);
@@ -88,8 +88,8 @@ test('fuite et cage : le porteur fuit derrière les écrans ou garde ses partena
   assert.ok(ends.breakaway.x < ends.cage.x); assert.ok(ends.breakaway.x <= 2);
 });
 
-test('écrans : menaces réparties et choix de blocage, sans modifier les jets ni l’état', () => {
-  const state = createMatch(), holder = state.players[2], blocker = state.players[1]; giveBall(state, holder, []);
+test('ancienne v4, écrans : menaces réparties et choix de blocage, sans modifier les jets ni l’état', () => {
+  const state = createMatch({ rulesVersion: 4 }), holder = state.players[2], blocker = state.players[1]; giveBall(state, holder, []);
   const before = structuredClone(state), plan = teamPlan(state, blocker), decision = decideTurn(state, blocker);
   assert.equal(new Set(plan.marks.values()).size, plan.marks.size); assert.equal(decision.action.type, 'grapple'); assert.deepEqual(state, before);
   state.round = 3; assert.equal(openingPlan(state, holder), null);

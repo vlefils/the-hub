@@ -1,0 +1,4649 @@
+{
+  "refs": {
+    "old": "514181ff54cdc50908a82147f670fa8746a7212d",
+    "new": "b8276fa749053543387615ffad9066eb270cfd94"
+  },
+  "method": {
+    "games": 100,
+    "pairedScenarios": 50,
+    "calibrationGamesExcluded": 6,
+    "rulesVersion": 5,
+    "level": 1,
+    "fatigue": 0,
+    "equipment": false,
+    "instructions": "normal",
+    "roster": [
+      {
+        "name": "Nora",
+        "archetype": "capitaine",
+        "role": "relay",
+        "armor": 14,
+        "maxHp": 23,
+        "speed": 9,
+        "skills": {
+          "acrobatics": 4,
+          "wrestling": 3,
+          "athletics": 1
+        }
+      },
+      {
+        "name": "Brique",
+        "archetype": "belier",
+        "role": "blocker",
+        "armor": 15,
+        "maxHp": 29,
+        "speed": 7.5,
+        "skills": {
+          "athletics": 5,
+          "wrestling": 5,
+          "acrobatics": 0
+        }
+      },
+      {
+        "name": "Zip",
+        "archetype": "escamoteur",
+        "role": "carrier",
+        "armor": 13,
+        "maxHp": 17,
+        "speed": 12,
+        "skills": {
+          "acrobatics": 5,
+          "wrestling": -1,
+          "athletics": -1
+        }
+      },
+      {
+        "name": "Étau",
+        "archetype": "belier",
+        "role": "retriever",
+        "armor": 14,
+        "maxHp": 24,
+        "speed": 9,
+        "skills": {
+          "wrestling": 4,
+          "athletics": 4,
+          "acrobatics": 1
+        }
+      },
+      {
+        "name": "Vigie",
+        "archetype": "passeur",
+        "role": "defender",
+        "armor": 13,
+        "maxHp": 20,
+        "speed": 9,
+        "skills": {
+          "acrobatics": 4,
+          "wrestling": 0,
+          "athletics": 0
+        }
+      }
+    ],
+    "description": "Same five profiles, tactics and mirrored deployment on both sides. Each seed played twice with AI sides exchanged. Shared new resolution rules; support replanning enabled only for new AI. Historical AI modules loaded from Git snapshots. No career progression between matches."
+  },
+  "results": {
+    "new": 41,
+    "old": 59,
+    "draws": 0
+  },
+  "byStrategy": {
+    "balanced": {
+      "games": 34,
+      "new": 16,
+      "old": 18,
+      "draws": 0
+    },
+    "possession": {
+      "games": 34,
+      "new": 11,
+      "old": 23,
+      "draws": 0
+    },
+    "pressing": {
+      "games": 32,
+      "new": 14,
+      "old": 18,
+      "draws": 0
+    }
+  },
+  "bySide": {
+    "new": {
+      "home": 21,
+      "away": 20
+    },
+    "old": {
+      "home": 30,
+      "away": 29
+    }
+  },
+  "metrics": {
+    "old": {
+      "stripsAttempted": 719,
+      "stripsCompleted": 324,
+      "passesAttempted": 209,
+      "passesCompleted": 134,
+      "readyPasses": 116,
+      "reactionPasses": 83,
+      "attacks": 786,
+      "grapplesAttempted": 1114,
+      "grapplesCompleted": 462,
+      "knockouts": 115,
+      "recoveries": 522
+    },
+    "new": {
+      "stripsAttempted": 456,
+      "stripsCompleted": 230,
+      "passesAttempted": 145,
+      "passesCompleted": 104,
+      "readyPasses": 63,
+      "reactionPasses": 41,
+      "attacks": 1034,
+      "grapplesAttempted": 450,
+      "grapplesCompleted": 206,
+      "knockouts": 126,
+      "recoveries": 431
+    }
+  },
+  "matches": [
+    {
+      "seed": "ai-duel-2026-10-17-balanced-0",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 91,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 16,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 1,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 20,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 236,
+        "new": 281
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-0",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 85,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 238,
+        "new": 248
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-1",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 11,
+      "turns": 97,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 2
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 0,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 278,
+        "new": 284
+      },
+      "survivingPlayers": {
+        "new": 2,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-1",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 5,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 9,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 4,
+          "knockouts": 0,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 279,
+        "new": 268
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-2",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 78,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 0,
+          "stripsCompleted": 0,
+          "passesAttempted": 7,
+          "passesCompleted": 7,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 7,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 2,
+          "knockouts": 2,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 0,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 16,
+          "grapplesAttempted": 1,
+          "grapplesCompleted": 0,
+          "knockouts": 2,
+          "recoveries": 1
+        }
+      },
+      "decisionCalls": {
+        "old": 207,
+        "new": 258
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-2",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 80,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 2,
+          "grapplesAttempted": 13,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 4,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 206,
+        "new": 266
+      },
+      "survivingPlayers": {
+        "old": 1,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-3",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 95,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 4,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 249,
+        "new": 281
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-3",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 89,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 1,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 1,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 9,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 2
+        }
+      },
+      "decisionCalls": {
+        "old": 245,
+        "new": 270
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-4",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 92,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 5,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 15,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 232,
+        "new": 296
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-4",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 86,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 5,
+          "passesAttempted": 2,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 8,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 238,
+        "new": 252
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-5",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 91,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 5,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 15,
+          "grapplesCompleted": 8,
+          "knockouts": 1,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 2,
+          "knockouts": 2,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 239,
+        "new": 276
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-5",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 89,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 11,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 2,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 19,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 3,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 226,
+        "new": 298
+      },
+      "survivingPlayers": {
+        "old": 2,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-6",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 2,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 8,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 9,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 2,
+          "knockouts": 3,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 223,
+        "new": 292
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-6",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 91,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 5,
+          "passesAttempted": 4,
+          "passesCompleted": 3,
+          "readyPasses": 5,
+          "reactionPasses": 4,
+          "attacks": 13,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 10,
+          "knockouts": 3,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 0,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 265,
+        "new": 252
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-7",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 94,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 5,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 262,
+        "new": 270
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-7",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 86,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 5,
+          "grapplesAttempted": 21,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 2,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 247,
+        "new": 238
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-8",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 92,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 11,
+          "stripsCompleted": 2,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 6,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 3,
+          "knockouts": 2,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 233,
+        "new": 278
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-8",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 83,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 5,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 4,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 0,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 1,
+          "knockouts": 3,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 176,
+        "new": 298
+      },
+      "survivingPlayers": {
+        "old": 2,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-9",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 83,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 7,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 7,
+          "knockouts": 2,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 1,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 238,
+        "new": 231
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-9",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 84,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 2,
+          "reactionPasses": 1,
+          "attacks": 5,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 19,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 2,
+          "knockouts": 3,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 240,
+        "new": 251
+      },
+      "survivingPlayers": {
+        "old": 2,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-10",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 14,
+          "stripsCompleted": 6,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 2,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 5,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 5,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 16,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 2,
+          "knockouts": 2,
+          "recoveries": 8
+        }
+      },
+      "decisionCalls": {
+        "old": 226,
+        "new": 287
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-10",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 85,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 13,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 5,
+          "knockouts": 4,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 10,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 251,
+        "new": 220
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 1
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-11",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 11,
+      "turns": 100,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 15,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 2,
+          "knockouts": 2,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 254,
+        "new": 302
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-11",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 97,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 2,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 3,
+          "knockouts": 2,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 4,
+          "passesAttempted": 2,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 1,
+          "knockouts": 0,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 286,
+        "new": 268
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-12",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 84,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 5,
+          "passesCompleted": 3,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 13,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 5,
+          "knockouts": 3,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 1,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 275,
+        "new": 202
+      },
+      "survivingPlayers": {
+        "new": 2,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-12",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 89,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 15,
+          "grapplesCompleted": 5,
+          "knockouts": 2,
+          "recoveries": 9
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 5,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 2,
+          "knockouts": 2,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 244,
+        "new": 255
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-13",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 93,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 16,
+          "grapplesAttempted": 12,
+          "grapplesCompleted": 7,
+          "knockouts": 2,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 1,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 280,
+        "new": 255
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-13",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 94,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 16,
+          "stripsCompleted": 5,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 2,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 5,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 13,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 5,
+          "knockouts": 1,
+          "recoveries": 7
+        }
+      },
+      "decisionCalls": {
+        "old": 256,
+        "new": 279
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-14",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 3,
+          "reactionPasses": 2,
+          "attacks": 9,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 2,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 9,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 276,
+        "new": 299
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-14",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 92,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 2,
+          "passesAttempted": 4,
+          "passesCompleted": 3,
+          "readyPasses": 5,
+          "reactionPasses": 4,
+          "attacks": 10,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 2,
+          "passesAttempted": 4,
+          "passesCompleted": 3,
+          "readyPasses": 3,
+          "reactionPasses": 2,
+          "attacks": 15,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 273,
+        "new": 248
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-15",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 91,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 0,
+          "passesAttempted": 6,
+          "passesCompleted": 5,
+          "readyPasses": 6,
+          "reactionPasses": 3,
+          "attacks": 14,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 7,
+          "knockouts": 1,
+          "recoveries": 2
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 1
+        }
+      },
+      "decisionCalls": {
+        "old": 259,
+        "new": 244
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-15",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 88,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 4,
+          "passesAttempted": 3,
+          "passesCompleted": 1,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 7,
+          "grapplesAttempted": 16,
+          "grapplesCompleted": 7,
+          "knockouts": 2,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 0,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 12,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 263,
+        "new": 250
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-16",
+      "strategy": "balanced",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 94,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 15,
+          "grapplesAttempted": 12,
+          "grapplesCompleted": 6,
+          "knockouts": 2,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 2,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 12,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 1,
+          "knockouts": 0,
+          "recoveries": 2
+        }
+      },
+      "decisionCalls": {
+        "old": 282,
+        "new": 258
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-balanced-16",
+      "strategy": "balanced",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 86,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 6,
+          "passesCompleted": 5,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 5,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 6,
+          "knockouts": 2,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 1,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 13,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 1,
+          "knockouts": 2,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 242,
+        "new": 256
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-0",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 93,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 5,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 1,
+          "stripsCompleted": 0,
+          "passesAttempted": 7,
+          "passesCompleted": 5,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 12,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 250,
+        "new": 288
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-0",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 93,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 2,
+          "passesAttempted": 10,
+          "passesCompleted": 6,
+          "readyPasses": 7,
+          "reactionPasses": 6,
+          "attacks": 11,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 3,
+          "knockouts": 2,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 1,
+          "stripsCompleted": 0,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 3,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 0,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 276,
+        "new": 262
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-1",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 100,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 4,
+          "passesCompleted": 4,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 9,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 4,
+          "knockouts": 0,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 292,
+        "new": 288
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-1",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 95,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 6,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 4,
+          "knockouts": 0,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 2,
+          "passesAttempted": 7,
+          "passesCompleted": 7,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 250,
+        "new": 297
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-2",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 3,
+          "passesAttempted": 5,
+          "passesCompleted": 3,
+          "readyPasses": 2,
+          "reactionPasses": 1,
+          "attacks": 2,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 6,
+          "passesCompleted": 5,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 9,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 295,
+        "new": 282
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-2",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 92,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 3,
+          "passesAttempted": 6,
+          "passesCompleted": 2,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 5,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 1,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 9,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 271,
+        "new": 267
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-3",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 4,
+          "passesCompleted": 4,
+          "readyPasses": 4,
+          "reactionPasses": 3,
+          "attacks": 8,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 6,
+          "knockouts": 2,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 268,
+        "new": 226
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-3",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 100,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 14,
+          "stripsCompleted": 7,
+          "passesAttempted": 4,
+          "passesCompleted": 2,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 22,
+          "grapplesCompleted": 9,
+          "knockouts": 0,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 7
+        }
+      },
+      "decisionCalls": {
+        "old": 275,
+        "new": 292
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-4",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 4,
+          "passesCompleted": 1,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 5,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 2,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 279,
+        "new": 282
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-4",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 11,
+      "turns": 106,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 11,
+          "stripsCompleted": 5,
+          "passesAttempted": 3,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 15,
+          "grapplesCompleted": 6,
+          "knockouts": 2,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 5,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 298,
+        "new": 306
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-5",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 97,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 2,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 267,
+        "new": 288
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-5",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 95,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 2,
+          "passesAttempted": 3,
+          "passesCompleted": 1,
+          "readyPasses": 3,
+          "reactionPasses": 2,
+          "attacks": 7,
+          "grapplesAttempted": 12,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 2,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 287,
+        "new": 266
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-6",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 93,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 3,
+          "grapplesAttempted": 17,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 294,
+        "new": 250
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-6",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 95,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 0,
+          "stripsCompleted": 0,
+          "passesAttempted": 7,
+          "passesCompleted": 6,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 4,
+          "grapplesAttempted": 16,
+          "grapplesCompleted": 5,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 1,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 8,
+          "grapplesAttempted": 1,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 1
+        }
+      },
+      "decisionCalls": {
+        "old": 260,
+        "new": 295
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-7",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 94,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 5,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 0,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 0,
+          "knockouts": 0,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 5,
+          "passesCompleted": 4,
+          "readyPasses": 3,
+          "reactionPasses": 1,
+          "attacks": 10,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 4,
+          "knockouts": 2,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 267,
+        "new": 289
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-7",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 87,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 1,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 3,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 2
+        },
+        "new": {
+          "stripsAttempted": 1,
+          "stripsCompleted": 1,
+          "passesAttempted": 4,
+          "passesCompleted": 3,
+          "readyPasses": 4,
+          "reactionPasses": 1,
+          "attacks": 6,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 6,
+          "knockouts": 2,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 247,
+        "new": 254
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-8",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 97,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 7,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 282,
+        "new": 274
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-8",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 96,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 5,
+          "knockouts": 2,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 4,
+          "knockouts": 0,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 276,
+        "new": 260
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-9",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 84,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 12,
+          "grapplesAttempted": 17,
+          "grapplesCompleted": 8,
+          "knockouts": 2,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 1,
+          "knockouts": 2,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 242,
+        "new": 238
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-9",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 100,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 4,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 9,
+          "grapplesAttempted": 19,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 0,
+          "knockouts": 0,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 280,
+        "new": 300
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-10",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 3,
+          "passesAttempted": 5,
+          "passesCompleted": 3,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 2,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 5,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 279,
+        "new": 294
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-10",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 97,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 5,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 16,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 5,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 287,
+        "new": 270
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-11",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 5,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 250,
+        "new": 253
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-11",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 100,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 1,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 15,
+          "grapplesCompleted": 5,
+          "knockouts": 2,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 1,
+          "passesAttempted": 5,
+          "passesCompleted": 3,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 6,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 282,
+        "new": 285
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-12",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 11,
+      "turns": 104,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 19,
+          "grapplesCompleted": 9,
+          "knockouts": 2,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 1,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 5,
+          "grapplesAttempted": 1,
+          "grapplesCompleted": 0,
+          "knockouts": 0,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 298,
+        "new": 293
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-12",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 96,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 2,
+          "passesAttempted": 8,
+          "passesCompleted": 7,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 5,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 2
+        }
+      },
+      "decisionCalls": {
+        "old": 264,
+        "new": 294
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-13",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 88,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 1,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 5,
+          "grapplesAttempted": 13,
+          "grapplesCompleted": 5,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 1,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 3,
+          "knockouts": 2,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 249,
+        "new": 259
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-13",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 4,
+          "passesAttempted": 4,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 3,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 0,
+          "passesAttempted": 4,
+          "passesCompleted": 3,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 11,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 4,
+          "knockouts": 2,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 236,
+        "new": 290
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-14",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 97,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 11,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 3,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 2,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 276,
+        "new": 288
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-14",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 89,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 4,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 6,
+          "grapplesAttempted": 16,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 2,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 9,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 0,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 264,
+        "new": 273
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-15",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 96,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 4,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 19,
+          "grapplesAttempted": 12,
+          "grapplesCompleted": 7,
+          "knockouts": 3,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 270,
+        "new": 271
+      },
+      "survivingPlayers": {
+        "new": 2,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-15",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 4,
+          "passesAttempted": 2,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 20,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 268,
+        "new": 298
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-16",
+      "strategy": "possession",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 2,
+          "passesAttempted": 5,
+          "passesCompleted": 5,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 4,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 11,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 251,
+        "new": 267
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-possession-16",
+      "strategy": "possession",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 88,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 6,
+          "passesCompleted": 4,
+          "readyPasses": 2,
+          "reactionPasses": 1,
+          "attacks": 23,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 5,
+          "knockouts": 3,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 1,
+          "passesAttempted": 3,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 1,
+          "grapplesCompleted": 0,
+          "knockouts": 0,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 265,
+        "new": 231
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-0",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 89,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 9,
+          "grapplesAttempted": 10,
+          "grapplesCompleted": 5,
+          "knockouts": 1,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 226,
+        "new": 268
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-0",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 94,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 2,
+          "reactionPasses": 1,
+          "attacks": 16,
+          "grapplesAttempted": 17,
+          "grapplesCompleted": 7,
+          "knockouts": 2,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 267,
+        "new": 254
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-1",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 82,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 11,
+          "stripsCompleted": 6,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 3,
+          "reactionPasses": 1,
+          "attacks": 13,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 0,
+          "knockouts": 1,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 260,
+        "new": 222
+      },
+      "survivingPlayers": {
+        "new": 2,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-1",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 83,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 4,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 1,
+          "knockouts": 0,
+          "recoveries": 8
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 19,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 1,
+          "knockouts": 4,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 194,
+        "new": 298
+      },
+      "survivingPlayers": {
+        "old": 1,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-2",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 11,
+          "stripsCompleted": 7,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 17,
+          "grapplesCompleted": 6,
+          "knockouts": 0,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 7
+        }
+      },
+      "decisionCalls": {
+        "old": 268,
+        "new": 286
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-2",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 88,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 12,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 1,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 15,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 4,
+          "knockouts": 3,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 210,
+        "new": 267
+      },
+      "survivingPlayers": {
+        "old": 2,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-3",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 11,
+          "stripsCompleted": 5,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 12,
+          "grapplesAttempted": 12,
+          "grapplesCompleted": 5,
+          "knockouts": 2,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 15,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 0,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 250,
+        "new": 276
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-3",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 11,
+      "turns": 84,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 2,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 2,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 2,
+          "knockouts": 2,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 216,
+        "new": 256
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-4",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 84,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 4,
+          "passesAttempted": 4,
+          "passesCompleted": 3,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 19,
+          "grapplesAttempted": 13,
+          "grapplesCompleted": 5,
+          "knockouts": 3,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 258,
+        "new": 210
+      },
+      "survivingPlayers": {
+        "new": 2,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-4",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 1,
+          "stripsCompleted": 0,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 20,
+          "grapplesCompleted": 10,
+          "knockouts": 2,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 1,
+          "stripsCompleted": 1,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 16,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 1
+        }
+      },
+      "decisionCalls": {
+        "old": 260,
+        "new": 252
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-5",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 5,
+          "passesAttempted": 2,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 6,
+          "grapplesAttempted": 16,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 1,
+          "knockouts": 2,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 254,
+        "new": 266
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-5",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 88,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 9,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 2,
+          "passesAttempted": 6,
+          "passesCompleted": 2,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 12,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 217,
+        "new": 298
+      },
+      "survivingPlayers": {
+        "old": 2,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-6",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 98,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 2,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 19,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 266,
+        "new": 294
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-6",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 94,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 15,
+          "grapplesCompleted": 6,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 9,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 1,
+          "knockouts": 0,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 282,
+        "new": 262
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-7",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 84,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 1,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 3,
+          "reactionPasses": 3,
+          "attacks": 16,
+          "grapplesAttempted": 13,
+          "grapplesCompleted": 4,
+          "knockouts": 3,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 220,
+        "new": 261
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-7",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 99,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 5,
+          "knockouts": 1,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 2,
+          "reactionPasses": 1,
+          "attacks": 12,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 274,
+        "new": 276
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-8",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 87,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 5,
+          "knockouts": 1,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 2,
+          "passesAttempted": 3,
+          "passesCompleted": 3,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 8,
+          "grapplesAttempted": 1,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 228,
+        "new": 256
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-8",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 88,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 9,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 5,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 8,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 238,
+        "new": 264
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-9",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 96,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 5,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 4,
+          "knockouts": 1,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 3,
+          "grapplesAttempted": 7,
+          "grapplesCompleted": 2,
+          "knockouts": 0,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 274,
+        "new": 266
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-9",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 89,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 15,
+          "grapplesCompleted": 7,
+          "knockouts": 0,
+          "recoveries": 7
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 16,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 1,
+          "knockouts": 2,
+          "recoveries": 3
+        }
+      },
+      "decisionCalls": {
+        "old": 202,
+        "new": 292
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-10",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 83,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 10,
+          "stripsCompleted": 5,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 15,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 4,
+          "knockouts": 3,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 5,
+          "passesAttempted": 1,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 7
+        }
+      },
+      "decisionCalls": {
+        "old": 251,
+        "new": 230
+      },
+      "survivingPlayers": {
+        "new": 2,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-10",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 97,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 11,
+          "grapplesAttempted": 13,
+          "grapplesCompleted": 4,
+          "knockouts": 0,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 13,
+          "grapplesAttempted": 4,
+          "grapplesCompleted": 2,
+          "knockouts": 2,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 272,
+        "new": 292
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 5
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-11",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 96,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 18,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 2,
+          "grapplesAttempted": 8,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 14,
+          "grapplesCompleted": 4,
+          "knockouts": 2,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 260,
+        "new": 284
+      },
+      "survivingPlayers": {
+        "new": 5,
+        "old": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-11",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 4,
+          "passesAttempted": 2,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 7,
+          "grapplesAttempted": 16,
+          "grapplesCompleted": 2,
+          "knockouts": 1,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 254,
+        "new": 271
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-12",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 82,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 3,
+          "stripsCompleted": 3,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 2,
+          "reactionPasses": 0,
+          "attacks": 14,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 3,
+          "grapplesCompleted": 1,
+          "knockouts": 3,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 226,
+        "new": 248
+      },
+      "survivingPlayers": {
+        "new": 2,
+        "old": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-12",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 83,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 4,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 14,
+          "grapplesAttempted": 15,
+          "grapplesCompleted": 7,
+          "knockouts": 2,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 3,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 7,
+          "grapplesAttempted": 1,
+          "grapplesCompleted": 0,
+          "knockouts": 2,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 238,
+        "new": 238
+      },
+      "survivingPlayers": {
+        "old": 3,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-13",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 94,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 2,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 15,
+          "grapplesAttempted": 11,
+          "grapplesCompleted": 7,
+          "knockouts": 1,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 1,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 6,
+          "grapplesAttempted": 2,
+          "grapplesCompleted": 1,
+          "knockouts": 1,
+          "recoveries": 2
+        }
+      },
+      "decisionCalls": {
+        "old": 255,
+        "new": 258
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-13",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 11,
+      "turns": 100,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 12,
+          "stripsCompleted": 3,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 12,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 10,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 0,
+          "knockouts": 1,
+          "recoveries": 4
+        }
+      },
+      "decisionCalls": {
+        "old": 302,
+        "new": 289
+      },
+      "survivingPlayers": {
+        "old": 4,
+        "new": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-14",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "new",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 86,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 4,
+          "passesAttempted": 3,
+          "passesCompleted": 1,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 8,
+          "grapplesAttempted": 9,
+          "grapplesCompleted": 4,
+          "knockouts": 2,
+          "recoveries": 5
+        },
+        "new": {
+          "stripsAttempted": 4,
+          "stripsCompleted": 2,
+          "passesAttempted": 2,
+          "passesCompleted": 2,
+          "readyPasses": 1,
+          "reactionPasses": 1,
+          "attacks": 12,
+          "grapplesAttempted": 0,
+          "grapplesCompleted": 0,
+          "knockouts": 1,
+          "recoveries": 6
+        }
+      },
+      "decisionCalls": {
+        "old": 252,
+        "new": 251
+      },
+      "survivingPlayers": {
+        "new": 3,
+        "old": 4
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-14",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "old",
+      "winnerSide": "home",
+      "rounds": 10,
+      "turns": 90,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 2,
+          "passesAttempted": 3,
+          "passesCompleted": 2,
+          "readyPasses": 3,
+          "reactionPasses": 2,
+          "attacks": 15,
+          "grapplesAttempted": 17,
+          "grapplesCompleted": 4,
+          "knockouts": 2,
+          "recoveries": 3
+        },
+        "new": {
+          "stripsAttempted": 5,
+          "stripsCompleted": 1,
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 4,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 3,
+          "knockouts": 0,
+          "recoveries": 2
+        }
+      },
+      "decisionCalls": {
+        "old": 287,
+        "new": 232
+      },
+      "survivingPlayers": {
+        "old": 5,
+        "new": 3
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-15",
+      "strategy": "pressing",
+      "newSide": "home",
+      "winner": "old",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 82,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 8,
+          "stripsCompleted": 5,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 10,
+          "grapplesAttempted": 6,
+          "grapplesCompleted": 3,
+          "knockouts": 1,
+          "recoveries": 6
+        },
+        "new": {
+          "stripsAttempted": 6,
+          "stripsCompleted": 2,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 1,
+          "reactionPasses": 0,
+          "attacks": 15,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 5
+        }
+      },
+      "decisionCalls": {
+        "old": 198,
+        "new": 275
+      },
+      "survivingPlayers": {
+        "new": 4,
+        "old": 2
+      }
+    },
+    {
+      "seed": "ai-duel-2026-10-17-pressing-15",
+      "strategy": "pressing",
+      "newSide": "away",
+      "winner": "new",
+      "winnerSide": "away",
+      "rounds": 10,
+      "turns": 81,
+      "metrics": {
+        "old": {
+          "stripsAttempted": 7,
+          "stripsCompleted": 4,
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "readyPasses": 0,
+          "reactionPasses": 0,
+          "attacks": 1,
+          "grapplesAttempted": 12,
+          "grapplesCompleted": 4,
+          "knockouts": 0,
+          "recoveries": 4
+        },
+        "new": {
+          "stripsAttempted": 2,
+          "stripsCompleted": 2,
+          "passesAttempted": 4,
+          "passesCompleted": 3,
+          "readyPasses": 2,
+          "reactionPasses": 2,
+          "attacks": 19,
+          "grapplesAttempted": 5,
+          "grapplesCompleted": 3,
+          "knockouts": 3,
+          "recoveries": 7
+        }
+      },
+      "decisionCalls": {
+        "old": 176,
+        "new": 295
+      },
+      "survivingPlayers": {
+        "old": 2,
+        "new": 5
+      }
+    }
+  ]
+}

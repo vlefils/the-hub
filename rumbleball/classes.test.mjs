@@ -249,6 +249,7 @@ test('dernier engagement : les réserves ne sont pas restaurées après les prol
 
 test('bots : feinte utile, exploitation de faille et passe ajustée sous pression', () => {
   const { state, a, b, events } = fixture(['home-1']); assign(a, 'escamoteur'); a.movement = 0;
+  state.round = 7;
   a.classState.targetId = b.id; a.classState.flaw = 1; giveBall(state, b, events);
   assert.equal(decideTurn(state, a).action.technique, 'exploitation');
   b.role = 'blocker';

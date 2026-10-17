@@ -10,7 +10,7 @@ function supportFixture() {
   state.players.forEach((p, i) => { p.hp = [0, 1, 4, 5, 6, 7, 8].includes(i) ? p.maxHp : 0; p.reaction = p.teamId === 'home' && p.hp > 0; });
   holder.position = { x: 1, y: 3 }; protector.position = { x: 2, y: 3 }; receiver.position = { x: 5, y: 3 };
   [[4, 2], [5, 2], [6, 2], [6, 3]].forEach(([x, y], i) => { state.players[i + 5].position = { x, y }; });
-  state.round = 3; state.activeId = holder.id; giveBall(state, holder, []); assertInvariants(state);
+  state.round = 7; state.activeId = holder.id; giveBall(state, holder, []); assertInvariants(state);
   return { state, holder, receiver };
 }
 
@@ -43,10 +43,10 @@ test('soutien : une réaction déjà dépensée ne peut pas déclencher un nouve
   assert.equal(decideTurn(state, receiver).task, 'standby'); assert.deepEqual(decideMovement(state, receiver), []);
 });
 
-test('ouverture : les relais attendent la possession et sa préparation, sans rejoindre une ancienne ancre', () => {
+test('ouverture : priorité au combat, sans faux démarquage vers une ancienne ancre', () => {
   const state = createMatch({ openings: { home: 'fallback', away: 'none' } }), receiver = state.players[4];
   receiver.position = { x: 0, y: 0 }; const before = structuredClone(state), decision = decideTurn(state, receiver);
-  assert.equal(decision.task, 'standby'); assert.deepEqual(decision.path, []); assert.deepEqual(decideMovement(state, receiver), []); assert.deepEqual(state, before);
+  assert.equal(decision.task, 'fight'); assert.notEqual(decision.action.type, 'pickup'); assert.deepEqual(state, before);
 });
 
 test('arrachement : probabilité exacte, égalités au défenseur et aides des deux côtés sans jet consommé', () => {
@@ -65,7 +65,7 @@ function contestFixture() {
   const state = createMatch({ seed: 'contest-roles', openings: { home: 'none', away: 'none' } }), actor = state.players[0], blocker = state.players[1], holder = state.players[5];
   state.players.forEach((p) => { p.hp = [actor, blocker, holder].includes(p) ? p.maxHp : 0; p.reaction = p.hp > 0; });
   actor.role = 'retriever'; actor.position = { x: 5, y: 3 }; blocker.role = 'blocker'; blocker.instruction = 'aggressive'; blocker.position = { x: 5, y: 4 }; holder.position = { x: 6, y: 3 };
-  actor.movement = blocker.movement = 0; state.round = 3; state.activeId = actor.id; giveBall(state, holder, []);
+  actor.movement = blocker.movement = 0; state.round = 7; state.activeId = actor.id; giveBall(state, holder, []);
   return { state, actor, blocker, holder };
 }
 

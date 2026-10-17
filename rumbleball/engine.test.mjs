@@ -263,6 +263,7 @@ test('lutte : relâcher est volontaire et gratuit ; aucun mouvement automatique 
 });
 test('bot : une prise réussie est maintenue malgré du mouvement disponible', () => {
   const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
+  state.round = 7;
   const holder = state.players[1]; holder.position = { x: 5, y: 4 }; giveBall(state, holder, events);
   a.role = 'blocker'; a.instruction = 'cautious'; a.skills.wrestling = 100;
   state.initiative = [a.id, b.id, holder.id]; state.turnIndex = 0;
@@ -380,6 +381,8 @@ test('opportunité : un appel direct sans sortie réelle est refusé sans effet'
 test('régression signalée : dernier tour, pressing et cinq bloqueurs agressifs', () => {
   let maintained = 0;
   const { state } = simulateMatch({ seed: 'arche-01', strategy: 'pressing',
+    // The reported match used v2; v5's combat-first tempo can avoid this grapple entirely.
+    rulesVersion: 2,
     players: Array.from({ length: 5 }, () => ({ role: 'blocker', instruction: 'aggressive' })) }, (s, events) => {
     const index = events.findIndex((e) => e.type === 'grapple');
     if (index >= 0) {
@@ -450,6 +453,7 @@ test('ancienne v4 : refuse la passe vers un relais sans réaction', () => {
 });
 test('réévaluation sur place : action légale après perte de possession en mouvement', () => {
   const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
+  state.round = 7;
   const relay = state.players[1]; relay.position = { x: 0, y: 0 };
   a.position = { x: 8, y: 3 }; b.position = { x: 9, y: 3 };
   a.role = 'carrier'; a.skills.acrobatics = 100; a.abilities.constitution = -200;
@@ -468,6 +472,7 @@ test('réévaluation sur place : action légale après perte de possession en mo
 });
 test('consignes : décisions différentes dans une même mêlée défensive', () => {
   const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
+  state.round = 7;
   const holder = state.players[1]; holder.position = { x: 5, y: 4 }; giveBall(state, holder, events);
   a.movement = 0; a.role = 'blocker'; b.hp = 4; a.instruction = 'cautious'; state.teams[0].strategy = 'possession';
   const cautious = decideTurn(state, a);
