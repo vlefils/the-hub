@@ -352,7 +352,7 @@ export function shouldTakeOpportunity(state, actor, mover) {
   const holder = carrier(state);
   if (mover.id === holder?.id) return true;
   if (openingPlan(state, actor)?.receivers.includes(actor.id)) return false;
-  const passingOutlet = actor.archetype === 'passeur' && actor.instruction !== 'aggressive'
+  const passingOutlet = (actor.archetype === 'passeur' || state.version >= 4 && actor.role === 'defender') && actor.instruction !== 'aggressive'
     && state.teams.find((t) => t.id === actor.teamId)?.strategy === 'possession'
     && holder && distance(actor.position, holder.position) <= 6;
   if (holder?.teamId === actor.teamId && (actor.role === 'relay' || actor.instruction === 'cautious' || passingOutlet)) return false;

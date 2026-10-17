@@ -31,9 +31,16 @@ test('UI simultanée : dix tours résolus, douze secondes affichées, plusieurs 
   view.load({ config: {}, state: createMatch({ openings: { home: 'wings', away: 'wings' } }), turns: [] }, true); c.elapse(0);
   assert.equal(saved.at(-1).round, 2); assert.equal(saved.at(-1).turns, 10);
   assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00'); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 1/10');
-  c.elapse(10000);
-  assert.ok(e.root.querySelectorAll('.rb-turn-marker').filter((n) => n.getAttribute('visibility') === 'visible').length > 1);
-  assert.ok(e.root.querySelectorAll('.rb-pawn').filter((n) => n.getAttribute('aria-current') === 'true').length > 1);
+  let overlap = false;
+  // Tactical changes may shift the overlapping actions within the round.
+  // Check that they receive matching markers when they happen, not at one fixed timestamp.
+  for (let time = 0; time < 10000; time += 100) {
+    c.elapse(100);
+    const markers = e.root.querySelectorAll('.rb-turn-marker').filter((n) => n.getAttribute('visibility') === 'visible').length;
+    const pawns = e.root.querySelectorAll('.rb-pawn').filter((n) => n.getAttribute('aria-current') === 'true').length;
+    assert.equal(markers, pawns); overlap ||= markers > 1;
+  }
+  assert.ok(overlap, 'Les actions indépendantes doivent afficher plusieurs joueurs actifs pendant le round.');
   assert.equal(saved.length, 10); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:50');
   await button(e.root, 'Pause').click();
   assert.equal(c.frames.size, 0); assert.equal(c.timers.size, 0); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:48');
