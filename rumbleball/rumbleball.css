@@ -85,20 +85,30 @@
 .rb-deployment h4 { margin: 0 0 .5rem; font-size: 1rem; }
 .rb-deployment-layout { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem 1.5rem; margin-top: .75rem; }
 .rb-deployment-scroll { overflow-x: auto; max-width: 100%; flex: 1 1 22rem; }
-.rb-deployment-board { max-width: 27rem; min-width: 18rem; padding-right: .65rem; }
-.rb-deployment-columns, .rb-deployment-grid { display: grid; grid-template-columns: 1.25rem repeat(6, minmax(0, 1fr)); gap: 2px; }
+.rb-deployment-board { --rb-deployment-axis: 1.25rem; --rb-deployment-gap: 2px; max-width: 30rem; min-width: 21.5rem; }
+.rb-deployment-columns, .rb-deployment-grid { display: grid; grid-template-columns: var(--rb-deployment-axis) repeat(7, minmax(0, 1fr)); gap: var(--rb-deployment-gap); }
+.rb-deployment-direction { display: flex; justify-content: space-between; gap: 1rem; padding: 0 0 .5rem calc(var(--rb-deployment-axis) + var(--rb-deployment-gap)); color: var(--muted); font-size: .8125rem; }
+.rb-deployment-direction > :first-child { color: var(--rb-home); }
 .rb-deployment-columns, .rb-deployment-row-number { color: var(--muted); font-size: .75rem; text-align: center; }
 .rb-deployment-columns { padding-bottom: .25rem; }
 .rb-deployment-row-number { align-self: center; }
 .rb-deployment-body { position: relative; }
 .rb-deployment-cell { display: grid; place-items: center; padding: 2px; aspect-ratio: 1; min-width: 0; border: 1px solid #3d514b; border-radius: 0; background: #1d2c28; cursor: pointer; }
 .rb-deployment-cell:hover { background: #34453b; }
-.rb-deployment-cell.is-center { border-color: #a99760; }
+.rb-deployment-cell.is-center { background: #353b2b; }
+.rb-deployment-cell.is-center:hover { background: #454d35; }
 .rb-deployment-cell.is-selected { outline: 2px solid var(--rb-ball); outline-offset: -2px; background: #354334; }
 .rb .rb-deployment-cell:disabled { opacity: 1; cursor: default; }
 .rb-deployment-cell .rb-player-portrait { width: 100%; max-width: 3rem; flex: none; }
 .rb-deployment-empty { color: #61766c; }
-.rb-deployment-ball { position: absolute; right: 0; top: 50%; width: .8rem; height: .8rem; border-radius: 50%; background: var(--rb-ball); border: 2px solid #17251e; transform: translate(50%, -50%); pointer-events: none; }
+.rb-deployment-opponent { background: repeating-linear-gradient(-45deg, #18201e, #18201e 5px, #1e2723 5px, #1e2723 6px); border: 1px solid #303c36; }
+.rb-deployment-opponent.is-center { background: repeating-linear-gradient(-45deg, #2b3024, #2b3024 5px, #33392a 5px, #33392a 6px); }
+.rb-deployment-markings { position: absolute; top: 0; left: calc(var(--rb-deployment-axis) + var(--rb-deployment-gap)); width: calc(100% - var(--rb-deployment-axis) - var(--rb-deployment-gap)); height: 100%; overflow: visible; pointer-events: none; }
+.rb-deployment-legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .6rem; padding-left: calc(var(--rb-deployment-axis) + var(--rb-deployment-gap)); font-size: .8125rem; color: var(--muted); }
+.rb-deployment-legend > span { display: inline-flex; align-items: center; gap: .4rem; }
+.rb-deployment-legend > span::before { content: ''; display: inline-block; }
+.rb-deployment-key-line::before { width: 1rem; border-top: 3px solid #dce6d4; }
+.rb-deployment-key-zone::before { width: .8rem; height: .8rem; border: 1px dashed var(--rb-ball); background: #353b2b; }
 .rb-deployment-controls { flex: 1 1 13rem; min-width: 0; display: grid; gap: .75rem; }
 .rb-deployment-status { font-size: .875rem; min-height: 1.4em; }
 .rb-center-zone { fill: #ead285; fill-opacity: .09; stroke: #d8c482; stroke-width: 2; stroke-dasharray: 6 5; pointer-events: none; }

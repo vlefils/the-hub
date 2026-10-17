@@ -101,7 +101,7 @@ test('coup d’envoi : 3, 2, 1, START puis arrivée au centre sans consommer de 
   }
   c.elapse(1000); assert.equal(cue(), 'START'); assert.equal(saved.length, 0);
   assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'inline');
-  assert.equal(classNode(e.root, 'rb-ball').parentNode.getAttribute('transform'), 'translate(360 240)');
+  assert.equal(classNode(classNode(e.root, 'rb-ball-layer'), 'rb-ball').parentNode.getAttribute('transform'), 'translate(360 240)');
   assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'visible');
   assert.ok(classNode(e.root, 'rb-ball-drop').classList.contains('is-arriving'));
   assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00');

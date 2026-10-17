@@ -122,11 +122,19 @@ test('ancienne rencontre : import et reprise gardent version, initiative, placem
 test('éditeur : clic, échange, clavier, contenu variable et lecture seule conservent cinq cases valides', async () => {
   environment(); const state = createMatch(), changes = [], editor = deploymentEditor({ players: state.players.slice(0, 5), onChange: (value) => changes.push(value) });
   assert.equal(editor.root.querySelectorAll('.rb-deployment-cell').length, 48);
+  assert.equal(editor.root.querySelectorAll('.rb-deployment-opponent').length, 8);
+  assert.ok(editor.root.querySelectorAll('.rb-deployment-opponent').every((n) => n.tagName === 'span' && n.getAttribute('aria-hidden') === 'true'));
+  assert.match(cell(editor.root, 5, 3).getAttribute('aria-label'), /zone d’engagement/);
+  assert.match(cell(editor.root, 5, 4).getAttribute('aria-label'), /zone d’engagement/);
+  assert.doesNotMatch(cell(editor.root, 4, 3).getAttribute('aria-label'), /zone d’engagement/);
+  assert.ok(editor.root.querySelectorAll('.rb-person-facing').every((n) => n.getAttribute('transform') === 'rotate(90)'));
+  await cell(editor.root, 5, 3).emit('keydown', { key: 'ArrowRight' }); assert.equal(document.activeElement, cell(editor.root, 5, 3));
   await cell(editor.root, 0, 0).click(); assert.deepEqual(editor.value[0], { x: 0, y: 0 });
   await cell(editor.root, 5, 3).click(); assert.deepEqual(editor.value[1], { x: 0, y: 0 }); assert.ok(validDeployment(editor.value));
   await cell(editor.root, 5, 3).emit('keydown', { key: 'ArrowDown' }); assert.equal(document.activeElement, cell(editor.root, 5, 4));
   const players = state.players.slice(0, 5).map((p) => ({ ...p, name: `${p.name} avec un nom beaucoup plus long` }));
   editor.update({ players, color: '#992244' }); assert.match(editor.root.querySelector('select').textContent, /beaucoup plus long/); assert.ok(validDeployment(editor.value));
+  assert.ok(editor.root.querySelectorAll('.rb-person-facing').every((n) => n.getAttribute('transform') === 'rotate(90)'));
   const before = editor.value; editor.update({ disabled: true }); await cell(editor.root, 0, 1).click(); assert.deepEqual(editor.value, before); assert.equal(changes.length, 2);
   assert.ok(editor.root.querySelectorAll('.rb-deployment-cell').every((b) => b.disabled));
 });
@@ -150,7 +158,7 @@ test('exhibition : déploiement libre dans le vestiaire ; ballon masqué avant l
   const e = environment(), { mountMatch } = await import('./ui.mjs'), view = mountMatch(e.root);
   await cell(classNode(e.root, 'rb-setup'), 0, 7).click();
   const pawn = descendants(e.root).find((n) => n.getAttribute('data-player') === 'home-0'); assert.equal(pawn.getAttribute('transform'), 'translate(30 450)');
-  assert.equal(classNode(e.root, 'rb-ball').parentNode.getAttribute('transform'), 'translate(360 240)');
+  assert.equal(classNode(classNode(e.root, 'rb-ball-layer'), 'rb-ball').parentNode.getAttribute('transform'), 'translate(360 240)');
   assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
   await classNode(e.root, 'rb-setup').emit('submit'); view.pause();
   assert.equal(pawn.getAttribute('transform'), 'translate(30 450)'); assert.equal(classNode(e.root, 'rb-setup').hidden, true);
