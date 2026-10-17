@@ -19,7 +19,7 @@ function timers(t) {
   let id = 0; const pending = new Map();
   t.mock.method(globalThis, 'setTimeout', (callback, delay) => { pending.set(++id, { callback, delay }); return id; });
   t.mock.method(globalThis, 'clearTimeout', (id) => pending.delete(id));
-  return { pending, firstTurn() { const [id, timer] = [...pending][0]; pending.delete(id); timer.callback(); } };
+  return { pending, until(check) { let count = 0; while (!check()) { assert.ok(++count < 20 && pending.size); const [id, timer] = [...pending][0]; pending.delete(id); timer.callback(); } } };
 }
 
 test('pages séparées : présentation statique, lancement et retour compatibles avec un sous-répertoire GitHub Pages', async () => {
@@ -66,7 +66,7 @@ test('page autonome : carrière existante, lecture automatique sans section du l
   assert.deepEqual(e.saved(), c, 'Ouvrir la nouvelle page ne modifie pas la sauvegarde.');
   await descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')).click();
   assert.equal(clock.pending.size, 1, 'La lecture démarre sans is-active du livre.');
-  clock.firstTurn();
+  clock.until(() => e.saved().current.state.turns > 0);
   assert.equal(e.saved().current.state.turns, 10);
   assert.equal(e.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
   const layout = classNode(e.root, 'rb-match-layout');
@@ -88,7 +88,7 @@ test('page autonome : première visite et Exhibition utilisables sans carrière'
   const e = standalone(), clock = timers(t); mountApp(e.root);
   assert.ok(classNode(e.root, 'rb-career-welcome')); assert.ok(classNode(e.root, 'rb-career-create'));
   await button(e.root, 'Exhibition').click(); assert.equal(classNode(e.root, 'rb-setup').hidden, false);
-  await classNode(e.root, 'rb-setup').emit('submit'); clock.firstTurn();
+  await classNode(e.root, 'rb-setup').emit('submit'); clock.until(() => classNode(e.root, 'rb-journal').children.length > 1);
   assert.equal(classNode(e.root, 'rb-setup').hidden, true);
   assert.ok(classNode(e.root, 'rb-journal').children.length > 1);
   await button(e.root, 'Carrière').click(); assert.equal(clock.pending.size, 0);

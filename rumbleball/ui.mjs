@@ -10,6 +10,7 @@ import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
 import { ARCHETYPES, archetypeLabel, classResources, classAbilities } from './classes.mjs';
 import { deploymentEditor } from './deployment-ui.mjs';
 import { defaultDeployment, isCenterBall } from './deployment.mjs';
+import { createKickoff } from './kickoff.mjs';
 
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
@@ -25,7 +26,7 @@ const button = (text, cls = 'rb-button') => { const el = element('button', cls, 
 export function mountMatch(root, callbacks = {}) {
   const section = root.closest('[data-section]');
   let state = createMatch(), lastConfig = null, started = false, running = false, timer = null, nextRoundAt = 0;
-  let context = 'exhibition';
+  let context = 'exhibition', ballReady = false;
   const teamLabel = (id) => state.teams.find((t) => t.id === id)?.name ?? '';
   let selectedId = null, speed = 1, journalCount = 0, lastTurnEvents = [], playbackMode = 'round', displayFrame = null, healthSignature = '';
   const visible = () => !root.closest('[hidden]') && (!section || section.classList.contains('is-active')) && !document.hidden;
@@ -116,7 +117,7 @@ export function mountMatch(root, callbacks = {}) {
   const arrow = svg('marker', { id: 'rb-opportunity-arrow', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto' });
   arrow.append(svg('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: '#ffdb78' })); definitions.append(arrow); court.append(definitions);
   court.append(arenaBackdrop(WET_CELLS));
-  const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { 'aria-hidden': 'true' });
+  const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { class: 'rb-ball-layer', 'aria-hidden': 'true' });
   const centerZone = svg('rect', { x: 300, y: 180, width: 120, height: 120, class: 'rb-center-zone', 'aria-hidden': 'true', visibility: 'hidden' });
   const links = svg('g', { class: 'rb-court-links', 'aria-hidden': 'true' });
   const effects = svg('g', { class: 'rb-court-effects', 'aria-hidden': 'true' });
@@ -124,9 +125,22 @@ export function mountMatch(root, callbacks = {}) {
   const pawnNodes = new Map(), markerNodes = new Map();
   const ballSprite = svg('g'); const ballHalo = svg('circle', { r: 20, class: 'rb-ball-halo' });
   const ballBody = svg('ellipse', { transform: 'rotate(-35)', class: 'rb-ball' });
-  ballSprite.append(ballHalo, ballBody, svg('path', { d: 'M-4,0h8 M0,-4v8', class: 'rb-ball-seam' })); ballLayer.append(ballSprite);
+  const ballDrop = svg('g', { class: 'rb-ball-drop' });
+  ballSprite.append(ballHalo, ballBody, svg('path', { d: 'M-4,0h8 M0,-4v8', class: 'rb-ball-seam' })); ballDrop.append(ballSprite); ballLayer.append(ballDrop);
   court.append(trace, centerZone, links, pawns, turnMarkers, ballLayer, effects);
   const courtPlayback = createCourtPlayback(renderCourtFrame);
+  const courtStage = element('div', 'rb-court-stage'), kickoffOverlay = element('div', 'rb-kickoff'), kickoffCopy = element('div', 'rb-kickoff-copy'), kickoffValue = element('div');
+  kickoffOverlay.hidden = true; kickoffOverlay.setAttribute('aria-hidden', 'true');
+  kickoffCopy.append(element('p', 'rb-eyebrow', 'Coup d’envoi'), kickoffValue); kickoffOverlay.append(kickoffCopy); courtStage.append(court, kickoffOverlay);
+  const kickoff = createKickoff((cue) => {
+    kickoffOverlay.hidden = false; kickoffOverlay.dataset.cue = cue.label;
+    kickoffValue.replaceChildren(element('strong', 'rb-kickoff-number', cue.label));
+    if (cue.ball) { ballReady = true; ballDrop.classList.add('is-arriving'); }
+    renderCourtFrame(displayFrame);
+  }, () => {
+    kickoffOverlay.hidden = true; ballDrop.classList.toggle('is-arriving', false);
+    if (running) tick(); else renderPlaybackStatus();
+  });
   const legend = element('div', 'rb-legend');
   for (const [cls, text] of [['home', 'Recrues'], ['away', 'Charognards'], ['ball', 'Ballon'], ['wet', 'Sol humide · coût ×2'], ['impact', 'Impact / dégâts'], ['grapple', 'Lutte']]) {
     const item = element('span'); item.append(element('i', `rb-swatch rb-swatch-${cls}`), document.createTextNode(text)); legend.append(item);
@@ -134,7 +148,7 @@ export function mountMatch(root, callbacks = {}) {
   const initiative = element('div', 'rb-initiative'); initiative.setAttribute('aria-label', 'Ordre d’initiative');
   const opportunityNote = element('p', 'rb-opportunity-note'); opportunityNote.hidden = true;
   const selected = element('div', 'rb-selected');
-  fieldColumn.append(court, legend, opportunityNote, initiative, selected);
+  fieldColumn.append(courtStage, legend, opportunityNote, initiative, selected);
   const journalPanel = element('section', 'rb-journal-panel');
   const journalHead = element('div', 'rb-journal-head');
   journalHead.append(element('h3', '', 'Le fil du match'));
@@ -149,7 +163,7 @@ export function mountMatch(root, callbacks = {}) {
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
     `10 rounds de ${ROUND_DURATION / 1000} secondes, soit deux minutes à ×1. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.`,
-    'Engagement : déploiement libre dans sa moitié. Le ballon apparaît à l’intersection de F4, G4, F5 et G5. Seuls les joueurs de ces quatre cases peuvent tenter de l’attraper, à leur tour d’initiative, en dépensant leur action. Lutte ou Acrobaties DD 10 sans opposition ; test opposé si un adversaire conteste, égalité au défenseur. Un échec laisse le ballon au centre.',
+    'Engagement : déploiement libre dans sa moitié. Après le compte à rebours, le ballon arrive à l’intersection de F4, G4, F5 et G5 au début du premier tour. Seuls les joueurs de ces quatre cases peuvent tenter de l’attraper, à leur tour d’initiative, en dépensant leur action. Lutte ou Acrobaties DD 10 sans opposition ; test opposé si un adversaire conteste, égalité au défenseur. Un échec laisse le ballon au centre.',
     `Lecture simultanée : un round dure ${ROUND_DURATION / 1000} secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.`,
     'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir, intercepter et frapper en opportunité utilisent cette même réaction.',
     'Une attaque d’opportunité est provoquée par un pas volontaire qui fait sortir de l’allonge (une case, diagonales comprises). Elle se résout avant ce pas : un KO laisse donc le joueur dans sa case de départ. Entrer dans l’allonge ou tourner autour sans en sortir ne provoque rien.',
@@ -173,12 +187,16 @@ export function mountMatch(root, callbacks = {}) {
   function setRunning(value) {
     running = value && started && !state.finished && visible();
     clearTimeout(timer); timer = null;
-    if (!running) { nextRoundAt = 0; courtPlayback.settle(); }
+    if (!running) { nextRoundAt = 0; kickoff.pause(); courtPlayback.settle(); ballDrop.classList.toggle('is-arriving', false); }
     pause.textContent = running ? 'Pause' : 'Reprendre';
     renderPlaybackStatus();
-    if (running) scheduleNextTurn();
+    if (running) { if (kickoff.active) kickoff.resume(); else scheduleNextTurn(); }
   }
   function renderPlaybackStatus() {
+    if (kickoff.active) {
+      status.textContent = `${running ? 'Coup d’envoi' : 'Pause · coup d’envoi'}${kickoff.cue.ball ? ' · START' : ` dans ${kickoff.cue.label}…`}`;
+      return;
+    }
     if (playbackMode === 'round' && started && !state.finished) {
       const active = displayFrame?.animating;
       const text = active ? `Round ${displayFrame.round} · actions simultanées` : `${running ? 'Lecture' : 'Pause'} · round ${state.round} · ${ROUND_DURATION / 1000} s à ×1`;
@@ -194,6 +212,9 @@ export function mountMatch(root, callbacks = {}) {
   }
   function scheduleNextTurn() {
     timer = setTimeout(tick, playbackMode === 'round' ? Math.max(courtPlayback.remaining(), nextRoundAt - performance.now(), 0) : nextCourtTurnDelay(courtPlayback.remaining(), speed));
+  }
+  function resetKickoff() {
+    kickoff.cancel(); kickoffOverlay.hidden = true; ballDrop.classList.toggle('is-arriving', false); ballReady = false;
   }
   function appendEvents(events) {
     if (!events.length) return;
@@ -270,7 +291,8 @@ export function mountMatch(root, callbacks = {}) {
   }
   function renderCourtFrame(frame) {
     displayFrame = frame;
-    centerZone.setAttribute('visibility', isCenterBall(frame) ? 'visible' : 'hidden');
+    centerZone.setAttribute('visibility', ballReady && isCenterBall(frame) ? 'visible' : 'hidden');
+    ballLayer.setAttribute('display', ballReady ? 'inline' : 'none');
     const activeIds = new Set(started ? playbackMode === 'round' ? frame.activeIds ?? [] : [state.activeId] : []);
     for (const p of frame.players) {
       const node = pawnNodes.get(p.id);
@@ -302,9 +324,9 @@ export function mountMatch(root, callbacks = {}) {
     const roundSeconds = ROUND_DURATION / 1000;
     const remaining = Math.max(0, (11 - frame.round) * roundSeconds - (frame.roundProgress ?? 0) * roundSeconds);
     const seconds = Math.ceil(remaining);
-    phaseText.textContent = frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
+    phaseText.textContent = !ballReady ? 'Avant le coup d’envoi' : frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
     timeText.textContent = frame.finished ? '00:00' : frame.round > 10 ? `+${String(Math.ceil(roundSeconds * (1 - (frame.roundProgress ?? 0)))).padStart(2, '0')}` : `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-    possessionText.textContent = frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : isCenterBall(frame) ? 'Engagement · ballon à l’intersection centrale' : 'Balle libre';
+    possessionText.textContent = !ballReady ? 'Ballon attendu au centre' : frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : isCenterBall(frame) ? 'Engagement · ballon à l’intersection centrale' : 'Balle libre';
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) score.querySelector('.rb-team-count').textContent = `${frame.players.filter((p) => p.teamId === teamId && p.hp > 0).length} / 5 en jeu`;
     toolbar.hidden = !started || state.finished && !frame.animating;
@@ -435,6 +457,8 @@ export function mountMatch(root, callbacks = {}) {
   function advance({ animate = true } = {}) {
     if (!errorBox.hidden) return;
     try {
+      if (kickoff.active) resetKickoff();
+      ballReady = true;
       courtPlayback.settle();
       const round = state.round, turns = []; let saved = true;
       do {
@@ -458,13 +482,13 @@ export function mountMatch(root, callbacks = {}) {
   function tick() { timer = null; if (!visible()) { setRunning(false); return; } advance(); if (running) scheduleNextTurn(); }
   function launch(configuration) {
     context = 'exhibition';
-    setRunning(false); lastConfig = structuredClone(configuration); state = createMatch(lastConfig);
+    setRunning(false); resetKickoff(); lastConfig = structuredClone(configuration); state = createMatch(lastConfig);
     started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
-    render(); setRunning(true);
+    render(); kickoff.start(); setRunning(true);
     pause.focus({ preventScroll: true }); scoreboard.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   function prepareAgain() {
-    setRunning(false); started = false; selectedId = null; journalCount = 0; resultPanel.hidden = true; errorBox.hidden = true;
+    setRunning(false); resetKickoff(); started = false; selectedId = null; journalCount = 0; resultPanel.hidden = true; errorBox.hidden = true;
     journal.replaceChildren(element('li', 'rb-journal-empty', 'Ajustez les consignes. Conservez le code pour comparer vos choix sur le même tirage.'));
     updatePreview(); strategySelect.focus(); setup.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
@@ -489,11 +513,14 @@ export function mountMatch(root, callbacks = {}) {
   return {
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
-    load(current, autoplay = false) {
-      setRunning(false); context = 'career'; lastConfig = structuredClone(current.config); state = structuredClone(current.state);
+    load(current, autoplay = false, { kickoff: freshKickoff = false } = {}) {
+      setRunning(false); resetKickoff(); context = 'career'; lastConfig = structuredClone(current.config); state = structuredClone(current.state);
+      ballReady = state.turns > 0 || state.finished;
       started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
       for (const events of current.turns) appendEvents(events);
-      render(current.turns.at(-1) ?? []); setRunning(autoplay);
+      render(current.turns.at(-1) ?? []);
+      if (freshKickoff && state.turns === 0 && !state.finished) kickoff.start();
+      setRunning(autoplay);
     },
   };
 }

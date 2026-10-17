@@ -85,3 +85,81 @@ test('carrière : sauvegarde après chaque tour du lot, arrêt sur erreur interm
   await button(reloaded.root, 'Reprendre la rencontre').click();
   assert.match(classNode(reloaded.root, 'rb-playback-status').textContent, /Pause · round 2/); assert.equal(reloaded.saved().current.turns.length, 10);
 });
+
+test('coup d’envoi : 3, 2, 1, START puis arrivée au centre sans consommer de temps de jeu ni de jets', async (t) => {
+  const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [], initial = createMatch();
+  globalThis.matchMedia = () => ({ matches: false });
+  const view = mountMatch(e.root, { onTurn(state) { saved.push(structuredClone(state)); return true; } });
+  const speed = descendants(e.root).find((n) => n.getAttribute('aria-label') === 'Vitesse de lecture'); speed.value = '8'; await speed.emit('change');
+  view.load({ config: {}, state: initial, turns: [] }, true, { kickoff: true });
+  const cue = () => classNode(e.root, 'rb-kickoff-number').textContent;
+  assert.equal(cue(), '3'); assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
+  for (const label of ['2', '1']) {
+    c.elapse(1000); assert.equal(cue(), label); assert.equal(saved.length, 0);
+    assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00');
+    assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
+  }
+  c.elapse(1000); assert.equal(cue(), 'START'); assert.equal(saved.length, 0);
+  assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'inline');
+  assert.equal(classNode(e.root, 'rb-ball').parentNode.getAttribute('transform'), 'translate(360 240)');
+  assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'visible');
+  assert.ok(classNode(e.root, 'rb-ball-drop').classList.contains('is-arriving'));
+  assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00');
+  c.elapse(499); assert.equal(saved.length, 0);
+  c.elapse(1); assert.equal(classNode(e.root, 'rb-kickoff').hidden, true); assert.equal(saved.at(-1).turns, 10);
+  const { stepMatch } = await import('./engine.mjs'); let expected = initial;
+  for (let i = 0; i < 10; i++) expected = stepMatch(expected, { stopAtRoundEnd: true }).state;
+  assert.deepEqual(saved.at(-1), expected, 'Le compte à rebours ne change aucun jet ni résultat.');
+  assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00');
+  c.elapse(1500); assert.equal(saved.at(-1).round, 3); view.pause();
+});
+
+test('coup d’envoi : pause exacte, changement de vitesse et reprise du décompte restant', async (t) => {
+  const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
+  const view = mountMatch(e.root, { onTurn(state) { saved.push(state); return true; } });
+  view.load({ config: {}, state: createMatch(), turns: [] }, true, { kickoff: true });
+  c.elapse(400); await button(e.root, 'Pause').click(); c.elapse(2000);
+  assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3'); assert.equal(c.timers.size, 0);
+  assert.match(classNode(e.root, 'rb-playback-status').textContent, /Pause · coup d’envoi/);
+  await button(e.root, 'Reprendre').click(); c.elapse(599); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3');
+  c.elapse(1); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '2');
+  const speed = descendants(e.root).find((n) => n.getAttribute('aria-label') === 'Vitesse de lecture'); speed.value = '8'; await speed.emit('change');
+  c.elapse(999); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '2');
+  c.elapse(1); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '1'); assert.equal(saved.length, 0);
+  const reading = classNode(e.root, 'rb-reading-mode'); reading.value = 'turn'; await reading.emit('change');
+  c.elapse(1000); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, 'START');
+  c.elapse(500); assert.equal(saved[0].turns, 1, 'Le premier tour détaillé commence dès la fin de l’intro.');
+  view.pause(); assert.equal(c.timers.size, 0);
+});
+
+test('coup d’envoi : étape manuelle, résultat immédiat et retour au vestiaire annulent les anciens rappels', async (t) => {
+  const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t);
+  const view = mountMatch(e.root); await classNode(e.root, 'rb-setup').emit('submit');
+  assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3');
+  await button(e.root, 'Round suivant').click(); assert.equal(classNode(e.root, 'rb-kickoff').hidden, true);
+  assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'inline'); assert.equal(c.timers.size, 0);
+  view.exhibition(); assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
+  await classNode(e.root, 'rb-setup').emit('submit'); await button(e.root, 'Voir le résultat').click();
+  assert.equal(classNode(e.root, 'rb-kickoff').hidden, true); assert.equal(classNode(e.root, 'rb-result').hidden, false);
+  assert.equal(c.timers.size, 0);
+  await button(e.root, 'Rejouer ce match').click(); c.elapse(1000); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '2');
+  view.exhibition(); c.elapse(5000); assert.equal(c.timers.size, 0);
+  assert.equal(classNode(e.root, 'rb-kickoff').hidden, true); assert.equal(classNode(e.root, 'rb-setup').hidden, false);
+});
+
+test('carrière : intro seulement au lancement, animations réduites et reprise sans nouveau décompte ni salaire', async (t) => {
+  let career = createCareer('Les Engagés'); career = confirmDraft(career, career.market.slice(0, 5).map((p) => p.id));
+  const e = environment(exportCareer(career)), { mountMatch } = await import('./ui.mjs'), c = clock(t); mountCareer(e.root, mountMatch);
+  await descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')).click();
+  assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3'); assert.equal(e.saved().current.state.turns, 0);
+  c.elapse(1000); c.elapse(1000); c.elapse(1000); assert.equal(c.frames.size, 0);
+  assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'inline');
+  await button(e.root, 'Retour au club · mettre en pause').click(); assert.equal(c.timers.size, 0);
+  const reloaded = environment(exportCareer(e.saved())); mountCareer(reloaded.root, mountMatch);
+  await button(reloaded.root, 'Reprendre la rencontre').click();
+  assert.equal(classNode(reloaded.root, 'rb-kickoff').hidden, true); assert.equal(c.timers.size, 0);
+  assert.equal(reloaded.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
+  await button(reloaded.root, 'Reprendre').click(); c.elapse(0);
+  assert.equal(reloaded.saved().current.state.turns, 10); assert.equal(classNode(reloaded.root, 'rb-kickoff').hidden, true);
+  await button(reloaded.root, 'Retour au club · mettre en pause').click();
+});

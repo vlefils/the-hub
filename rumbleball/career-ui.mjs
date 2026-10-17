@@ -281,7 +281,7 @@ export function mountCareer(root, mountMatch) {
   }
   function openMatch(autoplay = false) {
     if (unsaved && !save()) return;
-    manager.hidden = true; matchArea.hidden = false; matchActions.hidden = false; view.load(career.current, autoplay);
+    manager.hidden = true; matchArea.hidden = false; matchActions.hidden = false; view.load(career.current, autoplay, { kickoff: autoplay });
     matchArea.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   showMode('career');
