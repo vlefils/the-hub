@@ -3,9 +3,11 @@ import { decideClassAction, decideMovement, decideTurn } from './ai.mjs';
 import { ARCHETYPES, initialClassState } from './classes.mjs';
 import { matchKits } from './appearance.mjs';
 import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
-import { assertInvariants, beginTurn, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, stat } from './rules.mjs';
+import { defaultOpening, openingDeployment, validOpening } from './openings.mjs';
+import { assertInvariants, beginTurn, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, resolveCenterEngagement, stat } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
+export const CURRENT_RULES = 4;
 export function seedHash(seed) {
   let n = 2166136261;
   for (const char of String(seed)) n = Math.imul(n ^ char.charCodeAt(0), 16777619);
@@ -21,18 +23,20 @@ function centerBall(state) {
 export function createMatch(config = {}) {
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
-  const version = config.rulesVersion === 2 ? 2 : 3;
-  const deployments = {};
+  const version = [2, 3].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
+  const deployments = {}, openings = {};
   if (version >= 3) for (const side of ['home', 'away']) {
-    deployments[side] = config.deployments?.[side] ?? defaultDeployment(side === 'home' ? config.strategy : config.awayStrategy, side);
+    openings[side] = config.openings?.[side] ?? defaultOpening(side === 'home' ? config.strategy : config.awayStrategy);
+    if (!validOpening(openings[side])) throw new Error('Ouverture inconnue.');
+    deployments[side] = config.deployments?.[side] ?? (version >= 4 ? openingDeployment(openings[side], side) : defaultDeployment(side === 'home' ? config.strategy : config.awayStrategy, side));
     if (!validDeployment(deployments[side], side)) throw new Error('Déploiement invalide : cinq cases distinctes dans la moitié de chaque équipe.');
   }
   const state = {
     version, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
     phase: 'regular', finished: false, result: null, turns: 0, aids: [], calls: [], lastDecision: null,
     teams: [
-      { id: 'home', kitColor: kits.home, name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced' },
-      { id: 'away', kitColor: kits.away, name: config.teamNames?.away ?? 'Les Charognards', strategy: Object.hasOwn(STRATEGIES, config.awayStrategy) ? config.awayStrategy : 'balanced' },
+      { id: 'home', kitColor: kits.home, name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced', ...(version >= 4 ? { opening: openings.home } : {}) },
+      { id: 'away', kitColor: kits.away, name: config.teamNames?.away ?? 'Les Charognards', strategy: Object.hasOwn(STRATEGIES, config.awayStrategy) ? config.awayStrategy : 'balanced', ...(version >= 4 ? { opening: openings.away } : {}) },
     ],
     stats: { home: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 }, away: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 } },
     players: ['home', 'away'].flatMap((teamId) => {
@@ -97,6 +101,8 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   // Skip KO slots without granting turns or reactions. Also handles both teams entirely KO.
   let actor;
   while (!state.finished) {
+    // Also handle a new round reached while skipping KO slots in this call.
+    if (state.version >= 4 && state.turnIndex === 0) { state.activeId = null; resolveCenterEngagement(state, events); }
     actor = state.players.find((p) => p.id === state.initiative[state.turnIndex]);
     if (actor?.hp > 0) break;
     const round = state.round;
@@ -133,7 +139,8 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
       emit(state, events, 'replan', `${actor.name} adapte son plan après le déplacement : ${revised.reason}`);
     }
     if (!resolveAction(state, actor, action, events)) throw new Error(`Action illégale du bot : ${actor.id} ${action.type}`);
-    // An uncontested pickup is an interaction, so the actor still has their action.
+    // A pickup may spend only an interaction or an engagement reaction.
+    // Use the remaining action without granting an extra one.
     if (actor.action && actor.hp > 0) {
       const followup = decideTurn(state, actor);
       useClassAction(followup.path); moveAlong(state, actor, followup.path, events); useClassAction();

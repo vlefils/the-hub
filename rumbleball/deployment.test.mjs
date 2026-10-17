@@ -14,7 +14,7 @@ import { environment, descendants, button, classNode } from './test-support/dom.
 const p = (state, id) => state.players.find((p) => p.id === id);
 const club = () => { const c = createCareer('Les Centristes'); return confirmDraft(c, c.market.slice(0, 5).map((p) => p.id)); };
 function fixture(contested = false) {
-  const state = createMatch({ classes: false });
+  const state = createMatch({ classes: false, rulesVersion: 3 });
   state.players.forEach((p) => { p.hp = 0; }); const a = state.players[0], b = state.players[5];
   a.hp = a.maxHp; a.position = { x: 5, y: 3 }; a.skills = { wrestling: 0, acrobatics: 0 }; state.activeId = a.id;
   b.hp = contested ? b.maxHp : 0; b.position = { x: 6, y: 4 }; b.skills = { wrestling: 0, acrobatics: 0 };
@@ -35,7 +35,7 @@ test('engagement : intersection exacte, indépendante de la graine, et quatre ca
   state.ball.position = { ...CENTER }; a.position = { ...CENTER }; assert.throws(() => assertInvariants(state), /État invalide/);
 });
 
-test('prise seule : DD 10, action dépensée même sur échec, une tentative par tour et aucun ramassage gratuit', () => {
+test('ancienne règle v3 : prise seule DD 10, action dépensée et aucun ramassage gratuit', () => {
   const { state, a, events } = fixture(); dice(state, [9]);
   assert.equal(resolveAction(state, a, { type: 'pickup' }, events), true); assert.ok(isCenterBall(state));
   assert.equal(a.action, false); assert.equal(a.interaction, true); assert.equal(a.pickedUp, true); assert.equal(state.stats.home.recoveries, 0);
@@ -45,7 +45,7 @@ test('prise seule : DD 10, action dépensée même sur échec, une tentative par
   assert.equal(state.stats.home.recoveries, 1); assertInvariants(state);
 });
 
-test('prise contestée : meilleur Lutte/Acrobaties, égalité au défenseur ; le DD 10 ne s’ajoute pas à l’opposition', () => {
+test('ancienne règle v3 : prise contestée, égalité au défenseur, sans DD 10 ajouté', () => {
   const { state, a, b, events } = fixture(true); dice(state, [10, 10]);
   resolveAction(state, a, { type: 'pickup' }, events); assert.ok(isCenterBall(state)); assert.equal(a.action, false);
   beginTurn(state, a, []); a.skills = { wrestling: 4, acrobatics: 6 }; b.skills = { wrestling: 3, acrobatics: 2 }; dice(state, [2, 1]);

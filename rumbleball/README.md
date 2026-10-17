@@ -8,6 +8,25 @@ Au lancement d’une nouvelle rencontre, « 3, 2, 1, START » précède le premi
 
 En Exhibition, **Lancer le match** est disponible en haut du vestiaire, avant les fiches et le déploiement, puis à nouveau après les réglages. Sur téléphone, le bouton du haut occupe toute la largeur ; les deux boutons utilisent la même validation du formulaire et les consignes courantes.
 
+## Ouvertures et engagement
+
+Le menu **Ouverture · placement et premier tour**, dans l’Effectif et l’Exhibition, combine une formation et des priorités de bots. **Fuite sous écran** est l’ouverture par défaut. Le plan collectif Équilibrée/Conservation/Pressing reste indépendant et reprend la main après l’ouverture. Changer d’ouverture applique sa formation ; les cases peuvent ensuite être modifiées sans perdre la consigne d’ouverture.
+
+| Ouverture | Déploiement et premiers tours |
+|---|---|
+| Fuite sous écran | N°2 et 3 au centre. Le gagnant fuit dans sa moitié ; les trois autres répartissent le marquage et immobilisent les poursuivants. |
+| Passe en retrait | N°5 derrière, réaction réservée pour recevoir. N°2 et 3 contestent ; le gagnant cherche une passe sûre vers l’arrière dès son tour. |
+| Cage mobile | Bloc compact autour de l’engagement. Le porteur reste proche des protections et les partenaires ferment les contacts. |
+| Double relais sur les ailes | N°1 et 5 écartés, n°4 en écran, n°2 et 3 au centre. Le porteur choisit la réception la plus sûre. |
+| Pressing d’entrée | Ligne avancée. Arrachement par le plus proche si l’adversaire gagne, marquage de ses relais par les autres ; écrans si l’équipe gagne. |
+| Jeu libre | Formation ajustable, rôles et plan collectif habituels, aucune priorité d’ouverture. |
+
+Les priorités durent le premier round ; les relais arrière et sur les ailes restent disponibles jusqu’au round 2 si la première passe n’était pas sûre. Dès qu’un relais reçoit ou que l’adversaire prend la balle, les ouvertures de conservation laissent le jeu normal reprendre. Un relais KO n’est plus ciblé ; sans contestataire vivant, l’équipe reprend ses décisions ordinaires. Les numéros suivent les emplacements des titulaires et les relais gardent leurs positions de départ réellement choisies, y compris après un ajustement manuel.
+
+À l’arrivée du ballon, avant le premier déplacement, les joueurs des quatre cases centrales **interceptent en réaction**. Ils conservent donc leur action et leur mouvement pour passer, fuir ou bloquer dès leur tour. Sans adversaire ayant encore sa réaction : Lutte ou Acrobaties DD 10, dans l’ordre d’initiative jusqu’à une réussite. Si les deux équipes contestent : chacun dépense sa réaction et effectue un jet opposé ; meilleur total, égalité à la première initiative. Une réaction dépensée à l’engagement ne sert plus à recevoir, intercepter une passe ou frapper en opportunité pendant ce round. La Lecture de trajectoire du Passeur peut améliorer cette interception pour une concentration. Les tentatives toutes ratées laissent la balle au centre ; une réaction disponible permet une nouvelle tentative au contact.
+
+Les cinq adversaires de carrière ont chacun leur ouverture. En Exhibition, le code détermine une ouverture adverse parmi les cinq, sans consommer les tirages des jets. Les deux ouvertures sont affichées avec les noms des clubs, figées au coup d’envoi et conservées dans la sauvegarde.
+
 ## Carrière
 
 Fonder un club donne 2 400 chromas. Choisir cinq à huit des douze candidats, puis valider les contrats en une fois. Les vues **Effectif**, **Recrutement**, **Équipement** et **Ligue** donnent accès à la composition, aux consignes, aux achats et au calendrier. Composition, consignes et placement sont enregistrés automatiquement ; choisir un titulaire déjà présent échange les deux positions. Dans **Déploiement**, choisir le joueur puis cliquer une case de sa moitié ; une case occupée échange les deux joueurs. Les flèches parcourent les cases et Entrée valide le placement. La même interface existe en Exhibition. Les cinq adversaires disposent de sept joueurs fixes, progressent et font tourner leurs titulaires en fonction de leur fatigue ; aucune adaptation à la puissance du club.
@@ -35,7 +54,7 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball> pour la présentation, ou <htt
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs rumbleball/appearance.test.mjs rumbleball/round-playback.test.mjs rumbleball/round-ui.test.mjs rumbleball/deployment.test.mjs rumbleball/app.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs rumbleball/appearance.test.mjs rumbleball/round-playback.test.mjs rumbleball/round-ui.test.mjs rumbleball/deployment.test.mjs rumbleball/app.test.mjs rumbleball/openings.test.mjs
 ```
 
 Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
@@ -46,7 +65,7 @@ Les tests de lecture simultanée contrôlent le chevauchement des courses indép
 
 La même horloge vérifie le décompte de lancement, l’absence de ballon avant START, l’état inchangé avant le premier tour, la cadence indépendante de ×8, la pause à la milliseconde, l’annulation des rappels, le résultat immédiat et la reprise sans nouveau décompte ni salaire.
 
-Les tests de déploiement vérifient les limites des deux moitiés, les échanges de cases occupées, la sauvegarde, le gel en match, le clavier et les noms longs. L’engagement couvre les quatre cases éligibles, le DD 10 seul, l’opposition, les égalités, l’ordre d’initiative, la dépense de l’action et le maintien du ballon à l’intersection après un échec. Les anciennes rencontres restent importables et continuent avec leurs règles et leur hasard d’origine.
+Les tests de déploiement vérifient les limites des deux moitiés, les échanges de cases occupées, la sauvegarde, le gel en match, le clavier et les noms longs. Les tests d’ouverture couvrent les quatre réactions, le DD 10 seul, les jets opposés, l’initiative, la conservation de l’action, une passe arrière au premier tour, la fuite, la cage, les écrans, la réservation des réactions et les ajustements manuels. Vingt-cinq confrontations croisent les cinq ouvertures. Les anciennes rencontres v2/v3 restent importables et continuent avec leurs règles et leur hasard d’origine, y compris l’ancienne prise centrale en action pour la v3.
 
 Les tests de la page dédiée vérifient les liens aller/retour en local et sous un préfixe GitHub Pages, la séparation des ressources du livre, l’existence des ressources locales, la reprise d’une carrière existante, la lecture sans section du livre, la pause en quittant la page et l’Exhibition sans carrière. Ces tests utilisent le DOM en mémoire ; le rendu visuel et le responsive demandent une vérification en navigateur.
 
@@ -59,6 +78,7 @@ Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 2
 - `progression.mjs` : compilation pure, niveaux, fatigue, salaires et catalogue sportif.
 - `appearance.mjs` : identité visuelle déterministe, couleurs de club, tenue adverse de contraste et armes illustrées ; aucun tirage de la simulation.
 - `deployment.mjs` et `deployment-ui.mjs` : géométrie de l’engagement, validation des deux moitiés, formations par défaut et éditeur de placement partagé avec l’Exhibition.
+- `openings.mjs` et `opening-ui.mjs` : cinq plans d’ouverture, jeu libre, formations, rôles de lancement et choix partagé entre Effectif et Exhibition.
 - `career.mjs` : transitions pures de carrière, finances, calendrier et règlement des journées.
 - `career-storage.mjs` : validation, sauvegarde atomique et export/import JSON.
 - `career-ui.mjs` : gestion du club ; utilise le lecteur de match de `ui.mjs` pour préserver terrain, animations et journal.
@@ -95,7 +115,7 @@ API du moteur : `createMatch(config)` retourne un état ; `stepMatch(state)` ret
 
 L’option de lecture `stepMatch(state, { stopAtRoundEnd: true })` s’arrête à la frontière du round lorsque ses derniers créneaux sont KO. Elle évite de résoudre le premier joueur vivant du round suivant dans le même lot. Concaténer ses étapes conserve les événements et l’état final de l’API ordinaire.
 
-Les nouvelles rencontres utilisent la version 3 : `deployments.home` et `deployments.away` acceptent chacun cinq coordonnées de cases entières, distinctes et dans la moitié correspondante. Une entrée invalide est refusée ; sans placement explicite, la formation dépend du plan collectif. Les clubs conservent leur formation dans leur propre repère (colonnes A–F), retournée de 180° quand ils jouent à droite. Les cinq positions suivent les emplacements de titulaires. Le dernier engagement reprend les positions choisies sans restaurer les PV ou ressources. Les rencontres de version 2 sauvegardées avant ce changement conservent leur placement et leur engagement anciens jusqu’à leur fin ; la sauvegarde de carrière reste au format 1.
+Les nouvelles rencontres utilisent la version 4 : `openings.home` et `openings.away` fixent les ouvertures ; `deployments.home` et `deployments.away` acceptent chacun cinq coordonnées de cases entières, distinctes et dans la moitié correspondante. Une entrée invalide est refusée ; sans placement explicite, la formation suit l’ouverture. Les clubs conservent leur formation dans leur propre repère (colonnes A–F), retournée de 180° quand ils jouent à droite. Les cinq positions suivent les emplacements de titulaires. Le dernier engagement reprend les positions choisies sans restaurer les PV ou ressources. Les rencontres v2/v3 sauvegardées avant ce changement conservent leur placement, leur IA et leur engagement anciens jusqu’à leur fin ; la sauvegarde de carrière reste au format 1.
 
 ## Règles retenues
 
@@ -124,7 +144,7 @@ Conventions du prototype :
 - Déploiement libre : cinq joueurs sur cinq cases distinctes, colonnes A–F pour l’équipe de gauche et G–L pour celle de droite. Le ballon apparaît exactement à l’intersection de F4, G4, F5 et G5, soit `(5.5, 3.5)` dans les coordonnées internes des centres de cases. Seul le ballon utilise ce point fractionnaire ; les joueurs restent sur des cases entières. Aucun tirage de case au centre. Égalité complète d’initiative : tirage déterministe.
 - Réactions renouvelées au début du round, jamais au début du tour individuel. Une réception, une interception ou une opportunité utilise la même ressource. Les relais et joueurs prudents peuvent réserver leur réaction lorsque leur équipe porte ; ils contestent toujours un porteur adverse quittant leur allonge.
 - Une opportunité exige un pas volontaire allant d’une case adjacente à une case hors allonge. Entrer dans l’allonge ou rester adjacent (diagonales comprises) ne la provoque pas. L’attaque est résolue avant le pas : un KO peut empêcher toute sortie effective. Le journal conserve les cases du déclenchement ; les déplacements antérieurs sont publiés avant la réaction. Le terrain trace tous les tronçons du tour et marque en jaune le pas déclencheur, même interrompu.
-- Engagement central : seuls les joueurs des quatre cases autour de l’intersection peuvent tenter une prise, lors de leur tour d’initiative, en dépensant leur action même en cas d’échec. Meilleur Lutte/Acrobaties DD 10 sans adversaire dans ces quatre cases ; sinon test opposé contre le meilleur défenseur adverse vivant, avec son meilleur Lutte/Acrobaties et égalité au défenseur. Une seule tentative par tour. Un échec laisse le ballon à l’intersection, pour les suivants ; aucune prise gratuite par interaction après une action dépensée.
+- Engagement central : interception en réaction dans les quatre cases, avant les déplacements. Meilleur Lutte/Acrobaties DD 10 sans adversaire ayant sa réaction ; sinon tous les contacts disponibles font un jet opposé, égalité départagée par l’initiative. Réaction dépensée même sur échec, action et mouvement conservés. Si la balle est encore libre à un début de round, les nouvelles réactions peuvent la disputer. Les anciennes rencontres v3 conservent leur prise en action.
 - Après une chute sur une case normale : ramassage à une case ou moins, interaction sans opposition adjacente à la balle, sinon action contre le meilleur opposant adjacent. Un seul ramassage par tour. Porter n’interdit pas l’attaque de base à une main.
 - Interception après un test de passe réussi : une seule tentative, par proximité à la trajectoire puis Acrobaties puis initiative. Une égalité laisse la passe suivre son cours. La trajectoire traverse les intérieurs des cases ; une simple tangence de coin n’ajoute pas de case.
 - Plaquer et agripper : Lutte contre Athlétisme ou Acrobaties. Arracher : Lutte contre Lutte ou Acrobaties. Se libérer : Athlétisme ou Acrobaties contre Lutte. Les défenses choisissent leur meilleur bonus ; égalité au défenseur.

@@ -1,5 +1,5 @@
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
-import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
+import { createMatch, CURRENT_RULES, DEFAULT_SEED, seedHash, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
 import { arenaBackdrop, pawnArtwork, playerPortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
 import { KIT_COLORS, characterKey, readableKit, sportingWeapon, visibleGear } from './appearance.mjs';
@@ -11,6 +11,8 @@ import { ARCHETYPES, archetypeLabel, classResources, classAbilities } from './cl
 import { deploymentEditor } from './deployment-ui.mjs';
 import { defaultDeployment, isCenterBall } from './deployment.mjs';
 import { createKickoff } from './kickoff.mjs';
+import { DEFAULT_OPENING, OPENINGS, OPENING_IDS, openingDeployment } from './openings.mjs';
+import { openingPicker } from './opening-ui.mjs';
 
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
@@ -63,6 +65,8 @@ export function mountMatch(root, callbacks = {}) {
   });
   const preparation = element('div', 'rb-preparation'); preparation.append(setupRows);
   const deployment = deploymentEditor({ players: state.players.filter((p) => p.teamId === 'home'), positions: defaultDeployment(), color: colorInput.value, onChange: updatePreview });
+  const opening = openingPicker({ value: DEFAULT_OPENING, onChange: (value) => { deployment.update({ positions: openingDeployment(value) }); updatePreview(); } });
+  setupRows.prepend(opening.root);
   preparation.append(deployment.root); setup.append(preparation);
   const setupFoot = element('div', 'rb-setup-foot');
   const seedLabel = element('label', 'rb-field rb-seed', 'Code du match');
@@ -71,7 +75,7 @@ export function mountMatch(root, callbacks = {}) {
   const reroll = button('Nouveau tirage', 'rb-button rb-button-quiet');
   const start = button('Lancer le match', 'rb-button rb-button-primary'); start.type = 'submit';
   setupFoot.append(seedLabel, reroll, start);
-  const seedHelp = element('p', 'rb-muted', 'Même code et mêmes consignes : le match sera identique. Les consignes sont fixées au coup d’envoi.'); seedHelp.id = 'rb-seed-help';
+  const seedHelp = element('p', 'rb-muted', 'Même code, ouverture et consignes : le match sera identique. Le code fixe aussi l’ouverture adverse. Les choix sont figés au coup d’envoi.'); seedHelp.id = 'rb-seed-help';
   setup.append(setupFoot, seedHelp);
   const classGuide = element('details', 'rb-rules rb-class-guide');
   classGuide.append(element('summary', '', 'Les classes et leurs techniques de rumbleball'));
@@ -164,7 +168,7 @@ export function mountMatch(root, callbacks = {}) {
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
     `10 rounds de ${ROUND_DURATION / 1000} secondes, soit deux minutes à ×1. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.`,
-    'Engagement : déploiement libre dans sa moitié. Après le compte à rebours, le ballon arrive à l’intersection de F4, G4, F5 et G5 au début du premier tour. Seuls les joueurs de ces quatre cases peuvent tenter de l’attraper, à leur tour d’initiative, en dépensant leur action. Lutte ou Acrobaties DD 10 sans opposition ; test opposé si un adversaire conteste, égalité au défenseur. Un échec laisse le ballon au centre.',
+    'Engagement : après le décompte, les joueurs des quatre cases F4, G4, F5 et G5 peuvent intercepter le ballon en réaction avant les déplacements. Lutte ou Acrobaties : DD 10 sans adversaire, meilleur jet opposé si les deux équipes contestent ; égalité départagée par l’initiative. Les jets se font par ordre d’initiative. Chaque participant dépense sa réaction, conserve son action et son mouvement et peut passer, fuir ou frapper pendant son tour. Le ramassage d’une balle tombée ailleurs conserve ses règles habituelles.',
     `Lecture simultanée : un round dure ${ROUND_DURATION / 1000} secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.`,
     'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir, intercepter et frapper en opportunité utilisent cette même réaction.',
     'Une attaque d’opportunité est provoquée par un pas volontaire qui fait sortir de l’allonge (une case, diagonales comprises). Elle se résout avant ce pas : un KO laisse donc le joueur dans sa case de départ. Entrer dans l’allonge ou tourner autour sans en sortir ne provoque rien.',
@@ -177,7 +181,8 @@ export function mountMatch(root, callbacks = {}) {
   const errorBox = element('p', 'rb-error'); errorBox.setAttribute('role', 'alert'); errorBox.hidden = true; root.prepend(errorBox);
 
   function config() {
-    return { seed: seedInput.value.trim() || DEFAULT_SEED, rulesVersion: 3, deployments: { home: deployment.value }, strategy: strategySelect.value, kitColors: { home: colorInput.value },
+    const seed = seedInput.value.trim() || DEFAULT_SEED;
+    return { seed, rulesVersion: CURRENT_RULES, openings: { home: opening.value, away: OPENING_IDS[seedHash(`${seed}:opening:away`) % OPENING_IDS.length] }, deployments: { home: deployment.value }, strategy: strategySelect.value, kitColors: { home: colorInput.value },
       players: rowControls.map(({ role, instruction }) => ({ role: role.value, instruction: instruction.value })) };
   }
   function updatePreview() {
@@ -432,8 +437,8 @@ export function mountMatch(root, callbacks = {}) {
       root.style.setProperty(`--rb-${team.id}`, readableKit(color)); root.style.setProperty(`--rb-kit-${team.id}`, color);
     }
     if (!started) for (const [i, p] of state.players.filter((p) => p.teamId === 'home').entries()) rowControls[i].portrait.replaceChildren(playerPortrait(p, colorInput.value));
-    homeScore.querySelector('small').textContent = `${STRATEGIES[state.teams[0].strategy]} · votre équipe`;
-    awayScore.querySelector('small').textContent = `Plan ${STRATEGIES[state.teams[1].strategy]}`;
+    homeScore.querySelector('small').textContent = `${STRATEGIES[state.teams[0].strategy]} · ${OPENINGS[state.teams[0].opening]?.name ?? 'votre équipe'}`;
+    awayScore.querySelector('small').textContent = `${STRATEGIES[state.teams[1].strategy]} · ${OPENINGS[state.teams[1].opening]?.name ?? 'adversaire'}`;
     for (const [index, score] of [homeScore, awayScore].entries()) score.querySelector('strong').textContent = state.teams[index].name;
     for (const [index, id] of ['home', 'away'].entries()) legend.children[index].lastChild.textContent = teamLabel(id);
     setup.hidden = started;
@@ -510,7 +515,7 @@ export function mountMatch(root, callbacks = {}) {
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) setRunning(false); });
   window.addEventListener?.('pagehide', () => setRunning(false));
-  render(); setRunning(false);
+  updatePreview(); setRunning(false);
   return {
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },

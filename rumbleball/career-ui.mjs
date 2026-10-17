@@ -7,6 +7,8 @@ import { KIT_COLORS, clubKit } from './appearance.mjs';
 import { playerPortrait } from './visuals.mjs';
 import { deploymentEditor } from './deployment-ui.mjs';
 import { clubDeployment } from './deployment.mjs';
+import { clubOpening, openingDeployment } from './openings.mjs';
+import { openingPicker } from './opening-ui.mjs';
 
 const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}`, text); b.type = 'button'; b.addEventListener('click', action); return b; };
@@ -164,6 +166,9 @@ export function mountCareer(root, mountMatch) {
     const deploymentPlayers = () => career.lineup.map((id) => compilePlayer(ownedPlayers(career).find((p) => p.id === id), career.inventory));
     const positions = locked ? career.current.config.deployments?.home ?? STARTS.map(([x, y]) => ({ x, y })) : clubDeployment(career.clubs[0]);
     const deployment = deploymentEditor({ players: deploymentPlayers(), positions, color: color.value, disabled: locked, onChange: () => attempt(commitLineup) });
+    const opening = openingPicker({ value: locked ? career.current.config.openings?.home ?? 'none' : clubOpening(career.clubs[0]), disabled: locked,
+      onChange: (value) => attempt(() => { deployment.update({ positions: openingDeployment(value) }); commitLineup(); }) });
+    teamControls.append(opening.root);
     preparation.append(teamControls, deployment.root); form.append(preparation);
     const assignments = {}, statusLabels = new Map(), portraits = new Map(), list = el('div', 'rb-career-roster');
     for (const p of ownedPlayers(career)) {
@@ -188,7 +193,7 @@ export function mountCareer(root, mountMatch) {
     form.append(list); const submit = btn('Enregistrer la composition et les consignes', () => {}, true); submit.type = 'submit'; submit.disabled = locked; form.append(submit);
     const formNotice = el('p', 'rb-muted', 'Composition et consignes sont enregistrées automatiquement. Choisir un titulaire déjà présent échange leurs positions.'); form.append(formNotice);
     function commitLineup() {
-      career = configureTeam(career, slotControls.map((s) => s.value), Object.fromEntries(Object.entries(assignments).map(([id, controls]) => [id, { role: controls.role.value, instruction: controls.instruction.value }])), strategy.value, deployment.value);
+      career = configureTeam(career, slotControls.map((s) => s.value), Object.fromEntries(Object.entries(assignments).map(([id, controls]) => [id, { role: controls.role.value, instruction: controls.instruction.value }])), strategy.value, deployment.value, opening.value);
       career = setClubColor(career, color.value);
       const saved = save();
       for (const [id, label] of statusLabels) { const index = career.lineup.indexOf(id); label.textContent = index < 0 ? 'Remplaçant' : `Titulaire ${index + 1}`; }
@@ -200,7 +205,7 @@ export function mountCareer(root, mountMatch) {
       const duplicate = slotControls.find((other, otherIndex) => otherIndex !== index && other.value === control.value);
       if (duplicate) duplicate.value = career.lineup[index];
     });
-    form.addEventListener('change', (event) => { if (!deployment.root.contains(event.target)) attempt(commitLineup); });
+    form.addEventListener('change', (event) => { if (!deployment.root.contains(event.target) && !opening.root.contains(event.target)) attempt(commitLineup); });
     form.addEventListener('submit', (event) => { event.preventDefault(); attempt(commitLineup); });
     manager.append(form);
   }

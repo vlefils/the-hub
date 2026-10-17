@@ -1,8 +1,8 @@
 import { COURT } from './data.mjs';
 
-const announcements = new Set(['finish', 'overtime', 'restart']);
+const announcements = new Set(['finish', 'overtime', 'restart', 'engagement-result']);
 const boundary = (event) => event.resolvedAction || (event.type === 'class' && ['lock', 'call', 'feint', 'observe'].includes(event.ability))
-  || ['move', 'drag', 'opportunity', 'stand', 'hold-position', 'movement-stopped', 'round-end', 'finish', 'overtime', 'restart'].includes(event.type);
+  || ['move', 'drag', 'opportunity', 'stand', 'hold-position', 'movement-stopped', 'round-end', 'finish', 'overtime', 'restart', 'engagement-result'].includes(event.type);
 const metres = (steps) => {
   const distance = steps * COURT.cell;
   return `${distance.toLocaleString('fr-FR')} ${distance < 2 ? 'mètre' : 'mètres'}`;

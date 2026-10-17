@@ -1,4 +1,4 @@
-import { defaultDeployment, moveDeployment } from './deployment.mjs';
+import { defaultDeployment, moveDeployment, validDeployment } from './deployment.mjs';
 import { KIT_COLORS } from './appearance.mjs';
 import { playerPortrait } from './visuals.mjs';
 
@@ -58,5 +58,8 @@ export function deploymentEditor({ players, positions = defaultDeployment(), col
   }
   select.addEventListener('change', () => { selected = Number(select.value); render(); });
   render();
-  return { root, get value() { return cells.map((p) => ({ ...p })); }, update(next) { players = next.players ?? players; color = next.color ?? color; disabled = next.disabled ?? disabled; render(); } };
+  return { root, get value() { return cells.map((p) => ({ ...p })); }, update(next) {
+    if (next.positions !== undefined) { if (!validDeployment(next.positions)) throw new Error('Déploiement invalide.'); cells = next.positions.map((p) => ({ ...p })); }
+    players = next.players ?? players; color = next.color ?? color; disabled = next.disabled ?? disabled; render();
+  } };
 }

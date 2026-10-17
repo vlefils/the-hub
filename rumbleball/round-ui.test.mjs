@@ -28,13 +28,13 @@ test('UI simultanée : dix tours résolus, douze secondes affichées, plusieurs 
   const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
   globalThis.matchMedia = () => ({ matches: false });
   const view = mountMatch(e.root, { onTurn: (state) => { saved.push(structuredClone(state)); return true; } });
-  view.load({ config: {}, state: createMatch(), turns: [] }, true); c.elapse(0);
+  view.load({ config: {}, state: createMatch({ openings: { home: 'wings', away: 'wings' } }), turns: [] }, true); c.elapse(0);
   assert.equal(saved.at(-1).round, 2); assert.equal(saved.at(-1).turns, 10);
   assert.equal(classNode(e.root, 'rb-clock').textContent, '02:00'); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 1/10');
-  c.elapse(3000);
+  c.elapse(10000);
   assert.ok(e.root.querySelectorAll('.rb-turn-marker').filter((n) => n.getAttribute('visibility') === 'visible').length > 1);
   assert.ok(e.root.querySelectorAll('.rb-pawn').filter((n) => n.getAttribute('aria-current') === 'true').length > 1);
-  c.elapse(3000); assert.equal(saved.length, 10); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:54');
+  assert.equal(saved.length, 10); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:50');
   await button(e.root, 'Pause').click();
   assert.equal(c.frames.size, 0); assert.equal(c.timers.size, 0); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:48');
   assert.match(classNode(e.root, 'rb-playback-status').textContent, /Pause · round 2/);

@@ -1,6 +1,7 @@
 import { COURT, WET_CELLS, modifier } from './data.mjs';
 import { ARCHETYPES, classCaps, isRunner } from './classes.mjs';
 import { isCenterBall } from './deployment.mjs';
+import { openingPlan } from './openings.mjs';
 
 export const distance = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 export const sameCell = (a, b) => a.x === b.x && a.y === b.y;
@@ -236,6 +237,26 @@ export function giveBall(state, actor, events, reason = 'récupère', recovery =
   if (recovery) state.stats[actor.teamId].recoveries++;
   emit(state, events, 'possession', `${actor.name} ${reason} la balle.`, { playerId: actor.id, teamId: actor.teamId, reason });
 }
+export function resolveCenterEngagement(state, events = []) {
+  if (state.version < 4 || !isCenterBall(state)) return false;
+  const eligible = state.initiative.map((id) => playerById(state, id)).filter((p) => p?.hp > 0 && p.reaction && distance(p.position, state.ball.position) <= 1);
+  if (!eligible.length) return false;
+  const contested = new Set(eligible.map((p) => p.teamId)).size > 1;
+  emit(state, events, 'engagement', 'Le ballon arrive au centre : les joueurs au contact réagissent par ordre d’initiative.', { playerIds: eligible.map((p) => p.id) });
+  let winner = null, best = -Infinity;
+  for (const p of eligible) {
+    p.reaction = false; p.pickedUp = true;
+    emit(state, events, 'center-reaction', `${p.name} tente d’intercepter l’engagement en réaction.`, { playerId: p.id });
+    const reading = p.archetype === 'passeur' && p.classState.focus > 0 && !hasCheckHelp(state, p);
+    if (reading) { p.classState.focus--; classEvent(state, events, 'observe', p, `${p.name} lit la trajectoire de l’engagement (1 concentration).`, { label: 'Lecture' }); }
+    const total = skillCheck(state, p, Math.max(skill(p, 'wrestling'), skill(p, 'acrobatics')), events, `${p.name} · interception d’engagement${contested ? '' : ' DD 10'}`, reading);
+    if (contested) { if (total > best) { winner = p; best = total; } }
+    else if (total >= 10) { winner = p; break; }
+  }
+  if (winner) giveBall(state, winner, events, 'intercepte');
+  emit(state, events, 'engagement-result', winner ? `${winner.name} intercepte l’engagement en réaction et conserve son action.` : 'Les réactions manquent le ballon ; il reste libre au centre.', { playerId: winner?.id ?? null });
+  return true;
+}
 function releaseGrapples(state, actor) {
   if (actor.grappling) {
     const held = playerById(state, actor.grappling);
@@ -330,6 +351,7 @@ export function performAttack(state, actor, target, events, opportunity = null, 
 export function shouldTakeOpportunity(state, actor, mover) {
   const holder = carrier(state);
   if (mover.id === holder?.id) return true;
+  if (openingPlan(state, actor)?.receivers.includes(actor.id)) return false;
   const passingOutlet = actor.archetype === 'passeur' && actor.instruction !== 'aggressive'
     && state.teams.find((t) => t.id === actor.teamId)?.strategy === 'possession'
     && holder && distance(actor.position, holder.position) <= 6;
@@ -409,7 +431,7 @@ export function legalAction(state, actor, action) {
   const enemy = target && target.hp > 0 && target.teamId !== actor.teamId && distance(actor.position, target.position) <= 1;
   if (action.type === 'pickup') {
     if (state.ball.carrierId || actor.pickedUp || distance(actor.position, state.ball.position) > 1) return false;
-    if (isCenterBall(state)) return actor.action;
+    if (isCenterBall(state)) return state.version >= 4 ? actor.reaction : actor.action;
     return ballDefender(state, actor) ? actor.action : actor.interaction;
   }
   if (!actor.action) return false;
@@ -452,6 +474,7 @@ function resolveActionEvents(state, actor, action, events) {
   if (action.type === 'attack') return performAttack(state, actor, target, events, null, action.technique);
   actor.chargeRun = null;
   if (action.type === 'pickup') {
+    if (state.version >= 4 && isCenterBall(state)) return resolveCenterEngagement(state, events);
     actor.pickedUp = true;
     const defender = ballDefender(state, actor);
     if (!defender && isCenterBall(state)) {

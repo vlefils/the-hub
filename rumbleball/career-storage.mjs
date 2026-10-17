@@ -4,6 +4,7 @@ import { assertInvariants } from './rules.mjs';
 import { createMatch } from './engine.mjs';
 import { validKitColor } from './appearance.mjs';
 import { validDeployment } from './deployment.mjs';
+import { validOpening } from './openings.mjs';
 
 export const CAREER_KEY = 'the-hub.rumbleball.career.v1';
 const check = (condition) => { if (!condition) throw new Error('Sauvegarde de carrière invalide ou incompatible.'); };
@@ -25,6 +26,7 @@ export function validateCareer(c) {
   for (const [index, club] of c.clubs.entries()) {
     check(club.kitColor === undefined || validKitColor(club.kitColor));
     check(club.deployment === undefined || validDeployment(club.deployment));
+    check(club.opening === undefined || validOpening(club.opening));
     check(name(club.id) && name(club.name) && name(club.style) && Object.hasOwn(STRATEGIES, club.strategy) && Array.isArray(club.players));
     check(index ? club.players.length === 7 : c.status === 'draft' ? club.players.length === 0 : club.players.length >= 5 && club.players.length <= 8);
     club.players.forEach(validatePlayer);
@@ -85,9 +87,10 @@ export function validateCareer(c) {
     if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, 10));
     else check(m.state.result === null);
     check(['home', 'away'].every((side) => m.state.stats?.[side] && ['passesAttempted', 'passesCompleted', 'recoveries', 'knockouts'].every((key) => integer(m.state.stats[side][key]))));
-    check([2, 3].includes(m.state.version));
+    check([2, 3, 4].includes(m.state.version));
     check(m.config.rulesVersion === undefined || m.config.rulesVersion === m.state.version);
     const initial = createMatch({ ...m.config, rulesVersion: m.state.version });
+    if (m.state.version >= 4) check(m.state.teams.every((team, i) => validOpening(team.opening) && team.opening === initial.teams[i].opening));
     check(initial.players.every((p, i) => {
       const saved = m.state.players[i];
       check(name(p.name) && integer(p.level, 1) && p.level <= 5 && integer(p.maxHp, 1) && integer(p.armor, 1) && Number.isFinite(p.speed) && p.speed > 0);

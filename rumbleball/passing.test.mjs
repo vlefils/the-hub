@@ -6,7 +6,7 @@ import { decideClassAction, decideTurn, passCompletionChance, teamPlan } from '.
 import { assertInvariants, beginTurn, giveBall, resolveAction, resolveClassAction, shouldTakeOpportunity } from './rules.mjs';
 
 function fixture(ids = ['home-0', 'home-2', 'home-4', 'away-0']) {
-  const state = createMatch({ seed: 'passing-decisions', strategy: 'possession' });
+  const state = createMatch({ seed: 'passing-decisions', strategy: 'possession', openings: { home: 'none', away: 'none' } });
   for (const p of state.players) { p.hp = ids.includes(p.id) ? p.maxHp : 0; p.reaction = p.hp > 0; }
   const captain = state.players[0], receiver = state.players[2], passer = state.players[4], enemy = state.players[5];
   captain.position = { x: 2, y: 2 }; receiver.position = { x: 0, y: 0 }; passer.position = { x: 2, y: 4 }; enemy.position = { x: 3, y: 4 };
@@ -74,7 +74,7 @@ test('capitaine : conserve ses appels si le porteur doit encore subir plusieurs 
   const before = structuredClone(state); assert.notEqual(decideClassAction(state, captain)?.type, 'call'); assert.deepEqual(state, before);
 });
 test('Conservation : le passeur offre un second relais et préserve sa réception sans bloquer une opportunité sur le porteur', () => {
-  const state = createMatch({ strategy: 'possession' }), holder = state.players[2], passer = state.players[4], mover = state.players[5];
+  const state = createMatch({ strategy: 'possession', openings: { home: 'none', away: 'none' } }), holder = state.players[2], passer = state.players[4], mover = state.players[5];
   giveBall(state, holder, []); const plan = teamPlan(state, holder); assert.equal(plan.outlet, passer.id);
   assert.equal(shouldTakeOpportunity(state, passer, mover), false);
   passer.instruction = 'aggressive'; assert.equal(shouldTakeOpportunity(state, passer, mover), true);
