@@ -1,7 +1,9 @@
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, DEFAULT_SEED, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
-import { arenaBackdrop, pawnArtwork, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
+import { arenaBackdrop, pawnArtwork, playerPortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
+import { KIT_COLORS, characterKey, readableKit, sportingWeapon, visibleGear } from './appearance.mjs';
+import { CATALOGUE } from './progression.mjs';
 import { narrateTurn } from './narration.mjs';
 import { courtPoint, createCourtPlayback, nextCourtTurnDelay } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
@@ -35,12 +37,15 @@ export function mountMatch(root, callbacks = {}) {
   setupCopy.append(element('p', 'rb-eyebrow', 'Le vestiaire'), element('h3', '', 'Préparer les Recrues'), element('p', 'rb-muted', 'Quatre archétypes, cinq joueurs. Choisissez leurs rôles et leurs consignes ; les bots gèrent leurs techniques et leurs ressources.'));
   const strategyLabel = element('label', 'rb-field', 'Plan collectif');
   const strategySelect = element('select'); strategySelect.name = 'rb-strategy'; strategySelect.append(...options(STRATEGIES, 'balanced'));
-  strategyLabel.append(strategySelect); setupHead.append(setupCopy, strategyLabel); setup.append(setupHead);
+  strategyLabel.append(strategySelect);
+  const colorLabel = element('label', 'rb-field', 'Couleur des maillots'), colorInput = element('input', 'rb-kit-color');
+  colorInput.type = 'color'; colorInput.value = KIT_COLORS[0]; colorInput.setAttribute('aria-label', 'Couleur des maillots'); colorLabel.append(colorInput);
+  const setupOptions = element('div', 'rb-kit-options'); setupOptions.append(strategyLabel, colorLabel); setupHead.append(setupCopy, setupOptions); setup.append(setupHead);
   const setupRows = element('div', 'rb-setup-rows');
   const rowControls = state.players.filter((p) => p.teamId === 'home').map((p, index) => {
     const row = element('div', 'rb-setup-row');
     const identity = element('div', 'rb-identity');
-    identity.append(element('span', 'rb-number rb-home', String(p.number)));
+    const portrait = element('div', 'rb-portrait-wrap'); portrait.append(playerPortrait(p, colorInput.value)); identity.append(portrait);
     const copy = element('div'); copy.append(element('strong', '', p.name), element('span', 'rb-archetype', archetypeLabel(p)), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString('fr-FR')} m · attaque +${p.attack.bonus}, 1d${p.attack.die}+${p.attack.flat}`));
     identity.append(copy);
     const roleLabel = element('label', 'rb-field', 'Rôle'); const role = element('select'); role.name = `rb-role-${index}`;
@@ -51,7 +56,7 @@ export function mountMatch(root, callbacks = {}) {
     role.addEventListener('change', () => { description.textContent = ROLE_DESCRIPTIONS[role.value]; updatePreview(); });
     instruction.addEventListener('change', updatePreview);
     row.append(identity, roleLabel, instructionLabel, description); setupRows.append(row);
-    return { role, instruction };
+    return { role, instruction, portrait };
   });
   setup.append(setupRows);
   const setupFoot = element('div', 'rb-setup-foot');
@@ -148,7 +153,7 @@ export function mountMatch(root, callbacks = {}) {
   const errorBox = element('p', 'rb-error'); errorBox.setAttribute('role', 'alert'); errorBox.hidden = true; root.prepend(errorBox);
 
   function config() {
-    return { seed: seedInput.value.trim() || DEFAULT_SEED, strategy: strategySelect.value,
+    return { seed: seedInput.value.trim() || DEFAULT_SEED, strategy: strategySelect.value, kitColors: { home: colorInput.value },
       players: rowControls.map(({ role, instruction }) => ({ role: role.value, instruction: instruction.value })) };
   }
   function updatePreview() {
@@ -207,11 +212,13 @@ export function mountMatch(root, callbacks = {}) {
       let node = pawnNodes.get(p.id);
       if (!node) {
         node = svg('g', { 'data-player': p.id, role: 'button', tabindex: 0 });
-        node.append(pawnArtwork(p));
         node.addEventListener('click', () => selectPlayer(p.id));
         node.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectPlayer(p.id); } });
         pawns.append(node); pawnNodes.set(p.id, node);
       }
+      const color = state.teams.find((t) => t.id === p.teamId)?.kitColor ?? KIT_COLORS[p.teamId === 'home' ? 0 : 1];
+      const lookKey = characterKey(p, color);
+      if (node.dataset.lookKey !== lookKey) { node.replaceChildren(pawnArtwork(p, color)); node.dataset.lookKey = lookKey; node.dataset.broad = String(p.archetype === 'belier'); }
       node.setAttribute('class', `rb-pawn rb-${p.teamId}${p.hp === 0 ? ' is-ko' : ''}${state.activeId === p.id ? ' is-active' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
       node.setAttribute('aria-label', `${p.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${p.grappledBy ? ', agrippé' : ''}${p.prone ? ', à terre' : ''}${state.ball.carrierId === p.id ? ', porte la balle' : ''}${state.activeId === p.id ? ', tour en cours' : ''}`);
       node.setAttribute('aria-current', String(state.activeId === p.id));
@@ -258,6 +265,7 @@ export function mountMatch(root, callbacks = {}) {
       node.classList.toggle('is-ko', p.hp === 0); node.classList.toggle('is-prone', p.prone);
       node.querySelector('.rb-pawn-number').textContent = p.hp === 0 ? '×' : String(p.number);
       node.querySelector('.rb-pawn-health').setAttribute('width', String(32 * p.hp / p.maxHp));
+      poseCharacter(node, p, { carrying: frame.ball.carrierId === p.id });
     }
     ballSprite.setAttribute('transform', `translate(${frame.ballPoint.x} ${frame.ballPoint.y})`);
     const carried = Boolean(frame.ball.carrierId);
@@ -283,7 +291,9 @@ export function mountMatch(root, callbacks = {}) {
       const item = element('div'); item.append(element('dt', '', name), element('dd', '', String(value))); stats.append(item);
     }
     selected.append(heading, element('p', 'rb-archetype', archetypeLabel(p)), stats,
-      element('p', 'rb-muted', `Attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants.`));
+      element('p', 'rb-muted', `${sportingWeapon(p).name} · attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants.`));
+    const gear = visibleGear(p);
+    if (gear.protection || gear.implant) selected.append(element('p', 'rb-muted', `Protection : ${CATALOGUE[gear.protection]?.name ?? 'aucune'} · Implant : ${CATALOGUE[gear.implant]?.name ?? 'aucun'}.`));
     const classCopy = element('div', 'rb-class-details');
     classCopy.append(element('p', 'rb-class-resource', classResources(p, state.players)));
     for (const [name, description] of classAbilities(p)) {
@@ -348,6 +358,11 @@ export function mountMatch(root, callbacks = {}) {
   function render(events = []) {
     lastTurnEvents = events;
     renderPlaybackStatus();
+    for (const [index, team] of state.teams.entries()) {
+      const color = team.kitColor ?? KIT_COLORS[index];
+      root.style.setProperty(`--rb-${team.id}`, readableKit(color)); root.style.setProperty(`--rb-kit-${team.id}`, color);
+    }
+    if (!started) for (const [i, p] of state.players.filter((p) => p.teamId === 'home').entries()) rowControls[i].portrait.replaceChildren(playerPortrait(p, colorInput.value));
     const holder = state.players.find((p) => p.id === state.ball.carrierId);
     phaseText.textContent = state.finished ? 'Coup de sifflet final' : state.phase === 'final' ? 'Dernier engagement' : state.phase === 'overtime' ? `Prolongation ${state.round - 10}/2` : `Round ${state.round}/10`;
     timeText.textContent = state.finished ? '00:00' : state.round > 10 ? '+06' : `00:${String((11 - state.round) * 6).padStart(2, '0')}`;
@@ -409,6 +424,7 @@ export function mountMatch(root, callbacks = {}) {
   }
   setup.addEventListener('submit', (event) => { event.preventDefault(); launch(config()); });
   strategySelect.addEventListener('change', updatePreview); seedInput.addEventListener('change', updatePreview);
+  colorInput.addEventListener('input', updatePreview);
   reroll.addEventListener('click', () => {
     const value = new Uint32Array(1); crypto.getRandomValues(value); seedInput.value = `arche-${value[0].toString(36)}`; updatePreview();
   });

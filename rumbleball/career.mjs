@@ -1,6 +1,7 @@
 import { PROFILES, ROLES, INSTRUCTIONS, STRATEGIES, clone } from './data.mjs';
 import { createMatch, simulateMatch, seedHash } from './engine.mjs';
 import { compilePlayer, recruitmentPrice, salary, levelOf, progressPlayer, CATALOGUE, XP_THRESHOLDS } from './progression.mjs';
+import { KIT_COLORS, clubKit, validKitColor } from './appearance.mjs';
 
 export const SEASON_PRIZES = [600, 400, 200, 100, 100, 100];
 const CLUBS = [
@@ -59,10 +60,11 @@ export function standings(career) {
   }
   return rows.sort((a, b) => b.points - a.points || b.wins - a.wins || career.tieOrder.indexOf(a.clubId) - career.tieOrder.indexOf(b.clubId));
 }
-export function createCareer(name, seed = 'career-01') {
+export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0]) {
   need(typeof name === 'string' && name.trim().length > 0 && name.trim().length <= 80, 'Donnez au club un nom de 1 à 80 caractères.');
+  need(validKitColor(kitColor), 'Couleur de maillot invalide.');
   const career = { version: 1, seed: String(seed).slice(0, 80), status: 'draft', balance: 2400, season: 1, day: 0, completedDays: 0,
-    clubs: [{ id: 'club', name: name.trim(), style: 'Votre club', strategy: 'balanced', players: [] }, ...CLUBS.map(([clubName, style, strategy, profiles], index) => ({ id: `ai-${index}`, name: clubName, style, strategy,
+    clubs: [{ id: 'club', name: name.trim(), kitColor, style: 'Votre club', strategy: 'balanced', players: [] }, ...CLUBS.map(([clubName, style, strategy, profiles], index) => ({ id: `ai-${index}`, name: clubName, kitColor: KIT_COLORS[index + 1], style, strategy,
       players: profiles.map((profile, number) => { const p = player(`ai-${index}-${number}`, `${PROFILES[profile].name} ${number + 1}`, profile); if ([1, 4].includes(index)) p.instruction = 'aggressive'; if (index === 1) p.role = number < 3 ? 'blocker' : p.role; if (index === 3 && number < 3) p.role = 'relay'; return p; }) }))],
     lineup: [], inventory: [], transactions: [], market: [], schedule: [], tieOrder: [], current: null, seasonHistory: [] };
   career.market = generateMarket(career, true);
@@ -83,6 +85,10 @@ export function configureTeam(input, lineup, assignments, strategy) {
   need(Object.hasOwn(STRATEGIES, strategy), 'Plan collectif inconnu.');
   for (const p of ownedPlayers(c)) { const a = assignments[p.id]; if (!a) continue; need(Object.hasOwn(ROLES, a.role) && Object.hasOwn(INSTRUCTIONS, a.instruction), 'Consigne inconnue.'); p.role = a.role; p.instruction = a.instruction; }
   c.lineup = [...lineup]; team(c).strategy = strategy; return c;
+}
+export function setClubColor(input, color) {
+  const c = clone(input); need(!managementLocked(c), 'La gestion est verrouillée pendant la rencontre.');
+  need(validKitColor(color), 'Couleur de maillot invalide.'); team(c).kitColor = color.toLowerCase(); return c;
 }
 export function recruit(input, id) {
   const c = clone(input); editable(c); need(ownedPlayers(c).length < 8, 'Effectif complet : huit joueurs maximum.');
@@ -124,7 +130,7 @@ export function aiLineup(club) {
 function matchConfig(c, fixture) {
   // Keep the managed club on the left of the broadcast, even in an away fixture.
   const home = team(c), away = c.clubs.find((club) => club.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
-  return { seed: fixture.seed, teamNames: { home: home.name, away: away.name }, strategy: home.strategy, awayStrategy: away.strategy,
+  return { seed: fixture.seed, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home), away: clubKit(away, c.clubs.indexOf(away)) }, strategy: home.strategy, awayStrategy: away.strategy,
     rosters: { home: c.lineup.map((id) => compilePlayer(home.players.find((p) => p.id === id), c.inventory)), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id))) } };
 }
 export function launchCareerMatch(input) {
@@ -155,7 +161,7 @@ export function settleCareerMatch(input) {
   const progress = recordFixture(c, fixture, current.state, 'club', awayId);
   for (const other of c.schedule[c.day].filter((f) => f.id !== fixture.id)) {
     const home = c.clubs.find((club) => club.id === other.homeId), away = c.clubs.find((club) => club.id === other.awayId);
-    const state = simulateMatch({ seed: other.seed, teamNames: { home: home.name, away: away.name }, strategy: home.strategy, awayStrategy: away.strategy,
+    const state = simulateMatch({ seed: other.seed, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home, c.clubs.indexOf(home)), away: clubKit(away, c.clubs.indexOf(away)) }, strategy: home.strategy, awayStrategy: away.strategy,
       rosters: { home: aiLineup(home).map((id) => compilePlayer(home.players.find((p) => p.id === id))), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id))) } }).state;
     recordFixture(c, other, state, home.id, away.id);
   }

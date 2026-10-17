@@ -63,13 +63,14 @@
 .rb-setup-head { display: flex; justify-content: space-between; align-items: start; gap: 1.25rem; margin-bottom: 1.25rem; }
 .rb-setup-head p { margin-top: .4rem; }
 .rb-setup-head .rb-eyebrow { margin: 0 0 .5rem; }
-.rb-setup-head > .rb-field { flex: 0 1 12rem; }
+.rb-setup-head > .rb-kit-options { flex: 0 1 21rem; }
 .rb-field { display: flex; flex-direction: column; gap: .35rem; min-width: 0; font-size: .8125rem; color: var(--muted); }
 .rb select, .rb input { width: 100%; min-height: 2.75rem; min-width: 0; border: 1px solid #4a5950; border-radius: 2px; background: #101815; color: var(--text); padding: .5rem .65rem; font: inherit; font-size: .9375rem; }
 .rb select { color-scheme: dark; }
 .rb input[name='rb-seed'] { font-family: Consolas, monospace; letter-spacing: .03em; }
 .rb .rb-setup-row { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(8rem, 1fr) minmax(7rem, .8fr); gap: .4rem 1rem; align-items: center; padding: 1rem 0; border-top: 1px solid var(--rb-line); }
 .rb-identity { display: flex; gap: .75rem; min-width: 0; align-items: center; }
+.rb-identity > div { min-width: 0; }
 .rb-identity strong { font-size: 1rem; }
 .rb-identity strong, .rb-identity small { display: block; overflow-wrap: anywhere; }
 .rb-identity small { color: var(--muted); margin-top: .2rem; }
@@ -80,8 +81,7 @@
 .rb-class-details { margin-top: .75rem; font-size: .875rem; line-height: 1.6; }
 .rb-class-details p + p { margin-top: .5rem; }
 .rb-class-resource { grid-column: 1 / -1; color: #c8dcb4; overflow-wrap: anywhere; }
-.rb-number { display: grid; place-items: center; flex: 0 0 2rem; height: 2.35rem; border: 1px solid #4d7668; border-bottom: 3px solid var(--rb-home); background: #202f29; font: 700 1.3rem 'Rajdhani', sans-serif; }
-.rb-role-description { grid-column: 1/-1; padding-left: 2.75rem; color: var(--muted); font-size: .8125rem; line-height: 1.5; }
+.rb-role-description { grid-column: 1/-1; padding-left: 4.75rem; color: var(--muted); font-size: .8125rem; line-height: 1.5; }
 .rb-setup-foot { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-top: .75rem; }
 .rb-seed { flex: 1 1 11rem; max-width: 19rem; }
 .rb-setup > .rb-muted { margin-top: .85rem; font-size: .8125rem; line-height: 1.6; }
@@ -127,9 +127,7 @@
 .rb-center-line, .rb-center-circle { stroke: #c2cbb1; stroke-width: 1.8; fill: none; opacity: .35; }
 .rb-pitch-stamp { fill: #d2d8bd; opacity: .08; font-family: 'Rajdhani', Arial, sans-serif; font-size: 62px; font-weight: 700; letter-spacing: 4px; }
 .rb-pawn { cursor: pointer; }
-.rb-pawn-shell { fill: #111b18; stroke: currentColor; stroke-width: 1; }
-.rb-pawn-disc { fill: currentColor; stroke: #111b18; stroke-width: 2; }
-.rb-pawn-number { fill: #101b17; font-family: 'Space Grotesk', Arial, sans-serif; font-size: 22px; font-weight: 700; }
+.rb-pawn-number { fill: #fff8df; stroke: #132124; stroke-width: 2; paint-order: stroke; font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; }
 .rb-pawn-ring { fill: none; stroke: none; }
 .rb-pawn.is-selected .rb-pawn-ring { stroke: var(--rb-ball); stroke-width: 3; stroke-dasharray: none; }
 .rb-pawn:focus-visible .rb-pawn-ring { stroke: var(--rb-ball); stroke-width: 3; stroke-dasharray: none; }
@@ -138,10 +136,7 @@
 .rb-turn-marker-corners { stroke: #f0eee2; stroke-width: 3.5; }
 .rb-pawn-health-track { fill: #0b1310; }
 .rb-pawn-health { fill: currentColor; }
-.rb-pawn.is-ko { opacity: .3; }
-.rb-pawn.is-ko .rb-pawn-disc { fill: #7e8880; }
-.rb-prone-mark { display: none; fill: none; stroke: #142019; stroke-width: 2.5; }
-.rb-pawn.is-prone:not(.is-ko) .rb-prone-mark { display: block; }
+.rb-pawn.is-ko { opacity: .45; }
 .rb-court-links, .rb-court-effects { pointer-events: none; }
 .rb-grapple-link { fill: none; stroke: #c8dcb4; stroke-width: 4; stroke-dasharray: 5 3; }
 .rb-chain-link { fill: #17201a; stroke: #c8dcb4; stroke-width: 2; }
@@ -168,8 +163,8 @@
 .rb-legend { display: flex; flex-wrap: wrap; gap: .5rem 1rem; margin: .75rem 0; font-size: .75rem; color: var(--muted); }
 .rb-legend span { display: inline-flex; gap: .4rem; align-items: center; }
 .rb-swatch { display: inline-block; width: .65rem; height: .65rem; }
-.rb-swatch-home { background: var(--rb-home); border-radius: 50%; }
-.rb-swatch-away { background: var(--rb-away); transform: rotate(45deg); }
+.rb-swatch-home { background: var(--rb-kit-home, var(--rb-home)); border: 1px solid #d1ded2; border-radius: 50%; }
+.rb-swatch-away { background: var(--rb-kit-away, var(--rb-away)); border: 1px solid #d1ded2; transform: rotate(45deg); }
 .rb-swatch-ball { background: var(--rb-ball); border-radius: 50%; }
 .rb-swatch-wet { background: #466874; }
 .rb-swatch-impact { background: #ff9a87; }
@@ -263,7 +258,7 @@
   #outils-rumbleball .rb-hero h2 { font-size: clamp(2.2rem, 11vw, 4rem); }
   .rb-hero .rb-hero-meta { margin-top: 1rem; }
   .rb-setup-head { flex-direction: column; }
-  .rb-setup-head > .rb-field { flex-basis: auto; width: 100%; }
+  .rb-setup-head > .rb-kit-options { flex-basis: auto; width: 100%; }
   .rb .rb-setup-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
   .rb-identity { grid-column: 1/-1; }
   .rb-role-description { padding-left: 0; }
@@ -347,6 +342,17 @@
 .rb-career .rb-button, .rb-career-dialog .rb-button { white-space: normal; overflow-wrap: anywhere; text-align: left; }
 .rb-team-copy { min-width: 0; overflow-wrap: anywhere; }
 .rb-result h3, .rb-roster h3 { overflow-wrap: anywhere; }
+.rb-player-portrait { display: block; width: 4rem; height: auto; flex: 0 0 4rem; overflow: visible; pointer-events: none; }
+.rb-portrait-wrap { flex: 0 0 4rem; }
+.rb-person-identity { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.rb-person-identity > div { min-width: 0; }
+.rb-person-identity strong, .rb-person-identity small { display: block; }
+.rb-kit-options { display: flex; align-items: end; flex-wrap: wrap; gap: 1rem; }
+.rb-kit-options > .rb-field:first-child { flex: 1 1 11rem; }
+.rb-kit-preview { display: flex; gap: .5rem; flex-wrap: wrap; }
+.rb input.rb-kit-color { width: 5rem; height: 2.75rem; padding: .25rem; cursor: pointer; }
+.rb input.rb-kit-color:disabled { cursor: default; }
+.rb-candidate .rb-player-portrait { width: 3.25rem; flex-basis: 3.25rem; }
 @media (max-width: 680px) {
   .rb-candidate-list, .rb-career-roster, .rb-shop { grid-template-columns: minmax(0, 1fr); }
   .rb-club-header { display: grid; }
@@ -355,6 +361,7 @@
   .rb-career-finances > div:first-child dd { font-size: 1.5rem; }
   .rb-career-tabs .rb-button { flex: 1 1 8rem; }
   .rb-next-match .rb-button { width: 100%; }
+  .rb-setup-head .rb-kit-options { width: 100%; }
   .rb-candidate { grid-template-columns: auto minmax(0, 1fr); }
   .rb-candidate > span { grid-column: 2; }
 }

@@ -2,6 +2,7 @@ import { PROFILES, ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
 import { CATALOGUE } from './progression.mjs';
 import { assertInvariants } from './rules.mjs';
 import { createMatch } from './engine.mjs';
+import { validKitColor } from './appearance.mjs';
 
 export const CAREER_KEY = 'the-hub.rumbleball.career.v1';
 const check = (condition) => { if (!condition) throw new Error('Sauvegarde de carrière invalide ou incompatible.'); };
@@ -21,6 +22,7 @@ export function validateCareer(c) {
     check(!playerIds.has(p.id)); playerIds.add(p.id);
   };
   for (const [index, club] of c.clubs.entries()) {
+    check(club.kitColor === undefined || validKitColor(club.kitColor));
     check(name(club.id) && name(club.name) && name(club.style) && Object.hasOwn(STRATEGIES, club.strategy) && Array.isArray(club.players));
     check(index ? club.players.length === 7 : c.status === 'draft' ? club.players.length === 0 : club.players.length >= 5 && club.players.length <= 8);
     club.players.forEach(validatePlayer);
@@ -76,7 +78,7 @@ export function validateCareer(c) {
     check(m.config.rosters && ['home', 'away'].every((side) => Array.isArray(m.config.rosters[side]) && m.config.rosters[side].length === 5));
     check(name(m.config.teamNames?.home) && name(m.config.teamNames?.away));
     check(integer(m.state.rng) && m.state.rng <= 4294967295 && Array.isArray(m.state.teams) && m.state.teams.length === 2);
-    check(m.state.teams.every((t, i) => t.id === (i ? 'away' : 'home') && name(t.name) && Object.hasOwn(STRATEGIES, t.strategy)));
+    check(m.state.teams.every((t, i) => t.id === (i ? 'away' : 'home') && name(t.name) && Object.hasOwn(STRATEGIES, t.strategy) && (t.kitColor === undefined || validKitColor(t.kitColor))));
     check(['regular', 'overtime', 'final'].includes(m.state.phase));
     if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, 10));
     else check(m.state.result === null);

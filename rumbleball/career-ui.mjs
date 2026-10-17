@@ -1,8 +1,10 @@
 import { ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
 import { archetypeLabel, classAbilities } from './classes.mjs';
 import { CATALOGUE, XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice } from './progression.mjs';
-import { createCareer, confirmDraft, configureTeam, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
+import { createCareer, confirmDraft, configureTeam, setClubColor, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
 import { loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
+import { KIT_COLORS, clubKit } from './appearance.mjs';
+import { playerPortrait } from './visuals.mjs';
 
 const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}`, text); b.type = 'button'; b.addEventListener('click', action); return b; };
@@ -10,6 +12,13 @@ const field = (label, control) => { const node = el('label', 'rb-field', label);
 const select = (values, value) => { const node = el('select'); for (const [key, text] of Object.entries(values)) { const option = el('option', '', text); option.value = key; option.selected = key === String(value); node.append(option); } return node; };
 const money = (n) => `${n.toLocaleString('fr-FR')} chromas`;
 const signed = (n) => `${n >= 0 ? '+' : ''}${n}`;
+function kitPicker(value, disabled = false) {
+  const input = el('input', 'rb-kit-color'); input.type = 'color'; input.value = value; input.disabled = disabled; input.setAttribute('aria-label', 'Couleur des maillots'); return input;
+}
+function portraitIdentity(p, color, ...copy) {
+  const identity = el('div', 'rb-person-identity'), text = el('div'); text.append(...copy);
+  identity.append(playerPortrait(p, color), text); return identity;
+}
 function table(headers, rows) {
   const wrap = el('div', 'rb-table-scroll'), t = el('table', 'rb-stats-table'), head = el('thead'), body = el('tbody'), hr = el('tr');
   for (const text of headers) { const th = el('th', '', text); th.scope = 'col'; hr.append(th); } head.append(hr);
@@ -114,39 +123,44 @@ export function mountCareer(root, mountMatch) {
   function renderCreation() {
     const form = el('form', 'rb-career-create'), input = el('input'); input.required = true; input.maxLength = 80; input.placeholder = 'Les Rebuts du Chrome';
     form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', '2 400 chromas pour recruter cinq à huit joueurs. Une ligue de six clubs, dix journées par saison, cinq titulaires par match. Votre carrière est sauvegardée dans ce navigateur.'), field('Nom du club', input));
+    const color = kitPicker(KIT_COLORS[0]), preview = el('div', 'rb-kit-preview');
+    const showKit = () => preview.replaceChildren(...[0, 1, 2, 4].map((profile) => playerPortrait(compilePlayer({ id: `preview-${profile}`, name: 'Aperçu', profile, xp: 0, fatigue: 0 }), color.value)));
+    color.addEventListener('input', showKit); showKit(); form.append(field('Couleur des maillots', color), preview);
     let replace;
     if (loaded.hasSave) { replace = el('input'); replace.type = 'checkbox'; replace.required = true; form.append(field('Remplacer la sauvegarde existante, après avoir conservé une copie si nécessaire.', replace)); }
     const submit = btn('Choisir les premières recrues', () => {}, true); submit.type = 'submit'; form.append(submit);
-    form.addEventListener('submit', (event) => { event.preventDefault(); const seed = `club-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`; update(() => createCareer(input.value, seed)); });
+    form.addEventListener('submit', (event) => { event.preventDefault(); const seed = `club-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`; update(() => createCareer(input.value, seed, color.value)); });
     manager.append(form);
   }
   function renderDraft() {
     manager.append(el('p', 'rb-eyebrow', career.clubs[0].name), el('h3', '', 'Choisir votre effectif initial'), el('p', 'rb-muted', 'Sélection réversible. Les contrats sont payés ensemble à la validation. Les cinq premières recrues sélectionnées seront titulaires ; leur ordre restera modifiable.'));
+    const color = kitPicker(clubKit(career.clubs[0])); color.addEventListener('change', () => update(() => setClubColor(career, color.value))); manager.append(field('Couleur des maillots', color));
     const list = el('div', 'rb-candidate-list'), footer = el('div', 'rb-draft-total'), total = el('strong'), confirm = btn('Valider les contrats', () => update(() => confirmDraft(career, [...draftIds])), true);
     function totals() { const cost = career.market.filter((p) => draftIds.has(p.id)).reduce((sum, p) => sum + recruitmentPrice(p), 0); total.textContent = `${draftIds.size}/8 joueurs · ${money(cost)} · reste ${money(2400 - cost)}`; confirm.disabled = draftIds.size < 5 || draftIds.size > 8 || cost > 2400; }
     for (const p of career.market) {
       const row = el('label', 'rb-candidate'), checkbox = el('input'); checkbox.type = 'checkbox'; checkbox.checked = draftIds.has(p.id);
       checkbox.addEventListener('change', () => { if (checkbox.checked) draftIds.add(p.id); else draftIds.delete(p.id); totals(); });
       const compiled = compilePlayer(p), copy = el('div'); copy.append(el('strong', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled)), el('small', 'rb-muted', stats(compiled)));
-      row.append(checkbox, copy, el('span', '', money(recruitmentPrice(p)))); list.append(row);
+      row.append(checkbox, portraitIdentity(compiled, clubKit(career.clubs[0]), copy), el('span', '', money(recruitmentPrice(p)))); list.append(row);
     }
     totals(); footer.append(total, confirm); manager.append(list, footer);
   }
   function renderRoster(locked) {
     manager.append(el('h3', '', `Effectif · ${ownedPlayers(career).length}/8 joueurs`), el('p', 'rb-muted', 'Cinq titulaires dans l’ordre de leur position de départ. Les remplaçants récupèrent 3 fatigue et gagnent 4 XP ; les titulaires gagnent 10 XP. Aucun remplacement pendant le match.'), el('p', 'rb-muted', 'Fatigue 3–4 : −1,5 m. Fatigue 5–6 : même réduction et −1 en Lutte, Athlétisme et Acrobaties. Un KO ajoute 1 fatigue.'));
     const form = el('form', 'rb-lineup-form'), strategy = select(STRATEGIES, career.clubs[0].strategy); strategy.disabled = locked;
-    form.append(field('Plan collectif', strategy));
+    const color = kitPicker(clubKit(career.clubs[0]), locked), kitOptions = el('div', 'rb-kit-options'); kitOptions.append(field('Plan collectif', strategy), field('Couleur des maillots', color)); form.append(kitOptions);
     const lineup = el('div', 'rb-lineup-slots'), slotControls = [];
     const names = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, p.name]));
     for (const [i, id] of career.lineup.entries()) { const s = select(names, id); s.disabled = locked; slotControls.push(s); lineup.append(field(`Titulaire ${i + 1}`, s)); }
     form.append(lineup);
-    const assignments = {}, statusLabels = new Map(), list = el('div', 'rb-career-roster');
+    const assignments = {}, statusLabels = new Map(), portraits = new Map(), list = el('div', 'rb-career-roster');
     for (const p of ownedPlayers(career)) {
       const compiled = compilePlayer(p, career.inventory), level = levelOf(p), row = el('section', 'rb-career-player'), heading = el('div', 'rb-career-player-head'), info = el('div');
       const index = career.lineup.indexOf(p.id);
       const statusLabel = el('small', 'rb-muted', index < 0 ? 'Remplaçant' : `Titulaire ${index + 1}`); statusLabels.set(p.id, statusLabel);
       info.append(el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled)), statusLabel);
-      heading.append(info, el('strong', '', `Niveau ${level}`)); row.append(heading);
+      const portrait = el('div', 'rb-portrait-wrap'); portrait.append(playerPortrait(compiled, color.value)); portraits.set(p.id, portrait);
+      const identity = el('div', 'rb-person-identity'); identity.append(portrait, info); heading.append(identity, el('strong', '', `Niveau ${level}`)); row.append(heading);
       const xp = el('progress'); xp.max = level === 5 ? 140 : XP_THRESHOLDS[level]; xp.value = Math.min(p.xp, xp.max); xp.setAttribute('aria-label', `XP de ${p.name}`);
       row.append(el('p', 'rb-muted', `${p.xp} XP${level === 5 ? ' · niveau maximum' : ` / ${XP_THRESHOLDS[level]} pour le niveau ${level + 1}`} · Fatigue ${p.fatigue}/6 · Salaire ${money(salary(p))}`), xp, el('p', '', stats(compiled)));
       const protection = career.inventory.find((item) => item.playerId === p.id);
@@ -163,8 +177,10 @@ export function mountCareer(root, mountMatch) {
     const formNotice = el('p', 'rb-muted', 'Composition et consignes sont enregistrées automatiquement. Choisir un titulaire déjà présent échange leurs positions.'); form.append(formNotice);
     function commitLineup() {
       career = configureTeam(career, slotControls.map((s) => s.value), Object.fromEntries(Object.entries(assignments).map(([id, controls]) => [id, { role: controls.role.value, instruction: controls.instruction.value }])), strategy.value);
+      career = setClubColor(career, color.value);
       const saved = save();
       for (const [id, label] of statusLabels) { const index = career.lineup.indexOf(id); label.textContent = index < 0 ? 'Remplaçant' : `Titulaire ${index + 1}`; }
+      for (const p of ownedPlayers(career)) portraits.get(p.id).replaceChildren(playerPortrait(compilePlayer(p, career.inventory), color.value));
       formNotice.textContent = saved ? 'Composition et consignes enregistrées.' : 'Composition modifiée en mémoire ; sauvegarde à réessayer.';
     }
     for (const [index, control] of slotControls.entries()) control.addEventListener('change', () => {
@@ -180,7 +196,7 @@ export function mountCareer(root, mountMatch) {
     const list = el('div', 'rb-career-roster');
     for (const p of career.market) {
       const row = el('section', 'rb-career-player'), compiled = compilePlayer(p);
-      row.append(el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled)), el('p', '', `Niveau ${levelOf(p)} · ${stats(compiled)}`), el('p', 'rb-muted', `Salaire : ${money(salary(p))} par journée. Arrive avec une fatigue de 0/6 et sans équipement.`));
+      row.append(portraitIdentity(compiled, clubKit(career.clubs[0]), el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled))), el('p', '', `Niveau ${levelOf(p)} · ${stats(compiled)}`), el('p', 'rb-muted', `Salaire : ${money(salary(p))} par journée. Arrive avec une fatigue de 0/6 et sans équipement.`));
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length === 8 ? 'Effectif complet : huit joueurs maximum.' : purchaseBlock(career, recruitmentPrice(p));
       row.append(blocked(btn(`Recruter · ${money(recruitmentPrice(p))}`, () => update(() => recruit(career, p.id)), true), reason)); if (reason) row.append(el('small', 'rb-muted', reason)); list.append(row);
     }
@@ -193,12 +209,13 @@ export function mountCareer(root, mountMatch) {
     picker.addEventListener('change', () => { selectedShopPlayer = picker.value; renderManagement(); });
     const p = players.find((p) => p.id === selectedShopPlayer), before = compilePlayer(p, career.inventory);
     manager.append(el('h3', '', 'Équipement sportif'), field('Joueur pour la comparaison et l’achat', picker), el('p', 'rb-muted', 'Un emplacement de protection et un implant par joueur. Les protections se transfèrent gratuitement. Les implants sont attachés au joueur et ne se revendent pas séparément.'));
+    manager.append(portraitIdentity(before, clubKit(career.clubs[0]), el('strong', '', p.name), el('small', 'rb-muted', 'Équipement actuel')));
     const list = el('div', 'rb-shop');
     for (const [id, item] of Object.entries(CATALOGUE)) {
       const row = el('section', 'rb-career-player'), afterPlayer = structuredClone(p), afterInventory = structuredClone(career.inventory);
       if (item.slot === 'implant') afterPlayer.implant = id;
       else { for (const old of afterInventory) if (old.playerId === p.id) old.playerId = null; afterInventory.push({ id: 'preview', itemId: id, playerId: p.id }); }
-      row.append(el('small', 'rb-eyebrow', item.slot === 'implant' ? 'Implant' : 'Protection'), el('h4', '', item.name), el('p', '', item.effect), el('p', 'rb-muted', comparison(before, compilePlayer(afterPlayer, afterInventory))));
+      row.append(portraitIdentity(compilePlayer(afterPlayer, afterInventory), clubKit(career.clubs[0]), el('small', 'rb-eyebrow', item.slot === 'implant' ? 'Implant · après achat' : 'Protection · après achat'), el('h4', '', item.name)), el('p', '', item.effect), el('p', 'rb-muted', comparison(before, compilePlayer(afterPlayer, afterInventory))));
       if (p.implant && item.slot === 'implant') row.append(el('p', 'rb-career-debt', `Remplace et détruit : ${CATALOGUE[p.implant].name}.`));
       const reason = purchaseBlock(career, item.price);
       row.append(blocked(btn(`Acheter pour ${p.name} · ${money(item.price)}`, () => {

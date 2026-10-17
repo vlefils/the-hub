@@ -235,3 +235,37 @@ test('match complet à x8 : aucun effet coupé, balle et états finaux exacts, e
   assert.ok(count > 40); assert.ok(extendedTurns > 0);
 });
 function playerPosition(frame, id) { return frame.players.find((p) => p.id === id).position; }
+
+test('personnages : orientation par segment puis frappe vers la cible, sans modifier le moteur', () => {
+  const { before, after, a, b } = fixture(), path = [{ x: 2, y: 3 }, { x: 3, y: 3 }];
+  p(after, a.id).position = path.at(-1);
+  const events = [event('move', { playerId: a.id, path }), event('attack', { playerId: a.id, targetId: b.id }), event('miss')];
+  const original = structuredClone({ before, after, events }), plan = buildCourtPlayback(before, after, events);
+  const first = sampleCourtPlayback(plan, plan.stages[0].end / 2);
+  assert.equal(p(first, a.id).facing, 180); assert.equal(p(first, a.id).walking, true);
+  const second = sampleCourtPlayback(plan, plan.stages[1].start + 10); assert.equal(p(second, a.id).facing, 90);
+  const strike = plan.gestures.find((g) => g.kind === 'strike'), frame = sampleCourtPlayback(plan, strike.start + strike.duration / 2);
+  assert.equal(p(frame, a.id).facing, 0); assert.equal(p(frame, a.id).gesture.kind, 'strike'); assert.equal(p(frame, a.id).walking, false);
+  assert.equal(p(sampleCourtPlayback(plan, plan.duration), a.id).gesture, undefined);
+  assert.deepEqual({ before, after, events }, original);
+});
+
+test('personnages : lancer et réception se font face et les gestes suivent les vitesses', () => {
+  const { before, after, a, b } = fixture(); before.ball.carrierId = a.id; after.ball.carrierId = b.id;
+  const events = [event('pass', { playerId: a.id, targetId: b.id }), event('possession', { playerId: b.id, reason: 'reçoit' })];
+  const slow = buildCourtPlayback(before, after, events), fast = buildCourtPlayback(before, after, events, { speed: 8 });
+  assert.deepEqual(fast.gestures, slow.gestures.map((g) => ({ ...g, start: g.start / 8, duration: g.duration / 8 })));
+  const frame = sampleCourtPlayback(slow, 250); assert.equal(p(frame, a.id).facing, 90); assert.equal(p(frame, b.id).facing, 270);
+  assert.equal(p(frame, a.id).gesture.kind, 'throw'); assert.equal(p(frame, b.id).gesture.kind, 'receive');
+});
+
+test('personnages : pause retire les gestes en conservant l’orientation ; animations réduites immédiates', () => {
+  const { before, after, a, b } = fixture(), events = [event('attack', { playerId: a.id, targetId: b.id }), event('miss')];
+  const c = clock(), frames = [], playback = createCourtPlayback((f) => frames.push(f), { ...c, reducedMotion: () => false });
+  playback.show(before); playback.play(before, after, events); c.step(150);
+  assert.equal(p(frames.at(-1), a.id).gesture.kind, 'strike'); playback.settle();
+  assert.equal(p(frames.at(-1), a.id).gesture, undefined); assert.equal(p(frames.at(-1), a.id).facing, 90); assert.equal(c.pending.size, 0);
+  playback.show(after); assert.equal(p(frames.at(-1), a.id).facing, 90);
+  const reduced = createCourtPlayback((f) => frames.push(f), { ...c, reducedMotion: () => true });
+  assert.equal(reduced.play(before, after, events), 0); assert.equal(p(frames.at(-1), a.id).gesture, undefined); assert.equal(c.pending.size, 0);
+});

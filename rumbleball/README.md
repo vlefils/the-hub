@@ -29,7 +29,7 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prot
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs rumbleball/appearance.test.mjs
 ```
 
 Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
@@ -43,6 +43,7 @@ Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 2
 - `data.mjs` : profils, rôles, consignes et terrain.
 - `classes.mjs` : les quatre archétypes, leurs techniques, ressources initiales et textes partagés avec l’interface.
 - `progression.mjs` : compilation pure, niveaux, fatigue, salaires et catalogue sportif.
+- `appearance.mjs` : identité visuelle déterministe, couleurs de club, tenue adverse de contraste et armes illustrées ; aucun tirage de la simulation.
 - `career.mjs` : transitions pures de carrière, finances, calendrier et règlement des journées.
 - `career-storage.mjs` : validation, sauvegarde atomique et export/import JSON.
 - `career-ui.mjs` : gestion du club ; utilise le lecteur de match de `ui.mjs` pour préserver terrain, animations et journal.
@@ -56,7 +57,13 @@ Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 2
 - `court-effects.mjs` : liens de lutte et effets SVG brefs (frappe, réaction, dégâts, raté, KO, possession et plaquage).
 - `assets/arena-banner.webp` : illustration d’arène (154 Ko). Le [prompt de génération](assets/README.md) est conservé avec le visuel.
 
-L’habillage reste limité à `#outils-rumbleball` et aux composants `rb-*`. Turquoise et orange identifient les équipes ; les pions ont également des formes différentes. Le jaune marque le ballon, la sélection et les réactions. Les PV des pions et le nombre de joueurs encore en jeu reprennent l’état de la simulation. La bannière se sépare du texte sur petit écran ; le journal passe sous le terrain. Les illustrations et marquages décoratifs sont ignorés par les lecteurs d’écran.
+L’habillage reste limité à `#outils-rumbleball` et aux composants `rb-*`. Les maillots identifient les équipes ; le numéro reste droit, dans un rond pour votre club et un losange pour l’adversaire. Le jaune marque le ballon, la sélection et les réactions. Les PV des joueurs et le nombre de joueurs encore en jeu reprennent l’état de la simulation. La bannière se sépare du texte sur petit écran ; le journal passe sous le terrain. Les illustrations et marquages décoratifs sont ignorés par les lecteurs d’écran.
+
+Les personnages SVG sont dessinés de dessus avec une silhouette compacte : teintes de peau, couleurs et coiffures variées, carrure des Béliers et brassard du Capitaine. L’identité dépend de l’identifiant permanent, sans changer au recrutement, en déplaçant un titulaire, après un achat ou un rechargement. La couleur du club se choisit à la création et dans **Effectif**, gratuitement ; elle se conserve en JSON. L’Exhibition dispose de son propre choix. Si les couleurs sont proches, l’adversaire porte une autre tenue pour cette rencontre. Les anciens exports restent compatibles, avec les couleurs par défaut.
+
+Matraque, massue ou tonfa représentent les attaques de base existantes ; elles n’ajoutent aucune mécanique d’arme. Les quatre protections et quatre implants ont chacun un détail visible : plastron, épaulières, gants, semelles, jambes mécaniques, fibres au bras, viseur ou régulateur dorsal. Les portraits du recrutement, de l’effectif et des comparaisons d’achat utilisent le même dessin que le terrain. Les gestes suivent les événements : course, frappe, lancer, réception, prise et appel. Les personnages s’orientent vers leur déplacement ou leur cible et s’aplatissent au sol. La pause retire les gestes transitoires ; les préférences d’animations réduites sont respectées.
+
+`node tools/rumbleball-character-preview.mjs` génère la [planche SVG des personnages](../mockups/rumbleball-characters.svg), avec les équipements, poses et deux tailles de lecture. C’est un aperçu des dessins seuls, sans navigateur. Les tests d’apparence vérifient identité, équipement transféré, tenue sauvegardée, contraste, actualisation du terrain et conservation du focus. Le rendu complet et le responsive demandent encore une vérification dans un navigateur.
 
 Quatre coins blancs suivent le joueur dont le tour est affiché, y compris pendant ses déplacements et les réactions adverses. Ce repère reste visible si le joueur est sélectionné ou mis KO pendant son tour. Son nom apparaît près des commandes, et sa place dans l’initiative porte le même accent blanc ; les boutons correspondants exposent aussi `aria-current`.
 

@@ -31,6 +31,7 @@ export function compilePlayer(player, inventory = []) {
   result.skills[skill] += Number(level >= 2) + Number(level >= 4);
   if (base.archetype === 'escamoteur') result.speed += 1.5 * tiers;
   const protection = inventory.find((item) => item.playerId === player.id);
+  result.visualGear = { protection: protection?.itemId ?? null, implant: player.implant ?? null };
   for (const id of [protection?.itemId, player.implant]) {
     const item = CATALOGUE[id];
     if (!item) continue;

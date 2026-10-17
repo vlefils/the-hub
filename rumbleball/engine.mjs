@@ -1,6 +1,7 @@
 import { clone, PROFILES, STARTS, ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
 import { decideClassAction, decideMovement, decideTurn } from './ai.mjs';
 import { ARCHETYPES, initialClassState } from './classes.mjs';
+import { matchKits } from './appearance.mjs';
 import { assertInvariants, beginTurn, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, stat } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
@@ -18,12 +19,13 @@ function centerBall(state) {
 }
 export function createMatch(config = {}) {
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
+  const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
   const state = {
     version: 2, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
     phase: 'regular', finished: false, result: null, turns: 0, aids: [], calls: [], lastDecision: null,
     teams: [
-      { id: 'home', name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced' },
-      { id: 'away', name: config.teamNames?.away ?? 'Les Charognards', strategy: Object.hasOwn(STRATEGIES, config.awayStrategy) ? config.awayStrategy : 'balanced' },
+      { id: 'home', kitColor: kits.home, name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced' },
+      { id: 'away', kitColor: kits.away, name: config.teamNames?.away ?? 'Les Charognards', strategy: Object.hasOwn(STRATEGIES, config.awayStrategy) ? config.awayStrategy : 'balanced' },
     ],
     stats: { home: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 }, away: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 } },
     players: ['home', 'away'].flatMap((teamId) => {
