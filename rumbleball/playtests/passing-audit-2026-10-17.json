@@ -1,0 +1,42 @@
+{
+  "baseline": "83e3981",
+  "scenarios": 24,
+  "workingSourcesSha256": {
+    "ai.mjs": "89bf40c3f8d53a5ec637e885f3a090aa7c3e1731d513d93bc484ce46b9fc59be",
+    "rules.mjs": "10cb9f862e99d6c4e51233cff85b2f007bfee9b8d0dc27ae847e283b95cb8287"
+  },
+  "measurements": {
+    "83e3981": {
+      "matches": 24,
+      "turns": 1641,
+      "completedPasses": 85,
+      "relayTurns": 34,
+      "relayMovementTurns": 34,
+      "relayReceptionsAfterMovement": 26,
+      "expiredPreparations": 7,
+      "passes": 120,
+      "reactionPasses": 69,
+      "adjacentReceivers": 8,
+      "markedReceivers": 17,
+      "pressuredPassers": 28,
+      "pressuredMobilePassers": 15,
+      "preparations": 90
+    },
+    "working": {
+      "matches": 24,
+      "turns": 1627,
+      "completedPasses": 71,
+      "relayTurns": 36,
+      "relayMovementTurns": 36,
+      "relayReceptionsAfterMovement": 24,
+      "expiredPreparations": 5,
+      "passes": 94,
+      "reactionPasses": 59,
+      "adjacentReceivers": 7,
+      "markedReceivers": 0,
+      "pressuredPassers": 8,
+      "pressuredMobilePassers": 4,
+      "preparations": 71
+    }
+  }
+}

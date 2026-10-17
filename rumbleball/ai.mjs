@@ -62,7 +62,9 @@ export function teamPlan(state, actor) {
   }
   if (holder.teamId === actor.teamId) {
     const rest = team.filter((p) => p.id !== holder.id);
-    const protector = state.version >= 5 ? [...rest].sort((a, b) => Number(b.role === 'blocker') - Number(a.role === 'blocker')
+    // With only two players left, a prepared pass needs the sole teammate as
+    // its receiver. Before preparation that player still protects the holder.
+    const protector = state.version >= 5 ? (rest.length === 1 && readiedPasser(state) ? [] : [...rest]).sort((a, b) => Number(b.role === 'blocker') - Number(a.role === 'blocker')
       || Number(a.role === 'relay' || a.archetype === 'passeur') - Number(b.role === 'relay' || b.archetype === 'passeur') || order(a, b))[0]
       : ranked(rest, 'blocker', ball)[0];
     const relay = ranked(rest.filter((p) => p.id !== protector?.id && p.reaction), 'relay', ball)[0];
@@ -138,6 +140,10 @@ function receiverRunValue(state, receiver) {
   return Math.min(30, (best - current) * .6);
 }
 function passScore(state, actor, receiver, precision = false, opening = null, runValue = 0) {
+  // A direct pass is useful as soon as an ally is free, including a short pass.
+  // Otherwise carry, get clear, or prepare a pass and wait for an actual outlet.
+  const marked = opponents(state, receiver).some((p) => distance(p.position, receiver.position) <= 1);
+  if (state.version >= 5 && (receiver.grappledBy || receiver.prone || marked)) return null;
   const source = possessionSafety(state, actor, actor.position), destination = possessionSafety(state, receiver, receiver.position);
   const improvement = destination + runValue - source;
   const preferCarrier = receiver.role === 'carrier' && actor.role !== 'carrier';
@@ -152,8 +158,11 @@ function passScore(state, actor, receiver, precision = false, opening = null, ru
   if (improvement <= 6 && !(preferCarrier && improvement >= 0) && !plannedRelay && !timelyRelay) return null;
   if (chance < .45) return null;
   const weight = carryWeight(state, actor), loss = 65 + Number(state.round >= 9) * 65;
-  const pressureRelief = Math.max(0, opponents(state, actor).filter((p) => distance(p.position, actor.position) <= 1).length
-    - opponents(state, receiver).filter((p) => distance(p.position, receiver.position) <= 1).length) * 20;
+  const pressure = opponents(state, actor).filter((p) => distance(p.position, actor.position) <= 1).length;
+  // Evaluate the release cell itself: rewarding pressure relief used to reward
+  // staying in contact to throw, even when the same pass had a safer run-up.
+  const pressureRelief = state.version >= 5 && actor.movement >= 1.5 && !actor.grappledBy ? -pressure * 20
+    : Math.max(0, pressure - opponents(state, receiver).filter((p) => distance(p.position, receiver.position) <= 1).length) * 20;
   const relayTempo = receiverNext ? Math.min(24, receiver.speed * (strategyOf(state, actor) === 'possession' ? 2 : 1)) : 0;
   // Replace the thrower's positional value with expected possession at the receiver.
   return chance * ((destination + runValue) * weight + keepBonus(state, actor) + Number(preferCarrier) * 15 + pressureRelief + relayTempo)
@@ -329,16 +338,18 @@ export function decideTurn(state, actor) {
   const candidates = [];
   const receiverRuns = new Map();
   const futureRuns = new Map();
+  const prospectiveSupports = state.version >= 5 && task === 'carry' && actor.reaction
+    ? supportFormation(state, plan.holder, allies(state, actor), allies(state, actor).length > 1 ? plan.protector : null) : new Map();
   const readyCells = new Set([cells.find((cell) => !cell.path.length), ...cells.slice(0, 5)].filter(Boolean));
   const readyValue = (entry) => {
     if (state.version < 5 || !actor.reaction || !readyCells.has(entry)) return null;
     let options = 0;
     for (const ally of allies(state, actor)) {
-      if (ally.grappledBy || ally.grappling || state.round >= 10 && state.initiative.indexOf(ally.id) <= state.turnIndex) continue;
+      if (!prospectiveSupports.has(ally.id) || ally.grappledBy || ally.grappling
+        || state.round >= 10 && state.initiative.indexOf(ally.id) <= state.turnIndex) continue;
       if (!futureRuns.has(ally.id)) {
         const runs = reachableCells(state, ally, ally.speed * (ally.prone ? .5 : 1))
-          .filter((run) => !opponents(state, ally).some((p) => distance(p.position, run.position) <= 1))
-          .sort((a, b) => safety(state, ally, b.position) - safety(state, ally, a.position) || a.cost - b.cost).slice(0, 8);
+          .filter((run) => !opponents(state, ally).some((p) => distance(p.position, run.position) <= 1));
         futureRuns.set(ally.id, runs);
       }
       const passer = { ...actor, position: entry.position };
@@ -369,7 +380,8 @@ export function decideTurn(state, actor) {
       if (!receiverRuns.has(target.id)) receiverRuns.set(target.id, receiverRunValue(state, target));
       const runValue = receiverRuns.get(target.id);
       const normal = passScore(view.state, view.actor, target, false, plan.opening, runValue);
-      const direct = !entry.path.length && plan.opening?.receivers.includes(target.id) ? 24 : 0;
+      const direct = !entry.path.length && plan.opening?.receivers.includes(target.id)
+        && (state.version < 5 || opponents(view.state, view.actor).every((p) => distance(p.position, entry.position) > 1)) ? 24 : 0;
       if (normal !== null) candidates.push({ path: entry.path, action, score: entry.score + normal + direct + objectiveBonus, task });
       const difficult = view.actor.grappledBy || opponents(view.state, view.actor).some((p) => distance(p.position, entry.position) <= 1)
         || interceptionCandidates(view.state, view.actor, target.position).length > 0;
