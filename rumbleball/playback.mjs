@@ -183,15 +183,18 @@ export const ROUND_DURATION = 12000;
 // This intentionally keeps a crowded duel ordered while distant play overlaps.
 export function buildRoundPlayback(turns, { speed = 1, facings = {} } = {}) {
   if (!turns.length) throw new Error('Un round à animer doit contenir au moins une étape.');
-  const initial = snapshot(turns[0].before, facings), available = new Map(), scheduled = [];
+  const initial = snapshot(turns[0].before, facings), available = new Map(), readyWindows = new Map(), scheduled = [];
   const headings = { ...facings }, ids = new Set(initial.players.map((p) => p.id));
   for (const turn of turns) {
     const plan = buildCourtPlayback(turn.before, turn.after, turn.events, { facings: headings, deferRestart: true });
     for (const p of plan.final.players) headings[p.id] = p.facing;
     const participants = new Set(), resources = new Set();
-    const references = (value) => {
+    const references = (value, key) => {
+      // The passer is a prerequisite of a support run, not a physical participant
+      // in it. Reader/writer windows below allow several supports to run together.
+      if (key === 'supportPasserId') return;
       if (typeof value === 'string' && ids.has(value)) participants.add(value);
-      else if (value && typeof value === 'object') for (const child of Object.values(value)) references(child);
+      else if (value && typeof value === 'object') for (const [childKey, child] of Object.entries(value)) references(child, childKey);
     };
     turn.events.forEach(references);
     for (const p of plan.final.players) if (JSON.stringify(p) !== JSON.stringify(player(plan.initial, p.id))) participants.add(p.id);
@@ -223,9 +226,25 @@ export function buildRoundPlayback(turns, { speed = 1, facings = {} } = {}) {
       || [plan.initial.ball.carrierId, plan.final.ball.carrierId].some((id) => id && participants.has(id))
       || turn.events.some((e) => ['pass', 'possession', 'drop'].includes(e.type) || ['pickup', 'strip'].includes(e.resolvedAction?.type));
     if (usesBall) { resources.add('ball'); cell(plan.initial.ball.position); cell(plan.final.ball.position); }
-    const start = Math.max(0, ...[...resources].map((r) => available.get(r) ?? 0));
+    const decision = turn.events.find((e) => e.type === 'decision');
+    const priorPasser = player(plan.initial, plan.initial.ball.carrierId);
+    // Old saved logs have no task metadata. Conservatively order allied movement
+    // during a prepared pass without treating the passer as a moving participant.
+    const legacySupport = !decision?.task && priorPasser?.readiedPass && priorPasser.reaction && priorPasser.id !== actorId
+      && priorPasser.teamId === player(plan.initial, actorId)?.teamId && turn.events.some((e) => e.type === 'move' && e.playerId === actorId);
+    const supportPasser = decision?.supportPasserId ?? (legacySupport ? priorPasser.id : null);
+    const writers = new Set(turn.events.filter((e) => ['ready-pass', 'ready-trigger', 'ready-cancel'].includes(e.type)).map((e) => e.playerId));
+    for (const p of plan.final.players) if (JSON.stringify(p.readiedPass) !== JSON.stringify(player(plan.initial, p.id)?.readiedPass)) writers.add(p.id);
+    const start = Math.max(0, ...[...resources].map((r) => available.get(r) ?? 0),
+      supportPasser ? readyWindows.get(supportPasser)?.writeEnd ?? 0 : 0,
+      ...[...writers].map((id) => Math.max(readyWindows.get(id)?.writeEnd ?? 0, readyWindows.get(id)?.readEnd ?? 0)));
     const end = start + Math.max(plan.duration, actorId ? 180 : 0);
     for (const r of resources) available.set(r, end);
+    for (const id of writers) readyWindows.set(id, { writeEnd: end, readEnd: 0 });
+    if (supportPasser && !writers.has(supportPasser)) {
+      const timing = readyWindows.get(supportPasser) ?? { writeEnd: 0, readEnd: 0 };
+      readyWindows.set(supportPasser, { ...timing, readEnd: Math.max(timing.readEnd, end) });
+    }
     scheduled.push({ plan, actorId, participants: [...participants], usesBall, start, end });
   }
   const span = Math.max(1, ...scheduled.map((t) => t.end)), duration = ROUND_DURATION / speed, scale = duration / span;

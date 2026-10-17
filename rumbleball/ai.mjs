@@ -1,6 +1,6 @@
 import {
   active, allies, armorAgainst, canReceivePass, carrier, chargeRun, collectiveOpening, distance, hasCheckHelp, hasPassCall, interceptionCandidates, legalAction, legalClassAction,
-  inside, movementView, openPassReceiver, opponents, playerById, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill, trajectory,
+  inside, movementView, openPassReceiver, opponents, playerById, provokesOpportunity, reachableCells, readiedPasser, shouldTakeOpportunity, skill, trajectory,
 } from './rules.mjs';
 import { isRunner } from './classes.mjs';
 import { OPENINGS, openingPlan } from './openings.mjs';
@@ -65,10 +65,11 @@ export function teamPlan(state, actor) {
     const relay = ranked(rest.filter((p) => p.id !== protector?.id && p.reaction), 'relay', ball)[0];
     const outlet = strategyOf(state, actor) === 'possession'
       ? rest.filter((p) => p.id !== protector?.id && p.id !== relay?.id && p.reaction && p.archetype === 'passeur' && p.role !== 'blocker').sort(order)[0] : null;
-    const spread = state.version >= 5 ? Boolean(holder.readiedPass) : state.version >= 4 && !opening;
+    const passer = readiedPasser(state);
+    const spread = state.version >= 5 ? Boolean(passer) : state.version >= 4 && !opening;
     const supports = spread ? supportFormation(state, holder, rest, protector?.id) : new Map();
     const waiting = new Map(rest.map((p) => [p.id, { ...p.position }]));
-    return { mode: 'own', holder, protector: protector?.id, relay: relay?.id, outlet: outlet?.id, supports, waiting, opening, marks };
+    return { mode: 'own', holder, passer, protector: protector?.id, relay: relay?.id, outlet: outlet?.id, supports, waiting, opening, marks };
   }
   const primary = ranked(team, 'retriever', ball)[0];
   marks.clear();
@@ -155,6 +156,19 @@ function passScore(state, actor, receiver, precision = false, opening = null, ru
   return chance * ((destination + runValue) * weight + keepBonus(state, actor) + Number(preferCarrier) * 15 + pressureRelief + relayTempo)
     - (1 - chance) * loss - source * weight + Number(plannedRelay) * 72 + Number(timelyRelay) * (strategyOf(state, actor) === 'possession' ? 28 : 16);
 }
+export function stripSuccessChance(state, actor, holder, exploit = false) {
+  const advantage = hasCheckHelp(state, actor) || exploit || Boolean(collectiveOpening(state, actor, holder));
+  const attack = skill(actor, 'wrestling'), defense = Math.max(skill(holder, 'wrestling'), skill(holder, 'acrobatics'));
+  const defenseAdvantage = hasCheckHelp(state, holder);
+  let chance = 0;
+  for (let die = 1; die <= 20; die++) {
+    // A tie leaves possession with the defender. Helpers and class openings
+    // are public state; calculating the distribution spends no dice or aid.
+    const lower = Math.max(0, Math.min(1, (die + attack - defense - 1) / 20));
+    chance += (advantage ? (2 * die - 1) / 400 : 1 / 20) * (defenseAdvantage ? lower ** 2 : lower);
+  }
+  return chance;
+}
 function possessionUntilNextTurn(state, holder) {
   let retained = 1;
   const defense = Math.max(skill(holder, 'wrestling'), skill(holder, 'acrobatics'));
@@ -166,15 +180,24 @@ function possessionUntilNextTurn(state, holder) {
   }
   return retained;
 }
+function stripValue(state, actor, holder, task, aggression, exploit = false) {
+  const chance = stripSuccessChance(state, actor, holder, exploit), retention = possessionUntilNextTurn(state, actor);
+  const assigned = task === 'recover', specialist = actor.role === 'retriever';
+  // Winning the ball in an exposed scrum is worth less than securing it.
+  // One player contests possession; the other roles keep screening and marking.
+  return 18 + chance * (62 + retention * 30 + Number(state.round >= 10) * 45) - (1 - chance) * 12
+    + Number(assigned) * 18 + Number(specialist) * 18 + aggression * .15
+    - Number(!assigned) * 18 - Number(actor.role === 'blocker' && !assigned) * 12;
+}
 function taskFor(state, actor, plan) {
   if (state.ball.carrierId === actor.id) return 'carry';
   if (state.version >= 5 && plan.mode === 'own') {
     if (actor.id === plan.protector) return 'protect';
-    if (!plan.holder.readiedPass) return actor.role === 'blocker' ? 'screen' : 'standby';
+    if (!plan.passer) return actor.role === 'blocker' ? 'screen' : 'standby';
     return plan.supports.has(actor.id) ? 'relay' : 'screen';
   }
   if (plan.opening && plan.mode !== 'enemy') {
-    if (plan.opening.receivers.includes(actor.id)) return 'opening-relay';
+    if (plan.opening.receivers.includes(actor.id)) return state.version >= 5 ? 'standby' : 'opening-relay';
     if (plan.mode === 'free') return plan.opening.contenders.includes(actor.id) ? 'recover' : 'screen';
     return plan.opening.id === 'cage' ? 'protect' : 'screen';
   }
@@ -206,7 +229,7 @@ function positionalScore(state, actor, cell, plan, task) {
     }
     return score;
   }
-  if (task === 'standby') return 30 - distance(cell, plan.waiting.get(actor.id)) * 8 + safety(state, actor, cell) * .2;
+  if (task === 'standby') return 30 - distance(cell, plan.waiting?.get(actor.id) ?? actor.position) * 8 + safety(state, actor, cell) * .2;
   if (task === 'opening-relay') return 42 - distance(cell, plan.opening.anchors[actor.id]) * 18 + safety(state, actor, cell) * .25;
   if (task === 'recover') return 55 - distance(cell, ball) * 11;
   if (task === 'relay') {
@@ -214,7 +237,7 @@ function positionalScore(state, actor, cell, plan, task) {
     const blockedLane = plan.holder && interceptionCandidates(state, plan.holder, cell).length > 0;
     const anchor = plan.supports?.get(actor.id);
     const crowding = anchor ? allies(state, actor).filter((p) => p.id !== plan.holder.id && distance(p.position, cell) <= 1).length * 12 : 0;
-    const prepared = state.version >= 5 && plan.holder?.readiedPass;
+    const prepared = Boolean(readiedPasser(state));
     const available = prepared && gap >= 2 && gap <= 6 && !actor.prone && !actor.grappledBy && !blockedLane
       && opponents(state, actor).every((p) => distance(p.position, cell) > 1);
     return 26 - Math.abs(gap - (anchor ? 4 : 3)) * 8 + safety(state, actor, cell) * .55 - Number(gap > 6) * 40 - Number(blockedLane) * 18
@@ -250,7 +273,7 @@ function exposure(state, actor, path, disengaged = false) {
   return provoked.size * (state.ball.carrierId === actor.id ? 32 : actor.instruction === 'cautious' ? 22 : 13);
 }
 function evaluateCells(state, actor, plan, task, budget, disengaged = false) {
-  return reachableCells(state, actor, budget).filter((entry) => task !== 'cover' || !entry.path.length
+  return reachableCells(state, actor, budget).filter((entry) => task !== 'standby' || !entry.path.length).filter((entry) => task !== 'cover' || !entry.path.length
     || opponents(state, actor).every((p) => distance(p.position, entry.position) > 1)).map((entry) => {
     const view = movementView(state, actor, entry.position);
     return { ...entry, score: positionalScore(view.state, view.actor, entry.position, plan, task)
@@ -332,7 +355,10 @@ export function decideTurn(state, actor) {
     const opening = target && ['strip', 'grapple', 'shove'].includes(action.type) && collectiveOpening(view.state, view.actor, target);
     candidates.push({ path: entry.path, action, score: entry.score + score + (opening ? 7 : 0), task });
     let technique, gain = 0;
-    if (action.type === 'strip' && !hasCheckHelp(state, actor)) { technique = 'exploitation'; gain = 9; }
+    if (action.type === 'strip' && !hasCheckHelp(state, actor)) {
+      technique = 'exploitation';
+      gain = state.version >= 5 ? stripValue(view.state, view.actor, target, task, aggression, true) - score : 9;
+    }
     if (action.type === 'attack' && !actor.grappling && !target.grappledBy) { technique = 'percussion'; gain = 5; }
     const enhanced = { ...action, technique };
     if (technique && legalAction(view.state, view.actor, enhanced)) candidates.push({ path: entry.path, action: enhanced, score: entry.score + score + gain, task });
@@ -348,7 +374,8 @@ export function decideTurn(state, actor) {
       // Coverage leaves pursuit to the assigned pressure players. An opponent
       // already at contact can still be contested without abandoning the lane.
       if (task === 'cover' && distance(actor.position, enemy.position) > 1) continue;
-      add(cell, { type: 'strip', targetId: enemy.id }, 106 + skill(actor, 'wrestling') * 3 + Number(actor.role === 'retriever') * 16 + aggression * .3 + Number(plan.opening?.id === 'press') * 15);
+      if (enemy.id === holder?.id) add(cell, { type: 'strip', targetId: enemy.id }, state.version >= 5 ? stripValue(here, actorHere, enemy, task, aggression)
+        : 106 + skill(actor, 'wrestling') * 3 + Number(actor.role === 'retriever') * 16 + aggression * .3 + Number(plan.opening?.id === 'press') * 15);
       const hitChance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
       const ko = enemy.hp <= actor.attack.die / 2 + .5 + actor.attack.flat;
       const distraction = (supporting && !danger || task === 'cover' && enemy.id !== holder?.id) ? actor.instruction === 'aggressive' ? 10 : 30 : 0;

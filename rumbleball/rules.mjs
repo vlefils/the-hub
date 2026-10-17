@@ -234,6 +234,10 @@ export function cancelReadiedPass(state, actor, events, reason) {
   actor.readiedPass = null;
   emit(state, events, 'ready-cancel', `${actor.name} cesse d’attendre sa passe (${reason}).`, { playerId: actor.id, reason });
 }
+export function readiedPasser(state) {
+  const holder = carrier(state);
+  return state.version >= 5 && !state.finished && holder?.hp > 0 && holder.readiedPass && holder.reaction && !holder.action ? holder : null;
+}
 export function openPassReceiver(state, passer, receiver) {
   return Boolean(receiver && receiver.id !== passer.id && receiver.teamId === passer.teamId && canReceivePass(state, receiver)
     && !receiver.grappledBy && !receiver.prone && distance(passer.position, receiver.position) >= 2 && distance(passer.position, receiver.position) <= 6
@@ -241,8 +245,8 @@ export function openPassReceiver(state, passer, receiver) {
     && !interceptionCandidates(state, passer, receiver.position).length);
 }
 export function resolveReadiedPass(state, receiver, events = []) {
-  const passer = carrier(state);
-  if (state.finished || state.version < 5 || state.activeId !== receiver.id || !passer?.readiedPass || !passer.reaction
+  const passer = readiedPasser(state);
+  if (!passer || state.activeId !== receiver.id
     || !openPassReceiver(state, passer, receiver)) return false;
   const action = { type: 'pass', targetId: receiver.id, reaction: true };
   const precise = { ...action, technique: 'precision' };
@@ -433,8 +437,8 @@ export function moveAlong(state, actor, path, events) {
       releaseSeparatedGrapples(state, events);
     }
     traversed.push({ ...next });
-    if (state.version >= 5 && state.activeId === actor.id && carrier(state)?.readiedPass && carrier(state).id !== actor.id
-      && openPassReceiver(state, carrier(state), actor)) {
+    const passer = readiedPasser(state);
+    if (state.activeId === actor.id && passer && passer.id !== actor.id && openPassReceiver(state, passer, actor)) {
       flushMovement();
       if (resolveReadiedPass(state, actor, events)) break;
     }
@@ -467,7 +471,7 @@ export function legalAction(state, actor, action) {
     return ballDefender(state, actor) ? actor.action : actor.interaction;
   }
   const reactionPass = action.type === 'pass' && action.reaction === true;
-  if (reactionPass && !(state.version >= 5 && actor.readiedPass && actor.reaction && state.activeId === target?.id && openPassReceiver(state, actor, target))) return false;
+  if (reactionPass && !(readiedPasser(state)?.id === actor.id && state.activeId === target?.id && openPassReceiver(state, actor, target))) return false;
   if (!actor.action && !reactionPass) return false;
   switch (action.type) {
     case 'ready-pass': return Boolean(state.version >= 5 && actor.reaction && state.ball.carrierId === actor.id && !actor.readiedPass);

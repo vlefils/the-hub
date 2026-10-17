@@ -34,6 +34,30 @@ test('round simultané : deux courses indépendantes se chevauchent dans une fen
   assert.deepEqual([a, b], original);
 });
 
+test('démarquages : après la préparation, simultanés entre eux, avant sa fin ; anciens journaux compatibles', () => {
+  for (const metadata of [true, false]) for (const ending of ['ready-cancel', 'ready-trigger']) {
+    const before = fixture(), passer = p(before, 'home-0');
+    p(before, 'home-2').hp = p(before, 'home-2').maxHp; p(before, 'home-2').position = { x: 4, y: 6 };
+    before.ball = { carrierId: passer.id, position: { ...passer.position } };
+    const prepared = structuredClone(before); prepared.activeId = passer.id; prepared.turns++;
+    p(prepared, passer.id).action = false; p(prepared, passer.id).readiedPass = { round: 1, turn: 1 };
+    const preparation = { before, after: prepared, events: [e('ready-pass', { playerId: passer.id, readiedPass: { round: 1, turn: 1 } })] };
+    const a = moved(prepared, 'home-1', [{ x: 5, y: 1 }, { x: 6, y: 1 }]), b = moved(a.after, 'home-2', [{ x: 5, y: 6 }]);
+    if (metadata) for (const run of [a, b]) run.events.unshift(e('decision', { playerId: run.after.activeId, task: 'relay', supportPasserId: passer.id }));
+    const final = structuredClone(b.after); final.activeId = 'away-0'; final.turns++; p(final, passer.id).readiedPass = null;
+    const stop = { before: b.after, after: final, events: [e(ending, { playerId: passer.id, targetId: ending === 'ready-trigger' ? 'home-1' : undefined })] };
+    const turns = [preparation, a, b, stop], untouched = structuredClone(turns), plan = buildRoundPlayback(turns);
+    assert.ok(plan.turns[1].start >= plan.turns[0].end); close(plan.turns[1].start, plan.turns[2].start);
+    assert.ok(!plan.turns[1].participants.includes(passer.id)); assert.ok(!plan.turns[2].participants.includes(passer.id));
+    assert.ok(plan.turns[3].start >= Math.max(plan.turns[1].end, plan.turns[2].end));
+    const midRun = (plan.turns[1].start + Math.min(plan.turns[1].end, plan.turns[2].end)) / 2;
+    const frame = sampleRoundPlayback(plan, midRun); assert.ok(p(frame, passer.id).readiedPass);
+    assert.ok(p(frame, 'home-1').walking && p(frame, 'home-2').walking);
+    assert.equal(p(sampleRoundPlayback(plan, plan.duration), passer.id).readiedPass, null);
+    assert.equal(plan.duration, 12000); assert.deepEqual(turns, untouched);
+  }
+});
+
 test('contact : la cible reste en place pendant la frappe, puis son propre tour commence', () => {
   const before = fixture(); p(before, 'away-0').position = { x: 2, y: 1 };
   const after = structuredClone(before); after.activeId = 'home-0'; after.turns++; p(after, 'away-0').hp -= 4;

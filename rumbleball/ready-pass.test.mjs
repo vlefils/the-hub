@@ -41,6 +41,10 @@ test('une passe ne peut pas contourner le coût de réaction avec un indicateur 
     const before = structuredClone(state);
     assert.equal(resolveAction(state, a, { type: 'pass', targetId: b.id, reaction }), false); assert.deepEqual(state, before);
   }
+  state.activeId = a.id; ready(state, a); state.activeId = b.id; a.action = true;
+  const stale = structuredClone(state);
+  assert.equal(legalAction(state, a, { type: 'pass', targetId: b.id, reaction: true }), false);
+  assert.equal(resolveReadiedPass(state, b), false); assert.deepEqual(state, stale);
 });
 
 test('déclenchement : pas de passe avant un tour allié, ni vers un joueur marqué, à terre ou hors portée', () => {
@@ -118,6 +122,16 @@ test('moteur : réception pendant une course et réévaluation de l’action enc
   assert.deepEqual(state, before); assert.ok(next.events.some((e) => e.type === 'ready-trigger' && e.playerId === a.id && e.targetId === c.id));
   assert.ok(next.events.some((e) => e.type === 'replan')); assert.equal(next.state.lastDecision.playerId, c.id);
   assert.equal(next.state.lastDecision.action, 'pass'); assertInvariants(next.state);
+});
+
+test('moteur : une passe ratée pendant le démarquage abandonne immédiatement l’ancien plan de relais', () => {
+  const { state, a, c, enemy } = fixture(); a.skills.acrobatics = -100;
+  c.position = { x: 5, y: 2 }; enemy.position = { x: 6, y: 2 }; enemy.reaction = false;
+  ready(state, a); state.initiative = [c.id, ...state.initiative.filter((id) => id !== c.id)]; state.turnIndex = 0;
+  const next = stepMatch(state), trigger = next.events.findIndex((e) => e.type === 'ready-trigger');
+  assert.ok(trigger > next.events.findIndex((e) => e.type === 'move'));
+  assert.ok(next.events.slice(trigger + 1).some((e) => e.type === 'replan'));
+  assert.doesNotMatch(next.state.lastDecision.reason, /Se démarque/); assertInvariants(next.state);
 });
 
 test('sauvegarde : attente persistante, reprise déterministe, ancienne v4 conservée et état corrompu refusé', () => {

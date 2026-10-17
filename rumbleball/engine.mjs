@@ -4,7 +4,7 @@ import { ARCHETYPES, initialClassState } from './classes.mjs';
 import { matchKits } from './appearance.mjs';
 import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
 import { defaultOpening, openingDeployment, validOpening } from './openings.mjs';
-import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat } from './rules.mjs';
+import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
 export const CURRENT_RULES = 5;
@@ -123,8 +123,10 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   };
   useClassAction();
   const decision = decideTurn(state, actor);
+  const plannedPasser = decision.task === 'relay' ? readiedPasser(state)?.id : null;
   state.lastDecision = { playerId: actor.id, reason: decision.reason, action: decision.action.type };
-  emit(state, events, 'decision', `${actor.name} · ${decision.reason}`, { playerId: actor.id, action: decision.action.type });
+  emit(state, events, 'decision', `${actor.name} · ${decision.reason}`, { playerId: actor.id, action: decision.action.type,
+    ...(state.version >= 5 ? { task: decision.task, ...(plannedPasser ? { supportPasserId: plannedPasser } : {}) } : {}) });
   const previousHolder = state.ball.carrierId;
   useClassAction(decision.path); moveAlong(state, actor, decision.path, events); useClassAction();
   if (actor.hp > 0) {
@@ -135,7 +137,8 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
       const basic = { ...action }; delete basic.technique;
       if (legalAction(state, actor, basic)) action = basic;
     }
-    if (!legalAction(state, actor, action) || state.ball.carrierId === actor.id && previousHolder !== actor.id) {
+    const supportEnded = state.version >= 5 && decision.task === 'relay' && readiedPasser(state)?.id !== plannedPasser;
+    if (!legalAction(state, actor, action) || state.ball.carrierId === actor.id && previousHolder !== actor.id || supportEnded) {
       const revised = decideTurn(state, { ...actor, movement: 0 });
       action = revised.action;
       state.lastDecision = { playerId: actor.id, reason: revised.reason, action: action.type };
