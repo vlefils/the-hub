@@ -21,7 +21,8 @@ test('probabilité de passe : DD, avantage, réception et absence de mutation ou
   const before = structuredClone(state); close(passCompletionChance(state, passer, receiver), .75);
   close(passCompletionChance(state, passer, receiver, true), .9375); assert.deepEqual(state, before);
   state.aids.push({ helperId: captain.id, allyId: passer.id, kind: 'check' }); close(passCompletionChance(state, passer, receiver), .9375);
-  receiver.reaction = false; assert.equal(passCompletionChance(state, passer, receiver), 0);
+  receiver.reaction = false; close(passCompletionChance(state, passer, receiver), .9375);
+  state.version = 4; assert.equal(passCompletionChance(state, passer, receiver), 0); state.version = 5;
   receiver.reaction = true; receiver.hp = 0; assert.equal(passCompletionChance(state, passer, receiver), 0);
   receiver.hp = receiver.maxHp; receiver.position = { x: 11, y: 1 }; assert.equal(passCompletionChance(state, passer, receiver), 0);
 });
@@ -53,9 +54,9 @@ test('capitaine : appel utile au porteur immobilisé, utilisé sans dépenser la
   assert.equal(resolveAction(state, passer, decision.action, events), true); assert.equal(passer.classState.focus, 2); assert.equal(captain.classState.calls, 1);
   assert.ok(events.some((e) => e.type === 'class' && e.ability === 'call-used')); assertInvariants(state);
 });
-test('capitaine : pas d’appel sans réception possible, avec une aide ou après la dernière occasion avant sirène', () => {
+test('capitaine : réception libre sans réaction, mais pas d’appel avec une aide ou après la dernière occasion avant sirène', () => {
   const { state, captain, passer, receiver, enemy } = fixture(); passer.grappledBy = enemy.id; enemy.grappling = passer.id;
-  captain.reaction = false; receiver.reaction = false; assert.notEqual(decideClassAction(state, captain)?.type, 'call');
+  captain.reaction = false; receiver.reaction = false; assert.equal(decideClassAction(state, captain)?.type, 'call');
   receiver.reaction = true; state.aids.push({ helperId: receiver.id, allyId: passer.id, kind: 'check' }); assert.notEqual(decideClassAction(state, captain)?.type, 'call');
   state.aids = []; state.initiative = [passer.id, captain.id, receiver.id, enemy.id]; state.turnIndex = 1; state.round = 10;
   assert.notEqual(decideClassAction(state, captain)?.type, 'call');
@@ -101,8 +102,9 @@ function formationFixture(positions) {
   return state;
 }
 
-test('Conservation : trois relais distincts se démarquent, restent à portée et gardent leur affectation sans réaction', () => {
+test('ancienne v4 : trois relais distincts se démarquent, restent à portée et gardent leur affectation sans réaction', () => {
   let state = formationFixture([[1, 2], [2, 2], [2, 3], [0, 3], [1, 4], [9, 1], [9, 2], [9, 3], [9, 5], [9, 6]]);
+  state.version = 4;
   giveBall(state, state.players[2], []); const before = structuredClone(state), plan = teamPlan(state, state.players[0]);
   assert.equal(plan.supports.size, 3); assert.equal(new Set([...plan.supports.values()].map((p) => `${p.x},${p.y}`)).size, 3);
   assert.deepEqual(state, before);
@@ -137,7 +139,7 @@ test('passe proactive : un porteur mobile utilise le relais libre qui joue avant
   state.initiative = [actor.id, receiver.id, ...state.initiative.filter((id) => ![actor.id, receiver.id].includes(id))]; state.turnIndex = 0;
   const before = structuredClone(state), choice = decideTurn(state, actor);
   assert.ok(actor.movement > 0); assert.equal(choice.action.type, 'pass'); assert.equal(choice.action.targetId, receiver.id); assert.deepEqual(state, before);
-  receiver.reaction = false; assert.notEqual(decideTurn(state, actor).action.targetId, receiver.id);
+  receiver.reaction = false; assert.equal(decideTurn(state, actor).action.targetId, receiver.id);
 });
 
 test('défenseur : réserve sa réception en Conservation, mais réagit au porteur adverse et respecte la consigne agressive', () => {

@@ -1,6 +1,6 @@
 import {
-  active, allies, armorAgainst, carrier, chargeRun, collectiveOpening, distance, hasCheckHelp, hasPassCall, interceptionCandidates, legalAction, legalClassAction,
-  inside, movementView, opponents, playerById, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill, trajectory,
+  active, allies, armorAgainst, canReceivePass, carrier, chargeRun, collectiveOpening, distance, hasCheckHelp, hasPassCall, interceptionCandidates, legalAction, legalClassAction,
+  inside, movementView, openPassReceiver, opponents, playerById, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill, trajectory,
 } from './rules.mjs';
 import { isRunner } from './classes.mjs';
 import { OPENINGS, openingPlan } from './openings.mjs';
@@ -59,12 +59,16 @@ export function teamPlan(state, actor) {
   }
   if (holder.teamId === actor.teamId) {
     const rest = team.filter((p) => p.id !== holder.id);
-    const protector = ranked(rest, 'blocker', ball)[0];
+    const protector = state.version >= 5 ? [...rest].sort((a, b) => Number(b.role === 'blocker') - Number(a.role === 'blocker')
+      || Number(a.role === 'relay' || a.archetype === 'passeur') - Number(b.role === 'relay' || b.archetype === 'passeur') || order(a, b))[0]
+      : ranked(rest, 'blocker', ball)[0];
     const relay = ranked(rest.filter((p) => p.id !== protector?.id && p.reaction), 'relay', ball)[0];
     const outlet = strategyOf(state, actor) === 'possession'
       ? rest.filter((p) => p.id !== protector?.id && p.id !== relay?.id && p.reaction && p.archetype === 'passeur' && p.role !== 'blocker').sort(order)[0] : null;
-    const supports = state.version >= 4 && !opening ? supportFormation(state, holder, rest, protector?.id) : new Map();
-    return { mode: 'own', holder, protector: protector?.id, relay: relay?.id, outlet: outlet?.id, supports, opening, marks };
+    const spread = state.version >= 5 ? Boolean(holder.readiedPass) : state.version >= 4 && !opening;
+    const supports = spread ? supportFormation(state, holder, rest, protector?.id) : new Map();
+    const waiting = new Map(rest.map((p) => [p.id, { ...p.position }]));
+    return { mode: 'own', holder, protector: protector?.id, relay: relay?.id, outlet: outlet?.id, supports, waiting, opening, marks };
   }
   const primary = ranked(team, 'retriever', ball)[0];
   marks.clear();
@@ -104,7 +108,7 @@ const keepBonus = (state, actor) => 48 + Number(strategyOf(state, actor) === 'po
 // Public dice distributions only: one pass check and the one eligible interceptor.
 // No RNG is consumed and neither the seed nor future bot decisions are inspected.
 export function passCompletionChance(state, actor, receiver, precision = false) {
-  if (!receiver?.reaction || !legalAction(state, actor, { type: 'pass', targetId: receiver.id, ...(precision ? { technique: 'precision' } : {}) })) return 0;
+  if (!canReceivePass(state, receiver) || !legalAction(state, actor, { type: 'pass', targetId: receiver.id, ...(precision ? { technique: 'precision' } : {}) })) return 0;
   const dc = actor.grappledBy || opponents(state, actor).some((p) => distance(actor.position, p.position) <= 1) ? 15 : 10;
   const advantage = precision || hasCheckHelp(state, actor) || hasPassCall(state, actor);
   const interceptor = interceptionCandidates(state, actor, receiver.position)[0];
@@ -164,6 +168,11 @@ function possessionUntilNextTurn(state, holder) {
 }
 function taskFor(state, actor, plan) {
   if (state.ball.carrierId === actor.id) return 'carry';
+  if (state.version >= 5 && plan.mode === 'own') {
+    if (actor.id === plan.protector) return 'protect';
+    if (!plan.holder.readiedPass) return actor.role === 'blocker' ? 'screen' : 'standby';
+    return plan.supports.has(actor.id) ? 'relay' : 'screen';
+  }
   if (plan.opening && plan.mode !== 'enemy') {
     if (plan.opening.receivers.includes(actor.id)) return 'opening-relay';
     if (plan.mode === 'free') return plan.opening.contenders.includes(actor.id) ? 'recover' : 'screen';
@@ -185,7 +194,7 @@ function positionalScore(state, actor, cell, plan, task) {
   if (task === 'carry') {
     let score = possessionSafety(state, actor, cell) * carryWeight(state, actor);
     if (plan.supports?.size) {
-      const receivers = allies(state, actor).filter((p) => plan.supports.has(p.id) && p.reaction && !p.grappledBy);
+      const receivers = allies(state, actor).filter((p) => plan.supports.has(p.id) && canReceivePass(state, p) && !p.grappledBy);
       if (receivers.length) score -= Math.max(0, nearestDistance(receivers, cell) - 5) * 12;
     }
     if (plan.opening) {
@@ -197,6 +206,7 @@ function positionalScore(state, actor, cell, plan, task) {
     }
     return score;
   }
+  if (task === 'standby') return 30 - distance(cell, plan.waiting.get(actor.id)) * 8 + safety(state, actor, cell) * .2;
   if (task === 'opening-relay') return 42 - distance(cell, plan.opening.anchors[actor.id]) * 18 + safety(state, actor, cell) * .25;
   if (task === 'recover') return 55 - distance(cell, ball) * 11;
   if (task === 'relay') {
@@ -204,8 +214,11 @@ function positionalScore(state, actor, cell, plan, task) {
     const blockedLane = plan.holder && interceptionCandidates(state, plan.holder, cell).length > 0;
     const anchor = plan.supports?.get(actor.id);
     const crowding = anchor ? allies(state, actor).filter((p) => p.id !== plan.holder.id && distance(p.position, cell) <= 1).length * 12 : 0;
+    const prepared = state.version >= 5 && plan.holder?.readiedPass;
+    const available = prepared && gap >= 2 && gap <= 6 && !actor.prone && !actor.grappledBy && !blockedLane
+      && opponents(state, actor).every((p) => distance(p.position, cell) > 1);
     return 26 - Math.abs(gap - (anchor ? 4 : 3)) * 8 + safety(state, actor, cell) * .55 - Number(gap > 6) * 40 - Number(blockedLane) * 18
-      - (anchor ? distance(cell, anchor) * 4 : 0) - crowding;
+      - (anchor ? distance(cell, anchor) * 4 : 0) - crowding + (prepared ? available ? 32 : -12 : 0);
   }
   if (task === 'protect') {
     const threat = opponents(state, actor).sort((a, b) => distance(a.position, ball) - distance(b.position, ball) || order(a, b))[0];
@@ -250,7 +263,8 @@ function explain(actor, task, type, target) {
     attack: target ? `Contient ${target.name} par une frappe` : 'Met la pression au contact',
     grapple: 'Immobilise une menace', shove: 'Déséquilibre une menace', pass: 'Cherche un relais mieux protégé',
     help: 'Crée une ouverture pour un équipier', escape: 'Cherche à retrouver sa mobilité',
-    dodge: task === 'carry' ? 'Protège la possession en esquivant' : task === 'relay' ? 'Se démarque et offre une solution de passe'
+    'ready-pass': 'Prépare une passe en réaction au prochain démarquage',
+    dodge: task === 'carry' ? 'Protège la possession en esquivant' : task === 'standby' ? 'Attend une préparation de passe en restant disponible' : task === 'relay' ? 'Se démarque et offre une solution de passe'
       : task === 'cover' ? 'Couvre les lignes de passe en gardant ses distances' : 'Tient sa position en esquivant',
     disengage: 'Préserve sa mobilité sans subir de frappe gratuite', dash: 'Accélère pour remplir son rôle', wait: 'Garde sa position',
   };
@@ -265,6 +279,24 @@ export function decideTurn(state, actor) {
   const cells = evaluateCells(state, actor, plan, task, actor.movement);
   const candidates = [];
   const receiverRuns = new Map();
+  const futureRuns = new Map();
+  const readyCells = new Set([cells.find((cell) => !cell.path.length), ...cells.slice(0, 5)].filter(Boolean));
+  const readyValue = (entry) => {
+    if (state.version < 5 || !actor.reaction || !readyCells.has(entry)) return null;
+    let options = 0;
+    for (const ally of allies(state, actor)) {
+      if (ally.grappledBy || ally.grappling || state.round >= 10 && state.initiative.indexOf(ally.id) <= state.turnIndex) continue;
+      if (!futureRuns.has(ally.id)) {
+        const runs = reachableCells(state, ally, ally.speed * (ally.prone ? .5 : 1))
+          .filter((run) => !opponents(state, ally).some((p) => distance(p.position, run.position) <= 1))
+          .sort((a, b) => safety(state, ally, b.position) - safety(state, ally, a.position) || a.cost - b.cost).slice(0, 8);
+        futureRuns.set(ally.id, runs);
+      }
+      const passer = { ...actor, position: entry.position };
+      if (futureRuns.get(ally.id).some((run) => openPassReceiver(state, passer, { ...ally, position: run.position }))) options++;
+    }
+    return options ? keepBonus(state, actor) * .8 + 16 + Math.min(3, options) * 6 : null;
+  };
   const add = (entry, action, score) => {
     const view = movementView(state, actor, entry.position);
     view.actor = { ...view.actor, chargeRun: chargeRun(actor, entry.path) };
@@ -325,8 +357,10 @@ export function decideTurn(state, actor) {
       add(cell, { type: 'shove', targetId: enemy.id }, 17 + Number(danger) * 15 + Number(actor.role === 'blocker') * 8 + aggression * .3 - distraction);
     }
     if (holder?.id === actor.id) {
+      const prepared = readyValue(cell);
+      if (prepared !== null) add(cell, { type: 'ready-pass' }, prepared);
       for (const ally of allies(here, actorHere)) {
-        if (!ally.reaction || distance(cell.position, ally.position) > 6) continue;
+        if (!canReceivePass(state, ally) || distance(cell.position, ally.position) > 6) continue;
         add(cell, { type: 'pass', targetId: ally.id }, 0);
       }
     }
@@ -338,7 +372,8 @@ export function decideTurn(state, actor) {
       if (foe && !state.aids.some((a) => a.allyId === ally.id && a.enemyId === foe.id)) add(cell, { type: 'help', targetId: ally.id, enemyId: foe.id }, 24 + Number(actor.role === 'relay') * 8);
     }
     add(cell, { type: 'dodge' }, holder?.id === actor.id ? actor.grappledBy ? 0 : keepBonus(state, actor) : supporting ? 16 : 5);
-    if (adjacent.length && !actor.grappledBy && !actor.grappling) {
+    const enteringContact = state.version >= 5 && supporting && !opponents(state, actor).some((p) => distance(p.position, actor.position) <= 1);
+    if (adjacent.length && !actor.grappledBy && !actor.grappling && !enteringContact) {
       const freed = evaluateCells(here, actorHere, plan, task, Math.max(0, actor.movement - cell.cost), true)[0];
       const gain = freed ? freed.score - positionalScore(state, actor, cell.position, plan, task) : 0;
       add(cell, { type: 'disengage' }, 8 + Math.max(0, gain) + Number(holder?.id === actor.id) * 20);
@@ -397,7 +432,7 @@ export function decideClassAction(state, actor, path = []) {
 export function decideMovement(state, actor) {
   // Maintaining a hold already achieves a control objective. Spare movement is optional;
   // repositioning with a held target must be part of the next turn's deliberate plan.
-  if (actor.hp <= 0 || actor.grappledBy || actor.grappling || actor.movement < 1.5) return [];
+  if (actor.hp <= 0 || actor.grappledBy || actor.grappling || actor.readiedPass || actor.movement < 1.5) return [];
   const plan = teamPlan(state, actor), task = taskFor(state, actor, plan);
   const cells = evaluateCells(state, actor, plan, task, actor.movement);
   const current = positionalScore(state, actor, actor.position, plan, task);

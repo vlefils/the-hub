@@ -97,21 +97,21 @@ test('une égalité d’arrachement laisse la balle au porteur', () => {
   resolveAction(state, a, { type: 'strip', targetId: b.id }, events);
   assert.equal(state.ball.carrierId, b.id);
 });
-test('passe réussie sans réaction : balle aux pieds du receveur', () => {
+test('réception libre même sans réaction disponible', () => {
   const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
   b.position = { x: 11, y: 7 }; const receiver = state.players[1]; receiver.position = { x: 3, y: 3 }; receiver.reaction = false;
   a.skills.acrobatics = 100; giveBall(state, a, events);
   assert.ok(resolveAction(state, a, { type: 'pass', targetId: receiver.id }, events));
-  assert.equal(state.ball.carrierId, null); assert.deepEqual(state.ball.position, receiver.position);
-  assert.equal(state.stats.home.passesCompleted, 0);
+  assert.equal(state.ball.carrierId, receiver.id); assert.deepEqual(state.ball.position, receiver.position);
+  assert.equal(state.stats.home.passesCompleted, 1); assert.equal(receiver.reaction, false);
 });
-test('réception dépense la réaction ; pression impose DD 15', () => {
+test('réception conserve la réaction ; pression impose DD 15', () => {
   const { state, a, events } = fixture(['home-0', 'home-1', 'away-0']);
   const receiver = state.players[1]; receiver.position = { x: 3, y: 3 };
   state.players[5].reaction = false;
   a.skills.acrobatics = 100; giveBall(state, a, events);
   resolveAction(state, a, { type: 'pass', targetId: receiver.id }, events);
-  assert.equal(receiver.reaction, false); assert.equal(state.ball.carrierId, receiver.id);
+  assert.equal(receiver.reaction, true); assert.equal(state.ball.carrierId, receiver.id);
   assert.ok(events.some((e) => e.type === 'pass' && e.message.includes('DD 15')));
   assert.equal(state.stats.home.passesCompleted, 1);
 });
@@ -145,7 +145,7 @@ test('interception : égalité conserve la passe et dépense une seule réaction
   a.skills.acrobatics = 5; b.skills.acrobatics = 5;
   forceD20(state, [10, 10]); giveBall(state, a, events);
   resolveAction(state, a, { type: 'pass', targetId: receiver.id }, events);
-  assert.equal(state.ball.carrierId, receiver.id); assert.equal(b.reaction, false); assert.equal(receiver.reaction, false);
+  assert.equal(state.ball.carrierId, receiver.id); assert.equal(b.reaction, false); assert.equal(receiver.reaction, true);
 });
 test('dégâts : DD minimum 10, Constitution et perte sans dégâts supplémentaires', () => {
   const { state, a, b, events } = fixture(); giveBall(state, b, events);
@@ -441,8 +441,9 @@ test('coordination : un récupérateur prioritaire et rôles réaffectables', ()
   assert.equal(new Set(plans.map((p) => p.primary)).size, 1);
   assert.ok(state.players.slice(0, 5).every((p) => p.role === 'retriever'));
 });
-test('bot : refuse la passe vers un relais sans réaction', () => {
+test('ancienne v4 : refuse la passe vers un relais sans réaction', () => {
   const { state, a, b, events } = fixture(['home-0', 'home-1', 'away-0']);
+  state.version = 4;
   giveBall(state, a, events); state.players[1].position = { x: 1, y: 1 }; state.players[1].reaction = false;
   const decision = decideTurn(state, a);
   assert.notEqual(decision.action.type, 'pass');

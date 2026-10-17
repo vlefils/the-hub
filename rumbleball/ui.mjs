@@ -170,11 +170,12 @@ export function mountMatch(root, callbacks = {}) {
     `10 rounds de ${ROUND_DURATION / 1000} secondes, soit deux minutes à ×1. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.`,
     'Engagement : après le décompte, les joueurs des quatre cases F4, G4, F5 et G5 peuvent intercepter le ballon en réaction avant les déplacements. Lutte ou Acrobaties : DD 10 sans adversaire, meilleur jet opposé si les deux équipes contestent ; égalité départagée par l’initiative. Les jets se font par ordre d’initiative. Chaque participant dépense sa réaction, conserve son action et son mouvement et peut passer, fuir ou frapper pendant son tour. Le ramassage d’une balle tombée ailleurs conserve ses règles habituelles.',
     `Lecture simultanée : un round dure ${ROUND_DURATION / 1000} secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.`,
-    'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir, intercepter et frapper en opportunité utilisent cette même réaction.',
+    'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir une passe est une action libre. Intercepter, passer en réaction et frapper en opportunité partagent la même réaction.',
     'Une attaque d’opportunité est provoquée par un pas volontaire qui fait sortir de l’allonge (une case, diagonales comprises). Elle se résout avant ce pas : un KO laisse donc le joueur dans sa case de départ. Entrer dans l’allonge ou tourner autour sans en sortir ne provoque rien.',
     'Passe : action, 9 m, Acrobaties DD 10 ou 15 sous pression. Interception : résultat strictement supérieur à celui du passeur. Ramassage contesté et arrachement : tests opposés, égalité au défenseur.',
     'Après des dégâts au porteur : sauvegarde de Constitution, DD égal aux dégâts, minimum 10. Un plaquage seul ne fait pas lâcher la balle. À 0 PV : KO stable et sortie du match.',
-    'Diagonales : 1,5 m. Cases occupées bloquantes, sol humide difficile. Agripper immobilise la cible ; le lutteur peut l’entraîner à demi-vitesse en maintenant la prise. Les deux joueurs doivent avoir un passage libre. Pas de rebonds ni d’actions préparées.',
+    'Préparer une passe utilise l’action du porteur, sans lui donner l’esquive. Ses partenaires cherchent alors à se démarquer. Un allié disponible à son tour ou après un pas, sans adversaire au contact et avec un couloir libre à 9 m maximum, déclenche la passe avec la réaction du porteur. La préparation expire au prochain tour du porteur ou dès qu’il perd la balle. Le receveur peut préparer une nouvelle passe avec son action encore disponible.',
+    'Diagonales : 1,5 m. Cases occupées bloquantes, sol humide difficile. Agripper immobilise la cible ; le lutteur peut l’entraîner à demi-vitesse en maintenant la prise. Les deux joueurs doivent avoir un passage libre. Pas de rebonds.',
     'Trois classes, quatre archétypes : Brute Bélier, Runner Escamoteur, Runner Capitaine et Gâchette Passeur de précision. Une action bonus par tour ; les ressources de classe ne reviennent pas pendant le match. Aucun soin ni retour en jeu après un KO. Rôles et consignes orientent les décisions des bots.',
   ]) rulesCopy.append(element('p', '', text));
   rules.append(rulesCopy); root.append(rules);
@@ -308,9 +309,10 @@ export function mountMatch(root, callbacks = {}) {
       marker.setAttribute('visibility', active ? 'visible' : 'hidden'); marker.setAttribute('transform', `translate(${point.x} ${point.y})`);
       node.setAttribute('transform', `translate(${point.x} ${point.y})`);
       node.classList.toggle('is-ko', p.hp === 0); node.classList.toggle('is-prone', p.prone);
+      node.classList.toggle('is-ready', Boolean(p.readiedPass));
       node.classList.toggle('is-active', active); node.setAttribute('aria-current', String(active));
       const full = state.players.find((q) => q.id === p.id);
-      node.setAttribute('aria-label', `${full.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${p.grappledBy ? ', agrippé' : ''}${p.prone ? ', à terre' : ''}${frame.ball.carrierId === p.id ? ', porte la balle' : ''}${active ? ', action en cours' : ''}`);
+      node.setAttribute('aria-label', `${full.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${p.grappledBy ? ', agrippé' : ''}${p.prone ? ', à terre' : ''}${frame.ball.carrierId === p.id ? ', porte la balle' : ''}${p.readiedPass ? ', passe préparée' : ''}${active ? ', action en cours' : ''}`);
       node.querySelector('.rb-pawn-number').textContent = p.hp === 0 ? '×' : String(p.number);
       node.querySelector('.rb-pawn-health').setAttribute('width', String(32 * p.hp / p.maxHp));
       poseCharacter(node, p, { carrying: frame.ball.carrierId === p.id });
@@ -339,7 +341,7 @@ export function mountMatch(root, callbacks = {}) {
     resultPanel.hidden = !state.finished || Boolean(frame.animating);
     pause.disabled = state.finished && !frame.animating;
     pause.textContent = frame.animating || running ? 'Pause' : 'Reprendre';
-    const signature = JSON.stringify([frame.ball.carrierId, frame.players.map((p) => [p.id, p.hp, p.prone, p.grappledBy, p.grappling])]);
+    const signature = JSON.stringify([frame.ball.carrierId, frame.players.map((p) => [p.id, p.hp, p.prone, p.grappledBy, p.grappling, p.readiedPass, p.reaction])]);
     if (signature !== healthSignature) { healthSignature = signature; renderSelected(); renderRosters(); }
     if (frame.animating) {
       const text = `Round ${frame.round} · actions simultanées`;
@@ -375,6 +377,7 @@ export function mountMatch(root, callbacks = {}) {
     }
     const call = state.calls.find((c) => c.targetId === p.id);
     if (call) classCopy.append(element('p', 'rb-ball-text', `Appel de ${state.players.find((q) => q.id === call.sourceId).name} : prochaine passe avec avantage.`));
+    if (p.readiedPass) classCopy.append(element('p', 'rb-ball-text', 'Passe prête : attend un partenaire démarqué pour passer en réaction.'));
     selected.append(classCopy);
   }
   function signed(value) { return value >= 0 ? `+${value}` : String(value); }
@@ -392,7 +395,7 @@ export function mountMatch(root, callbacks = {}) {
         const copy = element('div'); copy.append(playerButton, element('small', 'rb-archetype', archetypeLabel(p)), element('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
         const health = element('div', 'rb-health'); health.append(element('span', '', `${p.hp}/${p.maxHp} PV`));
         const meter = element('meter'); meter.min = 0; meter.max = p.maxHp; meter.value = p.hp; meter.setAttribute('aria-label', `Points de vie de ${p.name}`); health.append(meter);
-        const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', (displayFrame?.ball ?? state.ball).carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
+        const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', p.readiedPass ? 'Passe prête' : '', (displayFrame?.ball ?? state.ball).carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
         const resource = element('small', 'rb-resource', p.hp === 0 ? 'Hors jeu' : p.reaction ? 'Réaction disponible' : 'Réaction dépensée');
         row.append(copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource,
           element('small', 'rb-class-resource', classResources(p, state.players))); block.append(row);

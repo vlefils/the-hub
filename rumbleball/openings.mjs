@@ -10,7 +10,7 @@ export const OPENINGS = {
   fallback: {
     name: 'Passe en retrait', rounds: 2, receivers: [5],
     cells: [[4, 2], [5, 3], [5, 4], [4, 5], [2, 3]],
-    description: 'Les n°2 et 3 interceptent l’engagement en réaction. Le n°5 reste derrière et garde sa réaction pour recevoir. Le gagnant privilégie une passe sûre vers lui dès son tour ; les autres bloquent les poursuivants.',
+    description: 'Les n°2 et 3 interceptent l’engagement en réaction. Le n°5 reste disponible derrière. Le gagnant privilégie une passe sûre vers lui dès son tour ; les autres bloquent les poursuivants. Recevoir est gratuit : le relais peut ensuite préparer sa propre passe.',
   },
   cage: {
     name: 'Cage mobile', rounds: 1, receivers: [],
@@ -20,7 +20,7 @@ export const OPENINGS = {
   wings: {
     name: 'Double relais sur les ailes', rounds: 2, receivers: [1, 5],
     cells: [[3, 1], [5, 3], [5, 4], [4, 3], [3, 6]],
-    description: 'Les n°2 et 3 interceptent l’engagement, le n°4 fait écran. Les n°1 et 5 s’écartent sur les deux ailes et gardent leur réaction ; le porteur cherche le relais le plus sûr dès son tour.',
+    description: 'Les n°2 et 3 interceptent l’engagement, le n°4 fait écran. Les n°1 et 5 commencent écartés sur les ailes ; le porteur cherche une passe sûre ou prépare une passe qui déclenche leurs démarquages.',
   },
   press: {
     name: 'Pressing d’entrée', rounds: 1, receivers: [],

@@ -204,7 +204,7 @@ test('concentration : réserve commune à la passe et l’interception, réactio
   a.position = { x: 0, y: 0 }; receiver.position = { x: 4, y: 0 }; b.position = { x: 11, y: 7 }; rival.position = { x: 10, y: 7 };
   a.skills.acrobatics = 100; giveBall(state, a, events);
   resolveAction(state, a, { type: 'pass', targetId: receiver.id, technique: 'precision' }, events);
-  assert.equal(a.classState.focus, 1); assert.ok(a.reaction); assert.equal(receiver.reaction, false);
+  assert.equal(a.classState.focus, 1); assert.ok(a.reaction); assert.equal(receiver.reaction, true);
   a.position = { x: 3, y: 2 }; receiver.position = { x: 0, y: 7 }; b.position = { x: 1, y: 2 }; rival.position = { x: 6, y: 2 };
   b.skills.acrobatics = 10; giveBall(state, b, events); events.length = 0;
   resolveAction(state, b, { type: 'pass', targetId: rival.id }, events);

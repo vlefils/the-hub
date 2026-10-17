@@ -12,6 +12,7 @@ export const active = (state) => state.players.filter((p) => p.hp > 0);
 export const opponents = (state, p) => active(state).filter((q) => q.teamId !== p.teamId);
 export const allies = (state, p) => active(state).filter((q) => q.teamId === p.teamId && q.id !== p.id);
 export const carrier = (state) => playerById(state, state.ball.carrierId);
+export const canReceivePass = (state, player) => Boolean(player?.hp > 0 && (state.version >= 5 || player.reaction));
 const wet = new Set(WET_CELLS.map(([x, y]) => `${x},${y}`));
 export const isWet = (p) => wet.has(`${p.x},${p.y}`);
 export const skill = (p, name) => p.skills[name] ?? modifier(p.abilities[name === 'acrobatics' ? 'dexterity' : 'strength']);
@@ -228,11 +229,32 @@ export function interceptionCandidates(state, passer, receiverPosition) {
     .sort((a, b) => Math.min(...line.map((c) => distance(a.position, c))) - Math.min(...line.map((c) => distance(b.position, c)))
       || skill(b, 'acrobatics') - skill(a, 'acrobatics') || state.initiative.indexOf(a.id) - state.initiative.indexOf(b.id));
 }
+export function cancelReadiedPass(state, actor, events, reason) {
+  if (!actor?.readiedPass) return;
+  actor.readiedPass = null;
+  emit(state, events, 'ready-cancel', `${actor.name} cesse d’attendre sa passe (${reason}).`, { playerId: actor.id, reason });
+}
+export function openPassReceiver(state, passer, receiver) {
+  return Boolean(receiver && receiver.id !== passer.id && receiver.teamId === passer.teamId && canReceivePass(state, receiver)
+    && !receiver.grappledBy && !receiver.prone && distance(passer.position, receiver.position) >= 2 && distance(passer.position, receiver.position) <= 6
+    && !opponents(state, receiver).some((p) => distance(p.position, receiver.position) <= 1)
+    && !interceptionCandidates(state, passer, receiver.position).length);
+}
+export function resolveReadiedPass(state, receiver, events = []) {
+  const passer = carrier(state);
+  if (state.finished || state.version < 5 || state.activeId !== receiver.id || !passer?.readiedPass || !passer.reaction
+    || !openPassReceiver(state, passer, receiver)) return false;
+  const action = { type: 'pass', targetId: receiver.id, reaction: true };
+  const precise = { ...action, technique: 'precision' };
+  const pressured = passer.grappledBy || opponents(state, passer).some((p) => distance(p.position, passer.position) <= 1);
+  return resolveAction(state, passer, pressured && !hasCheckHelp(state, passer) && !hasPassCall(state, passer) && legalAction(state, passer, precise) ? precise : action, events);
+}
 export function ballDefender(state, actor) {
   return opponents(state, actor).filter((p) => distance(p.position, state.ball.position) <= 1)
     .sort((a, b) => Math.max(skill(b, 'wrestling'), skill(b, 'acrobatics')) - Math.max(skill(a, 'wrestling'), skill(a, 'acrobatics')) || a.id.localeCompare(b.id))[0];
 }
 export function giveBall(state, actor, events, reason = 'récupère', recovery = true) {
+  if (state.ball.carrierId !== actor.id) cancelReadiedPass(state, carrier(state), events, 'perte de possession');
   state.ball = { carrierId: actor.id, position: { ...actor.position } };
   if (recovery) state.stats[actor.teamId].recoveries++;
   emit(state, events, 'possession', `${actor.name} ${reason} la balle.`, { playerId: actor.id, teamId: actor.teamId, reason });
@@ -271,6 +293,7 @@ function releaseGrapples(state, actor) {
 }
 export function dropBall(state, actor, events, attacker = null) {
   if (state.ball.carrierId !== actor.id) return;
+  cancelReadiedPass(state, actor, events, 'perte de possession');
   let destination = actor.position;
   if (actor.hp > 0 && attacker) {
     const options = neighbors(actor.position).filter((p) => !occupied(state, p));
@@ -318,7 +341,8 @@ export function performAttack(state, actor, target, events, opportunity = null, 
     || !provokesOpportunity(actor, target, opportunity.from, opportunity.to)
     || !canStep(state, target, opportunity.from, opportunity.to))) return false;
   if (technique && (opportunity || technique !== 'percussion' || actor.archetype !== 'belier' || actor.classState.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2)) return false;
-  if (opportunity) actor.reaction = false; else { actor.action = false; actor.chargeRun = null; }
+  if (opportunity) { actor.reaction = false; cancelReadiedPass(state, actor, events, 'réaction dépensée'); }
+  else { actor.action = false; actor.chargeRun = null; }
   if (technique) {
     actor.classState.adrenaline -= 2;
     classEvent(state, events, 'percussion', actor, `${actor.name} lance une percussion sur ${target.name}.`, { targetId: target.id, label: 'Percussion' });
@@ -351,6 +375,7 @@ export function performAttack(state, actor, target, events, opportunity = null, 
 export function shouldTakeOpportunity(state, actor, mover) {
   const holder = carrier(state);
   if (mover.id === holder?.id) return true;
+  if (actor.readiedPass) return false;
   if (openingPlan(state, actor)?.receivers.includes(actor.id)) return false;
   const passingOutlet = (actor.archetype === 'passeur' || state.version >= 4 && actor.role === 'defender') && actor.instruction !== 'aggressive'
     && state.teams.find((t) => t.id === actor.teamId)?.strategy === 'possession'
@@ -408,12 +433,19 @@ export function moveAlong(state, actor, path, events) {
       releaseSeparatedGrapples(state, events);
     }
     traversed.push({ ...next });
+    if (state.version >= 5 && state.activeId === actor.id && carrier(state)?.readiedPass && carrier(state).id !== actor.id
+      && openPassReceiver(state, carrier(state), actor)) {
+      flushMovement();
+      if (resolveReadiedPass(state, actor, events)) break;
+    }
   }
   flushMovement();
 }
 
 export function legalAction(state, actor, action) {
   if (!action || actor.hp <= 0) return false;
+  if (action.reaction !== undefined && typeof action.reaction !== 'boolean') return false;
+  if (action.reaction && action.type !== 'pass') return false;
   if (action.technique) {
     const r = actor.classState;
     if (action.technique === 'percussion') {
@@ -434,8 +466,11 @@ export function legalAction(state, actor, action) {
     if (isCenterBall(state)) return state.version >= 4 ? actor.reaction : actor.action;
     return ballDefender(state, actor) ? actor.action : actor.interaction;
   }
-  if (!actor.action) return false;
+  const reactionPass = action.type === 'pass' && action.reaction === true;
+  if (reactionPass && !(state.version >= 5 && actor.readiedPass && actor.reaction && state.activeId === target?.id && openPassReceiver(state, actor, target))) return false;
+  if (!actor.action && !reactionPass) return false;
   switch (action.type) {
+    case 'ready-pass': return Boolean(state.version >= 5 && actor.reaction && state.ball.carrierId === actor.id && !actor.readiedPass);
     case 'attack': case 'strip': return Boolean(enemy && (action.type !== 'strip' || state.ball.carrierId === target.id));
     case 'grapple': return Boolean(enemy && !actor.grappling && !target.grappledBy);
     case 'shove': return Boolean(enemy && (!target.prone || action.mode === 'push'));
@@ -493,7 +528,12 @@ function resolveActionEvents(state, actor, action, events) {
     }
     return true;
   }
-  actor.action = false;
+  if (!action.reaction) actor.action = false;
+  if (action.type === 'ready-pass') {
+    actor.readiedPass = { round: state.round, turn: state.turns };
+    emit(state, events, 'ready-pass', `${actor.name} prépare sa passe et attend qu’un partenaire se démarque.`, { playerId: actor.id, readiedPass: { ...actor.readiedPass } });
+    return true;
+  }
   if (action.type === 'dash') { actor.movement += actor.speed; emit(state, events, 'dash', `${actor.name} fonce : mouvement augmenté de ${actor.speed} m.`); }
   if (action.type === 'dodge') { actor.dodging = true; emit(state, events, 'dodge', `${actor.name} esquive jusqu’à son prochain tour.`); }
   if (action.type === 'disengage') { actor.disengaged = true; emit(state, events, 'disengage', `${actor.name} se désengage sans attaque d’opportunité.`); }
@@ -533,6 +573,10 @@ function resolveActionEvents(state, actor, action, events) {
     } else { target.prone = true; emit(state, events, 'prone', `${actor.name} plaque ${target.name} à terre ; la balle reste tenue.`); }
   }
   if (action.type === 'pass') {
+    if (action.reaction) {
+      actor.reaction = false; actor.readiedPass = null;
+      emit(state, events, 'ready-trigger', `${actor.name} déclenche sa passe en réaction au démarquage de ${target.name}.`, { playerId: actor.id, targetId: target.id });
+    } else cancelReadiedPass(state, actor, events, 'passe immédiate');
     const precision = action.technique === 'precision', called = hasPassCall(state, actor);
     if (precision) {
       actor.classState.focus--;
@@ -566,8 +610,8 @@ function resolveActionEvents(state, actor, action, events) {
         else emit(state, events, 'failure', `${interceptor.name} manque l’interception et dépense sa réaction.`);
       }
       if (!intercepted) {
-        if (target.reaction) {
-          target.reaction = false;
+        if (canReceivePass(state, target)) {
+          if (state.version < 5) target.reaction = false;
           state.stats[actor.teamId].passesCompleted++;
           giveBall(state, target, events, 'reçoit', false);
         } else {
@@ -581,6 +625,7 @@ function resolveActionEvents(state, actor, action, events) {
 }
 
 export function beginTurn(state, actor, events) {
+  cancelReadiedPass(state, actor, events, 'début de son prochain tour');
   actor.action = true; actor.bonusAction = true; actor.interaction = true; actor.pickedUp = false;
   actor.chargeRun = null; actor.feintTargetId = null;
   state.calls = (state.calls ?? []).filter((c) => c.sourceId !== actor.id);
@@ -596,6 +641,13 @@ export function assertInvariants(state) {
   if (!inside(state.ball.position) && !isCenterBall(state)) throw new Error('Balle hors terrain');
   if (new Set(alive.map((p) => `${p.position.x},${p.position.y}`)).size !== alive.length) throw new Error('Superposition de joueurs actifs');
   for (const p of state.players) {
+    if (state.version >= 5 && p.readiedPass !== null && (!p.readiedPass || typeof p.readiedPass !== 'object' || Array.isArray(p.readiedPass))) throw new Error('Passe préparée invalide');
+    if (p.readiedPass) {
+      const ready = p.readiedPass;
+      if (state.version < 5 || state.finished || state.ball.carrierId !== p.id || p.hp <= 0 || !p.reaction || p.action
+        || !Number.isInteger(ready.round) || ready.round < 1 || ready.round > state.round
+        || !Number.isInteger(ready.turn) || ready.turn < 0 || ready.turn > state.turns) throw new Error('Passe préparée invalide');
+    }
     if (!inside(p.position) || p.hp < 0 || p.hp > p.maxHp || p.movement < 0) throw new Error(`État invalide : ${p.id}`);
     const r = p.classState;
     if (r) {

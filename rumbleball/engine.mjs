@@ -4,10 +4,10 @@ import { ARCHETYPES, initialClassState } from './classes.mjs';
 import { matchKits } from './appearance.mjs';
 import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
 import { defaultOpening, openingDeployment, validOpening } from './openings.mjs';
-import { assertInvariants, beginTurn, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, resolveCenterEngagement, stat } from './rules.mjs';
+import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
-export const CURRENT_RULES = 4;
+export const CURRENT_RULES = 5;
 export function seedHash(seed) {
   let n = 2166136261;
   for (const char of String(seed)) n = Math.imul(n ^ char.charCodeAt(0), 16777619);
@@ -23,7 +23,7 @@ function centerBall(state) {
 export function createMatch(config = {}) {
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
-  const version = [2, 3].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
+  const version = [2, 3, 4].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
   const deployments = {}, openings = {};
   if (version >= 3) for (const side of ['home', 'away']) {
     openings[side] = config.openings?.[side] ?? defaultOpening(side === 'home' ? config.strategy : config.awayStrategy);
@@ -53,6 +53,7 @@ export function createMatch(config = {}) {
           hp: profile.maxHp, position: version >= 3 ? { ...deployments[teamId][index] } : startPosition(teamId, index), movement: profile.speed,
           ...(version >= 3 ? { startPosition: { ...deployments[teamId][index] } } : {}),
           reaction: true, action: true, interaction: true, pickedUp: false, prone: false,
+          ...(version >= 5 ? { readiedPass: null } : {}),
           dodging: false, disengaged: false, grappledBy: null, grappling: null,
         };
       });
@@ -67,7 +68,7 @@ export function createMatch(config = {}) {
 function finish(state, events, winner) {
   state.finished = true;
   state.calls = [];
-  for (const p of state.players) { p.classState.targetId = null; p.classState.flaw = 0; }
+  for (const p of state.players) { cancelReadiedPass(state, p, events, 'fin du match'); p.classState.targetId = null; p.classState.flaw = 0; }
   state.result = { winnerId: winner?.teamId ?? null, carrierId: winner?.id ?? null, round: state.round,
     reason: winner ? 'possession' : 'draw' };
   const team = state.teams.find((t) => t.id === winner?.teamId);
@@ -115,6 +116,7 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   state.activeId = actor.id;
   state.turns++;
   beginTurn(state, actor, events);
+  resolveReadiedPass(state, actor, events);
   const useClassAction = (path = []) => {
     const choice = decideClassAction(state, actor, path);
     if (choice) resolveClassAction(state, actor, choice, events);
@@ -123,6 +125,7 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   const decision = decideTurn(state, actor);
   state.lastDecision = { playerId: actor.id, reason: decision.reason, action: decision.action.type };
   emit(state, events, 'decision', `${actor.name} · ${decision.reason}`, { playerId: actor.id, action: decision.action.type });
+  const previousHolder = state.ball.carrierId;
   useClassAction(decision.path); moveAlong(state, actor, decision.path, events); useClassAction();
   if (actor.hp > 0) {
     // A reaction may remove possession during movement. Reconsider only actions legal
@@ -132,7 +135,7 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
       const basic = { ...action }; delete basic.technique;
       if (legalAction(state, actor, basic)) action = basic;
     }
-    if (!legalAction(state, actor, action)) {
+    if (!legalAction(state, actor, action) || state.ball.carrierId === actor.id && previousHolder !== actor.id) {
       const revised = decideTurn(state, { ...actor, movement: 0 });
       action = revised.action;
       state.lastDecision = { playerId: actor.id, reason: revised.reason, action: action.type };

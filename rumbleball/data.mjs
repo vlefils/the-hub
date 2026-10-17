@@ -9,7 +9,7 @@ export const ROLE_DESCRIPTIONS = {
   carrier: 'Prend et sécurise la balle ; offre un relais si un équipier porte.',
   blocker: 'Ferme les accès et immobilise les adversaires menaçants.',
   retriever: 'Conteste la balle libre et privilégie les arrachements.',
-  relay: 'Offre une passe sûre et garde sa réaction pour recevoir.',
+  relay: 'Se démarque quand une passe est préparée et garde sa réaction pour la relancer.',
   defender: 'Marque les adversaires dangereux et coupe les lignes de passe.',
 };
 export const PROFILES = [

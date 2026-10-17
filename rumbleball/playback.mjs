@@ -5,8 +5,10 @@ export const courtPoint = ({ x, y }) => ({ x: x * 60 + 30, y: y * 60 + 30 });
 const player = (view, id) => view.players.find((p) => p.id === id);
 const snapshot = (state, facings = {}) => ({
   round: state.round, phase: state.phase, finished: state.finished,
-  players: state.players.map(({ id, teamId, number, hp, maxHp, position, prone, grappling, grappledBy }) =>
-    ({ id, teamId, number, hp, maxHp, position: { ...position }, prone, grappling, grappledBy, facing: facings[id] ?? (teamId === 'home' ? 90 : 270) })),
+  players: state.players.map(({ id, teamId, number, hp, maxHp, position, prone, grappling, grappledBy, readiedPass, reaction }) =>
+    ({ id, teamId, number, hp, maxHp, position: { ...position }, prone, grappling, grappledBy,
+      ...(readiedPass !== undefined ? { readiedPass: readiedPass ? { ...readiedPass } : null, reaction } : {}),
+      facing: facings[id] ?? (teamId === 'home' ? 90 : 270) })),
   ball: { ...state.ball, position: { ...state.ball.position } },
 });
 const copy = (view) => structuredClone(view);
@@ -70,6 +72,14 @@ export function buildCourtPlayback(before, after, events, { speed = 1, facings =
       || (e.type === 'class' && ['lock', 'call', 'feint', 'observe'].includes(e.ability))) finishBeat();
     if (e.resolvedAction) action = e.resolvedAction;
     switch (e.type) {
+      case 'ready-pass':
+        gesture('signal', e.playerId); effect('class', e.playerId, 'Passe prête');
+        stage(450, (next) => { player(next, e.playerId).readiedPass = { ...e.readiedPass }; }); break;
+      case 'ready-trigger':
+        effect('class', e.playerId, 'Réaction');
+        stage(0, (next) => { const p = player(next, e.playerId); p.readiedPass = null; p.reaction = false; }); break;
+      case 'ready-cancel': stage(0, (next) => { player(next, e.playerId).readiedPass = null; }); break;
+      case 'center-reaction': stage(0, (next) => { player(next, e.playerId).reaction = false; }); break;
       case 'class':
         if (e.targetId) face(e.playerId, player(view, e.targetId)?.position);
         gesture(e.ability === 'absorb' ? 'brace' : e.ability === 'feint' ? 'dodge' : 'signal', e.visualId ?? e.playerId);
@@ -86,6 +96,9 @@ export function buildCourtPlayback(before, after, events, { speed = 1, facings =
         break;
       }
       case 'attack': case 'opportunity':
+        if (e.type === 'opportunity' && player(view, e.playerId).reaction !== undefined) {
+          stage(0, (next) => { player(next, e.playerId).reaction = false; });
+        }
         attack = { playerId: e.playerId, targetId: e.targetId };
         face(e.playerId, player(view, e.targetId)?.position); gesture('strike', e.playerId, 450);
         effect(e.type, e.targetId, '', { source: { ...player(view, e.playerId).position }, duration: 420 });

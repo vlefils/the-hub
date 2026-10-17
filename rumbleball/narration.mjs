@@ -79,8 +79,10 @@ export function narrateTurn(events, players) {
         goal = `passer la balle ${to(action.targetId)}`;
         outcome = received ? 'et sa passe est arrivée à bon port' : intercepted ? `mais ${name(intercepted.playerId)} l’a interceptée` : 'mais la balle a fini au sol';
         alone = received ? `${who} a passé la balle ${to(action.targetId)}` : `${who} a tenté une passe ${to(action.targetId)}, ${outcome}`;
+        if (action.reaction) alone += ' en réaction à son démarquage';
         break;
       }
+      case 'ready-pass': alone = `${who} a préparé une passe et attend qu’un partenaire se démarque`; break;
       case 'help':
         goal = `prêter main-forte ${to(action.targetId)}`; alone = `${who} a prêté main-forte ${to(action.targetId)}`;
         break;
@@ -140,7 +142,7 @@ export function narrateTurn(events, players) {
     }
     if (announcements.has(event.type)) { flushMovement(); notices.push({ type: event.type, message: event.message }); }
     else if (event.type === 'stand') { flushMovement(); sentences.push(`${name(event.actorId)} a repris ses appuis.`); }
-    else if (event.type === 'release') { flushMovement(); sentences.push(event.message); }
+    else if (event.type === 'release' || event.type === 'ready-cancel') { flushMovement(); sentences.push(event.message); }
     else if (event.type === 'class') { flushMovement(); sentences.push(event.message); }
     i++;
   }

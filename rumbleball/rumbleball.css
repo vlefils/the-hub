@@ -139,6 +139,7 @@
 .rb-pawn { cursor: pointer; }
 .rb-pawn-number { fill: #fff8df; stroke: #132124; stroke-width: 2; paint-order: stroke; font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; }
 .rb-pawn-ring { fill: none; stroke: none; }
+.rb-pawn.is-ready .rb-pawn-ring { stroke: #8cebdc; stroke-width: 2; stroke-dasharray: 3 3; }
 .rb-pawn.is-selected .rb-pawn-ring { stroke: var(--rb-ball); stroke-width: 3; stroke-dasharray: none; }
 .rb-pawn:focus-visible .rb-pawn-ring { stroke: var(--rb-ball); stroke-width: 3; stroke-dasharray: none; }
 .rb-turn-marker { pointer-events: none; fill: none; stroke-linejoin: round; }

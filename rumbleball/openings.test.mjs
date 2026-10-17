@@ -62,7 +62,7 @@ test('premier tour : engagement avant déplacement, passe immédiate au relais a
   const before = structuredClone(state), turn = stepMatch(state);
   assert.deepEqual(state, before); assert.equal(turn.state.round, 1); assert.equal(turn.state.turns, 1);
   assert.equal(turn.state.ball.carrierId, 'home-4'); assert.equal(turn.state.players[2].reaction, false);
-  assert.equal(turn.state.players[2].action, false); assert.equal(turn.state.players[4].reaction, false);
+  assert.equal(turn.state.players[2].action, false); assert.equal(turn.state.players[4].reaction, true);
   assert.ok(turn.events.findIndex((e) => e.type === 'engagement') < turn.events.findIndex((e) => e.type === 'decision'));
   assert.equal(turn.events.find((e) => e.type === 'pass').targetId, 'home-4');
   assert.equal(turn.events.filter((e) => e.type === 'pass').length, 1); assertInvariants(turn.state);
@@ -111,7 +111,7 @@ test('cinq placements : valides, symétriques, indépendants et compatibles avec
 test('carrière : ouverture sauvegardée, figée au lancement et protégée contre la corruption', () => {
   const c = club(), edited = configureTeam(c, c.lineup, {}, 'balanced', openingDeployment('wings'), 'wings');
   assert.equal(edited.balance, c.balance); const saved = importCareer(exportCareer(edited)), launched = launchCareerMatch(saved);
-  assert.equal(launched.current.state.version, 4); assert.equal(launched.current.config.openings.home, 'wings'); assert.equal(launched.current.state.teams[0].opening, 'wings');
+  assert.equal(launched.current.state.version, 5); assert.equal(launched.current.config.openings.home, 'wings'); assert.equal(launched.current.state.teams[0].opening, 'wings');
   assert.throws(() => configureTeam(launched, launched.lineup, {}, 'balanced', undefined, 'press'), /verrouillée/);
   const corrupt = structuredClone(launched); corrupt.current.state.teams[0].opening = 'cage'; assert.throws(() => exportCareer(corrupt));
   corrupt.current.state.teams[0].opening = 'wings'; corrupt.clubs[0].opening = 'inconnue'; assert.throws(() => exportCareer(corrupt));
