@@ -311,7 +311,7 @@ test('dernier engagement : conserve les PV et permet une victoire au round 13', 
   state.ball.position = { x: 11, y: 7 };
   const restart = stepMatch(state).state;
   assert.equal(restart.round, 13); assert.equal(restart.players[0].hp, 9);
-  assert.equal(restart.ball.carrierId, null); assert.deepEqual(restart.players[0].position, { x: 1, y: 1 });
+  assert.equal(restart.ball.carrierId, null); assert.deepEqual(restart.players[0].position, a.startPosition);
   giveBall(restart, restart.players[0], []);
   const result = finishFrom(restart).state;
   assert.equal(result.result.winnerId, 'home'); assert.equal(result.round, 13);

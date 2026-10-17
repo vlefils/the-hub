@@ -2,6 +2,7 @@ import { clone, PROFILES, STARTS, ROLES, INSTRUCTIONS, STRATEGIES } from './data
 import { decideClassAction, decideMovement, decideTurn } from './ai.mjs';
 import { ARCHETYPES, initialClassState } from './classes.mjs';
 import { matchKits } from './appearance.mjs';
+import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
 import { assertInvariants, beginTurn, carrier, emit, endTurn, legalAction, moveAlong, randomInt, resolveAction, resolveClassAction, stat } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
@@ -15,13 +16,19 @@ const startPosition = (team, index) => {
   return team === 'home' ? { x, y } : { x: 11 - x, y: 7 - y };
 };
 function centerBall(state) {
-  state.ball = { carrierId: null, position: { x: 5 + randomInt(state, 2), y: 3 + randomInt(state, 2) } };
+  state.ball = { carrierId: null, position: state.version >= 3 ? { ...CENTER } : { x: 5 + randomInt(state, 2), y: 3 + randomInt(state, 2) } };
 }
 export function createMatch(config = {}) {
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
+  const version = config.rulesVersion === 2 ? 2 : 3;
+  const deployments = {};
+  if (version >= 3) for (const side of ['home', 'away']) {
+    deployments[side] = config.deployments?.[side] ?? defaultDeployment(side === 'home' ? config.strategy : config.awayStrategy, side);
+    if (!validDeployment(deployments[side], side)) throw new Error('Déploiement invalide : cinq cases distinctes dans la moitié de chaque équipe.');
+  }
   const state = {
-    version: 2, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
+    version, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
     phase: 'regular', finished: false, result: null, turns: 0, aids: [], calls: [], lastDecision: null,
     teams: [
       { id: 'home', kitColor: kits.home, name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced' },
@@ -39,7 +46,8 @@ export function createMatch(config = {}) {
           name: config.rosters?.[teamId] ? profile.name : teamId === 'home' ? profile.trainingName : profile.name,
           role: Object.hasOwn(ROLES, assigned?.role) ? assigned.role : profile.role,
           instruction: Object.hasOwn(INSTRUCTIONS, assigned?.instruction) ? assigned.instruction : 'normal',
-          hp: profile.maxHp, position: startPosition(teamId, index), movement: profile.speed,
+          hp: profile.maxHp, position: version >= 3 ? { ...deployments[teamId][index] } : startPosition(teamId, index), movement: profile.speed,
+          ...(version >= 3 ? { startPosition: { ...deployments[teamId][index] } } : {}),
           reaction: true, action: true, interaction: true, pickedUp: false, prone: false,
           dodging: false, disengaged: false, grappledBy: null, grappling: null,
         };
@@ -72,7 +80,7 @@ function endRound(state, events) {
   if (state.round === 13) {
     state.phase = 'final'; centerBall(state); state.aids = []; state.calls = [];
     for (const p of state.players) {
-      p.position = startPosition(p.teamId, p.number - 1); p.grappling = null; p.grappledBy = null; p.dodging = false;
+      p.position = { ...(p.startPosition ?? startPosition(p.teamId, p.number - 1)) }; p.grappling = null; p.grappledBy = null; p.dodging = false;
       p.classState.targetId = null; p.classState.flaw = 0;
     }
     emit(state, events, 'restart', 'Dernier engagement au centre : un round pour contrôler la balle. PV et KO conservés.');

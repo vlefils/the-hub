@@ -4,7 +4,7 @@ Accessible dans **Outils → Rumbleball** (`#outils-rumbleball`). Une carrière 
 
 ## Carrière
 
-Fonder un club donne 2 400 chromas. Choisir cinq à huit des douze candidats, puis valider les contrats en une fois. Les vues **Effectif**, **Recrutement**, **Équipement** et **Ligue** donnent accès à la composition, aux consignes, aux achats et au calendrier. Composition et consignes sont enregistrées automatiquement ; choisir un titulaire déjà présent échange les deux positions. Les cinq adversaires disposent de sept joueurs fixes, progressent et font tourner leurs titulaires en fonction de leur fatigue ; aucune adaptation à la puissance du club.
+Fonder un club donne 2 400 chromas. Choisir cinq à huit des douze candidats, puis valider les contrats en une fois. Les vues **Effectif**, **Recrutement**, **Équipement** et **Ligue** donnent accès à la composition, aux consignes, aux achats et au calendrier. Composition, consignes et placement sont enregistrés automatiquement ; choisir un titulaire déjà présent échange les deux positions. Dans **Déploiement**, choisir le joueur puis cliquer une case de sa moitié ; une case occupée échange les deux joueurs. Les flèches parcourent les cases et Entrée valide le placement. La même interface existe en Exhibition. Les cinq adversaires disposent de sept joueurs fixes, progressent et font tourner leurs titulaires en fonction de leur fatigue ; aucune adaptation à la puissance du club.
 
 Dix journées aller-retour par saison. Les salaires de tout l’effectif sont prélevés une seule fois au lancement, même si le solde devient négatif. Seuls les salaires permettent le découvert : les achats restent bloqués jusqu’au remboursement par primes ou ventes. Prime de match : défaite 200, nul 275, victoire 350 ; classement : 600 / 400 / 200 / 100 / 100 / 100. La nouvelle saison conserve argent, dette, joueurs et équipement et remet la fatigue à zéro.
 
@@ -29,7 +29,7 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prot
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs rumbleball/appearance.test.mjs rumbleball/round-playback.test.mjs rumbleball/round-ui.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs rumbleball/appearance.test.mjs rumbleball/round-playback.test.mjs rumbleball/round-ui.test.mjs rumbleball/deployment.test.mjs
 ```
 
 Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
@@ -37,6 +37,8 @@ Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 
 Les tests de carrière couvrent aussi trois saisons, une saison de défaites avec huit joueurs coûteux endettés, la progression des adversaires, l’équipement, les sauvegardes corrompues et les erreurs de stockage. Les tests d’événements d’interface utilisent un petit DOM en mémoire et le vrai lecteur de match : ils vérifient les transitions et les erreurs, sans prétendre vérifier le rendu ou le responsive dans un navigateur.
 
 Les tests de lecture simultanée contrôlent le chevauchement des courses indépendantes, les contacts, les cases libérées et diagonales croisées, les passes, la lutte, les KO, le dernier engagement et les quatre vitesses. Trois matchs animés conservent exactement l’état, les jets et le journal de leur simulation séquentielle ; leurs images sont échantillonnées pour détecter les collisions. Une horloge de test vérifie douze secondes par round, le compteur, les repères multiples, la pause, le résultat différé et la cadence avec animations réduites. Une erreur de stockage au troisième tour d’un lot arrête la résolution ; la reprise conserve les dix tours sans duplication.
+
+Les tests de déploiement vérifient les limites des deux moitiés, les échanges de cases occupées, la sauvegarde, le gel en match, le clavier et les noms longs. L’engagement couvre les quatre cases éligibles, le DD 10 seul, l’opposition, les égalités, l’ordre d’initiative, la dépense de l’action et le maintien du ballon à l’intersection après un échec. Les anciennes rencontres restent importables et continuent avec leurs règles et leur hasard d’origine.
 
 Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 242 victoires des Recrues, 258 des Charognards, 22 prolongations sur les 500 matchs. Les 30 matchs de compositions donnent 13 victoires des Recrues et 17 des Charognards. Le journal compte 295 décisions de passe, hors passes enchaînées après un ramassage. Les tests contrôlés vérifient aussi la concentration partagée et les interceptions. Les résultats de la nouvelle campagne et des deux journées de carrière figurent dans le [compte rendu](playtests/README.md).
 
@@ -46,6 +48,7 @@ Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 2
 - `classes.mjs` : les quatre archétypes, leurs techniques, ressources initiales et textes partagés avec l’interface.
 - `progression.mjs` : compilation pure, niveaux, fatigue, salaires et catalogue sportif.
 - `appearance.mjs` : identité visuelle déterministe, couleurs de club, tenue adverse de contraste et armes illustrées ; aucun tirage de la simulation.
+- `deployment.mjs` et `deployment-ui.mjs` : géométrie de l’engagement, validation des deux moitiés, formations par défaut et éditeur de placement partagé avec l’Exhibition.
 - `career.mjs` : transitions pures de carrière, finances, calendrier et règlement des journées.
 - `career-storage.mjs` : validation, sauvegarde atomique et export/import JSON.
 - `career-ui.mjs` : gestion du club ; utilise le lecteur de match de `ui.mjs` pour préserver terrain, animations et journal.
@@ -79,6 +82,8 @@ API du moteur : `createMatch(config)` retourne un état ; `stepMatch(state)` ret
 
 L’option de lecture `stepMatch(state, { stopAtRoundEnd: true })` s’arrête à la frontière du round lorsque ses derniers créneaux sont KO. Elle évite de résoudre le premier joueur vivant du round suivant dans le même lot. Concaténer ses étapes conserve les événements et l’état final de l’API ordinaire.
 
+Les nouvelles rencontres utilisent la version 3 : `deployments.home` et `deployments.away` acceptent chacun cinq coordonnées de cases entières, distinctes et dans la moitié correspondante. Une entrée invalide est refusée ; sans placement explicite, la formation dépend du plan collectif. Les clubs conservent leur formation dans leur propre repère (colonnes A–F), retournée de 180° quand ils jouent à droite. Les cinq positions suivent les emplacements de titulaires. Le dernier engagement reprend les positions choisies sans restaurer les PV ou ressources. Les rencontres de version 2 sauvegardées avant ce changement conservent leur placement et leur engagement anciens jusqu’à leur fin ; la sauvegarde de carrière reste au format 1.
+
 ## Règles retenues
 
 Source du socle : `scenario/la-troisieme-mi-temps/04-match.md`. Les profils des Charognards sont transcrits dans les données pour que le jeu ne dépende pas du dossier de scénario à l’exécution. Les Recrues en sont des copies mécaniques. Les capacités particulières du scénario sont remplacées par les adaptations sportives ci-dessous ; elles ne modifient pas les classes du livre. L’attaque du Frigo garde son +5 et son 1d8+3.
@@ -103,10 +108,11 @@ Le temps réglementaire dure deux minutes à ×1, soit dix rounds de douze secon
 Conventions du prototype :
 
 - Grille 12 × 8, coordonnées depuis zéro ; zones humides x=3–4/y=1–2 et x=7–8/y=5–6. Déplacement et portée mesurés en cases, diagonales comprises. Une diagonale entre deux cases occupées est bloquée. Les joueurs actifs bloquent les cases, les KO non.
-- Départ des Recrues en (1,1), (1,2), (1,3), (1,5), (1,6), adversaires par rotation de 180°. Balle tirée parmi les quatre cases centrales. Égalité complète d’initiative : tirage déterministe.
+- Déploiement libre : cinq joueurs sur cinq cases distinctes, colonnes A–F pour l’équipe de gauche et G–L pour celle de droite. Le ballon apparaît exactement à l’intersection de F4, G4, F5 et G5, soit `(5.5, 3.5)` dans les coordonnées internes des centres de cases. Seul le ballon utilise ce point fractionnaire ; les joueurs restent sur des cases entières. Aucun tirage de case au centre. Égalité complète d’initiative : tirage déterministe.
 - Réactions renouvelées au début du round, jamais au début du tour individuel. Une réception, une interception ou une opportunité utilise la même ressource. Les relais et joueurs prudents peuvent réserver leur réaction lorsque leur équipe porte ; ils contestent toujours un porteur adverse quittant leur allonge.
 - Une opportunité exige un pas volontaire allant d’une case adjacente à une case hors allonge. Entrer dans l’allonge ou rester adjacent (diagonales comprises) ne la provoque pas. L’attaque est résolue avant le pas : un KO peut empêcher toute sortie effective. Le journal conserve les cases du déclenchement ; les déplacements antérieurs sont publiés avant la réaction. Le terrain trace tous les tronçons du tour et marque en jaune le pas déclencheur, même interrompu.
-- Ramassage à une case ou moins : interaction sans opposition adjacente à la balle ; sinon action contre le meilleur opposant adjacent. Un seul ramassage par tour. Porter n’interdit pas l’attaque de base à une main.
+- Engagement central : seuls les joueurs des quatre cases autour de l’intersection peuvent tenter une prise, lors de leur tour d’initiative, en dépensant leur action même en cas d’échec. Meilleur Lutte/Acrobaties DD 10 sans adversaire dans ces quatre cases ; sinon test opposé contre le meilleur défenseur adverse vivant, avec son meilleur Lutte/Acrobaties et égalité au défenseur. Une seule tentative par tour. Un échec laisse le ballon à l’intersection, pour les suivants ; aucune prise gratuite par interaction après une action dépensée.
+- Après une chute sur une case normale : ramassage à une case ou moins, interaction sans opposition adjacente à la balle, sinon action contre le meilleur opposant adjacent. Un seul ramassage par tour. Porter n’interdit pas l’attaque de base à une main.
 - Interception après un test de passe réussi : une seule tentative, par proximité à la trajectoire puis Acrobaties puis initiative. Une égalité laisse la passe suivre son cours. La trajectoire traverse les intérieurs des cases ; une simple tangence de coin n’ajoute pas de case.
 - Plaquer et agripper : Lutte contre Athlétisme ou Acrobaties. Arracher : Lutte contre Lutte ou Acrobaties. Se libérer : Athlétisme ou Acrobaties contre Lutte. Les défenses choisissent leur meilleur bonus ; égalité au défenseur.
 - Aider : avantage non cumulable à un prochain test d’un allié adjacent, ou à sa prochaine attaque contre une cible adjacente à l’aidant. Expiration au début du prochain tour de l’aidant. L’aide ne donne pas l’avantage aux sauvegardes de Constitution.

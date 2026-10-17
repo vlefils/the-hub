@@ -1,5 +1,6 @@
 import { COURT, WET_CELLS, modifier } from './data.mjs';
 import { ARCHETYPES, classCaps, isRunner } from './classes.mjs';
+import { isCenterBall } from './deployment.mjs';
 
 export const distance = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 export const sameCell = (a, b) => a.x === b.x && a.y === b.y;
@@ -205,8 +206,8 @@ export function reachableCells(state, actor, budget = actor.movement) {
 export function trajectory(from, to) {
   const points = [];
   const dx = to.x - from.x, dy = to.y - from.y;
-  for (let y = Math.min(from.y, to.y); y <= Math.max(from.y, to.y); y++) {
-    for (let x = Math.min(from.x, to.x); x <= Math.max(from.x, to.x); x++) {
+  for (let y = Math.floor(Math.min(from.y, to.y)); y <= Math.ceil(Math.max(from.y, to.y)); y++) {
+    for (let x = Math.floor(Math.min(from.x, to.x)); x <= Math.ceil(Math.max(from.x, to.x)); x++) {
       let low = 0, high = 1;
       for (const [origin, delta, min, max] of [[from.x, dx, x - .5, x + .5], [from.y, dy, y - .5, y + .5]]) {
         if (delta === 0) { if (origin < min || origin > max) high = -1; }
@@ -408,6 +409,7 @@ export function legalAction(state, actor, action) {
   const enemy = target && target.hp > 0 && target.teamId !== actor.teamId && distance(actor.position, target.position) <= 1;
   if (action.type === 'pickup') {
     if (state.ball.carrierId || actor.pickedUp || distance(actor.position, state.ball.position) > 1) return false;
+    if (isCenterBall(state)) return actor.action;
     return ballDefender(state, actor) ? actor.action : actor.interaction;
   }
   if (!actor.action) return false;
@@ -430,6 +432,7 @@ export function legalAction(state, actor, action) {
 export function resolveAction(state, actor, action, events = []) {
   const firstEvent = events.length;
   const context = { ...action, playerId: actor.id,
+    ...(action?.type === 'pickup' && isCenterBall(state) ? { atCenter: true } : {}),
     targetId: action?.targetId ?? (action?.type === 'release' ? actor.grappling : action?.type === 'escape' ? actor.grappledBy : undefined) };
   const resolved = resolveActionEvents(state, actor, action, events);
   // Mark the actual action, including replans and pickup follow-ups, on its first event.
@@ -451,12 +454,18 @@ function resolveActionEvents(state, actor, action, events) {
   if (action.type === 'pickup') {
     actor.pickedUp = true;
     const defender = ballDefender(state, actor);
-    if (!defender) { actor.interaction = false; giveBall(state, actor, events); }
+    if (!defender && isCenterBall(state)) {
+      actor.action = false;
+      const attempt = skillCheck(state, actor, Math.max(skill(actor, 'wrestling'), skill(actor, 'acrobatics')), events, `${actor.name} · prise au centre DD 10`);
+      if (attempt >= 10) giveBall(state, actor, events, 'attrape');
+      else emit(state, events, 'failure', `${actor.name} manque le ballon au centre ; il reste à l’intersection.`);
+    }
+    else if (!defender) { actor.interaction = false; giveBall(state, actor, events); }
     else {
       actor.action = false;
       const attempt = skillCheck(state, actor, Math.max(skill(actor, 'wrestling'), skill(actor, 'acrobatics')), events, `${actor.name} · ramassage contesté`);
       const defense = skillCheck(state, defender, Math.max(skill(defender, 'wrestling'), skill(defender, 'acrobatics')), events, `${defender.name} · opposition au ramassage`);
-      if (attempt > defense) giveBall(state, actor, events);
+      if (attempt > defense) giveBall(state, actor, events, isCenterBall(state) ? 'attrape' : 'récupère');
       else emit(state, events, 'failure', `${defender.name} empêche le ramassage ; balle libre.`);
     }
     return true;
@@ -561,7 +570,7 @@ export function beginTurn(state, actor, events) {
 }
 export function assertInvariants(state) {
   const alive = active(state);
-  if (!inside(state.ball.position)) throw new Error('Balle hors terrain');
+  if (!inside(state.ball.position) && !isCenterBall(state)) throw new Error('Balle hors terrain');
   if (new Set(alive.map((p) => `${p.position.x},${p.position.y}`)).size !== alive.length) throw new Error('Superposition de joueurs actifs');
   for (const p of state.players) {
     if (!inside(p.position) || p.hp < 0 || p.hp > p.maxHp || p.movement < 0) throw new Error(`État invalide : ${p.id}`);

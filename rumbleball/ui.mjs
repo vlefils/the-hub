@@ -9,6 +9,8 @@ import { courtPoint, createCourtPlayback, nextCourtTurnDelay, ROUND_DURATION } f
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
 import { ARCHETYPES, archetypeLabel, classResources, classAbilities } from './classes.mjs';
 import { mountCareer } from './career-ui.mjs';
+import { deploymentEditor } from './deployment-ui.mjs';
+import { defaultDeployment, isCenterBall } from './deployment.mjs';
 
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
@@ -59,6 +61,8 @@ export function mountMatch(root, callbacks = {}) {
     return { role, instruction, portrait };
   });
   setup.append(setupRows);
+  const deployment = deploymentEditor({ players: state.players.filter((p) => p.teamId === 'home'), positions: defaultDeployment(), color: colorInput.value, onChange: updatePreview });
+  setup.append(deployment.root);
   const setupFoot = element('div', 'rb-setup-foot');
   const seedLabel = element('label', 'rb-field rb-seed', 'Code du match');
   const seedInput = element('input'); seedInput.name = 'rb-seed'; seedInput.value = DEFAULT_SEED; seedInput.maxLength = 80; seedInput.required = true;
@@ -113,6 +117,7 @@ export function mountMatch(root, callbacks = {}) {
   arrow.append(svg('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: '#ffdb78' })); definitions.append(arrow); court.append(definitions);
   court.append(arenaBackdrop(WET_CELLS));
   const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { 'aria-hidden': 'true' });
+  const centerZone = svg('rect', { x: 300, y: 180, width: 120, height: 120, class: 'rb-center-zone', 'aria-hidden': 'true', visibility: 'hidden' });
   const links = svg('g', { class: 'rb-court-links', 'aria-hidden': 'true' });
   const effects = svg('g', { class: 'rb-court-effects', 'aria-hidden': 'true' });
   const turnMarkers = svg('g', { 'aria-hidden': 'true' });
@@ -120,7 +125,7 @@ export function mountMatch(root, callbacks = {}) {
   const ballSprite = svg('g'); const ballHalo = svg('circle', { r: 20, class: 'rb-ball-halo' });
   const ballBody = svg('ellipse', { transform: 'rotate(-35)', class: 'rb-ball' });
   ballSprite.append(ballHalo, ballBody, svg('path', { d: 'M-4,0h8 M0,-4v8', class: 'rb-ball-seam' })); ballLayer.append(ballSprite);
-  court.append(trace, links, pawns, turnMarkers, ballLayer, effects);
+  court.append(trace, centerZone, links, pawns, turnMarkers, ballLayer, effects);
   const courtPlayback = createCourtPlayback(renderCourtFrame);
   const legend = element('div', 'rb-legend');
   for (const [cls, text] of [['home', 'Recrues'], ['away', 'Charognards'], ['ball', 'Ballon'], ['wet', 'Sol humide · coût ×2'], ['impact', 'Impact / dégâts'], ['grapple', 'Lutte']]) {
@@ -144,6 +149,7 @@ export function mountMatch(root, callbacks = {}) {
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
     `10 rounds de ${ROUND_DURATION / 1000} secondes, soit deux minutes à ×1. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.`,
+    'Engagement : déploiement libre dans sa moitié. Le ballon apparaît à l’intersection de F4, G4, F5 et G5. Seuls les joueurs de ces quatre cases peuvent tenter de l’attraper, à leur tour d’initiative, en dépensant leur action. Lutte ou Acrobaties DD 10 sans opposition ; test opposé si un adversaire conteste, égalité au défenseur. Un échec laisse le ballon au centre.',
     `Lecture simultanée : un round dure ${ROUND_DURATION / 1000} secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.`,
     'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir, intercepter et frapper en opportunité utilisent cette même réaction.',
     'Une attaque d’opportunité est provoquée par un pas volontaire qui fait sortir de l’allonge (une case, diagonales comprises). Elle se résout avant ce pas : un KO laisse donc le joueur dans sa case de départ. Entrer dans l’allonge ou tourner autour sans en sortir ne provoque rien.',
@@ -156,12 +162,13 @@ export function mountMatch(root, callbacks = {}) {
   const errorBox = element('p', 'rb-error'); errorBox.setAttribute('role', 'alert'); errorBox.hidden = true; root.prepend(errorBox);
 
   function config() {
-    return { seed: seedInput.value.trim() || DEFAULT_SEED, strategy: strategySelect.value, kitColors: { home: colorInput.value },
+    return { seed: seedInput.value.trim() || DEFAULT_SEED, rulesVersion: 3, deployments: { home: deployment.value }, strategy: strategySelect.value, kitColors: { home: colorInput.value },
       players: rowControls.map(({ role, instruction }) => ({ role: role.value, instruction: instruction.value })) };
   }
   function updatePreview() {
     if (started) return;
     state = createMatch(config()); selectedId = null; render();
+    deployment.update({ players: state.players.filter((p) => p.teamId === 'home'), color: colorInput.value });
   }
   function setRunning(value) {
     running = value && started && !state.finished && visible();
@@ -263,6 +270,7 @@ export function mountMatch(root, callbacks = {}) {
   }
   function renderCourtFrame(frame) {
     displayFrame = frame;
+    centerZone.setAttribute('visibility', isCenterBall(frame) ? 'visible' : 'hidden');
     const activeIds = new Set(started ? playbackMode === 'round' ? frame.activeIds ?? [] : [state.activeId] : []);
     for (const p of frame.players) {
       const node = pawnNodes.get(p.id);
@@ -296,7 +304,7 @@ export function mountMatch(root, callbacks = {}) {
     const seconds = Math.ceil(remaining);
     phaseText.textContent = frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
     timeText.textContent = frame.finished ? '00:00' : frame.round > 10 ? `+${String(Math.ceil(roundSeconds * (1 - (frame.roundProgress ?? 0)))).padStart(2, '0')}` : `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-    possessionText.textContent = frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : 'Balle libre';
+    possessionText.textContent = frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : isCenterBall(frame) ? 'Engagement · ballon à l’intersection centrale' : 'Balle libre';
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) score.querySelector('.rb-team-count').textContent = `${frame.players.filter((p) => p.teamId === teamId && p.hp > 0).length} / 5 en jeu`;
     toolbar.hidden = !started || state.finished && !frame.animating;

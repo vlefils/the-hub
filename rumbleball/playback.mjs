@@ -132,6 +132,7 @@ export function buildCourtPlayback(before, after, events, { speed = 1, facings =
       case 'help': gesture('signal', action?.playerId); effect('help', action?.targetId, 'Aide'); stage(650); break;
       case 'failure':
         if (['grapple', 'strip', 'shove'].includes(action?.type)) { effect('miss', action.targetId, 'Résiste'); stage(650); }
+        if (action?.type === 'pickup') { face(action.playerId, view.ball.position); gesture('receive', action.playerId); effect('miss', action.playerId, 'Manqué'); stage(650); }
         break;
     }
   }

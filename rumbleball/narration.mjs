@@ -48,6 +48,10 @@ export function narrateTurn(events, players) {
       }
       case 'pickup': {
         const success = possessions.some((e) => e.playerId === action.playerId);
+        if (action.atCenter) {
+          goal = 'attraper le ballon au centre'; outcome = success ? 'et l’a attrapé' : 'mais l’a manqué';
+          alone = success ? `${who} a attrapé le ballon au centre` : `${who} a tenté d’attraper le ballon au centre, sans succès`; break;
+        }
         goal = 'récupérer la balle'; outcome = success ? 'et a pris le contrôle' : 'mais s’est fait barrer la route';
         alone = success ? `${who} a récupéré la balle` : `${who} a tenté de récupérer la balle, sans succès`;
         break;

@@ -3,6 +3,7 @@ import { CATALOGUE } from './progression.mjs';
 import { assertInvariants } from './rules.mjs';
 import { createMatch } from './engine.mjs';
 import { validKitColor } from './appearance.mjs';
+import { validDeployment } from './deployment.mjs';
 
 export const CAREER_KEY = 'the-hub.rumbleball.career.v1';
 const check = (condition) => { if (!condition) throw new Error('Sauvegarde de carrière invalide ou incompatible.'); };
@@ -23,6 +24,7 @@ export function validateCareer(c) {
   };
   for (const [index, club] of c.clubs.entries()) {
     check(club.kitColor === undefined || validKitColor(club.kitColor));
+    check(club.deployment === undefined || validDeployment(club.deployment));
     check(name(club.id) && name(club.name) && name(club.style) && Object.hasOwn(STRATEGIES, club.strategy) && Array.isArray(club.players));
     check(index ? club.players.length === 7 : c.status === 'draft' ? club.players.length === 0 : club.players.length >= 5 && club.players.length <= 8);
     club.players.forEach(validatePlayer);
@@ -83,12 +85,15 @@ export function validateCareer(c) {
     if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, 10));
     else check(m.state.result === null);
     check(['home', 'away'].every((side) => m.state.stats?.[side] && ['passesAttempted', 'passesCompleted', 'recoveries', 'knockouts'].every((key) => integer(m.state.stats[side][key]))));
-    const initial = createMatch(m.config);
+    check([2, 3].includes(m.state.version));
+    check(m.config.rulesVersion === undefined || m.config.rulesVersion === m.state.version);
+    const initial = createMatch({ ...m.config, rulesVersion: m.state.version });
     check(initial.players.every((p, i) => {
       const saved = m.state.players[i];
       check(name(p.name) && integer(p.level, 1) && p.level <= 5 && integer(p.maxHp, 1) && integer(p.armor, 1) && Number.isFinite(p.speed) && p.speed > 0);
       check(Object.values(p.skills).every(Number.isFinite) && Object.values(p.abilities).every(Number.isFinite) && Object.values(p.attack).every(Number.isFinite));
       check(integer(saved.hp) && Number.isFinite(saved.movement) && saved.movement >= 0 && saved.classState && Array.isArray(m.state.aids) && Array.isArray(m.state.calls));
+      if (m.state.version >= 3) check(JSON.stringify(p.startPosition) === JSON.stringify(saved.startPosition));
       return ['playerId', 'id', 'teamId', 'name', 'level', 'archetype', 'maxHp', 'armor', 'speed', 'number', 'role', 'instruction', 'initiativeDie', 'initiative', 'initiativeTie'].every((key) => p[key] === saved[key])
         && ['skills', 'abilities', 'attack'].every((key) => JSON.stringify(p[key]) === JSON.stringify(saved[key]));
     }));

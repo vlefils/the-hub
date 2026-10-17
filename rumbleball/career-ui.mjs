@@ -1,10 +1,12 @@
-import { ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
+import { ROLES, INSTRUCTIONS, STRATEGIES, STARTS } from './data.mjs';
 import { archetypeLabel, classAbilities } from './classes.mjs';
 import { CATALOGUE, XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice } from './progression.mjs';
 import { createCareer, confirmDraft, configureTeam, setClubColor, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
 import { loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
 import { KIT_COLORS, clubKit } from './appearance.mjs';
 import { playerPortrait } from './visuals.mjs';
+import { deploymentEditor } from './deployment-ui.mjs';
+import { clubDeployment } from './deployment.mjs';
 
 const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}`, text); b.type = 'button'; b.addEventListener('click', action); return b; };
@@ -153,6 +155,10 @@ export function mountCareer(root, mountMatch) {
     const names = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, p.name]));
     for (const [i, id] of career.lineup.entries()) { const s = select(names, id); s.disabled = locked; slotControls.push(s); lineup.append(field(`Titulaire ${i + 1}`, s)); }
     form.append(lineup);
+    const deploymentPlayers = () => career.lineup.map((id) => compilePlayer(ownedPlayers(career).find((p) => p.id === id), career.inventory));
+    const positions = locked ? career.current.config.deployments?.home ?? STARTS.map(([x, y]) => ({ x, y })) : clubDeployment(career.clubs[0]);
+    const deployment = deploymentEditor({ players: deploymentPlayers(), positions, color: color.value, disabled: locked, onChange: () => attempt(commitLineup) });
+    form.append(deployment.root);
     const assignments = {}, statusLabels = new Map(), portraits = new Map(), list = el('div', 'rb-career-roster');
     for (const p of ownedPlayers(career)) {
       const compiled = compilePlayer(p, career.inventory), level = levelOf(p), row = el('section', 'rb-career-player'), heading = el('div', 'rb-career-player-head'), info = el('div');
@@ -176,18 +182,19 @@ export function mountCareer(root, mountMatch) {
     form.append(list); const submit = btn('Enregistrer la composition et les consignes', () => {}, true); submit.type = 'submit'; submit.disabled = locked; form.append(submit);
     const formNotice = el('p', 'rb-muted', 'Composition et consignes sont enregistrées automatiquement. Choisir un titulaire déjà présent échange leurs positions.'); form.append(formNotice);
     function commitLineup() {
-      career = configureTeam(career, slotControls.map((s) => s.value), Object.fromEntries(Object.entries(assignments).map(([id, controls]) => [id, { role: controls.role.value, instruction: controls.instruction.value }])), strategy.value);
+      career = configureTeam(career, slotControls.map((s) => s.value), Object.fromEntries(Object.entries(assignments).map(([id, controls]) => [id, { role: controls.role.value, instruction: controls.instruction.value }])), strategy.value, deployment.value);
       career = setClubColor(career, color.value);
       const saved = save();
       for (const [id, label] of statusLabels) { const index = career.lineup.indexOf(id); label.textContent = index < 0 ? 'Remplaçant' : `Titulaire ${index + 1}`; }
       for (const p of ownedPlayers(career)) portraits.get(p.id).replaceChildren(playerPortrait(compilePlayer(p, career.inventory), color.value));
+      deployment.update({ players: deploymentPlayers(), color: color.value });
       formNotice.textContent = saved ? 'Composition et consignes enregistrées.' : 'Composition modifiée en mémoire ; sauvegarde à réessayer.';
     }
     for (const [index, control] of slotControls.entries()) control.addEventListener('change', () => {
       const duplicate = slotControls.find((other, otherIndex) => otherIndex !== index && other.value === control.value);
       if (duplicate) duplicate.value = career.lineup[index];
     });
-    form.addEventListener('change', () => attempt(commitLineup));
+    form.addEventListener('change', (event) => { if (!deployment.root.contains(event.target)) attempt(commitLineup); });
     form.addEventListener('submit', (event) => { event.preventDefault(); attempt(commitLineup); });
     manager.append(form);
   }

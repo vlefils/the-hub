@@ -254,6 +254,7 @@ test('bots : feinte utile, exploitation de faille et passe ajustée sous pressio
   b.role = 'blocker';
   assert.equal(decideClassAction(state, a, [{ x: 1, y: 3 }]).type, 'feint');
   assign(a, 'passeur'); a.role = 'blocker'; const relay = state.players[1]; relay.role = 'carrier'; relay.position = { x: 0, y: 0 };
+  state.initiative = [a.id, relay.id, b.id, ...state.players.filter((p) => ![a.id, relay.id, b.id].includes(p.id)).map((p) => p.id)];
   giveBall(state, a, events); const original = structuredClone(state);
   const decision = decideTurn(state, a); assert.equal(decision.action.type, 'pass'); assert.equal(decision.action.technique, 'precision');
   assert.deepEqual(state, original);
