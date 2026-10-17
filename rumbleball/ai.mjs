@@ -13,6 +13,7 @@ const turnsUntil = (state, id) => {
   return gap > 0 ? gap : gap + state.initiative.length;
 };
 export const strategyOf = (state, actor) => state.teams.find((t) => t.id === actor.teamId).strategy;
+const passingGame = (state, actor) => state.version >= 5 && strategyOf(state, actor) === 'possession';
 export const matchPriority = (state) => state.version >= 5 ? state.round <= 6 ? 'combat' : 'ball' : null;
 const combatActionBonus = { attack: 60, grapple: 20, shove: 20, strip: -80 };
 
@@ -108,8 +109,10 @@ function possessionSafety(state, actor, cell) {
   return safety(state, actor, cell) + Math.min(8, Math.max(skill(actor, 'wrestling'), skill(actor, 'acrobatics'))) * 2
     - Number(Boolean(actor.grappledBy)) * 18 - Number(actor.prone) * 10 - (1 - actor.hp / actor.maxHp) * 10 - pursuers * (state.version >= 4 ? 16 : 8);
 }
-const carryWeight = (state, actor) => strategyOf(state, actor) === 'possession' || actor.instruction === 'cautious' ? 1.6 : 1.2;
-const keepBonus = (state, actor) => 48 + Number(strategyOf(state, actor) === 'possession') * 12 + Number(actor.instruction === 'cautious') * 12;
+const carryWeight = (state, actor) => passingGame(state, actor) ? actor.instruction === 'cautious' ? 1.4 : 1.2
+  : strategyOf(state, actor) === 'possession' || actor.instruction === 'cautious' ? 1.6 : 1.2;
+const keepBonus = (state, actor) => 48 + Number(strategyOf(state, actor) === 'possession'
+  && (!passingGame(state, actor) || state.round >= 9)) * 12 + Number(actor.instruction === 'cautious') * 12;
 
 // Public dice distributions only: one pass check and the one eligible interceptor.
 // No RNG is consumed and neither the seed nor future bot decisions are inspected.
@@ -155,7 +158,15 @@ function passScore(state, actor, receiver, precision = false, opening = null, ru
   const timelyRelay = state.version >= 4 && chance >= .6 && receiverNext && improvement >= -4 && !receiver.grappledBy && !receiver.prone
     && !opponents(state, receiver).some((p) => distance(p.position, receiver.position) <= 1)
     && approachingOpponents(state, actor, actor.position) > approachingOpponents(state, receiver, receiver.position);
-  if (improvement <= 6 && !(preferCarrier && improvement >= 0) && !plannedRelay && !timelyRelay) return null;
+  // Circulate through a free teammate who can keep the relay going. A player
+  // already used this round is useful only if nobody can catch them before
+  // their next turn. Less skilled throwers can hand off through a clear lane.
+  const relayWindow = receiverNext || approachingOpponents(state, receiver, receiver.position) === 0;
+  const clearHandoff = chance >= .5 && skill(receiver, 'acrobatics') >= skill(actor, 'acrobatics') + 2
+    && !interceptionCandidates(state, actor, receiver.position).length;
+  const circulation = passingGame(state, actor) && state.round < 9 && relayWindow && (chance >= .65 || clearHandoff) && improvement >= -8
+    && skill(receiver, 'acrobatics') >= 3 && distance(actor.position, receiver.position) >= 2;
+  if (improvement <= 6 && !(preferCarrier && improvement >= 0) && !plannedRelay && !timelyRelay && !circulation) return null;
   if (chance < .45) return null;
   const weight = carryWeight(state, actor), loss = 65 + Number(state.round >= 9) * 65;
   const pressure = opponents(state, actor).filter((p) => distance(p.position, actor.position) <= 1).length;
@@ -165,8 +176,8 @@ function passScore(state, actor, receiver, precision = false, opening = null, ru
     : Math.max(0, pressure - opponents(state, receiver).filter((p) => distance(p.position, receiver.position) <= 1).length) * 20;
   const relayTempo = receiverNext ? Math.min(24, receiver.speed * (strategyOf(state, actor) === 'possession' ? 2 : 1)) : 0;
   // Replace the thrower's positional value with expected possession at the receiver.
-  return chance * ((destination + runValue) * weight + keepBonus(state, actor) + Number(preferCarrier) * 15 + pressureRelief + relayTempo)
-    - (1 - chance) * loss - source * weight + Number(plannedRelay) * 72 + Number(timelyRelay) * (strategyOf(state, actor) === 'possession' ? 28 : 16);
+  return { circulation, score: chance * ((destination + runValue) * weight + keepBonus(state, actor) + Number(preferCarrier) * 15 + pressureRelief + relayTempo)
+    - (1 - chance) * loss - source * weight + Number(plannedRelay) * 72 + Number(timelyRelay) * (strategyOf(state, actor) === 'possession' ? 28 : 16) };
 }
 export function stripSuccessChance(state, actor, holder, exploit = false) {
   const advantage = hasCheckHelp(state, actor) || exploit || Boolean(collectiveOpening(state, actor, holder));
@@ -238,6 +249,16 @@ function positionalScore(state, actor, cell, plan, task) {
   }
   if (task === 'carry') {
     let score = possessionSafety(state, actor, cell) * carryWeight(state, actor);
+    if (passingGame(state, actor)) {
+      const teammates = allies(state, actor);
+      const receivers = teammates.filter((p) => (teammates.length === 1 || p.id !== plan.protector) && !p.grappledBy && !p.grappling);
+      if (receivers.length) {
+        const gaps = receivers.map((p) => distance(p.position, cell)).sort((a, b) => a - b);
+        // Keep the ball connected to the team, even before preparing a pass.
+        // This moves only the holder; off-ball runs still require a real wait.
+        score -= Math.max(0, gaps[0] - 4) * 18 + Math.max(0, (gaps[1] ?? gaps[0]) - 5) * 6;
+      }
+    }
     if (plan.supports?.size) {
       const receivers = allies(state, actor).filter((p) => plan.supports.has(p.id) && canReceivePass(state, p) && !p.grappledBy);
       if (receivers.length) score -= Math.max(0, nearestDistance(receivers, cell) - 5) * 12;
@@ -262,8 +283,9 @@ function positionalScore(state, actor, cell, plan, task) {
     const prepared = Boolean(readiedPasser(state));
     const available = prepared && gap >= 2 && gap <= 6 && !actor.prone && !actor.grappledBy && !blockedLane
       && opponents(state, actor).every((p) => distance(p.position, cell) > 1);
+    const availability = prepared ? available ? passingGame(state, actor) ? 56 : 32 : -12 : 0;
     return 26 - Math.abs(gap - (anchor ? 4 : 3)) * 8 + safety(state, actor, cell) * .55 - Number(gap > 6) * 40 - Number(blockedLane) * 18
-      - (anchor ? distance(cell, anchor) * 4 : 0) - crowding + (prepared ? available ? 32 : -12 : 0);
+      - (anchor ? distance(cell, anchor) * 4 : 0) - crowding + availability;
   }
   if (task === 'protect') {
     const threat = opponents(state, actor).sort((a, b) => distance(a.position, ball) - distance(b.position, ball) || order(a, b))[0];
@@ -336,14 +358,15 @@ export function decideTurn(state, actor) {
   const aggression = Number(actor.instruction === 'aggressive') * 18 + Number(strategy === 'pressing') * 8 - Number(actor.instruction === 'cautious') * 12;
   const cells = evaluateCells(state, actor, plan, task, actor.movement);
   const candidates = [];
+  const circulatingPasses = new Set();
   const receiverRuns = new Map();
   const futureRuns = new Map();
   const prospectiveSupports = state.version >= 5 && task === 'carry' && actor.reaction
     ? supportFormation(state, plan.holder, allies(state, actor), allies(state, actor).length > 1 ? plan.protector : null) : new Map();
-  const readyCells = new Set([cells.find((cell) => !cell.path.length), ...cells.slice(0, 5)].filter(Boolean));
+  const readyCells = new Set([cells.find((cell) => !cell.path.length), ...cells.slice(0, passingGame(state, actor) ? 12 : 5)].filter(Boolean));
   const readyValue = (entry) => {
     if (state.version < 5 || !actor.reaction || !readyCells.has(entry)) return null;
-    let options = 0;
+    let options = 0, unmarkingOptions = 0, openOptions = 0;
     for (const ally of allies(state, actor)) {
       if (!prospectiveSupports.has(ally.id) || ally.grappledBy || ally.grappling
         || state.round >= 10 && state.initiative.indexOf(ally.id) <= state.turnIndex) continue;
@@ -353,9 +376,15 @@ export function decideTurn(state, actor) {
         futureRuns.set(ally.id, runs);
       }
       const passer = { ...actor, position: entry.position };
-      if (futureRuns.get(ally.id).some((run) => openPassReceiver(state, passer, { ...ally, position: run.position }))) options++;
+      if (futureRuns.get(ally.id).some((run) => openPassReceiver(state, passer, { ...ally, position: run.position }))) {
+        options++;
+        if (!openPassReceiver(state, passer, ally)) unmarkingOptions++;
+        else if (state.initiative.indexOf(ally.id) > state.turnIndex) openOptions++;
+      }
     }
-    return options ? keepBonus(state, actor) * .8 + 16 + Math.min(3, options) * 6 : null;
+    const coordination = passingGame(state, actor) && state.round < 9 && unmarkingOptions && !openOptions
+      ? 24 + Math.min(3, unmarkingOptions) * 8 : 0;
+    return options ? keepBonus(state, actor) * .8 + 16 + Math.min(3, options) * 6 + coordination : null;
   };
   const add = (entry, action, score) => {
     const view = movementView(state, actor, entry.position);
@@ -382,13 +411,19 @@ export function decideTurn(state, actor) {
       const normal = passScore(view.state, view.actor, target, false, plan.opening, runValue);
       const direct = !entry.path.length && plan.opening?.receivers.includes(target.id)
         && (state.version < 5 || opponents(view.state, view.actor).every((p) => distance(p.position, entry.position) > 1)) ? 24 : 0;
-      if (normal !== null) candidates.push({ path: entry.path, action, score: entry.score + normal + direct + objectiveBonus, task });
+      if (normal !== null) {
+        const candidate = { path: entry.path, action, score: entry.score + normal.score + direct + objectiveBonus, task };
+        candidates.push(candidate); if (normal.circulation) circulatingPasses.add(candidate);
+      }
       const difficult = view.actor.grappledBy || opponents(view.state, view.actor).some((p) => distance(p.position, entry.position) <= 1)
         || interceptionCandidates(view.state, view.actor, target.position).length > 0;
       const enhanced = { ...action, technique: 'precision' };
       if ((difficult || state.round >= 8) && !hasCheckHelp(state, actor) && !hasPassCall(state, actor) && legalAction(view.state, view.actor, enhanced)) {
         const adjusted = passScore(view.state, view.actor, target, true, plan.opening, runValue);
-        if (adjusted !== null) candidates.push({ path: entry.path, action: enhanced, score: entry.score + adjusted + direct + objectiveBonus, task });
+        if (adjusted !== null) {
+          const candidate = { path: entry.path, action: enhanced, score: entry.score + adjusted.score + direct + objectiveBonus, task };
+          candidates.push(candidate); if (adjusted.circulation) circulatingPasses.add(candidate);
+        }
       }
       return;
     }
@@ -418,7 +453,8 @@ export function decideTurn(state, actor) {
         : 106 + skill(actor, 'wrestling') * 3 + Number(actor.role === 'retriever') * 16 + aggression * .3 + Number(plan.opening?.id === 'press') * 15);
       const hitChance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
       const ko = enemy.hp <= actor.attack.die / 2 + .5 + actor.attack.flat;
-      const distraction = (supporting && !danger || task === 'cover' && enemy.id !== holder?.id) ? actor.instruction === 'aggressive' ? 10 : 30 : 0;
+      const distraction = (supporting && (!danger || passingGame(state, actor)) || task === 'cover' && enemy.id !== holder?.id)
+        ? actor.instruction === 'aggressive' ? 10 : passingGame(state, actor) && supporting ? 45 : 30 : 0;
       add(cell, { type: 'attack', targetId: enemy.id }, 18 + hitChance * 18 + Number(enemy.id === holder?.id) * 28 + Number(danger) * 18 + Number(ko) * 20 + aggression - distraction);
       add(cell, { type: 'grapple', targetId: enemy.id }, 20 + Number(danger) * 38 + Number(actor.role === 'blocker') * 15 + Number(enemy.id === holder?.id) * 8 + aggression * .2 - distraction);
       add(cell, { type: 'shove', targetId: enemy.id }, 17 + Number(danger) * 15 + Number(actor.role === 'blocker') * 8 + aggression * .3 - distraction);
@@ -453,7 +489,15 @@ export function decideTurn(state, actor) {
     }
   }
   candidates.sort((a, b) => b.score - a.score || a.path.length - b.path.length || a.action.type.localeCompare(b.action.type) || (a.action.targetId ?? '').localeCompare(b.action.targetId ?? ''));
-  const chosen = candidates[0] ?? { path: [], action: { type: 'wait' }, score: 0, task };
+  let chosen = candidates[0] ?? { path: [], action: { type: 'wait' }, score: 0, task };
+  if (passingGame(state, actor) && state.ball.carrierId === actor.id && state.round < 9) {
+    // This plan has a different priority, not a generic bonus for more throws.
+    // Keep the same risk costs and do not run through an opportunity to force it.
+    const relay = candidates.find((c) => circulatingPasses.has(c) && exposure(state, actor, c.path) === 0);
+    const preparation = candidates.find((c) => c.action.type === 'ready-pass' && exposure(state, actor, c.path) === 0
+      && opponents(state, actor).every((p) => distance(p.position, c.path.at(-1) ?? actor.position) > 1));
+    chosen = relay ?? (chosen.action.type === 'pass' ? chosen : preparation ?? chosen);
+  }
   const priority = state.version >= 5 && ['carry', 'recover', 'relay'].includes(task) ? 'ball' : matchPriority(state);
   return { ...chosen, reason: `${priority ? priority === 'combat' ? 'Priorité combat : ' : 'Priorité ballon : ' : ''}${plan.opening ? `${OPENINGS[plan.opening.id].name} : ` : ''}${explain(actor, task, chosen.action.type, playerById(state, chosen.action.targetId))}` };
 }
