@@ -23,6 +23,6 @@ const server = http.createServer(async (request, response) => {
     response.end(data);
   } catch { response.writeHead(404); response.end('Not found'); }
 });
-server.listen(port, '127.0.0.1', () => console.log(`Local: http://127.0.0.1:${port}/#outils-rumbleball`));
+server.listen(port, '127.0.0.1', () => console.log(`The Hub: http://127.0.0.1:${port}/#outils-rumbleball\nRumbleball: http://127.0.0.1:${port}/rumbleball/index.html`));
 process.on('SIGINT', () => server.close(() => process.exit(0)));
 process.on('SIGTERM', () => server.close(() => process.exit(0)));

@@ -53,7 +53,7 @@ export function mountCareer(root, mountMatch) {
   tools.append(exportButton, importButton, retry, importInput); top.append(modes, tools);
   const notice = el('p', 'rb-career-notice'); notice.setAttribute('role', 'alert'); notice.hidden = !loaded.error; notice.textContent = loaded.error ?? '';
   const importPreview = el('section', 'rb-career-import'); importPreview.hidden = true;
-  const manager = el('div', 'rb-career'), matchArea = el('div'), matchActions = el('div', 'rb-controls rb-match-back'), matchRoot = el('div');
+  const manager = el('div', 'rb-career'), matchArea = el('div', 'rb-match-area'), matchActions = el('div', 'rb-controls rb-match-back'), matchRoot = el('div');
   matchActions.append(btn('Retour au club · mettre en pause', () => { view.pause(); matchArea.hidden = true; manager.hidden = false; renderManagement(); }));
   matchArea.append(matchActions, matchRoot); matchArea.hidden = true;
   root.append(top, notice, importPreview, manager, matchArea);
@@ -123,6 +123,11 @@ export function mountCareer(root, mountMatch) {
     if (tab === 'Ligue') renderLeague();
   }
   function renderCreation() {
+    const welcome = el('section', 'rb-career-welcome'), introduction = el('div', 'rb-career-introduction');
+    introduction.append(el('p', 'rb-eyebrow', 'Bienvenue dans l’arène'), el('h2', '', 'Du chrome. Du contact. Un club à vous.'), el('p', '', 'Recrutez vos cinq titulaires, préparez vos tactiques et regardez-les se disputer le ballon. Deux minutes pour le tenir jusqu’à la sirène.'));
+    const steps = el('ol', 'rb-career-steps');
+    for (const [title, copy] of [['Recrutez', 'Quatre archétypes, des équipements et des implants.'], ['Préparez', 'Vos rôles, vos consignes, votre placement.'], ['Entrez dans l’arène', 'Les joueurs agissent seuls. Le club progresse avec vous.']]) { const step = el('li'); step.append(el('strong', '', title), el('span', '', copy)); steps.append(step); }
+    introduction.append(steps);
     const form = el('form', 'rb-career-create'), input = el('input'); input.required = true; input.maxLength = 80; input.placeholder = 'Les Rebuts du Chrome';
     form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', '2 400 chromas pour recruter cinq à huit joueurs. Une ligue de six clubs, dix journées par saison, cinq titulaires par match. Votre carrière est sauvegardée dans ce navigateur.'), field('Nom du club', input));
     const color = kitPicker(KIT_COLORS[0]), preview = el('div', 'rb-kit-preview');
@@ -132,7 +137,7 @@ export function mountCareer(root, mountMatch) {
     if (loaded.hasSave) { replace = el('input'); replace.type = 'checkbox'; replace.required = true; form.append(field('Remplacer la sauvegarde existante, après avoir conservé une copie si nécessaire.', replace)); }
     const submit = btn('Choisir les premières recrues', () => {}, true); submit.type = 'submit'; form.append(submit);
     form.addEventListener('submit', (event) => { event.preventDefault(); const seed = `club-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`; update(() => createCareer(input.value, seed, color.value)); });
-    manager.append(form);
+    welcome.append(introduction, form); manager.append(welcome);
   }
   function renderDraft() {
     manager.append(el('p', 'rb-eyebrow', career.clubs[0].name), el('h3', '', 'Choisir votre effectif initial'), el('p', 'rb-muted', 'Sélection réversible. Les contrats sont payés ensemble à la validation. Les cinq premières recrues sélectionnées seront titulaires ; leur ordre restera modifiable.'));
@@ -150,15 +155,16 @@ export function mountCareer(root, mountMatch) {
   function renderRoster(locked) {
     manager.append(el('h3', '', `Effectif · ${ownedPlayers(career).length}/8 joueurs`), el('p', 'rb-muted', 'Cinq titulaires dans l’ordre de leur position de départ. Les remplaçants récupèrent 3 fatigue et gagnent 4 XP ; les titulaires gagnent 10 XP. Aucun remplacement pendant le match.'), el('p', 'rb-muted', 'Fatigue 3–4 : −1,5 m. Fatigue 5–6 : même réduction et −1 en Lutte, Athlétisme et Acrobaties. Un KO ajoute 1 fatigue.'));
     const form = el('form', 'rb-lineup-form'), strategy = select(STRATEGIES, career.clubs[0].strategy); strategy.disabled = locked;
-    const color = kitPicker(clubKit(career.clubs[0]), locked), kitOptions = el('div', 'rb-kit-options'); kitOptions.append(field('Plan collectif', strategy), field('Couleur des maillots', color)); form.append(kitOptions);
+    const preparation = el('div', 'rb-preparation'), teamControls = el('div', 'rb-team-controls');
+    const color = kitPicker(clubKit(career.clubs[0]), locked), kitOptions = el('div', 'rb-kit-options'); kitOptions.append(field('Plan collectif', strategy), field('Couleur des maillots', color)); teamControls.append(kitOptions);
     const lineup = el('div', 'rb-lineup-slots'), slotControls = [];
     const names = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, p.name]));
     for (const [i, id] of career.lineup.entries()) { const s = select(names, id); s.disabled = locked; slotControls.push(s); lineup.append(field(`Titulaire ${i + 1}`, s)); }
-    form.append(lineup);
+    teamControls.append(lineup);
     const deploymentPlayers = () => career.lineup.map((id) => compilePlayer(ownedPlayers(career).find((p) => p.id === id), career.inventory));
     const positions = locked ? career.current.config.deployments?.home ?? STARTS.map(([x, y]) => ({ x, y })) : clubDeployment(career.clubs[0]);
     const deployment = deploymentEditor({ players: deploymentPlayers(), positions, color: color.value, disabled: locked, onChange: () => attempt(commitLineup) });
-    form.append(deployment.root);
+    preparation.append(teamControls, deployment.root); form.append(preparation);
     const assignments = {}, statusLabels = new Map(), portraits = new Map(), list = el('div', 'rb-career-roster');
     for (const p of ownedPlayers(career)) {
       const compiled = compilePlayer(p, career.inventory), level = levelOf(p), row = el('section', 'rb-career-player'), heading = el('div', 'rb-career-player-head'), info = el('div');

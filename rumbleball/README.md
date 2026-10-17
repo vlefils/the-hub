@@ -1,6 +1,8 @@
 # Rumbleball Manager — carrière V1 et exhibition
 
-Accessible dans **Outils → Rumbleball** (`#outils-rumbleball`). Une carrière locale permet de recruter, composer cinq titulaires, acheter des protections et implants et disputer une ligue de six clubs. Le mode **Exhibition** conserve les équipes préfaites et reste indépendant de la carrière. Aucun soin, remplacement ou retour en jeu après un KO pendant une rencontre.
+Accessible depuis **Outils → Rumbleball** (`#outils-rumbleball`), qui présente le jeu et propose de le lancer. Le jeu possède sa propre page (`rumbleball/index.html`), son identité visuelle et son interface ; le bouton en haut à droite revient au site principal. Une carrière locale permet de recruter, composer cinq titulaires, acheter des protections et implants et disputer une ligue de six clubs. Le mode **Exhibition** conserve les équipes préfaites et reste indépendant de la carrière. Aucun soin, remplacement ou retour en jeu après un KO pendant une rencontre.
+
+La page dédiée conserve la même origine et la même clé de sauvegarde : une carrière créée sur le site principal est retrouvée automatiquement. Aucun module du jeu n’est chargé sur la page de présentation. Sur grand écran, le terrain et le journal sont côte à côte ; à partir de 1 700 px, les effectifs occupent une troisième colonne. Le terrain conserve ses proportions et sa hauteur s’adapte à l’écran. Sur tablette et téléphone, le terrain précède le journal et les effectifs. La préparation met consignes et déploiement côte à côte à partir de 1 100 px. Les panneaux déroulants restent utilisables au clavier et le retour au site principal reste visible dans l’en-tête.
 
 ## Carrière
 
@@ -24,12 +26,12 @@ Depuis la racine du dépôt, avec Node.js 22 ou plus récent :
 node tools/serve.mjs
 ```
 
-Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prototype utilise des modules JavaScript : il faut le servir en HTTP, ou l’ouvrir sur GitHub Pages, plutôt que directement en `file://`.
+Ouvrir <http://127.0.0.1:8766/#outils-rumbleball> pour la présentation, ou <http://127.0.0.1:8766/rumbleball/index.html> pour jouer directement. Arrêter avec Ctrl+C. Le prototype utilise des modules JavaScript : il faut le servir en HTTP, ou l’ouvrir sur GitHub Pages, plutôt que directement en `file://`.
 
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs rumbleball/appearance.test.mjs rumbleball/round-playback.test.mjs rumbleball/round-ui.test.mjs rumbleball/deployment.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs rumbleball/appearance.test.mjs rumbleball/round-playback.test.mjs rumbleball/round-ui.test.mjs rumbleball/deployment.test.mjs rumbleball/app.test.mjs
 ```
 
 Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
@@ -39,6 +41,8 @@ Les tests de carrière couvrent aussi trois saisons, une saison de défaites ave
 Les tests de lecture simultanée contrôlent le chevauchement des courses indépendantes, les contacts, les cases libérées et diagonales croisées, les passes, la lutte, les KO, le dernier engagement et les quatre vitesses. Trois matchs animés conservent exactement l’état, les jets et le journal de leur simulation séquentielle ; leurs images sont échantillonnées pour détecter les collisions. Une horloge de test vérifie douze secondes par round, le compteur, les repères multiples, la pause, le résultat différé et la cadence avec animations réduites. Une erreur de stockage au troisième tour d’un lot arrête la résolution ; la reprise conserve les dix tours sans duplication.
 
 Les tests de déploiement vérifient les limites des deux moitiés, les échanges de cases occupées, la sauvegarde, le gel en match, le clavier et les noms longs. L’engagement couvre les quatre cases éligibles, le DD 10 seul, l’opposition, les égalités, l’ordre d’initiative, la dépense de l’action et le maintien du ballon à l’intersection après un échec. Les anciennes rencontres restent importables et continuent avec leurs règles et leur hasard d’origine.
+
+Les tests de la page dédiée vérifient les liens aller/retour en local et sous un préfixe GitHub Pages, la séparation des ressources du livre, l’existence des ressources locales, la reprise d’une carrière existante, la lecture sans section du livre, la pause en quittant la page et l’Exhibition sans carrière. Ces tests utilisent le DOM en mémoire ; le rendu visuel et le responsive demandent une vérification en navigateur.
 
 Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 242 victoires des Recrues, 258 des Charognards, 22 prolongations sur les 500 matchs. Les 30 matchs de compositions donnent 13 victoires des Recrues et 17 des Charognards. Le journal compte 295 décisions de passe, hors passes enchaînées après un ramassage. Les tests contrôlés vérifient aussi la concentration partagée et les interceptions. Les résultats de la nouvelle campagne et des deux journées de carrière figurent dans le [compte rendu](playtests/README.md).
 
@@ -55,14 +59,16 @@ Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 2
 - `rules.mjs` : actions légales, jets, réactions, mouvements et invariants.
 - `ai.mjs` : plan collectif et évaluation des décisions, sans modification des statistiques.
 - `engine.mjs` : initialisation et orchestration, indépendantes de l’affichage.
-- `ui.mjs` et `rumbleball.css` : préparation, terrain SVG, lecture et journal.
+- `index.html`, `app.mjs` et `app.css` : page autonome, démarrage et disposition responsive ; `icon.svg` : identité de l’application.
+- `landing.css` : présentation et lancement depuis le site principal ; ne charge pas le moteur.
+- `ui.mjs` et `rumbleball.css` : composants de préparation, terrain SVG, lecture et journal.
 - `narration.mjs` : résumé narratif des événements exécutés, sans accès au hasard ni modification de l’état. Les détails et jets originaux restent dépliables dans leur ordre chronologique. Les distances correspondent aux cases parcourues, pas au coût en mouvement.
 - `visuals.mjs` : écussons, marquages du terrain et pions SVG, indépendants des règles.
 - `playback.mjs` : chronologie de présentation issue des événements exécutés, interpolée avec une seule boucle d’animation. Les trajets suivent les cases réellement parcourues ; le lutteur, sa cible et leur balle se déplacent ensemble. Les effets apparaissent après l’approche, au moment de l’action.
 - `court-effects.mjs` : liens de lutte et effets SVG brefs (frappe, réaction, dégâts, raté, KO, possession et plaquage).
 - `assets/arena-banner.webp` : illustration d’arène (154 Ko). Le [prompt de génération](assets/README.md) est conservé avec le visuel.
 
-L’habillage reste limité à `#outils-rumbleball` et aux composants `rb-*`. Les maillots identifient les équipes ; le numéro reste droit, dans un rond pour votre club et un losange pour l’adversaire. Le jaune marque le ballon, la sélection et les réactions. Les PV des joueurs et le nombre de joueurs encore en jeu reprennent l’état de la simulation. La bannière se sépare du texte sur petit écran ; le journal passe sous le terrain. Les illustrations et marquages décoratifs sont ignorés par les lecteurs d’écran.
+L’habillage du jeu est autonome, sous `.rb-app` et les composants `rb-*`. Le site principal ne charge que la présentation dans `#outils-rumbleball`. Les maillots identifient les équipes ; le numéro reste droit, dans un rond pour votre club et un losange pour l’adversaire. Le jaune marque le ballon, la sélection et les réactions. Les PV des joueurs et le nombre de joueurs encore en jeu reprennent l’état de la simulation. Les illustrations et marquages décoratifs sont ignorés par les lecteurs d’écran.
 
 Les personnages SVG sont dessinés de dessus avec une silhouette compacte : teintes de peau, couleurs et coiffures variées, carrure des Béliers et brassard du Capitaine. L’identité dépend de l’identifiant permanent, sans changer au recrutement, en déplaçant un titulaire, après un achat ou un rechargement. La couleur du club se choisit à la création et dans **Effectif**, gratuitement ; elle se conserve en JSON. L’Exhibition dispose de son propre choix. Si les couleurs sont proches, l’adversaire porte une autre tenue pour cette rencontre. Les anciens exports restent compatibles, avec les couleurs par défaut.
 

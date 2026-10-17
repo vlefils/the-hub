@@ -1,0 +1,33 @@
+/* Presentation in the book. The game itself loads on its own page. */
+#outils-rumbleball { --rb-accent: #d8e58b; --text: #f0eee2; --muted: #b0b8ad; background: #101716; color: var(--text); }
+.rb-hero { position: relative; isolation: isolate; display: flex; align-items: center; min-height: clamp(22rem, 32vw, 30rem); padding: clamp(1.5rem, 4vw, 3.5rem); margin-bottom: 1.75rem; background: #121a18; border-bottom: 3px solid var(--rb-accent); overflow: hidden; }
+#outils-rumbleball .rb-hero-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 65% center; border: 0; box-shadow: none; clip-path: none; filter: none; z-index: -2; }
+.rb-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #0a1110f5, #0a1110b8 45%, #0a11100d 85%); z-index: -1; }
+.rb-hero-copy { max-width: 38rem; }
+.rb-hero p { margin: 0; }
+.rb-overline { color: var(--rb-accent); font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
+#outils-rumbleball .rb-hero h2 { margin: .8rem 0 1.5rem; color: var(--text); font-family: 'Rajdhani', 'Arial Narrow', sans-serif; font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 700; line-height: .88; letter-spacing: -.025em; }
+.rb-hero h2 span { display: block; margin-top: .6rem; color: var(--rb-accent); font-size: .28em; line-height: 1.1; letter-spacing: .34em; }
+.rb-hero-description { max-width: 38ch; color: #e0e3d7; font-size: 1rem; line-height: 1.7; }
+#outils-rumbleball .rb-launch { display: inline-flex; align-items: center; justify-content: center; gap: 1.5rem; min-height: 3.25rem; margin-top: 1.5rem; padding: .8rem 1.25rem; background: var(--rb-accent); color: #172016; border: 1px solid var(--rb-accent); border-radius: 2px; font-weight: 700; text-decoration: none; }
+#outils-rumbleball .rb-launch:hover { background: #e8f3b0; border-color: #e8f3b0; }
+#outils-rumbleball .rb-launch:focus-visible { outline: 2px solid #f2dc83; outline-offset: 4px; }
+.rb-hero .rb-launch-note { margin-top: .75rem; color: #c1c9b5; font-size: .8125rem; }
+.rb-launch-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; margin: 0; }
+.rb-launch-features dt { margin-bottom: .4rem; color: var(--rb-accent); font-weight: 700; }
+.rb-launch-features dd { margin: 0; color: var(--muted); font-size: .9375rem; line-height: 1.7; }
+@media (max-width: 640px) {
+  .rb-hero { display: block; padding: 0; min-height: 0; }
+  #outils-rumbleball .rb-hero-art { position: relative; height: 10rem; object-position: right center; z-index: auto; }
+  .rb-hero::after { display: none; }
+  .rb-hero-copy { max-width: none; padding: 1.25rem; }
+  #outils-rumbleball .rb-hero h2 { font-size: clamp(2.6rem, 11vw, 4rem); }
+  #outils-rumbleball .rb-launch { display: flex; width: 100%; }
+  .rb-launch-features { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+}
+@media print {
+  .rb-hero-art, .rb-hero::after, .rb-launch, .rb-launch-note { display: none !important; }
+  #outils-rumbleball { --text: #111; --muted: #444; --rb-accent: #111; background: white; }
+  .rb-hero { min-height: 0; padding: 0; border: 0; background: none; }
+  .rb-hero-description { color: #111; }
+}

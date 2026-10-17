@@ -8,7 +8,6 @@ import { narrateTurn } from './narration.mjs';
 import { courtPoint, createCourtPlayback, nextCourtTurnDelay, ROUND_DURATION } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
 import { ARCHETYPES, archetypeLabel, classResources, classAbilities } from './classes.mjs';
-import { mountCareer } from './career-ui.mjs';
 import { deploymentEditor } from './deployment-ui.mjs';
 import { defaultDeployment, isCenterBall } from './deployment.mjs';
 
@@ -29,9 +28,9 @@ export function mountMatch(root, callbacks = {}) {
   let context = 'exhibition';
   const teamLabel = (id) => state.teams.find((t) => t.id === id)?.name ?? '';
   let selectedId = null, speed = 1, journalCount = 0, lastTurnEvents = [], playbackMode = 'round', displayFrame = null, healthSignature = '';
-  const visible = () => !root.closest('[hidden]') && section.classList.contains('is-active') && !document.hidden;
+  const visible = () => !root.closest('[hidden]') && (!section || section.classList.contains('is-active')) && !document.hidden;
   root.replaceChildren();
-  root.classList.add('rb');
+  root.classList.add('rb', 'rb-match');
 
   const setup = element('form', 'rb-setup');
   const setupHead = element('div', 'rb-setup-head');
@@ -60,9 +59,9 @@ export function mountMatch(root, callbacks = {}) {
     row.append(identity, roleLabel, instructionLabel, description); setupRows.append(row);
     return { role, instruction, portrait };
   });
-  setup.append(setupRows);
+  const preparation = element('div', 'rb-preparation'); preparation.append(setupRows);
   const deployment = deploymentEditor({ players: state.players.filter((p) => p.teamId === 'home'), positions: defaultDeployment(), color: colorInput.value, onChange: updatePreview });
-  setup.append(deployment.root);
+  preparation.append(deployment.root); setup.append(preparation);
   const setupFoot = element('div', 'rb-setup-foot');
   const seedLabel = element('label', 'rb-field rb-seed', 'Code du match');
   const seedInput = element('input'); seedInput.name = 'rb-seed'; seedInput.value = DEFAULT_SEED; seedInput.maxLength = 80; seedInput.required = true;
@@ -96,7 +95,8 @@ export function mountMatch(root, callbacks = {}) {
   const awayCopy = element('div', 'rb-team-copy');
   awayCopy.append(element('strong', '', 'Les Charognards'), element('small', '', 'Plan équilibré'), element('span', 'rb-team-count'));
   awayScore.append(teamCrest('away'), awayCopy);
-  scoreboard.append(homeScore, timebox, awayScore); root.append(scoreboard);
+  const stage = element('section', 'rb-match-stage'); stage.setAttribute('aria-label', 'La rencontre');
+  scoreboard.append(homeScore, timebox, awayScore); stage.append(scoreboard); root.append(stage);
 
   const toolbar = element('div', 'rb-toolbar');
   const controls = element('div', 'rb-controls');
@@ -107,7 +107,7 @@ export function mountMatch(root, callbacks = {}) {
   speedSelect.setAttribute('aria-label', 'Vitesse de lecture'); speedSelect.append(...options({ 1: '×1', 2: '×2', 4: '×4', 8: '×8' }, '1')); speedLabel.append(speedSelect);
   controls.append(pause, next, modeLabel, speedLabel, finish);
   const status = element('p', 'rb-playback-status'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-  toolbar.append(controls, status); root.append(toolbar);
+  toolbar.append(controls, status); stage.append(toolbar);
 
   const matchLayout = element('div', 'rb-match-layout');
   const fieldColumn = element('div', 'rb-field-column');
@@ -141,10 +141,10 @@ export function mountMatch(root, callbacks = {}) {
   const journalCaption = element('span', 'rb-muted', 'Le match raconté · détails dépliables'); journalHead.append(journalCaption);
   const journal = element('ol', 'rb-journal'); journal.setAttribute('aria-label', 'Journal chronologique du match'); journal.tabIndex = 0;
   const emptyJournal = element('li', 'rb-journal-empty', 'Le coup d’envoi approche. Préparez vos cinq joueurs, puis lancez le match.'); journal.append(emptyJournal);
-  journalPanel.append(journalHead, journal); matchLayout.append(fieldColumn, journalPanel); root.append(matchLayout);
+  const rosters = element('div', 'rb-rosters'); rosters.tabIndex = 0; rosters.setAttribute('role', 'region'); rosters.setAttribute('aria-label', 'Effectifs sur le terrain');
+  journalPanel.append(journalHead, journal); matchLayout.append(fieldColumn, journalPanel, rosters); stage.append(matchLayout);
 
   const resultPanel = element('section', 'rb-result'); resultPanel.hidden = true; root.append(resultPanel);
-  const rosters = element('div', 'rb-rosters'); root.append(rosters);
   const rules = element('details', 'rb-rules'); rules.append(element('summary', '', 'Règles et conventions de ce prototype'));
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
@@ -483,8 +483,8 @@ export function mountMatch(root, callbacks = {}) {
     while (!state.finished && errorBox.hidden) advance({ animate: false });
     if (state.finished) resultPanel.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   });
-  document.addEventListener('hub:sectionchange', (event) => { if (event.detail.id !== 'outils-rumbleball') setRunning(false); });
   document.addEventListener('visibilitychange', () => { if (document.hidden) setRunning(false); });
+  window.addEventListener?.('pagehide', () => setRunning(false));
   render(); setRunning(false);
   return {
     pause: () => setRunning(false),
@@ -497,6 +497,3 @@ export function mountMatch(root, callbacks = {}) {
     },
   };
 }
-
-const root = document.querySelector('[data-rumbleball]');
-if (root) mountCareer(root, mountMatch);

@@ -1,0 +1,120 @@
+/* The game owns its shell; none of the book's layout or component styles are loaded. */
+:root { color-scheme: dark; --rb-gutter: clamp(.75rem, 2vw, 2.5rem); }
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; min-height: 100vh; min-height: 100svh; font-family: 'Space Grotesk', Arial, sans-serif; line-height: 1.55; }
+.rb-app { background: #101716; color: var(--text); }
+.rb-app :is(h1, h2, h3, h4) { text-wrap: balance; }
+.rb-app button, .rb-app a, .rb-app input, .rb-app select { -webkit-tap-highlight-color: transparent; }
+.rb-app a { color: inherit; text-underline-offset: .2em; }
+.rb-app :focus-visible { outline: 2px solid var(--rb-ball); outline-offset: 4px; }
+.rb-app-header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .9rem var(--rb-gutter); border-bottom: 1px solid var(--rb-line); background: #151f1b; }
+.rb-app-brand { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.rb-app-brand img { display: block; width: 2.75rem; height: auto; }
+.rb-app-brand h1 { margin: 0; font: 700 clamp(1.5rem, 2vw, 2rem)/.95 'Rajdhani', 'Arial Narrow', sans-serif; text-transform: uppercase; letter-spacing: .02em; }
+.rb-app-brand h1 span { display: block; margin-top: .35rem; color: var(--rb-accent); font: 500 .6875rem/1.1 'Space Grotesk', Arial, sans-serif; letter-spacing: .3em; }
+.rb-hub-link { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; margin-left: auto; padding: .55rem .8rem; border: 1px solid #536157; border-radius: 2px; font-size: .875rem; text-decoration: none; }
+.rb-hub-link:hover { background: #26322b; border-color: #a5b594; }
+.rb-app-main { width: min(calc(100% - var(--rb-gutter) - var(--rb-gutter)), 144rem); margin-inline: auto; padding-block: 1.25rem 3rem; }
+.rb-app-main:focus { outline: none; }
+.rb-skip { position: absolute; top: .5rem; left: 1rem; z-index: 10; padding: .75rem 1rem; background: var(--rb-accent); color: #172016 !important; transform: translateY(-180%); }
+.rb-skip:focus { transform: none; }
+.rb-loading { padding: 2rem 0; color: var(--muted); }
+
+/* One navigation row, then the club or the match. No persistent book sidebar. */
+.rb-app .rb-career-top { padding-bottom: 1rem; border-bottom: 1px solid var(--rb-line); }
+.rb-career-top > .rb-controls:first-child .rb-button { padding-inline: 1.2rem; background: transparent; border-color: transparent; font-size: 1rem; }
+.rb-career-top > .rb-controls:first-child [aria-pressed='true'] { border-bottom: 2px solid var(--rb-accent); border-radius: 0; }
+.rb-career-top > .rb-controls:last-child .rb-button { background: transparent; font-weight: 500; }
+.rb-app .rb-career { max-width: 118rem; margin-inline: auto; }
+.rb-app .rb-club-header h3 { font: 700 clamp(1.8rem, 3vw, 2.6rem)/1.1 'Rajdhani', sans-serif; }
+.rb-app .rb-career-finances dd { font-variant-numeric: tabular-nums; }
+.rb-app .rb-career-finances > div:first-child dd { font-size: 1.5rem; }
+.rb-app .rb-career-roster, .rb-app .rb-shop, .rb-app .rb-candidate-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr)); gap: 1.25rem 2rem; }
+.rb-team-controls { display: grid; gap: 1.5rem; align-content: start; min-width: 0; }
+.rb-app .rb-preparation { display: grid; gap: 1.5rem 2.5rem; align-items: start; }
+.rb-app .rb-preparation > .rb-deployment { margin-block: 0; padding-top: 1rem; border-top: 1px solid var(--rb-line); }
+.rb-app .rb-deployment-board { max-width: 22rem; }
+.rb-app .rb-deployment-scroll { flex-basis: 19rem; }
+.rb-app .rb-deployment-controls { flex-basis: 11rem; }
+.rb-app .rb-setup { max-width: 118rem; margin-inline: auto; }
+
+/* The first visit explains the loop beside a directly usable creation form. */
+.rb-career-welcome { display: grid; gap: 2rem; width: 100%; max-width: 85rem; margin: clamp(.5rem, 3vw, 3rem) auto; }
+.rb-career-introduction { min-width: 0; }
+.rb-career-welcome > * { min-width: 0; }
+.rb-career-introduction::before { content: ''; display: block; aspect-ratio: 3 / 1; margin-bottom: 1.5rem; background: linear-gradient(0deg, #101716, transparent 45%), url('assets/arena-banner.webp') center / cover; }
+.rb-career-introduction h2 { margin: .75rem 0 1rem; max-width: 17ch; font: 700 clamp(2.25rem, 4vw, 4rem)/1.05 'Rajdhani', sans-serif; }
+.rb-career-introduction > p:last-of-type { max-width: 54ch; color: var(--muted); }
+.rb-career-steps { display: grid; gap: 1rem; margin: 1.75rem 0 0; padding-left: 1.4rem; color: var(--rb-accent); }
+.rb-career-steps li { padding-left: .4rem; }
+.rb-career-steps strong, .rb-career-steps span { display: block; }
+.rb-career-steps strong { color: var(--text); }
+.rb-career-steps span { color: var(--muted); font-size: .875rem; }
+.rb-app .rb-career-create { max-width: none; margin: 0; padding: clamp(1.25rem, 3vw, 2.5rem); border-top: 2px solid var(--rb-accent); }
+.rb-app .rb-career-create > .rb-button { justify-self: start; }
+
+/* Match workspace: the pitch keeps priority; extra width exposes both squads. */
+.rb-app .rb-match-back { margin-bottom: .75rem; }
+.rb-app .rb-match-area { scroll-margin-top: 6rem; }
+.rb-app .rb-match-back .rb-button { padding: .5rem 0; background: transparent; border: 0; color: var(--muted); font-weight: 500; text-decoration: underline; text-underline-offset: .25em; }
+.rb-app .rb-scoreboard { padding-block: .85rem; margin-bottom: .75rem; }
+.rb-app .rb-clock { font-size: clamp(2.75rem, 4vw, 3.5rem); }
+.rb-app .rb-toolbar { margin-bottom: 1rem; }
+.rb-app .rb-match-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'field' 'journal' 'rosters'; gap: 1.5rem; }
+.rb-app .rb-field-column { grid-area: field; }
+.rb-app .rb-rosters { grid-area: rosters; margin-top: 0; }
+.rb-app .rb-journal-panel { grid-area: journal; border-left: 0; border-top: 1px solid var(--rb-line); padding: 1rem 0 0; }
+.rb-app .rb-journal { max-height: 26rem; }
+.rb-app .rb-court { aspect-ratio: 780 / 544; }
+.rb-app .rb-initiative { margin-block: .75rem; }
+.rb-app .rb-result { max-width: 70rem; margin-inline: auto; }
+.rb-app .rb-setup, .rb-app .rb-scoreboard, .rb-app .rb-result { scroll-margin-top: 6rem; }
+
+@media (min-width: 1100px) {
+  .rb-career-welcome { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; gap: clamp(2rem, 5vw, 6rem); }
+  .rb-app .rb-preparation { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+  .rb-app .rb-team-controls .rb-lineup-slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rb-app .rb-match-layout { grid-template-columns: minmax(0, 1fr) clamp(19rem, 23vw, 25rem); grid-template-areas: 'field journal' 'rosters rosters'; gap: 1.5rem; }
+  .rb-app .rb-journal-panel { border-left: 1px solid var(--rb-line); border-top: 0; padding: 0 0 0 1.25rem; }
+  .rb-app .rb-journal-head { flex-direction: column; }
+  .rb-app .rb-journal { max-height: max(26rem, calc(100svh - 22rem)); }
+  /* Preserve the full court at short desktop heights, with normal page scrolling below. */
+  .rb-app .rb-court { max-height: max(25rem, calc(100svh - 22rem)); }
+}
+@media (min-width: 1700px) {
+  .rb-app .rb-match-layout { grid-template-columns: clamp(16rem, 18vw, 21rem) minmax(0, 1fr) clamp(20rem, 21vw, 26rem); grid-template-areas: 'rosters field journal'; }
+  .rb-app .rb-rosters { grid-template-columns: minmax(0, 1fr); max-height: max(32rem, calc(100svh - 22rem)); overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-right: 1rem; border-right: 1px solid var(--rb-line); }
+  .rb-app .rb-roster-heading { flex-wrap: wrap; }
+  .rb-app .rb-roster-title h3 { font-size: 1.2rem; }
+  .rb-app .rb-roster-row { grid-template-columns: minmax(0, 1fr) 5rem; padding-block: .75rem; }
+}
+@media (max-width: 640px) {
+  .rb-app-header { gap: .5rem; padding-block: .75rem; }
+  .rb-app-brand { gap: .5rem; }
+  .rb-app-brand img { width: 1.75rem; }
+  .rb-hub-link { font-size: .75rem; padding-inline: .5rem; }
+  .rb-hub-link > span { display: none; }
+  .rb-app-main { padding-top: .75rem; }
+  .rb-app .rb-career-top { gap: .5rem; margin-bottom: 1rem; }
+  .rb-app .rb-career-top .rb-button { padding-inline: .7rem; }
+  .rb-career-introduction::before, .rb-career-steps { display: none; }
+  .rb-career-introduction h2 { max-width: none; }
+  .rb-app .rb-career-roster, .rb-app .rb-shop, .rb-app .rb-candidate-list { grid-template-columns: minmax(0, 1fr); }
+  .rb-app .rb-match-layout { gap: 1rem; }
+  .rb-app .rb-journal { max-height: 22rem; }
+  .rb-app .rb-toolbar > .rb-controls { gap: .5rem; width: 100%; }
+  .rb-app .rb-toolbar .rb-speed { flex: 1 1 7rem; }
+  .rb-app .rb-toolbar .rb-reading { flex-basis: 100%; }
+  .rb-app .rb-toolbar .rb-reading select { flex: 1; min-width: 0; }
+  .rb-app .rb-setup, .rb-app .rb-scoreboard, .rb-app .rb-result, .rb-app .rb-match-area { scroll-margin-top: 5rem; }
+}
+@media print {
+  :root { color-scheme: light; }
+  .rb-app { --text: #111; --muted: #444; background: white; }
+  .rb-app-header, .rb-career-top, .rb-match-back, .rb-skip { display: none; }
+  .rb-app-main { width: 100%; padding: 0; }
+  .rb-app .rb-match-layout { display: block; }
+  .rb-app .rb-court { max-height: none; }
+  .rb-app .rb-rosters { max-height: none; overflow: visible; border: 0; padding: 0; }
+}
