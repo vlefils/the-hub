@@ -453,6 +453,8 @@ test('réévaluation sur place : action légale après perte de possession en mo
   a.position = { x: 8, y: 3 }; b.position = { x: 9, y: 3 };
   a.role = 'carrier'; a.skills.acrobatics = 100; a.abilities.constitution = -200;
   a.armor = 1; b.attack.bonus = 100;
+  // A short remaining movement keeps the safe receiver preferable to running away.
+  a.speed = 3; a.movement = 3;
   state.initiative = [a.id, b.id, relay.id]; state.turnIndex = 0;
   giveBall(state, a, events); forceD20(state, [10]);
   const planned = decideTurn(state, a);
@@ -473,7 +475,7 @@ test('consignes : décisions différentes dans une même mêlée défensive', ()
   assert.notEqual(cautious.action.type, aggressive.action.type);
 });
 test('500 matchs : actions légales, invariants et terminaison ; rapport de biais', { timeout: 240000 }, () => {
-  const report = { home: 0, away: 0, draws: 0, overtime: 0, actions: {}, strategies: {} };
+  const report = { home: 0, away: 0, draws: 0, overtime: 0, actions: {}, strategies: {}, abilities: {}, passes: { attempted: 0, completed: 0 } };
   const strategies = ['balanced', 'possession', 'pressing'];
   for (let n = 0; n < 500; n++) {
     const strategy = strategies[n % strategies.length];
@@ -493,6 +495,8 @@ test('500 matchs : actions légales, invariants et terminaison ; rapport de biai
     report.strategies[strategy] ??= { matches: 0, wins: 0 };
     report.strategies[strategy].matches++; report.strategies[strategy].wins += Number(state.result.winnerId === 'home');
     for (const e of events.filter((e) => e.type === 'decision')) report.actions[e.action] = (report.actions[e.action] ?? 0) + 1;
+    for (const e of events.filter((e) => e.type === 'class')) report.abilities[e.ability] = (report.abilities[e.ability] ?? 0) + 1;
+    for (const side of ['home', 'away']) { report.passes.attempted += state.stats[side].passesAttempted; report.passes.completed += state.stats[side].passesCompleted; }
   }
   assert.ok(report.home > 0 && report.away > 0);
   console.log('Rumbleball — 500 matchs :', JSON.stringify(report));

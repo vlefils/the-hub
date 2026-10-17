@@ -1,0 +1,1333 @@
+{
+  "baseline": {
+    "day": 1,
+    "balance": 295,
+    "stats": {
+      "home": {
+        "passesAttempted": 1,
+        "passesCompleted": 1,
+        "recoveries": 7,
+        "knockouts": 2
+      },
+      "away": {
+        "passesAttempted": 0,
+        "passesCompleted": 0,
+        "recoveries": 6,
+        "knockouts": 3
+      }
+    }
+  },
+  "days": [
+    {
+      "day": 2,
+      "opponent": "Les Crocs Néon",
+      "before": {
+        "balance": 295,
+        "roster": [
+          {
+            "name": "Nora",
+            "fatigue": 3,
+            "level": 1,
+            "starter": true
+          },
+          {
+            "name": "Brique",
+            "fatigue": 2,
+            "level": 1,
+            "starter": true
+          },
+          {
+            "name": "Zip",
+            "fatigue": 3,
+            "level": 1,
+            "starter": false
+          },
+          {
+            "name": "Étau",
+            "fatigue": 2,
+            "level": 1,
+            "starter": true
+          },
+          {
+            "name": "Vigie",
+            "fatigue": 3,
+            "level": 1,
+            "starter": false
+          },
+          {
+            "name": "Flash 1",
+            "fatigue": 0,
+            "level": 1,
+            "starter": true
+          },
+          {
+            "name": "Prisme 1",
+            "fatigue": 0,
+            "level": 1,
+            "starter": true
+          }
+        ]
+      },
+      "config": {
+        "seed": "league-qidcy5",
+        "teamNames": {
+          "home": "Les Rebuts du Chrome",
+          "away": "Les Crocs Néon"
+        },
+        "strategy": "possession",
+        "awayStrategy": "pressing",
+        "rosters": {
+          "home": [
+            {
+              "name": "Nora",
+              "trainingName": "Nora",
+              "archetype": "capitaine",
+              "role": "relay",
+              "armor": 14,
+              "maxHp": 23,
+              "speed": 7.5,
+              "abilities": {
+                "strength": 12,
+                "dexterity": 14,
+                "constitution": 14,
+                "mind": 13,
+                "charisma": 14
+              },
+              "skills": {
+                "acrobatics": 4,
+                "wrestling": 3,
+                "athletics": 1
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "offer-0-0",
+              "level": 1,
+              "instruction": "normal",
+              "fatigue": 3,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 0,
+                "calls": 2,
+                "flaw": 1
+              }
+            },
+            {
+              "name": "Brique",
+              "trainingName": "Brique",
+              "archetype": "belier",
+              "role": "blocker",
+              "armor": 15,
+              "maxHp": 29,
+              "speed": 7.5,
+              "abilities": {
+                "strength": 17,
+                "dexterity": 10,
+                "constitution": 15,
+                "mind": 9,
+                "charisma": 10
+              },
+              "skills": {
+                "athletics": 5,
+                "wrestling": 5,
+                "acrobatics": 0
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 8,
+                "flat": 3
+              },
+              "playerId": "offer-0-1",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 2,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Flash 1",
+              "trainingName": "Zip",
+              "archetype": "escamoteur",
+              "role": "carrier",
+              "armor": 13,
+              "maxHp": 20,
+              "speed": 12,
+              "abilities": {
+                "strength": 9,
+                "dexterity": 17,
+                "constitution": 12,
+                "mind": 12,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 5,
+                "wrestling": -1,
+                "athletics": -1
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 6,
+                "flat": 3
+              },
+              "playerId": "offer-0-8",
+              "level": 1,
+              "instruction": "cautious",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 1
+              }
+            },
+            {
+              "name": "Étau",
+              "trainingName": "Étau",
+              "archetype": "belier",
+              "role": "retriever",
+              "armor": 14,
+              "maxHp": 24,
+              "speed": 9,
+              "abilities": {
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 14,
+                "mind": 10,
+                "charisma": 11
+              },
+              "skills": {
+                "wrestling": 5,
+                "athletics": 4,
+                "acrobatics": 1
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "offer-0-3",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 2,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Prisme 1",
+              "trainingName": "Vigie",
+              "archetype": "passeur",
+              "role": "relay",
+              "armor": 13,
+              "maxHp": 20,
+              "speed": 9,
+              "abilities": {
+                "strength": 11,
+                "dexterity": 14,
+                "constitution": 12,
+                "mind": 15,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 4,
+                "wrestling": 0,
+                "athletics": 0
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "offer-0-10",
+              "level": 1,
+              "instruction": "cautious",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 2,
+                "calls": 0,
+                "flaw": 0
+              }
+            }
+          ],
+          "away": [
+            {
+              "name": "Raf « Double Tour » 6",
+              "trainingName": "Étau",
+              "archetype": "belier",
+              "role": "retriever",
+              "armor": 14,
+              "maxHp": 24,
+              "speed": 9,
+              "abilities": {
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 14,
+                "mind": 10,
+                "charisma": 11
+              },
+              "skills": {
+                "wrestling": 4,
+                "athletics": 4,
+                "acrobatics": 1
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "ai-4-5",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Miette 7",
+              "trainingName": "Zip",
+              "archetype": "escamoteur",
+              "role": "carrier",
+              "armor": 13,
+              "maxHp": 17,
+              "speed": 12,
+              "abilities": {
+                "strength": 9,
+                "dexterity": 17,
+                "constitution": 12,
+                "mind": 12,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 5,
+                "wrestling": -1,
+                "athletics": -1
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 6,
+                "flat": 3
+              },
+              "playerId": "ai-4-6",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 1
+              }
+            },
+            {
+              "name": "Raf « Double Tour » 1",
+              "trainingName": "Étau",
+              "archetype": "belier",
+              "role": "retriever",
+              "armor": 14,
+              "maxHp": 24,
+              "speed": 9,
+              "abilities": {
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 14,
+                "mind": 10,
+                "charisma": 11
+              },
+              "skills": {
+                "wrestling": 4,
+                "athletics": 4,
+                "acrobatics": 1
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "ai-4-0",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 2,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Le Frigo 3",
+              "trainingName": "Brique",
+              "archetype": "belier",
+              "role": "blocker",
+              "armor": 15,
+              "maxHp": 29,
+              "speed": 7.5,
+              "abilities": {
+                "strength": 17,
+                "dexterity": 10,
+                "constitution": 15,
+                "mind": 9,
+                "charisma": 10
+              },
+              "skills": {
+                "athletics": 5,
+                "wrestling": 5,
+                "acrobatics": 0
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 8,
+                "flat": 3
+              },
+              "playerId": "ai-4-2",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 2,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Pépé 404 5",
+              "trainingName": "Vigie",
+              "archetype": "passeur",
+              "role": "defender",
+              "armor": 13,
+              "maxHp": 20,
+              "speed": 9,
+              "abilities": {
+                "strength": 11,
+                "dexterity": 14,
+                "constitution": 12,
+                "mind": 15,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 4,
+                "wrestling": 0,
+                "athletics": 0
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "ai-4-4",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 2,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 2,
+                "calls": 0,
+                "flaw": 0
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "winnerId": "away",
+        "carrierId": "away-2",
+        "round": 10,
+        "reason": "possession"
+      },
+      "holder": "Raf « Double Tour » 1",
+      "turns": 77,
+      "stats": {
+        "home": {
+          "passesAttempted": 1,
+          "passesCompleted": 1,
+          "recoveries": 6,
+          "knockouts": 2
+        },
+        "away": {
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "recoveries": 7,
+          "knockouts": 4
+        }
+      },
+      "abilities": {
+        "home": {
+          "absorb": 4,
+          "lock": 4,
+          "observe": 8,
+          "precision": 1,
+          "call": 1,
+          "exploit": 2,
+          "opening": 3,
+          "feint": 1
+        },
+        "away": {
+          "lock": 3,
+          "observe": 4,
+          "percussion": 2,
+          "absorb": 3,
+          "feint": 1
+        }
+      },
+      "passes": [
+        {
+          "round": 4,
+          "from": "Prisme 1",
+          "to": "Flash 1"
+        }
+      ],
+      "summary": {
+        "reward": 200,
+        "wages": 105,
+        "debtRepaid": 0,
+        "remainingDebt": 0,
+        "available": 390,
+        "balance": 390,
+        "seasonPrize": 0,
+        "rank": null,
+        "progress": [
+          {
+            "playerId": "offer-0-0",
+            "name": "Nora",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 2,
+            "beforeFatigue": 3,
+            "fatigue": 6,
+            "ko": true
+          },
+          {
+            "playerId": "offer-0-1",
+            "name": "Brique",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 2,
+            "beforeFatigue": 2,
+            "fatigue": 5,
+            "ko": true
+          },
+          {
+            "playerId": "offer-0-2",
+            "name": "Zip",
+            "xp": 4,
+            "beforeLevel": 1,
+            "level": 1,
+            "beforeFatigue": 3,
+            "fatigue": 0,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-3",
+            "name": "Étau",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 2,
+            "beforeFatigue": 2,
+            "fatigue": 5,
+            "ko": true
+          },
+          {
+            "playerId": "offer-0-4",
+            "name": "Vigie",
+            "xp": 4,
+            "beforeLevel": 1,
+            "level": 1,
+            "beforeFatigue": 3,
+            "fatigue": 0,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-8",
+            "name": "Flash 1",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 1,
+            "beforeFatigue": 0,
+            "fatigue": 2,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-10",
+            "name": "Prisme 1",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 1,
+            "beforeFatigue": 0,
+            "fatigue": 3,
+            "ko": true
+          }
+        ]
+      },
+      "logs": [
+        {
+          "turn": 25,
+          "round": 3,
+          "text": "Nora a parcouru 3 mètres pour mettre une beigne à Raf « Double Tour » 6 et a mis sa cible KO (8 dégâts). Nora a parcouru 3 mètres. Miette 7 repère une faille chez Nora.",
+          "announcements": []
+        },
+        {
+          "turn": 38,
+          "round": 4,
+          "text": "Prisme 1 a parcouru 1,5 mètre pour passer la balle à Flash 1 et sa passe est arrivée à bon port. Prisme 1 ajuste sa passe avec concentration. Prisme 1 a parcouru 1,5 mètre. Miette 7 repère une faille chez Prisme 1.",
+          "announcements": []
+        },
+        {
+          "turn": 50,
+          "round": 6,
+          "text": "Le Frigo 3 a parcouru 1,5 mètre pour mettre une beigne à Brique et a mis sa cible KO (9 dégâts).",
+          "announcements": []
+        },
+        {
+          "turn": 58,
+          "round": 7,
+          "text": "Le Frigo 3 a mis Étau KO d’une beigne (9 dégâts). Le Frigo 3 a parcouru 1,5 mètre.",
+          "announcements": []
+        },
+        {
+          "turn": 63,
+          "round": 8,
+          "text": "Miette 7 a parcouru 6 mètres pour mettre une beigne à Prisme 1 et a mis sa cible KO (9 dégâts). Miette 7 a parcouru 1,5 mètre.",
+          "announcements": []
+        },
+        {
+          "turn": 69,
+          "round": 9,
+          "text": "Flash 1 a cueilli Miette 7 au passage et a provoqué son KO (13 dégâts).",
+          "announcements": []
+        },
+        {
+          "turn": 71,
+          "round": 9,
+          "text": "Le Frigo 3 a parcouru 4,5 mètres pour mettre une beigne à Nora et a mis sa cible KO (8 dégâts). Le Frigo 3 a parcouru 3 mètres.",
+          "announcements": []
+        },
+        {
+          "turn": 77,
+          "round": 10,
+          "text": "",
+          "announcements": [
+            "Les Crocs Néon remportent le match : Raf « Double Tour » 1 possède la balle à la sirène."
+          ]
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "opponent": "Les Brise-Chrome",
+      "before": {
+        "balance": 90,
+        "roster": [
+          {
+            "name": "Nora",
+            "fatigue": 6,
+            "level": 2,
+            "starter": false
+          },
+          {
+            "name": "Brique",
+            "fatigue": 5,
+            "level": 2,
+            "starter": true
+          },
+          {
+            "name": "Zip",
+            "fatigue": 0,
+            "level": 1,
+            "starter": true
+          },
+          {
+            "name": "Étau",
+            "fatigue": 5,
+            "level": 2,
+            "starter": true
+          },
+          {
+            "name": "Vigie",
+            "fatigue": 0,
+            "level": 1,
+            "starter": true
+          },
+          {
+            "name": "Flash 1",
+            "fatigue": 2,
+            "level": 1,
+            "starter": false
+          },
+          {
+            "name": "Prisme 1",
+            "fatigue": 3,
+            "level": 1,
+            "starter": false
+          },
+          {
+            "name": "Echo 3",
+            "fatigue": 0,
+            "level": 1,
+            "starter": true
+          }
+        ]
+      },
+      "config": {
+        "seed": "league-1qampcc",
+        "teamNames": {
+          "home": "Les Rebuts du Chrome",
+          "away": "Les Brise-Chrome"
+        },
+        "strategy": "possession",
+        "awayStrategy": "pressing",
+        "rosters": {
+          "home": [
+            {
+              "name": "Echo 3",
+              "trainingName": "Nora",
+              "archetype": "capitaine",
+              "role": "relay",
+              "armor": 14,
+              "maxHp": 23,
+              "speed": 9,
+              "abilities": {
+                "strength": 12,
+                "dexterity": 14,
+                "constitution": 14,
+                "mind": 13,
+                "charisma": 14
+              },
+              "skills": {
+                "acrobatics": 4,
+                "wrestling": 3,
+                "athletics": 1
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "offer-2-0",
+              "level": 1,
+              "instruction": "normal",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 0,
+                "calls": 2,
+                "flaw": 1
+              }
+            },
+            {
+              "name": "Brique",
+              "trainingName": "Brique",
+              "archetype": "belier",
+              "role": "blocker",
+              "armor": 15,
+              "maxHp": 31,
+              "speed": 6,
+              "abilities": {
+                "strength": 17,
+                "dexterity": 10,
+                "constitution": 15,
+                "mind": 9,
+                "charisma": 10
+              },
+              "skills": {
+                "athletics": 4,
+                "wrestling": 5,
+                "acrobatics": -1
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 8,
+                "flat": 3
+              },
+              "playerId": "offer-0-1",
+              "level": 2,
+              "instruction": "aggressive",
+              "fatigue": 5,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Zip",
+              "trainingName": "Zip",
+              "archetype": "escamoteur",
+              "role": "carrier",
+              "armor": 13,
+              "maxHp": 20,
+              "speed": 12,
+              "abilities": {
+                "strength": 9,
+                "dexterity": 17,
+                "constitution": 12,
+                "mind": 12,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 5,
+                "wrestling": -1,
+                "athletics": -1
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 6,
+                "flat": 3
+              },
+              "playerId": "offer-0-2",
+              "level": 1,
+              "instruction": "cautious",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 1
+              }
+            },
+            {
+              "name": "Étau",
+              "trainingName": "Étau",
+              "archetype": "belier",
+              "role": "retriever",
+              "armor": 14,
+              "maxHp": 26,
+              "speed": 7.5,
+              "abilities": {
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 14,
+                "mind": 10,
+                "charisma": 11
+              },
+              "skills": {
+                "wrestling": 5,
+                "athletics": 3,
+                "acrobatics": 0
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "offer-0-3",
+              "level": 2,
+              "instruction": "aggressive",
+              "fatigue": 5,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Vigie",
+              "trainingName": "Vigie",
+              "archetype": "passeur",
+              "role": "relay",
+              "armor": 13,
+              "maxHp": 20,
+              "speed": 9,
+              "abilities": {
+                "strength": 11,
+                "dexterity": 14,
+                "constitution": 12,
+                "mind": 15,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 4,
+                "wrestling": 0,
+                "athletics": 0
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "offer-0-4",
+              "level": 1,
+              "instruction": "cautious",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 2,
+                "calls": 0,
+                "flaw": 0
+              }
+            }
+          ],
+          "away": [
+            {
+              "name": "Suze « Clou » 4",
+              "trainingName": "Nora",
+              "archetype": "capitaine",
+              "role": "relay",
+              "armor": 14,
+              "maxHp": 23,
+              "speed": 9,
+              "abilities": {
+                "strength": 12,
+                "dexterity": 14,
+                "constitution": 14,
+                "mind": 13,
+                "charisma": 14
+              },
+              "skills": {
+                "acrobatics": 4,
+                "wrestling": 3,
+                "athletics": 1
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "ai-1-3",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 0,
+                "calls": 2,
+                "flaw": 1
+              }
+            },
+            {
+              "name": "Miette 5",
+              "trainingName": "Zip",
+              "archetype": "escamoteur",
+              "role": "carrier",
+              "armor": 13,
+              "maxHp": 17,
+              "speed": 12,
+              "abilities": {
+                "strength": 9,
+                "dexterity": 17,
+                "constitution": 12,
+                "mind": 12,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 5,
+                "wrestling": -1,
+                "athletics": -1
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 6,
+                "flat": 3
+              },
+              "playerId": "ai-1-4",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 0,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 1
+              }
+            },
+            {
+              "name": "Raf « Double Tour » 6",
+              "trainingName": "Étau",
+              "archetype": "belier",
+              "role": "retriever",
+              "armor": 14,
+              "maxHp": 24,
+              "speed": 9,
+              "abilities": {
+                "strength": 15,
+                "dexterity": 13,
+                "constitution": 14,
+                "mind": 10,
+                "charisma": 11
+              },
+              "skills": {
+                "wrestling": 4,
+                "athletics": 4,
+                "acrobatics": 1
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "ai-1-5",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 2,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Pépé 404 7",
+              "trainingName": "Vigie",
+              "archetype": "passeur",
+              "role": "defender",
+              "armor": 13,
+              "maxHp": 20,
+              "speed": 9,
+              "abilities": {
+                "strength": 11,
+                "dexterity": 14,
+                "constitution": 12,
+                "mind": 15,
+                "charisma": 13
+              },
+              "skills": {
+                "acrobatics": 4,
+                "wrestling": 0,
+                "athletics": 0
+              },
+              "attack": {
+                "bonus": 4,
+                "die": 6,
+                "flat": 2
+              },
+              "playerId": "ai-1-6",
+              "level": 1,
+              "instruction": "aggressive",
+              "fatigue": 2,
+              "caps": {
+                "adrenaline": 0,
+                "focus": 2,
+                "calls": 0,
+                "flaw": 0
+              }
+            },
+            {
+              "name": "Le Frigo 1",
+              "trainingName": "Brique",
+              "archetype": "belier",
+              "role": "blocker",
+              "armor": 15,
+              "maxHp": 31,
+              "speed": 6,
+              "abilities": {
+                "strength": 17,
+                "dexterity": 10,
+                "constitution": 15,
+                "mind": 9,
+                "charisma": 10
+              },
+              "skills": {
+                "athletics": 5,
+                "wrestling": 6,
+                "acrobatics": 0
+              },
+              "attack": {
+                "bonus": 5,
+                "die": 8,
+                "flat": 3
+              },
+              "playerId": "ai-1-0",
+              "level": 2,
+              "instruction": "aggressive",
+              "fatigue": 4,
+              "caps": {
+                "adrenaline": 6,
+                "focus": 0,
+                "calls": 0,
+                "flaw": 0
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "winnerId": "away",
+        "carrierId": "away-2",
+        "round": 10,
+        "reason": "possession"
+      },
+      "holder": "Raf « Double Tour » 6",
+      "turns": 86,
+      "stats": {
+        "home": {
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "recoveries": 6,
+          "knockouts": 1
+        },
+        "away": {
+          "passesAttempted": 0,
+          "passesCompleted": 0,
+          "recoveries": 7,
+          "knockouts": 2
+        }
+      },
+      "abilities": {
+        "home": {
+          "lock": 4,
+          "absorb": 4,
+          "observe": 8,
+          "opening": 4
+        },
+        "away": {
+          "lock": 2,
+          "observe": 2,
+          "percussion": 2,
+          "absorb": 1,
+          "opening": 1
+        }
+      },
+      "passes": [],
+      "summary": {
+        "reward": 200,
+        "wages": 135,
+        "debtRepaid": 45,
+        "remainingDebt": 0,
+        "available": 155,
+        "balance": 155,
+        "seasonPrize": 0,
+        "rank": null,
+        "progress": [
+          {
+            "playerId": "offer-0-0",
+            "name": "Nora",
+            "xp": 4,
+            "beforeLevel": 2,
+            "level": 2,
+            "beforeFatigue": 6,
+            "fatigue": 3,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-1",
+            "name": "Brique",
+            "xp": 10,
+            "beforeLevel": 2,
+            "level": 2,
+            "beforeFatigue": 5,
+            "fatigue": 6,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-2",
+            "name": "Zip",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 2,
+            "beforeFatigue": 0,
+            "fatigue": 3,
+            "ko": true
+          },
+          {
+            "playerId": "offer-0-3",
+            "name": "Étau",
+            "xp": 10,
+            "beforeLevel": 2,
+            "level": 2,
+            "beforeFatigue": 5,
+            "fatigue": 6,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-4",
+            "name": "Vigie",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 2,
+            "beforeFatigue": 0,
+            "fatigue": 2,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-8",
+            "name": "Flash 1",
+            "xp": 4,
+            "beforeLevel": 1,
+            "level": 1,
+            "beforeFatigue": 2,
+            "fatigue": 0,
+            "ko": false
+          },
+          {
+            "playerId": "offer-0-10",
+            "name": "Prisme 1",
+            "xp": 4,
+            "beforeLevel": 1,
+            "level": 1,
+            "beforeFatigue": 3,
+            "fatigue": 0,
+            "ko": false
+          },
+          {
+            "playerId": "offer-2-0",
+            "name": "Echo 3",
+            "xp": 10,
+            "beforeLevel": 1,
+            "level": 1,
+            "beforeFatigue": 0,
+            "fatigue": 3,
+            "ko": true
+          }
+        ]
+      },
+      "logs": [
+        {
+          "turn": 26,
+          "round": 3,
+          "text": "Brique a mis Miette 5 KO d’une beigne (11 dégâts).",
+          "announcements": []
+        },
+        {
+          "turn": 38,
+          "round": 4,
+          "text": "Le Frigo 1 a traîné Zip sur 3 mètres pour mettre une beigne à Zip et a mis sa cible KO (9 dégâts).",
+          "announcements": []
+        },
+        {
+          "turn": 77,
+          "round": 9,
+          "text": "Raf « Double Tour » 6 a mis Echo 3 KO d’une beigne (5 dégâts).",
+          "announcements": []
+        },
+        {
+          "turn": 86,
+          "round": 10,
+          "text": "Pépé 404 7 a parcouru 1,5 mètre pour tenter de mettre une beigne à Vigie, mais a raté son coup.",
+          "announcements": [
+            "Les Brise-Chrome remportent le match : Raf « Double Tour » 6 possède la balle à la sirène."
+          ]
+        }
+      ]
+    }
+  ],
+  "recruitment": {
+    "name": "Echo 3",
+    "cost": 300
+  },
+  "final": {
+    "balance": 155,
+    "table": [
+      {
+        "clubId": "ai-1",
+        "name": "Les Brise-Chrome",
+        "played": 3,
+        "wins": 3,
+        "draws": 0,
+        "losses": 0,
+        "points": 9
+      },
+      {
+        "clubId": "ai-4",
+        "name": "Les Crocs Néon",
+        "played": 3,
+        "wins": 2,
+        "draws": 0,
+        "losses": 1,
+        "points": 6
+      },
+      {
+        "clubId": "ai-0",
+        "name": "Les Charognards",
+        "played": 3,
+        "wins": 2,
+        "draws": 0,
+        "losses": 1,
+        "points": 6
+      },
+      {
+        "clubId": "club",
+        "name": "Les Rebuts du Chrome",
+        "played": 3,
+        "wins": 1,
+        "draws": 0,
+        "losses": 2,
+        "points": 3
+      },
+      {
+        "clubId": "ai-2",
+        "name": "Les Voltigeurs",
+        "played": 3,
+        "wins": 1,
+        "draws": 0,
+        "losses": 2,
+        "points": 3
+      },
+      {
+        "clubId": "ai-3",
+        "name": "Circuit Ouvert",
+        "played": 3,
+        "wins": 0,
+        "draws": 0,
+        "losses": 3,
+        "points": 0
+      }
+    ],
+    "roster": [
+      {
+        "name": "Nora",
+        "level": 2,
+        "xp": 24,
+        "fatigue": 3
+      },
+      {
+        "name": "Brique",
+        "level": 2,
+        "xp": 30,
+        "fatigue": 6
+      },
+      {
+        "name": "Zip",
+        "level": 2,
+        "xp": 24,
+        "fatigue": 3
+      },
+      {
+        "name": "Étau",
+        "level": 2,
+        "xp": 30,
+        "fatigue": 6
+      },
+      {
+        "name": "Vigie",
+        "level": 2,
+        "xp": 24,
+        "fatigue": 2
+      },
+      {
+        "name": "Flash 1",
+        "level": 1,
+        "xp": 18,
+        "fatigue": 0
+      },
+      {
+        "name": "Prisme 1",
+        "level": 1,
+        "xp": 18,
+        "fatigue": 0
+      },
+      {
+        "name": "Echo 3",
+        "level": 1,
+        "xp": 10,
+        "fatigue": 3
+      }
+    ]
+  }
+}

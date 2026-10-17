@@ -29,14 +29,14 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball>. Arrêter avec Ctrl+C. Le prot
 ## Vérifier
 
 ```sh
-node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs
+node --test rumbleball/engine.test.mjs rumbleball/classes.test.mjs rumbleball/narration.test.mjs rumbleball/playback.test.mjs rumbleball/career.test.mjs rumbleball/career-ui.test.mjs rumbleball/passing.test.mjs
 ```
 
 Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.
 
 Les tests de carrière couvrent aussi trois saisons, une saison de défaites avec huit joueurs coûteux endettés, la progression des adversaires, l’équipement, les sauvegardes corrompues et les erreurs de stockage. Les tests d’événements d’interface utilisent un petit DOM en mémoire et le vrai lecteur de match : ils vérifient les transitions et les erreurs, sans prétendre vérifier le rendu ou le responsive dans un navigateur.
 
-Campagne initiale du 17 octobre 2026 : 242 victoires des Recrues, 258 des Charognards, 22 prolongations sur les 500 matchs. Les 30 matchs de compositions donnent 13 victoires des Recrues et 17 des Charognards. Les passes restent occasionnelles (295 tentatives sur les 500 matchs), donc les capacités de Gâchette sont moins fréquentes que celles du contact. Les tests contrôlés vérifient aussi la concentration partagée et les interceptions. Ces relevés servent de point de départ aux essais d’équilibrage.
+Campagne initiale du 17 octobre 2026, avant l’ajustement de la circulation : 242 victoires des Recrues, 258 des Charognards, 22 prolongations sur les 500 matchs. Les 30 matchs de compositions donnent 13 victoires des Recrues et 17 des Charognards. Le journal compte 295 décisions de passe, hors passes enchaînées après un ramassage. Les tests contrôlés vérifient aussi la concentration partagée et les interceptions. Les résultats de la nouvelle campagne et des deux journées de carrière figurent dans le [compte rendu](playtests/README.md).
 
 ## Organisation
 
@@ -101,4 +101,8 @@ Conventions du prototype :
 - Une prise ne se termine que par libération réussie, relâchement volontaire gratuit, KO ou éloignement dû à un déplacement forcé. Après un agrippement réussi, le bot conserve sa position et la prise ; il ne dépense pas son mouvement restant pour se replacer. Aux tours suivants, un entraînement éventuel est évalué avec le coût et la position des deux joueurs.
 - Aucun rebond, protocole Neuro, compagnon, soin, action préparée ou objet consommable pendant le match.
 
-Les bots utilisent un score local explicable par rôle et une coordination recalculée à chaque tour. Ils n’effectuent pas de recherche tactique sur plusieurs tours ; la qualité compétitive et les stratégies de conservation restent à éprouver en jeu.
+Les bots utilisent un score local explicable par rôle et une coordination recalculée à chaque tour. Pour une passe, ils comparent la possession à l’arrivée à celle du lanceur : DD, avantage, unique intercepteur éligible, réception disponible, défense du receveur et ordre d’initiative. Le calcul parcourt les distributions publiques des dés, sans consommer de hasard ni consulter les jets futurs. L’exposition au trajet reste pénalisée ; les réactions dépensées en opportunité pendant ce trajet ne sont plus comptées comme de futures interceptions. Les adversaires capables de rejoindre le porteur avant son prochain tour réduisent la sécurité estimée. Le bonus de protection d’un équipier ne s’applique pas au porteur lui-même ; esquiver en étant immobilisé ne reçoit plus un bonus défensif suspendu par les règles.
+
+En Conservation, un passeur disponible peut offrir un deuxième relais et réserver sa réaction pour recevoir ; une consigne agressive conserve la priorité aux opportunités. Le capitaine prépare une passe effectivement choisie dans son aperçu local : portée, aide existante, renouvellement des réactions, initiative et fin de round sont pris en compte. Il conserve ses appels si des contestations au contact avant le tour du porteur rendent sa conservation trop incertaine. Les coûts, portées, jets et durées des techniques restent ceux des règles sportives ; ces changements concernent les décisions des bots. Des passes restent rares lorsque le terrain n’offre pas de réception sûre.
+
+Le [compte rendu des deux journées](playtests/README.md) et sa sauvegarde JSON permettent de reprendre la carrière de test. Le script `node tools/rumbleball-two-days.mjs`, lancé depuis la racine d’un dépôt Git complet, reconstruit la première rencontre avec les sources du commit `c966ffc`, puis joue les journées 2 et 3 avec les décisions actuelles. Il écrit uniquement les fichiers de test dans `rumbleball/playtests/`.
