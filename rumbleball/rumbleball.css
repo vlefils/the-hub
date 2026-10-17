@@ -112,6 +112,8 @@
 .rb-controls { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 .rb-speed { display: flex; gap: .4rem; align-items: center; font-size: .8125rem; color: var(--muted); }
 .rb-speed select { width: 4.4rem; }
+.rb-reading { flex-wrap: wrap; max-width: 100%; }
+.rb-reading select { width: auto; max-width: 100%; }
 .rb-playback-status { max-width: 100%; font-size: .875rem; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
 
 /* Code-drawn arena markings and pawns remain sharp at every viewport size. */

@@ -1,7 +1,10 @@
+import { trajectory } from './rules.mjs';
+
 // Presentation timeline only: never advances the engine or consumes random numbers.
 export const courtPoint = ({ x, y }) => ({ x: x * 60 + 30, y: y * 60 + 30 });
 const player = (view, id) => view.players.find((p) => p.id === id);
 const snapshot = (state, facings = {}) => ({
+  round: state.round, phase: state.phase, finished: state.finished,
   players: state.players.map(({ id, teamId, number, hp, maxHp, position, prone, grappling, grappledBy }) =>
     ({ id, teamId, number, hp, maxHp, position: { ...position }, prone, grappling, grappledBy, facing: facings[id] ?? (teamId === 'home' ? 90 : 270) })),
   ball: { ...state.ball, position: { ...state.ball.position } },
@@ -33,11 +36,11 @@ const reconcile = (view) => {
 // Keep the familiar minimum cadence, but leave every action time to finish.
 export const nextCourtTurnDelay = (remaining = 0, speed = 1) => Math.max(2000 / speed, remaining + 300 / speed);
 
-export function buildCourtPlayback(before, after, events, { speed = 1, facings = {} } = {}) {
+export function buildCourtPlayback(before, after, events, { speed = 1, facings = {}, deferRestart = false } = {}) {
   const initial = snapshot(before, facings), final = snapshot(after, facings);
   const stages = [], effects = [], gestures = [];
   // A new kickoff is a reset, not a trip across the court.
-  if (events.some((e) => e.type === 'restart')) return { initial, final, stages, effects, gestures, duration: 0 };
+  if (!deferRestart && events.some((e) => e.type === 'restart')) return { initial, final, stages, effects, gestures, duration: 0 };
   let view = initial, cursor = 0, action = null, attack = null, lastPasser = null;
   const heading = (from, to) => (Math.atan2(to.y - from.y, to.x - from.x) * 180 / Math.PI + 450) % 360;
   const face = (id, target) => {
@@ -148,15 +151,92 @@ export function sampleCourtPlayback(plan, elapsed) {
   const stage = plan.stages.find((s) => elapsed < s.end) ?? plan.stages.at(-1);
   const progress = Math.max(0, Math.min(1, (elapsed - stage.start) / (stage.end - stage.start)));
   const gestures = new Map((plan.gestures ?? []).filter((g) => elapsed >= g.start && elapsed < g.start + g.duration).map((g) => [g.playerId, { kind: g.kind, progress: (elapsed - g.start) / g.duration }]));
-  const view = { players: stage.to.players.map((p) => {
+  const view = { round: plan.initial.round, phase: plan.initial.phase, finished: false, players: stage.to.players.map((p) => {
     const from = player(stage.from, p.id).position;
     return { ...p, position: mix(from, p.position, progress), walking: !p.grappledBy && (from.x !== p.position.x || from.y !== p.position.y),
       walkPhase: (plan.stages.indexOf(stage) + progress) * Math.PI, gesture: gestures.get(p.id) };
-  }), ball: stage.to.ball };
+  }), ball: stage.flight ? { ...stage.to.ball, carrierId: null } : stage.to.ball };
   return { ...view, ballPoint: stage.flight ? mix(ballPoint(stage.from), ballPoint(stage.to), progress) : ballPoint(view),
     flying: stage.flight,
     effects: plan.effects.filter((e) => elapsed >= e.start && elapsed < e.start + e.duration)
       .map((e) => ({ ...e, progress: (elapsed - e.start) / e.duration })) };
+}
+
+export const ROUND_DURATION = 6000;
+
+// Whole turns are independent tracks. Reserve the people, ball and traversed
+// cells they actually use, so an interaction cannot overtake its prerequisites.
+// This intentionally keeps a crowded duel ordered while distant play overlaps.
+export function buildRoundPlayback(turns, { speed = 1, facings = {} } = {}) {
+  if (!turns.length) throw new Error('Un round à animer doit contenir au moins une étape.');
+  const initial = snapshot(turns[0].before, facings), available = new Map(), scheduled = [];
+  const headings = { ...facings }, ids = new Set(initial.players.map((p) => p.id));
+  for (const turn of turns) {
+    const plan = buildCourtPlayback(turn.before, turn.after, turn.events, { facings: headings, deferRestart: true });
+    for (const p of plan.final.players) headings[p.id] = p.facing;
+    const participants = new Set(), resources = new Set();
+    const references = (value) => {
+      if (typeof value === 'string' && ids.has(value)) participants.add(value);
+      else if (value && typeof value === 'object') for (const child of Object.values(value)) references(child);
+    };
+    turn.events.forEach(references);
+    for (const p of plan.final.players) if (JSON.stringify(p) !== JSON.stringify(player(plan.initial, p.id))) participants.add(p.id);
+    const actorId = turn.after.turns > turn.before.turns ? turn.after.activeId : null;
+    if (actorId) participants.add(actorId);
+    // A held player and the holder stay on the same track, even without a drag.
+    for (const id of participants) for (const view of [plan.initial, plan.final]) {
+      const p = player(view, id); if (p?.grappling) participants.add(p.grappling); if (p?.grappledBy) participants.add(p.grappledBy);
+    }
+    const cell = (p) => { if (p) resources.add(`cell:${p.x},${p.y}`); };
+    const route = (points) => {
+      points.forEach(cell);
+      // Crossing diagonals also share a corridor, despite distinct endpoints.
+      for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1], b = points[i];
+        if (a.x !== b.x && a.y !== b.y) resources.add(`diagonal:${Math.min(a.x, b.x)},${Math.min(a.y, b.y)}`);
+      }
+    };
+    for (const id of participants) {
+      resources.add(`player:${id}`); cell(player(plan.initial, id)?.position); cell(player(plan.final, id)?.position);
+    }
+    for (const e of turn.events) if (['move', 'drag', 'push'].includes(e.type)) route([e.from, ...(e.path ?? [e.position])].filter(Boolean));
+    for (const stage of plan.stages) if (stage.flight) {
+      const from = player(stage.from, stage.from.ball.carrierId)?.position ?? stage.from.ball.position;
+      const to = player(stage.to, stage.to.ball.carrierId)?.position ?? stage.to.ball.position;
+      route(trajectory(from, to));
+    }
+    const usesBall = JSON.stringify(plan.initial.ball) !== JSON.stringify(plan.final.ball)
+      || [plan.initial.ball.carrierId, plan.final.ball.carrierId].some((id) => id && participants.has(id))
+      || turn.events.some((e) => ['pass', 'possession', 'drop'].includes(e.type) || ['pickup', 'strip'].includes(e.resolvedAction?.type));
+    if (usesBall) { resources.add('ball'); cell(plan.initial.ball.position); cell(plan.final.ball.position); }
+    const start = Math.max(0, ...[...resources].map((r) => available.get(r) ?? 0));
+    const end = start + Math.max(plan.duration, actorId ? 180 : 0);
+    for (const r of resources) available.set(r, end);
+    scheduled.push({ plan, actorId, participants: [...participants], usesBall, start, end });
+  }
+  const span = Math.max(1, ...scheduled.map((t) => t.end)), duration = ROUND_DURATION / speed, scale = duration / span;
+  return { initial, final: snapshot(turns.at(-1).after, headings), duration,
+    turns: scheduled.map((t) => ({ ...t, start: t.start * scale, end: t.end * scale, scale })) };
+}
+
+export function sampleRoundPlayback(plan, elapsed) {
+  if (elapsed >= plan.duration) return { ...plan.final, ballPoint: ballPoint(plan.final), effects: [], activeIds: [], animating: false };
+  const view = copy(plan.initial), effects = [], activeIds = [];
+  let flight = null;
+  for (const t of plan.turns) {
+    if (elapsed < t.start) continue;
+    const frame = sampleCourtPlayback(t.plan, (elapsed - t.start) / t.scale);
+    for (const id of t.participants) {
+      const index = view.players.findIndex((p) => p.id === id);
+      view.players[index] = { ...player(frame, id), position: { ...player(frame, id).position } };
+    }
+    if (t.usesBall) { view.ball = copy(frame.ball); flight = frame.flying ? frame.ballPoint : null; }
+    effects.push(...frame.effects);
+    if (elapsed < t.end && t.actorId) activeIds.push(t.actorId);
+  }
+  reconcile(view);
+  return { ...view, finished: false, effects, activeIds, animating: true, roundProgress: elapsed / plan.duration,
+    ballPoint: flight ?? ballPoint(view), flying: Boolean(flight) };
 }
 
 export function createCourtPlayback(draw, {
@@ -181,20 +261,22 @@ export function createCourtPlayback(draw, {
     matchKey = key; lastTurns = state.turns;
     stop(); final = snapshot(state, facings); render({ ...final, ballPoint: ballPoint(final), effects: [] });
   };
-  const play = (before, after, events, options) => {
+  const run = (plan, sample) => {
     stop();
-    const plan = buildCourtPlayback(before, after, events, { ...options, facings }), started = now(), token = generation;
+    const started = now(), token = generation;
     final = plan.final;
     if (reducedMotion()) { settle(); return 0; }
     endsAt = started + plan.duration;
     const tick = (time) => {
       if (token !== generation) return;
       if (time - started >= plan.duration || reducedMotion()) { settle(); return; }
-      render(sampleCourtPlayback(plan, time - started));
+      render(sample(plan, time - started));
       requestId = request(tick);
     };
     tick(started);
     return plan.duration;
   };
-  return { show, play, settle, remaining: () => Math.max(0, endsAt - now()) };
+  const play = (before, after, events, options) => run(buildCourtPlayback(before, after, events, { ...options, facings }), sampleCourtPlayback);
+  const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, facings }), sampleRoundPlayback);
+  return { show, play, playRound, settle, remaining: () => Math.max(0, endsAt - now()) };
 }

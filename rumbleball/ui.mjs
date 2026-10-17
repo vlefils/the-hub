@@ -5,7 +5,7 @@ import { arenaBackdrop, pawnArtwork, playerPortrait, poseCharacter, svg, teamCre
 import { KIT_COLORS, characterKey, readableKit, sportingWeapon, visibleGear } from './appearance.mjs';
 import { CATALOGUE } from './progression.mjs';
 import { narrateTurn } from './narration.mjs';
-import { courtPoint, createCourtPlayback, nextCourtTurnDelay } from './playback.mjs';
+import { courtPoint, createCourtPlayback, nextCourtTurnDelay, ROUND_DURATION } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
 import { ARCHETYPES, archetypeLabel, classResources, classAbilities } from './classes.mjs';
 import { mountCareer } from './career-ui.mjs';
@@ -23,10 +23,10 @@ const button = (text, cls = 'rb-button') => { const el = element('button', cls, 
 
 export function mountMatch(root, callbacks = {}) {
   const section = root.closest('[data-section]');
-  let state = createMatch(), lastConfig = null, started = false, running = false, timer = null;
+  let state = createMatch(), lastConfig = null, started = false, running = false, timer = null, nextRoundAt = 0;
   let context = 'exhibition';
   const teamLabel = (id) => state.teams.find((t) => t.id === id)?.name ?? '';
-  let selectedId = null, speed = 1, journalCount = 0, lastTurnEvents = [];
+  let selectedId = null, speed = 1, journalCount = 0, lastTurnEvents = [], playbackMode = 'round', displayFrame = null, healthSignature = '';
   const visible = () => !root.closest('[hidden]') && section.classList.contains('is-active') && !document.hidden;
   root.replaceChildren();
   root.classList.add('rb');
@@ -96,10 +96,12 @@ export function mountMatch(root, callbacks = {}) {
 
   const toolbar = element('div', 'rb-toolbar');
   const controls = element('div', 'rb-controls');
-  const pause = button('Pause'); const next = button('Tour suivant'); const finish = button('Voir le résultat');
+  const pause = button('Pause'); const next = button('Round suivant'); const finish = button('Voir le résultat');
+  const modeLabel = element('label', 'rb-speed rb-reading', 'Lecture'), modeSelect = element('select', 'rb-reading-mode');
+  modeSelect.setAttribute('aria-label', 'Mode de lecture'); modeSelect.append(...options({ round: 'Round simultané · 6 s à ×1', turn: 'Détail des tours' }, 'round')); modeLabel.append(modeSelect);
   const speedLabel = element('label', 'rb-speed', 'Vitesse'); const speedSelect = element('select');
   speedSelect.setAttribute('aria-label', 'Vitesse de lecture'); speedSelect.append(...options({ 1: '×1', 2: '×2', 4: '×4', 8: '×8' }, '1')); speedLabel.append(speedSelect);
-  controls.append(pause, next, speedLabel, finish);
+  controls.append(pause, next, modeLabel, speedLabel, finish);
   const status = element('p', 'rb-playback-status'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
   toolbar.append(controls, status); root.append(toolbar);
 
@@ -113,12 +115,12 @@ export function mountMatch(root, callbacks = {}) {
   const trace = svg('g', { class: 'rb-trace', 'aria-hidden': 'true' }); const pawns = svg('g'); const ballLayer = svg('g', { 'aria-hidden': 'true' });
   const links = svg('g', { class: 'rb-court-links', 'aria-hidden': 'true' });
   const effects = svg('g', { class: 'rb-court-effects', 'aria-hidden': 'true' });
-  const turnMarker = turnMarkerArtwork();
-  const pawnNodes = new Map();
+  const turnMarkers = svg('g', { 'aria-hidden': 'true' });
+  const pawnNodes = new Map(), markerNodes = new Map();
   const ballSprite = svg('g'); const ballHalo = svg('circle', { r: 20, class: 'rb-ball-halo' });
   const ballBody = svg('ellipse', { transform: 'rotate(-35)', class: 'rb-ball' });
   ballSprite.append(ballHalo, ballBody, svg('path', { d: 'M-4,0h8 M0,-4v8', class: 'rb-ball-seam' })); ballLayer.append(ballSprite);
-  court.append(trace, links, pawns, turnMarker, ballLayer, effects);
+  court.append(trace, links, pawns, turnMarkers, ballLayer, effects);
   const courtPlayback = createCourtPlayback(renderCourtFrame);
   const legend = element('div', 'rb-legend');
   for (const [cls, text] of [['home', 'Recrues'], ['away', 'Charognards'], ['ball', 'Ballon'], ['wet', 'Sol humide · coût ×2'], ['impact', 'Impact / dégâts'], ['grapple', 'Lutte']]) {
@@ -142,6 +144,7 @@ export function mountMatch(root, callbacks = {}) {
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
     '10 rounds de 6 secondes. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.',
+    'Lecture simultanée : un round dure six secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.',
     'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir, intercepter et frapper en opportunité utilisent cette même réaction.',
     'Une attaque d’opportunité est provoquée par un pas volontaire qui fait sortir de l’allonge (une case, diagonales comprises). Elle se résout avant ce pas : un KO laisse donc le joueur dans sa case de départ. Entrer dans l’allonge ou tourner autour sans en sortir ne provoque rien.',
     'Passe : action, 9 m, Acrobaties DD 10 ou 15 sous pression. Interception : résultat strictement supérieur à celui du passeur. Ramassage contesté et arrachement : tests opposés, égalité au défenseur.',
@@ -163,12 +166,18 @@ export function mountMatch(root, callbacks = {}) {
   function setRunning(value) {
     running = value && started && !state.finished && visible();
     clearTimeout(timer); timer = null;
-    if (!running) courtPlayback.settle();
+    if (!running) { nextRoundAt = 0; courtPlayback.settle(); }
     pause.textContent = running ? 'Pause' : 'Reprendre';
     renderPlaybackStatus();
     if (running) scheduleNextTurn();
   }
   function renderPlaybackStatus() {
+    if (playbackMode === 'round' && started && !state.finished) {
+      const active = displayFrame?.animating;
+      const text = active ? `Round ${displayFrame.round} · actions simultanées` : `${running ? 'Lecture' : 'Pause'} · round ${state.round} · 6 s à ×1`;
+      if (status.textContent !== text) status.textContent = text;
+      return;
+    }
     const actor = state.players.find((p) => p.id === state.activeId);
     if (!started || state.finished || !actor) {
       status.textContent = !started ? 'Prêt au coup d’envoi' : state.finished ? 'Match terminé' : running ? 'Match en cours' : 'Lecture en pause';
@@ -177,7 +186,7 @@ export function mountMatch(root, callbacks = {}) {
     status.replaceChildren(document.createTextNode(running ? 'Tour de ' : 'Pause · tour de '), element('strong', `rb-${actor.teamId}`, actor.name));
   }
   function scheduleNextTurn() {
-    timer = setTimeout(tick, nextCourtTurnDelay(courtPlayback.remaining(), speed));
+    timer = setTimeout(tick, playbackMode === 'round' ? Math.max(courtPlayback.remaining(), nextRoundAt - performance.now(), 0) : nextCourtTurnDelay(courtPlayback.remaining(), speed));
   }
   function appendEvents(events) {
     if (!events.length) return;
@@ -215,6 +224,7 @@ export function mountMatch(root, callbacks = {}) {
         node.addEventListener('click', () => selectPlayer(p.id));
         node.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectPlayer(p.id); } });
         pawns.append(node); pawnNodes.set(p.id, node);
+        const marker = turnMarkerArtwork(); turnMarkers.append(marker); markerNodes.set(p.id, marker);
       }
       const color = state.teams.find((t) => t.id === p.teamId)?.kitColor ?? KIT_COLORS[p.teamId === 'home' ? 0 : 1];
       const lookKey = characterKey(p, color);
@@ -226,6 +236,7 @@ export function mountMatch(root, callbacks = {}) {
     }
     courtPlayback.show(state);
     trace.replaceChildren();
+    if (playbackMode === 'round') { opportunityNote.hidden = true; return; }
     for (const movement of events.filter((e) => e.type === 'move' || e.type === 'drag')) {
       const points = [movement.from, ...movement.path].map((p) => `${p.x * 60 + 30},${p.y * 60 + 30}`).join(' ');
       trace.append(svg('polyline', { points, class: movement.type === 'drag' ? 'rb-drag-line' : 'rb-move-line' }));
@@ -251,18 +262,19 @@ export function mountMatch(root, callbacks = {}) {
     }).join(' ') + (opportunities.length ? ' La flèche jaune montre le pas déclencheur ; la réaction précède ce pas.' : '');
   }
   function renderCourtFrame(frame) {
-    const actor = frame.players.find((p) => p.id === state.activeId);
-    turnMarker.setAttribute('visibility', actor ? 'visible' : 'hidden');
-    if (actor) {
-      const point = courtPoint(actor.position);
-      turnMarker.setAttribute('transform', `translate(${point.x} ${point.y})`);
-    }
+    displayFrame = frame;
+    const activeIds = new Set(started ? playbackMode === 'round' ? frame.activeIds ?? [] : [state.activeId] : []);
     for (const p of frame.players) {
       const node = pawnNodes.get(p.id);
       if (!node) continue;
       const point = courtPoint(p.position);
+      const active = activeIds.has(p.id), marker = markerNodes.get(p.id);
+      marker.setAttribute('visibility', active ? 'visible' : 'hidden'); marker.setAttribute('transform', `translate(${point.x} ${point.y})`);
       node.setAttribute('transform', `translate(${point.x} ${point.y})`);
       node.classList.toggle('is-ko', p.hp === 0); node.classList.toggle('is-prone', p.prone);
+      node.classList.toggle('is-active', active); node.setAttribute('aria-current', String(active));
+      const full = state.players.find((q) => q.id === p.id);
+      node.setAttribute('aria-label', `${full.name}, ${teamLabel(p.teamId)}, ${p.hp} PV sur ${p.maxHp}${p.hp === 0 ? ', KO' : ''}${p.grappledBy ? ', agrippé' : ''}${p.prone ? ', à terre' : ''}${frame.ball.carrierId === p.id ? ', porte la balle' : ''}${active ? ', action en cours' : ''}`);
       node.querySelector('.rb-pawn-number').textContent = p.hp === 0 ? '×' : String(p.number);
       node.querySelector('.rb-pawn-health').setAttribute('width', String(32 * p.hp / p.maxHp));
       poseCharacter(node, p, { carrying: frame.ball.carrierId === p.id });
@@ -272,7 +284,31 @@ export function mountMatch(root, callbacks = {}) {
     ballHalo.setAttribute('visibility', carried || frame.flying ? 'hidden' : 'visible');
     ballBody.setAttribute('rx', carried ? 11 : 15); ballBody.setAttribute('ry', carried ? 7 : 10);
     drawCourtLinks(links, frame.players); drawCourtEffects(effects, frame.effects);
+    for (const chip of initiative.children) if (chip.dataset.rbOrder) {
+      const p = state.players.find((p) => p.id === chip.dataset.rbOrder), active = activeIds.has(p.id);
+      chip.classList.toggle('is-active', active); chip.setAttribute('aria-current', String(active));
+      chip.classList.toggle('is-ko', frame.players.find((q) => q.id === p.id).hp === 0);
+      chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${active ? ', action en cours' : ''}`);
+    }
+    const holder = frame.players.find((p) => p.id === frame.ball.carrierId), name = (id) => state.players.find((p) => p.id === id)?.name;
+    const remaining = Math.max(0, (11 - frame.round) * 6 - (frame.roundProgress ?? 0) * 6);
+    phaseText.textContent = frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
+    timeText.textContent = frame.finished ? '00:00' : frame.round > 10 ? `+${String(Math.ceil(6 * (1 - (frame.roundProgress ?? 0)))).padStart(2, '0')}` : remaining > 59 ? '01:00' : `00:${String(Math.ceil(remaining)).padStart(2, '0')}`;
+    possessionText.textContent = frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : 'Balle libre';
+    possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
+    for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) score.querySelector('.rb-team-count').textContent = `${frame.players.filter((p) => p.teamId === teamId && p.hp > 0).length} / 5 en jeu`;
+    toolbar.hidden = !started || state.finished && !frame.animating;
+    resultPanel.hidden = !state.finished || Boolean(frame.animating);
+    pause.disabled = state.finished && !frame.animating;
+    pause.textContent = frame.animating || running ? 'Pause' : 'Reprendre';
+    const signature = JSON.stringify([frame.ball.carrierId, frame.players.map((p) => [p.id, p.hp, p.prone, p.grappledBy, p.grappling])]);
+    if (signature !== healthSignature) { healthSignature = signature; renderSelected(); renderRosters(); }
+    if (frame.animating) {
+      const text = `Round ${frame.round} · actions simultanées`;
+      if (status.textContent !== text) status.textContent = text;
+    } else renderPlaybackStatus();
   }
+  const visiblePlayers = () => state.players.map((p) => ({ ...p, ...displayFrame?.players.find((q) => q.id === p.id) }));
   function selectPlayer(id) {
     selectedId = selectedId === id ? null : id;
     for (const [playerId, node] of pawnNodes) {
@@ -282,7 +318,7 @@ export function mountMatch(root, callbacks = {}) {
   }
   function renderSelected() {
     selected.replaceChildren();
-    const p = state.players.find((p) => p.id === selectedId);
+    const p = visiblePlayers().find((p) => p.id === selectedId);
     if (!p) { selected.append(element('p', 'rb-muted', 'Sélectionnez un pion ou un nom pour consulter ses caractéristiques.')); return; }
     const heading = element('div', 'rb-selected-heading'); heading.append(element('strong', `rb-${p.teamId}`, `${p.number} · ${p.name}`), element('span', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
     const stats = element('dl', 'rb-player-stats');
@@ -310,15 +346,15 @@ export function mountMatch(root, callbacks = {}) {
     for (const team of state.teams) {
       const block = element('section', `rb-roster rb-roster-${team.id}`); const header = element('div', 'rb-roster-heading');
       const teamTitle = element('div', 'rb-roster-title'); teamTitle.append(teamCrest(team.id), element('h3', `rb-${team.id}`, team.name));
-      header.append(teamTitle, element('span', 'rb-muted', `${state.players.filter((p) => p.teamId === team.id && p.hp > 0).length}/5 en jeu`)); block.append(header);
-      for (const p of state.players.filter((p) => p.teamId === team.id)) {
+      header.append(teamTitle, element('span', 'rb-muted', `${visiblePlayers().filter((p) => p.teamId === team.id && p.hp > 0).length}/5 en jeu`)); block.append(header);
+      for (const p of visiblePlayers().filter((p) => p.teamId === team.id)) {
         const row = element('div', `rb-roster-row${p.hp === 0 ? ' is-ko' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
         const playerButton = button(`${p.number} · ${p.name}`, 'rb-player-name'); playerButton.setAttribute('aria-pressed', String(selectedId === p.id)); playerButton.addEventListener('click', () => selectPlayer(p.id));
         playerButton.dataset.rbPlayer = p.id;
         const copy = element('div'); copy.append(playerButton, element('small', 'rb-archetype', archetypeLabel(p)), element('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
         const health = element('div', 'rb-health'); health.append(element('span', '', `${p.hp}/${p.maxHp} PV`));
         const meter = element('meter'); meter.min = 0; meter.max = p.maxHp; meter.value = p.hp; meter.setAttribute('aria-label', `Points de vie de ${p.name}`); health.append(meter);
-        const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', state.ball.carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
+        const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', (displayFrame?.ball ?? state.ball).carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
         const resource = element('small', 'rb-resource', p.hp === 0 ? 'Hors jeu' : p.reaction ? 'Réaction disponible' : 'Réaction dépensée');
         row.append(copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource,
           element('small', 'rb-class-resource', classResources(p, state.players))); block.append(row);
@@ -363,31 +399,23 @@ export function mountMatch(root, callbacks = {}) {
       root.style.setProperty(`--rb-${team.id}`, readableKit(color)); root.style.setProperty(`--rb-kit-${team.id}`, color);
     }
     if (!started) for (const [i, p] of state.players.filter((p) => p.teamId === 'home').entries()) rowControls[i].portrait.replaceChildren(playerPortrait(p, colorInput.value));
-    const holder = state.players.find((p) => p.id === state.ball.carrierId);
-    phaseText.textContent = state.finished ? 'Coup de sifflet final' : state.phase === 'final' ? 'Dernier engagement' : state.phase === 'overtime' ? `Prolongation ${state.round - 10}/2` : `Round ${state.round}/10`;
-    timeText.textContent = state.finished ? '00:00' : state.round > 10 ? '+06' : `00:${String((11 - state.round) * 6).padStart(2, '0')}`;
-    if (!state.finished && state.round === 1) timeText.textContent = '01:00';
-    possessionText.textContent = holder ? `${holder.name} · ${teamLabel(holder.teamId)}` : 'Balle libre';
-    possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     homeScore.querySelector('small').textContent = `${STRATEGIES[state.teams[0].strategy]} · votre équipe`;
     awayScore.querySelector('small').textContent = `Plan ${STRATEGIES[state.teams[1].strategy]}`;
     for (const [index, score] of [homeScore, awayScore].entries()) score.querySelector('strong').textContent = state.teams[index].name;
     for (const [index, id] of ['home', 'away'].entries()) legend.children[index].lastChild.textContent = teamLabel(id);
-    for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) {
-      const count = state.players.filter((p) => p.teamId === teamId && p.hp > 0).length;
-      score.querySelector('.rb-team-count').textContent = `${count} / 5 en jeu`;
-    }
     setup.hidden = started;
     toolbar.hidden = !started || state.finished;
     next.disabled = state.finished; finish.disabled = state.finished; pause.disabled = state.finished;
+    next.textContent = playbackMode === 'round' ? 'Round suivant' : 'Tour suivant';
     renderCourt(events); renderSelected(); renderRosters();
     const focusedOrder = initiative.contains(document.activeElement) ? document.activeElement.dataset.rbOrder : null;
     initiative.replaceChildren(element('span', 'rb-muted', 'Initiative'));
     for (const id of state.initiative) {
       const p = state.players.find((q) => q.id === id);
-      const chip = button(String(p.number), `rb-order-token rb-${p.teamId}${p.id === state.activeId ? ' is-active' : ''}${p.hp === 0 ? ' is-ko' : ''}`);
-      chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${p.id === state.activeId ? ', tour en cours' : ''}`); chip.title = `${p.name} · initiative ${p.initiative}`;
-      chip.setAttribute('aria-current', String(p.id === state.activeId));
+      const active = playbackMode === 'turn' && p.id === state.activeId;
+      const chip = button(String(p.number), `rb-order-token rb-${p.teamId}${active ? ' is-active' : ''}${p.hp === 0 ? ' is-ko' : ''}`);
+      chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${active ? ', action en cours' : ''}`); chip.title = `${p.name} · initiative ${p.initiative}`;
+      chip.setAttribute('aria-current', String(active));
       chip.dataset.rbOrder = p.id;
       chip.addEventListener('click', () => selectPlayer(p.id)); initiative.append(chip);
     }
@@ -398,13 +426,21 @@ export function mountMatch(root, callbacks = {}) {
     if (!errorBox.hidden) return;
     try {
       courtPlayback.settle();
-      const before = state;
-      const turn = stepMatch(state); state = turn.state;
-      const saved = context !== 'career' || callbacks.onTurn?.(state, turn.events) !== false;
-      appendEvents(turn.events); render(turn.events);
+      const round = state.round, turns = []; let saved = true;
+      do {
+        const before = state, turn = stepMatch(state, { stopAtRoundEnd: playbackMode === 'round' }); state = turn.state;
+        turns.push({ before, after: state, events: turn.events });
+        saved = context !== 'career' || callbacks.onTurn?.(state, turn.events) !== false;
+        appendEvents(turn.events);
+      } while (saved && playbackMode === 'round' && !state.finished && state.round === round);
+      render(turns.at(-1).events);
+      nextRoundAt = performance.now() + ROUND_DURATION / speed;
       if (!saved) { setRunning(false); errorBox.hidden = false; errorBox.textContent = 'Progression non enregistrée. Revenez au club pour réessayer la sauvegarde ou exporter votre carrière.'; }
       if (state.finished) { setRunning(false); status.textContent = 'Match terminé'; }
-      if (animate && visible()) courtPlayback.play(before, state, turn.events, { speed });
+      if (saved && animate && visible()) {
+        if (playbackMode === 'round') courtPlayback.playRound(turns, { speed });
+        else courtPlayback.play(turns[0].before, state, turns[0].events, { speed });
+      }
     } catch (error) {
       setRunning(false); errorBox.hidden = false; errorBox.textContent = `La simulation a été interrompue. Code du match : ${state.seed}. ${error.message}`;
     }
@@ -428,9 +464,10 @@ export function mountMatch(root, callbacks = {}) {
   reroll.addEventListener('click', () => {
     const value = new Uint32Array(1); crypto.getRandomValues(value); seedInput.value = `arche-${value[0].toString(36)}`; updatePreview();
   });
-  pause.addEventListener('click', () => setRunning(!running));
+  pause.addEventListener('click', () => setRunning(displayFrame?.animating ? false : !running));
   next.addEventListener('click', () => { setRunning(false); if (started && !state.finished) advance(); });
-  speedSelect.addEventListener('change', () => { courtPlayback.settle(); speed = Number(speedSelect.value); if (running) setRunning(true); });
+  speedSelect.addEventListener('change', () => { courtPlayback.settle(); nextRoundAt = 0; speed = Number(speedSelect.value); if (running) setRunning(true); });
+  modeSelect.addEventListener('change', () => { courtPlayback.settle(); nextRoundAt = 0; playbackMode = modeSelect.value; render(lastTurnEvents); setRunning(running); });
   finish.addEventListener('click', () => {
     setRunning(false);
     while (!state.finished && errorBox.hidden) advance({ animate: false });

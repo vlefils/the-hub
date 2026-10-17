@@ -26,6 +26,7 @@ test('parcours UI : création, échange de titulaires, consignes, équipement et
   assert.equal(e.saved().balance, 725); assert.equal(e.saved().current.state.turns, 0);
   // The real match reader receives the club names and compiled stats.
   assert.match(classNode(e.root, 'rb-scoreboard').textContent, /Un nom de club/);
+  const reading = classNode(e.root, 'rb-reading-mode'); reading.value = 'turn'; await reading.emit('change');
   await button(e.root, 'Tour suivant').click(); assert.equal(e.saved().current.state.turns, 1);
   await button(e.root, 'Retour au club · mettre en pause').click();
   assert.match(classNode(e.root, 'rb-next-match').textContent, /lecture seule/);
@@ -44,7 +45,7 @@ test('UI : échec de sauvegarde visible, reprise en pause et remplacement JSON e
   const e = environment(); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await foundClub(e.root);
   let play = descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Jouer ·')); await play.click();
   const valid = e.storage.getItem(CAREER_KEY); e.storage.failing = true;
-  await button(e.root, 'Tour suivant').click(); assert.equal(e.storage.getItem(CAREER_KEY), valid);
+  await button(e.root, 'Round suivant').click(); assert.equal(e.storage.getItem(CAREER_KEY), valid);
   assert.match(classNode(e.root, 'rb-career-notice').textContent, /Progression non enregistrée/); assert.match(classNode(e.root, 'rb-error').textContent, /non enregistrée/);
   await button(e.root, 'Retour au club · mettre en pause').click(); e.storage.failing = false; await button(e.root, 'Réessayer la sauvegarde').click();
   assert.equal(e.saved().current.state.turns, 1); assert.equal(e.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);

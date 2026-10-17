@@ -83,7 +83,7 @@ function advance(state, events) {
   state.turnIndex++;
   if (state.turnIndex === state.initiative.length) endRound(state, events);
 }
-function stepMutable(state) {
+function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   const events = [];
   if (state.finished) return events;
   // Skip KO slots without granting turns or reactions. Also handles both teams entirely KO.
@@ -91,7 +91,11 @@ function stepMutable(state) {
   while (!state.finished) {
     actor = state.players.find((p) => p.id === state.initiative[state.turnIndex]);
     if (actor?.hp > 0) break;
+    const round = state.round;
     advance(state, events);
+    // Presentation may batch a round, including its skipped KO slots, without
+    // accidentally executing the first living player's turn in the next round.
+    if (stopAtRoundEnd && (state.round !== round || state.finished)) { assertInvariants(state); return events; }
   }
   if (state.finished) { assertInvariants(state); return events; }
   state.activeId = actor.id;
@@ -144,9 +148,9 @@ function stepMutable(state) {
   assertInvariants(state);
   return events;
 }
-export function stepMatch(input) {
+export function stepMatch(input, options) {
   const state = clone(input);
-  return { state, events: stepMutable(state) };
+  return { state, events: stepMutable(state, options) };
 }
 export function simulateMatch(config = {}, onTurn) {
   const state = createMatch(config), events = [];

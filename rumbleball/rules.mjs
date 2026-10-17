@@ -28,12 +28,12 @@ export function randomInt(state, max) {
 export function emit(state, events, type, message, data = {}) {
   events.push({ round: state.round, phase: state.phase, actorId: state.activeId ?? null, type, message, ...data });
 }
-export function check(state, bonus, events, label, { advantage = false, disadvantage = false } = {}) {
+export function check(state, bonus, events, label, { advantage = false, disadvantage = false, playerId } = {}) {
   const dice = [randomInt(state, 20) + 1];
   if (advantage !== disadvantage) dice.push(randomInt(state, 20) + 1);
   const natural = dice.length === 1 ? dice[0] : advantage ? Math.max(...dice) : Math.min(...dice);
   const total = natural + bonus;
-  emit(state, events, 'roll', `${label} : ${dice.join(' / ')} ${bonus >= 0 ? '+' : '−'} ${Math.abs(bonus)} = ${total}`, { dice, natural, bonus, total });
+  emit(state, events, 'roll', `${label} : ${dice.join(' / ')} ${bonus >= 0 ? '+' : '−'} ${Math.abs(bonus)} = ${total}`, { dice, natural, bonus, total, ...(playerId ? { playerId } : {}) });
   return { natural, total };
 }
 function aided(state, actor, enemyId, kind) {
@@ -44,7 +44,8 @@ function aided(state, actor, enemyId, kind) {
 }
 function skillCheck(state, actor, bonus, events, label, advantage = false) {
   const help = aided(state, actor, null, 'check');
-  return check(state, bonus, events, label, { advantage: help || advantage }).total;
+  // Keep failed defenders/interceptors identifiable for presentation dependencies.
+  return check(state, bonus, events, label, { advantage: help || advantage, playerId: actor.id }).total;
 }
 
 export const hasCheckHelp = (state, actor) => state.aids.some((a) => a.allyId === actor.id && a.kind === 'check');
