@@ -13,7 +13,7 @@ const copy = (view) => structuredClone(view);
 const ballPoint = (view) => {
   const holder = player(view, view.ball.carrierId);
   const point = courtPoint(holder?.position ?? view.ball.position);
-  return holder ? { x: point.x + 17, y: point.y - 17 } : point;
+  return holder ? { x: point.x + 24, y: point.y - 17 } : point;
 };
 const release = (view, id) => {
   const p = player(view, id);

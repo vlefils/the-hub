@@ -151,8 +151,6 @@
 .rb-impact-slash { fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; }
 .rb-effect-label { fill: currentColor; stroke: #101716; stroke-width: 4; paint-order: stroke; stroke-linejoin: round; font-family: 'Space Grotesk', Arial, sans-serif; font-size: 24px; font-weight: 700; }
 .rb-effect-damage .rb-effect-label, .rb-effect-ko .rb-effect-label { font-size: 28px; }
-.rb-ball { fill: var(--rb-ball); stroke: #18201a; stroke-width: 2.5; }
-.rb-ball-seam { stroke: #63562b; stroke-width: 1.5; }
 .rb-ball-halo { fill: none; stroke: var(--rb-ball); stroke-width: 1.5; stroke-dasharray: 3 4; }
 .rb-move-line { fill: none; stroke: #e3ead6; stroke-width: 3; stroke-dasharray: 5 6; opacity: .65; }
 .rb-drag-line { fill: none; stroke: #b6c2b7; stroke-width: 3; stroke-dasharray: 2 7; opacity: .7; }

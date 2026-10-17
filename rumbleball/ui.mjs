@@ -1,7 +1,7 @@
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, CURRENT_RULES, DEFAULT_SEED, seedHash, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
-import { arenaBackdrop, pawnArtwork, playerPortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
+import { arenaBackdrop, ballArtwork, pawnArtwork, playerPortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
 import { KIT_COLORS, characterKey, readableKit, sportingWeapon, visibleGear } from './appearance.mjs';
 import { CATALOGUE } from './progression.mjs';
 import { narrateTurn } from './narration.mjs';
@@ -128,10 +128,10 @@ export function mountMatch(root, callbacks = {}) {
   const effects = svg('g', { class: 'rb-court-effects', 'aria-hidden': 'true' });
   const turnMarkers = svg('g', { 'aria-hidden': 'true' });
   const pawnNodes = new Map(), markerNodes = new Map();
-  const ballSprite = svg('g'); const ballHalo = svg('circle', { r: 20, class: 'rb-ball-halo' });
-  const ballBody = svg('ellipse', { transform: 'rotate(-35)', class: 'rb-ball' });
+  const ballSprite = ballArtwork(); const ballHalo = ballSprite.querySelector('.rb-ball-halo');
+  const ballBody = ballSprite.querySelector('.rb-ball');
   const ballDrop = svg('g', { class: 'rb-ball-drop' });
-  ballSprite.append(ballHalo, ballBody, svg('path', { d: 'M-4,0h8 M0,-4v8', class: 'rb-ball-seam' })); ballDrop.append(ballSprite); ballLayer.append(ballDrop);
+  ballDrop.append(ballSprite); ballLayer.append(ballDrop);
   court.append(trace, centerZone, links, pawns, turnMarkers, ballLayer, effects);
   const courtPlayback = createCourtPlayback(renderCourtFrame);
   const courtStage = element('div', 'rb-court-stage'), kickoffOverlay = element('div', 'rb-kickoff'), kickoffCopy = element('div', 'rb-kickoff-copy'), kickoffValue = element('div');
@@ -318,7 +318,7 @@ export function mountMatch(root, callbacks = {}) {
     ballSprite.setAttribute('transform', `translate(${frame.ballPoint.x} ${frame.ballPoint.y})`);
     const carried = Boolean(frame.ball.carrierId);
     ballHalo.setAttribute('visibility', carried || frame.flying ? 'hidden' : 'visible');
-    ballBody.setAttribute('rx', carried ? 11 : 15); ballBody.setAttribute('ry', carried ? 7 : 10);
+    ballBody.setAttribute('transform', carried && !frame.flying ? 'scale(.76)' : 'scale(1)');
     drawCourtLinks(links, frame.players); drawCourtEffects(effects, frame.effects);
     for (const chip of initiative.children) if (chip.dataset.rbOrder) {
       const p = state.players.find((p) => p.id === chip.dataset.rbOrder), active = activeIds.has(p.id);

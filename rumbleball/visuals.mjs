@@ -7,6 +7,27 @@ export function svg(tag, attributes = {}, text) {
   return el;
 }
 
+let ballArtworkId = 0;
+export function ballArtwork() {
+  const sprite = svg('g', { class: 'rb-ball-sprite' });
+  const body = svg('g', { class: 'rb-ball' });
+  const gradientId = `rb-ball-shell-${++ballArtworkId}`, definitions = svg('defs');
+  const shell = svg('radialGradient', { id: gradientId, cx: '30%', cy: '25%', r: '80%' });
+  for (const [offset, color] of [['0%', '#fff9dd'], ['55%', '#e4d69c'], ['100%', '#8e916d']]) {
+    shell.append(svg('stop', { offset, 'stop-color': color }));
+  }
+  definitions.append(shell); sprite.append(definitions, svg('circle', { r: 27, class: 'rb-ball-halo' }));
+  body.append(svg('ellipse', { cy: 19, rx: 18, ry: 6, fill: '#071111', opacity: .45 }),
+    svg('circle', { r: 21, fill: `url(#${gradientId})`, stroke: '#142326', 'stroke-width': 2.5 }),
+    svg('path', { d: 'M0-9V-20M8.6-2.8 19.5-6.3M5.3 8.5 12.1 16.6M-5.3 8.5-12.1 16.6M-8.6-2.8-19.5-6.3', fill: 'none', stroke: '#526262', 'stroke-width': 2.2, 'stroke-linejoin': 'round' }),
+    svg('path', { d: 'M-7-19Q0-21 7-19L5-15H-5ZM18-9Q22 0 18 9L14 5V-5ZM8 18Q0 22-8 18L-5 14H5ZM-18 9Q-22 0-18-9L-14-5V5Z', fill: '#53666b', stroke: '#213337', 'stroke-width': 1.2, 'stroke-linejoin': 'round' }),
+    svg('path', { d: 'M0-9 8.6-2.8 5.3 8.5H-5.3L-8.6-2.8Z', fill: '#344b53', stroke: '#182d32', 'stroke-width': 1.8, 'stroke-linejoin': 'round' }),
+    svg('path', { d: 'M-5-1 0-5 5-1M-3 5H3M-3-17H3M17-3V3M-17-3V3', fill: 'none', stroke: '#8cebdc', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }),
+    svg('path', { d: 'M-15-7Q-13-13-8-15', fill: 'none', stroke: '#fffcef', 'stroke-width': 2.5, 'stroke-linecap': 'round', opacity: .8 }));
+  sprite.append(body);
+  return sprite;
+}
+
 export function teamCrest(teamId) {
   const crest = svg('svg', { viewBox: '0 0 64 72', class: `rb-crest rb-${teamId}`, 'aria-hidden': 'true', focusable: 'false' });
   crest.append(svg('path', { d: 'M6 5H58V43L32 65 6 43Z', class: 'rb-crest-shield' }));

@@ -77,7 +77,7 @@ test('ballon : passe, réception puis course du receveur ; un troisième joueur 
   const plan = buildRoundPlayback([a, b, c]); assert.equal(plan.turns[1].start, 0); assert.ok(plan.turns[2].start >= plan.turns[0].end);
   assert.equal(sampleRoundPlayback(plan, 0).ball.carrierId, null); // No possession is displayed before the ball arrives.
   assert.ok(sampleRoundPlayback(plan, plan.turns[0].scale * 75).flying);
-  const final = sampleRoundPlayback(plan, 12000); assert.equal(final.ball.carrierId, 'home-1'); close(final.ballPoint.x, 5 * 60 + 30 + 17);
+  const final = sampleRoundPlayback(plan, 12000); assert.equal(final.ball.carrierId, 'home-1'); close(final.ballPoint.x, 5 * 60 + 30 + 24);
 });
 
 test('trajectoire du ballon : une course traversant le couloir de passe attend sa réception', () => {
@@ -95,7 +95,7 @@ test('lutte : les deux corps restent couplés, la balle suit le joueur entraîn�
   const other = moved(after, 'away-0', [{ x: 8, y: 6 }]), plan = buildRoundPlayback([{ before, after, events }, other]);
   for (let t = 0; t <= 12000; t += 200) {
     const frame = sampleRoundPlayback(plan, t); close(p(frame, b.id).position.x - p(frame, a.id).position.x, 1);
-    close(frame.ballPoint.x, p(frame, b.id).position.x * 60 + 47); assert.ok(!p(frame, b.id).walking);
+    close(frame.ballPoint.x, p(frame, b.id).position.x * 60 + 54); assert.ok(!p(frame, b.id).walking);
   }
 });
 

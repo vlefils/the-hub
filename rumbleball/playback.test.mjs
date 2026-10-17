@@ -50,7 +50,7 @@ test('lutte : les deux pions et la balle glissent ensemble en gardant leur écar
   for (let t = 0; t <= plan.duration; t += plan.duration / 16) {
     const frame = sampleCourtPlayback(plan, t), holder = p(frame, a.id), held = p(frame, b.id);
     close(held.position.x - holder.position.x, 1); close(held.position.y, holder.position.y);
-    close(frame.ballPoint.x, courtPoint(held.position).x + 17);
+    close(frame.ballPoint.x, courtPoint(held.position).x + 24);
     close(frame.ballPoint.y, courtPoint(held.position).y - 17);
   }
 });
@@ -103,7 +103,7 @@ test('passe interceptée : la balle vole vers l’intercepteur, pas vers le dest
   const plan = buildCourtPlayback(before, after, events);
   const flight = plan.stages.find((s) => s.flight);
   const midway = sampleCourtPlayback(plan, flight.end / 2);
-  close(midway.ballPoint.x, (courtPoint(a.position).x + courtPoint(b.position).x) / 2 + 17);
+  close(midway.ballPoint.x, (courtPoint(a.position).x + courtPoint(b.position).x) / 2 + 24);
   assert.equal(sampleCourtPlayback(plan, flight.end).ball.carrierId, b.id);
   assert.ok(plan.effects.some((e) => e.label === 'Intercept.'));
 });
