@@ -76,7 +76,7 @@ export async function mountOnline(root, config, connect) {
       const { error } = await client.auth.resetPasswordForEmail(email.value, { redirectTo: new URL('./multi.html?recovery=1', location.href).href });
       if (error) throw error; message('Si ce compte existe, un lien de récupération vous a été envoyé.', false);
     })));
-    panel.append(actions, el('p', 'rb-muted', 'Les comptes utilisent le même service Supabase que Riftbound Tracker. La session Rumbleball et les clubs sont séparés.'));
+    panel.append(actions, el('p', 'rb-muted', 'Votre compte Riftbound Tracker fonctionne aussi ici. Votre club et votre session Rumbleball restent séparés.'));
   }
   async function renderLobby() {
     content.className = 'rb-online-lobby';
