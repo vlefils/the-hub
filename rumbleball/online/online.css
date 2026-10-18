@@ -1,0 +1,22 @@
+.rb-online-top, .rb-online-actions, .rb-online-nav { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.rb-online-top { justify-content: space-between; margin-bottom: 1.5rem; }
+.rb-online-intro { max-width: 48rem; padding-block: 2rem; }
+.rb-online-form { max-width: 38rem; display: grid; gap: 1rem; margin-block: 1.5rem; }
+.rb-online-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr)); gap: 2rem; align-items: start; }
+.rb-online-nav { margin-block: 1rem 1.5rem; }
+.rb-online-nav [aria-current="page"] { border-bottom-color: var(--rb-accent, #43d3be); color: #fff; }
+.rb-online-identity { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.rb-online-identity h2 { overflow-wrap: anywhere; }
+.rb-online-roster { display: grid; gap: 1.5rem; margin-block: 1.5rem; }
+.rb-online-player { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding-bottom: 1rem; border-bottom: 1px solid #34423d; }
+.rb-online-player > div { flex: 1 1 15rem; min-width: 0; }
+.rb-online-player strong, .rb-online-player small { display: block; overflow-wrap: anywhere; }
+.rb-online-lineup { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .75rem; align-items: end; }
+.rb-online-live { margin-top: 1.5rem; }
+.rb-online-code { overflow-wrap: anywhere; user-select: all; }
+.rb-online-lock { color: #ffdb78; font-weight: 600; }
+.rb-online-notice { margin-block: 1rem; max-width: 58rem; }
+@media (max-width: 650px) {
+  .rb-online-lineup { grid-template-columns: 1fr; padding-bottom: 1rem; border-bottom: 1px solid #34423d; }
+  .rb-online-nav .rb-button { flex: 1 1 auto; }
+}

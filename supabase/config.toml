@@ -1,0 +1,7 @@
+project_id = "rumbleball"
+
+[functions.rumbleball-api]
+verify_jwt = false
+
+[functions.rumbleball-worker]
+verify_jwt = false

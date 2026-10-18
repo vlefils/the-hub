@@ -339,6 +339,7 @@ export function mountMatch(root, callbacks = {}) {
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) score.querySelector('.rb-team-count').textContent = `${frame.players.filter((p) => p.teamId === teamId && p.hp > 0).length} / 5 en jeu`;
     toolbar.hidden = !started || state.finished && !frame.animating;
+    if (context === 'broadcast') toolbar.hidden = true;
     resultPanel.hidden = !state.finished || Boolean(frame.animating);
     pause.disabled = state.finished && !frame.animating;
     pause.textContent = frame.animating || running ? 'Pause' : 'Reprendre';
@@ -425,6 +426,7 @@ export function mountMatch(root, callbacks = {}) {
     }
     table.append(tbody); const statsWrap = element('div', 'rb-table-scroll'); statsWrap.append(table); resultPanel.append(statsWrap);
     const actions = element('div', 'rb-controls');
+    if (context === 'broadcast') return;
     if (context === 'career') {
       const back = button('Voir le bilan de la journée', 'rb-button rb-button-primary'); back.addEventListener('click', () => { setRunning(false); callbacks.onReturn?.(); });
       actions.append(back); resultPanel.append(actions); return;
@@ -447,6 +449,7 @@ export function mountMatch(root, callbacks = {}) {
     for (const [index, id] of ['home', 'away'].entries()) legend.children[index].lastChild.textContent = teamLabel(id);
     setup.hidden = started;
     toolbar.hidden = !started || state.finished;
+    if (context === 'broadcast') toolbar.hidden = true;
     next.disabled = state.finished; finish.disabled = state.finished; pause.disabled = state.finished;
     next.textContent = playbackMode === 'round' ? 'Round suivant' : 'Tour suivant';
     renderCourt(events); renderSelected(); renderRosters();
@@ -465,6 +468,7 @@ export function mountMatch(root, callbacks = {}) {
     if (state.finished) renderResult();
   }
   function advance({ animate = true } = {}) {
+    if (context === 'broadcast') return;
     if (!errorBox.hidden) return;
     try {
       if (kickoff.active) resetKickoff();
@@ -513,6 +517,7 @@ export function mountMatch(root, callbacks = {}) {
   speedSelect.addEventListener('change', () => { courtPlayback.settle(); nextRoundAt = 0; speed = Number(speedSelect.value); if (running) setRunning(true); });
   modeSelect.addEventListener('change', () => { courtPlayback.settle(); nextRoundAt = 0; playbackMode = modeSelect.value; render(lastTurnEvents); setRunning(running); });
   finish.addEventListener('click', () => {
+    if (context === 'broadcast') return;
     setRunning(false);
     while (!state.finished && errorBox.hidden) advance({ animate: false });
     if (state.finished) resultPanel.scrollIntoView({ block: 'nearest', behavior: 'instant' });
@@ -523,6 +528,16 @@ export function mountMatch(root, callbacks = {}) {
   return {
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
+    broadcast(frame, elapsed = 0) {
+      setRunning(false); resetKickoff(); context = 'broadcast'; started = true; ballReady = Boolean(frame.turns.length);
+      state = structuredClone(frame.turns.at(-1)?.after ?? frame.initial);
+      selectedId = state.players.some((p) => p.id === selectedId) ? selectedId : null;
+      journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
+      for (const turn of frame.turns) appendEvents(turn.events);
+      render(frame.turns.at(-1)?.events ?? []);
+      if (frame.turns.length) courtPlayback.playRound(frame.turns, { speed: 1, elapsed });
+      toolbar.hidden = true;
+    },
     load(current, autoplay = false, { kickoff: freshKickoff = false } = {}) {
       setRunning(false); resetKickoff(); context = 'career'; lastConfig = structuredClone(current.config); state = structuredClone(current.state);
       ballReady = state.turns > 0 || state.finished;

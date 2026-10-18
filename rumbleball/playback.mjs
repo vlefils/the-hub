@@ -294,9 +294,10 @@ export function createCourtPlayback(draw, {
     matchKey = key; lastTurns = state.turns;
     stop(); final = snapshot(state, facings); render({ ...final, ballPoint: ballPoint(final), effects: [] });
   };
-  const run = (plan, sample) => {
+  const run = (plan, sample, elapsed = 0) => {
     stop();
-    const started = now(), token = generation;
+    const offset = Math.max(0, Math.min(plan.duration, elapsed));
+    const started = now() - offset, token = generation;
     final = plan.final;
     if (reducedMotion()) { settle(); return 0; }
     endsAt = started + plan.duration;
@@ -306,10 +307,10 @@ export function createCourtPlayback(draw, {
       render(sample(plan, time - started));
       requestId = request(tick);
     };
-    tick(started);
-    return plan.duration;
+    tick(now());
+    return Math.max(0, plan.duration - offset);
   };
   const play = (before, after, events, options) => run(buildCourtPlayback(before, after, events, { ...options, facings }), sampleCourtPlayback);
-  const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, facings }), sampleRoundPlayback);
+  const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, facings }), sampleRoundPlayback, options?.elapsed ?? 0);
   return { show, play, playRound, settle, remaining: () => Math.max(0, endsAt - now()) };
 }

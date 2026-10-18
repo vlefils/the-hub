@@ -25,6 +25,7 @@ export function mountCareer(root, mountMatch) {
   const top = el('div', 'rb-career-top'), modes = el('div', 'rb-controls'), tools = el('div', 'rb-controls');
   const careerMode = btn('Carrière', () => showMode('career')), exhibitionMode = btn('Exhibition', () => showMode('exhibition'));
   modes.setAttribute('aria-label', 'Mode de jeu'); modes.append(careerMode, exhibitionMode);
+  const onlineLink = el('a', 'rb-button', 'Multijoueur'); onlineLink.href = './multi.html'; modes.append(onlineLink);
   const exportButton = btn('Exporter', () => attempt(() => download(exportCareer(career), `rumbleball-saison-${career.season}.json`)));
   const importInput = el('input'); importInput.type = 'file'; importInput.accept = '.json,application/json'; importInput.hidden = true;
   const importButton = btn('Importer', () => importInput.click());

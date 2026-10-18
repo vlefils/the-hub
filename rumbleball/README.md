@@ -33,6 +33,8 @@ Les cinq adversaires de carrière ont chacun leur ouverture. En Exhibition, le c
 
 ## Carrière
 
+Un socle de ligues en ligne est préparé dans [online/](online/README.md), avec comptes Supabase, invitations, préparations annulables et soirées à 20 h. Le bouton **Multijoueur** ouvre sa page dédiée. L’ouverture des comptes de jeu et des ligues reste désactivée tant que la migration et les fonctions serveur n’ont pas été installées. La carrière locale et l’Exhibition restent accessibles.
+
 Fonder un club donne 2 400 chromas. Choisir cinq à huit des douze candidats, puis valider les contrats en une fois. Les vues **Effectif**, **Recrutement**, **Équipement** et **Ligue** donnent accès à la composition, aux consignes, aux achats et au calendrier. Composition, consignes et placement sont enregistrés automatiquement ; choisir un titulaire déjà présent échange les deux positions. Dans **Déploiement**, choisir le joueur puis cliquer une case de sa moitié ; une case occupée échange les deux joueurs. Les flèches parcourent les cases et Entrée valide le placement. La même interface existe en Exhibition. Les cinq adversaires disposent de sept joueurs fixes, progressent et font tourner leurs titulaires en fonction de leur fatigue ; aucune adaptation à la puissance du club.
 
 Dix journées aller-retour par saison. Les salaires de tout l’effectif sont prélevés une seule fois au lancement, même si le solde devient négatif. Seuls les salaires permettent le découvert : les achats restent bloqués jusqu’au remboursement par primes ou ventes. Prime de match : défaite 200, nul 275, victoire 350 ; classement : 600 / 400 / 200 / 100 / 100 / 100. La nouvelle saison conserve argent, dette, joueurs et équipement et remet la fatigue à zéro.
