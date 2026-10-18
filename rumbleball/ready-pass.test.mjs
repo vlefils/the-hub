@@ -105,13 +105,16 @@ test('démarquage : le déplacement est publié avant la passe, puis la course s
 
 test('IA : pas de démarquage coordonné avant la préparation, puis des relais pendant son attente', () => {
   const { state, a, c } = fixture(); const before = structuredClone(state);
-  assert.equal(teamPlan(state, c).supports.size, 0); assert.equal(decideTurn(state, c).task, 'standby'); assert.deepEqual(state, before);
+  assert.equal(teamPlan(state, c).supports.size, 0); assert.notEqual(decideTurn(state, c).task, 'relay'); assert.deepEqual(state, before);
   ready(state, a); assert.ok(teamPlan(state, c).supports.has(c.id)); assert.equal(decideTurn(state, c).task, 'relay');
   assert.equal(decideTurn(state, a).action.type, 'wait', 'Une préparation n’ajoute pas de deuxième action.');
 });
 
 test('IA : la préparation appartient aux choix du porteur sans modifier le hasard', () => {
-  const { state, a } = fixture(); a.movement = 0; a.role = 'carrier'; const before = structuredClone(state);
+  const { state, a, b, c, enemy } = fixture(); a.movement = 0; a.role = 'carrier';
+  c.position = { x: 5, y: 5 }; enemy.position = { x: 5, y: 4 };
+  state.initiative = [a.id, b.id, c.id, enemy.id]; state.turnIndex = 0;
+  const before = structuredClone(state);
   assert.equal(decideTurn(state, a).action.type, 'ready-pass'); assert.deepEqual(state, before);
 });
 

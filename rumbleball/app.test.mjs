@@ -68,7 +68,9 @@ test('page autonome : carrière existante, lecture automatique sans section du l
   await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
   assert.equal(clock.pending.size, 1, 'La lecture démarre sans is-active du livre.');
   clock.until(() => e.saved().current.state.turns > 0);
-  assert.equal(e.saved().current.state.turns, 10);
+  assert.equal(e.saved().current.state.round, 2);
+  const savedTurns = e.saved().current.state.turns;
+  assert.ok(savedTurns > 0 && savedTurns <= 10, 'Un round complet, avec les éventuels créneaux KO sautés.');
   assert.equal(e.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
   const layout = classNode(e.root, 'rb-match-layout');
   for (const name of ['rb-field-column', 'rb-journal-panel', 'rb-rosters']) assert.ok(layout.children.includes(classNode(e.root, name)));
@@ -78,7 +80,7 @@ test('page autonome : carrière existante, lecture automatique sans section du l
   const loaded = standalone(exportCareer(e.saved())); mountApp(loaded.root);
   await button(loaded.root, 'Reprendre la rencontre').click();
   assert.equal(clock.pending.size, 0, 'Une reprise reste en pause.');
-  assert.equal(loaded.saved().current.state.turns, 10);
+  assert.equal(loaded.saved().current.state.turns, savedTurns);
   assert.equal(loaded.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
   let expected = loaded.saved().current.state;
   const round = expected.round;

@@ -15,11 +15,11 @@ const sideOf = (id) => id?.startsWith('home-') ? 'home' : id?.startsWith('away-'
 
 // Count executed actions, including nested reaction passes and pickup follow-ups.
 // No hooks, dice consumption, AI replacement, or changes to the production engine.
-export function measureMatch(config) {
+export function measureMatch(config, simulate = simulateMatch) {
   const metrics = { home: blankMetrics(), away: blankMetrics() }, hp = new Map();
   let firstEngagement, roundOneHolder = null;
   let observedCarrier = null;
-  const { state } = simulateMatch(config, (state, events) => {
+  const { state } = simulate(config, (state, events) => {
     for (const p of state.players) {
       const lost = (hp.get(p.id) ?? p.maxHp) - p.hp;
       assert.ok(lost >= 0, 'No healing or return from KO is expected.');

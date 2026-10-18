@@ -27,6 +27,9 @@ test('passe directe : un receveur marqué reste refusé même si la passe serait
 
 test('passe directe : une passe courte vers un partenaire libre reste possible sans préparation', () => {
   const { state, passer, receiver, enemy } = fixture(); enemy.position = { x: 0, y: 3 };
+  // With the reaction spent, waiting is unavailable; the adjacent free receiver
+  // must still be usable by a direct pass with the normal action.
+  passer.reaction = false;
   const before = structuredClone(state), decision = decideTurn(state, passer);
   assert.equal(distance(passer.position, receiver.position), 1);
   assert.equal(decision.action.type, 'pass'); assert.equal(decision.action.targetId, receiver.id);

@@ -5,6 +5,7 @@ import {
 import { isRunner } from './classes.mjs';
 import { OPENINGS, openingPlan } from './openings.mjs';
 import { isCenterBall } from './deployment.mjs';
+import { evasiveDecision, evasiveMovement } from './evasion.mjs';
 
 const nearestDistance = (players, cell) => Math.min(12, ...players.map((p) => distance(p.position, cell)));
 const order = (a, b) => a.id.localeCompare(b.id);
@@ -353,6 +354,10 @@ export function decideTurn(state, actor) {
   const pickup = decideGroundPickup(state, actor);
   if (pickup) return pickup;
   const plan = teamPlan(state, actor), task = taskFor(state, actor, plan);
+  if (passingGame(state, actor)) {
+    const evasion = evasiveDecision(state, actor, plan, passCompletionChance);
+    if (evasion) return { ...evasion, reason: `Jeu collectif : ${explain(actor, evasion.task, evasion.action.type, playerById(state, evasion.action.targetId))}` };
+  }
   const strategy = strategyOf(state, actor);
   const supporting = state.version >= 4 && task === 'relay' && plan.supports?.has(actor.id);
   const aggression = Number(actor.instruction === 'aggressive') * 18 + Number(strategy === 'pressing') * 8 - Number(actor.instruction === 'cautious') * 12;
@@ -528,7 +533,8 @@ export function decideClassAction(state, actor, path = []) {
         calls: [...state.calls, { sourceId: actor.id, targetId: holder.id }] };
       const nextHolder = { ...holder, action: true, interaction: true, pickedUp: false, dodging: false, disengaged: false,
         movement: holder.grappledBy ? 0 : holder.speed * (holder.prone ? .5 : 1) };
-      if (decideTurn(preview, nextHolder).action.type === 'pass') return call;
+      const planned = decideTurn(preview, nextHolder).action.type;
+      if (planned === 'pass' || passingGame(state, actor) && planned === 'ready-pass') return call;
     }
   }
   const enemies = opponents(state, actor).filter((p) => distance(p.position, actor.position) <= 6)
@@ -546,6 +552,10 @@ export function decideMovement(state, actor) {
   // repositioning with a held target must be part of the next turn's deliberate plan.
   if (actor.hp <= 0 || actor.grappledBy || actor.grappling || actor.readiedPass || actor.movement < 1.5) return [];
   const plan = teamPlan(state, actor), task = taskFor(state, actor, plan);
+  if (passingGame(state, actor)) {
+    const path = evasiveMovement(state, actor, plan);
+    if (path) return path;
+  }
   const cells = evaluateCells(state, actor, plan, task, actor.movement);
   const current = positionalScore(state, actor, actor.position, plan, task);
   return cells[0]?.score > current + 1 ? cells[0].path : [];

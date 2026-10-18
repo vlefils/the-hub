@@ -251,7 +251,8 @@ export function resolveReadiedPass(state, receiver, events = []) {
   const action = { type: 'pass', targetId: receiver.id, reaction: true };
   const precise = { ...action, technique: 'precision' };
   const pressured = passer.grappledBy || opponents(state, passer).some((p) => distance(p.position, passer.position) <= 1);
-  return resolveAction(state, passer, pressured && !hasCheckHelp(state, passer) && !hasPassCall(state, passer) && legalAction(state, passer, precise) ? precise : action, events);
+  const conserve = state.teams.find((t) => t.id === passer.teamId)?.strategy === 'possession';
+  return resolveAction(state, passer, (pressured || conserve) && !hasCheckHelp(state, passer) && !hasPassCall(state, passer) && legalAction(state, passer, precise) ? precise : action, events);
 }
 export function ballDefender(state, actor) {
   return opponents(state, actor).filter((p) => distance(p.position, state.ball.position) <= 1)

@@ -40,12 +40,15 @@ test('Conservation : peut confier le ballon au relais qui jouera en sécurité a
   assert.equal(decideTurn(state, holder).action.type, 'pass');
 });
 
-test('Conservation : un bloqueur peut remettre la balle par une ligne libre à un partenaire meilleur passeur', () => {
+test('Conservation : un bloqueur en sécurité attend une aide avant une remise peu fiable', () => {
   const { state, holder, receiver } = circulationFixture(), blocker = state.players[1];
   holder.hp = 0; holder.reaction = false; blocker.hp = blocker.maxHp; blocker.reaction = true;
   blocker.position = { x: 1, y: 0 }; blocker.movement = 0;
   state.activeId = blocker.id; state.initiative = [blocker.id, receiver.id, ...state.initiative.filter((id) => ![blocker.id, receiver.id].includes(id))];
-  giveBall(state, blocker, []); const before = structuredClone(state), decision = decideTurn(state, blocker);
+  giveBall(state, blocker, []);
+  assert.notEqual(decideTurn(state, blocker).action.type, 'pass', 'Une remise à 55 % ne justifie pas de perdre une possession sûre.');
+  state.aids.push({ helperId: receiver.id, allyId: blocker.id, kind: 'check' });
+  const before = structuredClone(state), decision = decideTurn(state, blocker);
   assert.equal(decision.action.type, 'pass'); assert.equal(decision.action.targetId, receiver.id);
   assert.deepEqual(state, before); assertInvariants(state);
 });
@@ -95,15 +98,15 @@ test('Conservation : le relais quitte réellement le groupe et reçoit la passe 
   assert.equal(turn.state.players[4].readiedPass, null); assert.deepEqual(state, before); assertInvariants(turn.state);
 });
 
-test('Conservation : le porteur reste relié aux receveurs plutôt que fuir seul au-delà de leur portée', () => {
+test('Conservation : la sortie de pression garde un partenaire à portée de passe', () => {
   const { state } = supportFixture();
   [[7, 5], [3, 3], [4, 3], [6, 5], [7, 6], [8, 0], [9, 0], [10, 0], [10, 1], [11, 0]]
     .forEach(([x, y], i) => { state.players[i].position = { x, y }; });
   const holder = state.players[2]; giveBall(state, holder, []); state.activeId = holder.id;
   state.initiative = [holder.id, ...state.initiative.filter((id) => id !== holder.id)]; state.turnIndex = 0;
-  const before = structuredClone(state), decision = decideTurn(state, holder), release = decision.path.at(-1) ?? holder.position;
-  assert.ok(Math.min(...[state.players[0], state.players[4]].map((p) => distance(p.position, release))) <= 4);
-  assert.ok(['pass', 'ready-pass'].includes(decision.action.type));
+  const before = structuredClone(state), turn = stepMatch(state), next = turn.state.players[2];
+  assert.ok(Math.min(...turn.state.players.filter((p) => p.teamId === holder.teamId && p.id !== holder.id && p.hp > 0)
+    .map((p) => distance(p.position, next.position))) <= 6);
   assert.deepEqual(state, before); assertInvariants(state);
 });
 

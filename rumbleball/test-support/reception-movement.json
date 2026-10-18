@@ -1,0 +1,711 @@
+{
+  "version": 5,
+  "seed": "reception-move-2",
+  "rng": 3746918848,
+  "round": 1,
+  "turnIndex": 7,
+  "activeId": "home-2",
+  "phase": "regular",
+  "finished": false,
+  "result": null,
+  "turns": 7,
+  "aids": [],
+  "calls": [],
+  "lastDecision": {
+    "playerId": "home-2",
+    "reason": "Jeu collectif : Contient Miette par une frappe · normal.",
+    "action": "attack"
+  },
+  "teams": [
+    {
+      "id": "home",
+      "kitColor": "#79decb",
+      "name": "Les Recrues",
+      "strategy": "possession",
+      "opening": "fallback"
+    },
+    {
+      "id": "away",
+      "kitColor": "#f4a070",
+      "name": "Les Charognards",
+      "strategy": "balanced",
+      "opening": "breakaway"
+    }
+  ],
+  "stats": {
+    "home": {
+      "passesAttempted": 0,
+      "passesCompleted": 0,
+      "recoveries": 0,
+      "knockouts": 0
+    },
+    "away": {
+      "passesAttempted": 1,
+      "passesCompleted": 1,
+      "recoveries": 1,
+      "knockouts": 0
+    }
+  },
+  "players": [
+    {
+      "name": "Nora",
+      "trainingName": "Nora",
+      "archetype": "capitaine",
+      "role": "relay",
+      "armor": 14,
+      "maxHp": 23,
+      "speed": 9,
+      "abilities": {
+        "strength": 12,
+        "dexterity": 14,
+        "constitution": 14,
+        "mind": 13,
+        "charisma": 14
+      },
+      "skills": {
+        "acrobatics": 4,
+        "wrestling": 3
+      },
+      "attack": {
+        "bonus": 4,
+        "die": 6,
+        "flat": 2
+      },
+      "id": "home-0",
+      "teamId": "home",
+      "number": 1,
+      "classState": {
+        "adrenaline": 0,
+        "focus": 0,
+        "calls": 2,
+        "targetId": "away-1",
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": false,
+      "chargeRun": {
+        "dx": -1,
+        "dy": 1,
+        "steps": 1
+      },
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 18,
+      "position": {
+        "x": 3,
+        "y": 1
+      },
+      "movement": 0,
+      "startPosition": {
+        "x": 4,
+        "y": 2
+      },
+      "reaction": true,
+      "action": false,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 18,
+      "initiative": 20,
+      "initiativeTie": 672025
+    },
+    {
+      "name": "Brique",
+      "trainingName": "Brique",
+      "archetype": "belier",
+      "role": "blocker",
+      "armor": 15,
+      "maxHp": 29,
+      "speed": 7.5,
+      "abilities": {
+        "strength": 17,
+        "dexterity": 10,
+        "constitution": 15,
+        "mind": 9,
+        "charisma": 10
+      },
+      "skills": {
+        "athletics": 5,
+        "wrestling": 5
+      },
+      "attack": {
+        "bonus": 5,
+        "die": 8,
+        "flat": 3
+      },
+      "id": "home-1",
+      "teamId": "home",
+      "number": 2,
+      "classState": {
+        "adrenaline": 6,
+        "focus": 0,
+        "calls": 0,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": true,
+      "chargeRun": null,
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 29,
+      "position": {
+        "x": 5,
+        "y": 3
+      },
+      "movement": 7.5,
+      "startPosition": {
+        "x": 5,
+        "y": 3
+      },
+      "reaction": false,
+      "action": true,
+      "interaction": true,
+      "pickedUp": true,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 3,
+      "initiative": 3,
+      "initiativeTie": 683679
+    },
+    {
+      "name": "Zip",
+      "trainingName": "Zip",
+      "archetype": "escamoteur",
+      "role": "carrier",
+      "armor": 13,
+      "maxHp": 17,
+      "speed": 12,
+      "abilities": {
+        "strength": 9,
+        "dexterity": 17,
+        "constitution": 12,
+        "mind": 12,
+        "charisma": 13
+      },
+      "skills": {
+        "acrobatics": 5
+      },
+      "attack": {
+        "bonus": 5,
+        "die": 6,
+        "flat": 3
+      },
+      "id": "home-2",
+      "teamId": "home",
+      "number": 3,
+      "classState": {
+        "adrenaline": 0,
+        "focus": 0,
+        "calls": 0,
+        "targetId": "away-4",
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": false,
+      "chargeRun": {
+        "dx": 1,
+        "dy": -1,
+        "steps": 2
+      },
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 13,
+      "position": {
+        "x": 8,
+        "y": 0
+      },
+      "movement": 4.5,
+      "startPosition": {
+        "x": 5,
+        "y": 4
+      },
+      "reaction": false,
+      "action": false,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 7,
+      "initiative": 10,
+      "initiativeTie": 637582
+    },
+    {
+      "name": "Étau",
+      "trainingName": "Étau",
+      "archetype": "belier",
+      "role": "retriever",
+      "armor": 14,
+      "maxHp": 24,
+      "speed": 9,
+      "abilities": {
+        "strength": 15,
+        "dexterity": 13,
+        "constitution": 14,
+        "mind": 10,
+        "charisma": 11
+      },
+      "skills": {
+        "wrestling": 4,
+        "athletics": 4
+      },
+      "attack": {
+        "bonus": 4,
+        "die": 6,
+        "flat": 2
+      },
+      "id": "home-3",
+      "teamId": "home",
+      "number": 4,
+      "classState": {
+        "adrenaline": 6,
+        "focus": 0,
+        "calls": 0,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": true,
+      "chargeRun": null,
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 24,
+      "position": {
+        "x": 4,
+        "y": 5
+      },
+      "movement": 9,
+      "startPosition": {
+        "x": 4,
+        "y": 5
+      },
+      "reaction": true,
+      "action": true,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 5,
+      "initiative": 6,
+      "initiativeTie": 311545
+    },
+    {
+      "name": "Vigie",
+      "trainingName": "Vigie",
+      "archetype": "passeur",
+      "role": "defender",
+      "armor": 13,
+      "maxHp": 20,
+      "speed": 9,
+      "abilities": {
+        "strength": 11,
+        "dexterity": 14,
+        "constitution": 12,
+        "mind": 15,
+        "charisma": 13
+      },
+      "skills": {
+        "acrobatics": 4
+      },
+      "attack": {
+        "bonus": 4,
+        "die": 6,
+        "flat": 2
+      },
+      "id": "home-4",
+      "teamId": "home",
+      "number": 5,
+      "classState": {
+        "adrenaline": 0,
+        "focus": 2,
+        "calls": 0,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": true,
+      "chargeRun": {
+        "dx": -1,
+        "dy": 0,
+        "steps": 1
+      },
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 20,
+      "position": {
+        "x": 3,
+        "y": 3
+      },
+      "movement": 1.5,
+      "startPosition": {
+        "x": 2,
+        "y": 3
+      },
+      "reaction": true,
+      "action": false,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 17,
+      "initiative": 19,
+      "initiativeTie": 281870
+    },
+    {
+      "name": "Suze « Clou »",
+      "trainingName": "Nora",
+      "archetype": "capitaine",
+      "role": "relay",
+      "armor": 14,
+      "maxHp": 23,
+      "speed": 9,
+      "abilities": {
+        "strength": 12,
+        "dexterity": 14,
+        "constitution": 14,
+        "mind": 13,
+        "charisma": 14
+      },
+      "skills": {
+        "acrobatics": 4,
+        "wrestling": 3
+      },
+      "attack": {
+        "bonus": 4,
+        "die": 6,
+        "flat": 2
+      },
+      "id": "away-0",
+      "teamId": "away",
+      "number": 1,
+      "classState": {
+        "adrenaline": 0,
+        "focus": 0,
+        "calls": 1,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": false,
+      "chargeRun": null,
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 23,
+      "position": {
+        "x": 6,
+        "y": 5
+      },
+      "movement": 7.5,
+      "startPosition": {
+        "x": 7,
+        "y": 4
+      },
+      "reaction": true,
+      "action": false,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 18,
+      "initiative": 20,
+      "initiativeTie": 826407
+    },
+    {
+      "name": "Le Frigo",
+      "trainingName": "Brique",
+      "archetype": "belier",
+      "role": "blocker",
+      "armor": 15,
+      "maxHp": 29,
+      "speed": 7.5,
+      "abilities": {
+        "strength": 17,
+        "dexterity": 10,
+        "constitution": 15,
+        "mind": 9,
+        "charisma": 10
+      },
+      "skills": {
+        "athletics": 5,
+        "wrestling": 5
+      },
+      "attack": {
+        "bonus": 5,
+        "die": 8,
+        "flat": 3
+      },
+      "id": "away-1",
+      "teamId": "away",
+      "number": 2,
+      "classState": {
+        "adrenaline": 6,
+        "focus": 0,
+        "calls": 0,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": true,
+      "chargeRun": null,
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 29,
+      "position": {
+        "x": 11,
+        "y": 1
+      },
+      "movement": 0,
+      "startPosition": {
+        "x": 6,
+        "y": 4
+      },
+      "reaction": false,
+      "action": false,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 18,
+      "initiative": 18,
+      "initiativeTie": 185145
+    },
+    {
+      "name": "Miette",
+      "trainingName": "Zip",
+      "archetype": "escamoteur",
+      "role": "carrier",
+      "armor": 13,
+      "maxHp": 17,
+      "speed": 12,
+      "abilities": {
+        "strength": 9,
+        "dexterity": 17,
+        "constitution": 12,
+        "mind": 12,
+        "charisma": 13
+      },
+      "skills": {
+        "acrobatics": 5
+      },
+      "attack": {
+        "bonus": 5,
+        "die": 6,
+        "flat": 3
+      },
+      "id": "away-2",
+      "teamId": "away",
+      "number": 3,
+      "classState": {
+        "adrenaline": 0,
+        "focus": 0,
+        "calls": 0,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": true,
+      "chargeRun": null,
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 5,
+      "position": {
+        "x": 6,
+        "y": 3
+      },
+      "movement": 12,
+      "startPosition": {
+        "x": 6,
+        "y": 3
+      },
+      "reaction": false,
+      "action": true,
+      "interaction": true,
+      "pickedUp": true,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 4,
+      "initiative": 7,
+      "initiativeTie": 839349
+    },
+    {
+      "name": "Raf « Double Tour »",
+      "trainingName": "Étau",
+      "archetype": "belier",
+      "role": "retriever",
+      "armor": 14,
+      "maxHp": 24,
+      "speed": 9,
+      "abilities": {
+        "strength": 15,
+        "dexterity": 13,
+        "constitution": 14,
+        "mind": 10,
+        "charisma": 11
+      },
+      "skills": {
+        "wrestling": 4,
+        "athletics": 4
+      },
+      "attack": {
+        "bonus": 4,
+        "die": 6,
+        "flat": 2
+      },
+      "id": "away-3",
+      "teamId": "away",
+      "number": 4,
+      "classState": {
+        "adrenaline": 4,
+        "focus": 0,
+        "calls": 0,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": true,
+      "chargeRun": null,
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 24,
+      "position": {
+        "x": 3,
+        "y": 4
+      },
+      "movement": 3,
+      "startPosition": {
+        "x": 7,
+        "y": 3
+      },
+      "reaction": false,
+      "action": false,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": null,
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 15,
+      "initiative": 16,
+      "initiativeTie": 283890
+    },
+    {
+      "name": "Pépé 404",
+      "trainingName": "Vigie",
+      "archetype": "passeur",
+      "role": "defender",
+      "armor": 13,
+      "maxHp": 20,
+      "speed": 9,
+      "abilities": {
+        "strength": 11,
+        "dexterity": 14,
+        "constitution": 12,
+        "mind": 15,
+        "charisma": 13
+      },
+      "skills": {
+        "acrobatics": 4
+      },
+      "attack": {
+        "bonus": 4,
+        "die": 6,
+        "flat": 2
+      },
+      "id": "away-4",
+      "teamId": "away",
+      "number": 5,
+      "classState": {
+        "adrenaline": 0,
+        "focus": 2,
+        "calls": 0,
+        "targetId": null,
+        "flaw": 0,
+        "observedRound": 0
+      },
+      "bonusAction": true,
+      "chargeRun": null,
+      "feintTargetId": null,
+      "instruction": "normal",
+      "hp": 20,
+      "position": {
+        "x": 11,
+        "y": 0
+      },
+      "movement": 4.5,
+      "startPosition": {
+        "x": 8,
+        "y": 3
+      },
+      "reaction": true,
+      "action": false,
+      "interaction": true,
+      "pickedUp": false,
+      "prone": false,
+      "readiedPass": {
+        "round": 1,
+        "turn": 6
+      },
+      "dodging": false,
+      "disengaged": false,
+      "grappledBy": null,
+      "grappling": null,
+      "initiativeDie": 11,
+      "initiative": 13,
+      "initiativeTie": 951650
+    }
+  ],
+  "ball": {
+    "carrierId": "away-4",
+    "position": {
+      "x": 11,
+      "y": 0
+    }
+  },
+  "initiative": [
+    "home-0",
+    "away-0",
+    "home-4",
+    "away-1",
+    "away-3",
+    "away-4",
+    "home-2",
+    "away-2",
+    "home-3",
+    "home-1"
+  ]
+}

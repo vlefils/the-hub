@@ -248,7 +248,7 @@ export function mountCareer(root, mountMatch) {
     const opening = openingPicker({ value: locked ? career.current.config.openings?.home ?? 'none' : clubOpening(career.clubs[0]), disabled: locked,
       onChange: (value) => attempt(() => { formationUndo = { positions: deployment.value, opening: clubOpening(career.clubs[0]) }; deployment.update({ positions: openingDeployment(value) }); undo.hidden = false; commitLineup(); }) });
     const strategyHelp = el('p', 'rb-muted');
-    function describeStrategy() { strategyHelp.textContent = { balanced: 'Une répartition équilibrée entre progression, soutien et défense.', possession: 'Privilégie la conservation du ballon et les relais entre partenaires.', pressing: 'Met la pression sur le porteur adverse et conteste les accès au ballon.' }[strategy.value]; }
+    function describeStrategy() { strategyHelp.textContent = { balanced: 'Une répartition équilibrée entre progression, soutien et défense.', possession: 'Protège le porteur par des blocages, des sorties de pression et des relais sûrs.', pressing: 'Met la pression sur le porteur adverse et conteste les accès au ballon.' }[strategy.value]; }
     describeStrategy(); teamPlans.append(field('Plan collectif', strategy), strategyHelp, opening.root, undo); form.append(teamPlans);
     teamControls.append(el('h4', '', 'Les cinq titulaires'), lineup, active, bench);
     for (const [index, id] of career.lineup.entries()) {

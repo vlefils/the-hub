@@ -14,10 +14,10 @@ function supportFixture() {
   return { state, holder, receiver };
 }
 
-test('soutien : aucun déplacement de démarquage sans passe préparée, même vers une case plus sûre', () => {
+test('soutien : le repli défensif ne crée aucun démarquage sans passe préparée', () => {
   const { state, holder, receiver } = supportFixture(), before = structuredClone(state);
   const decision = decideTurn(state, receiver);
-  assert.equal(decision.task, 'standby'); assert.deepEqual(decision.path, []); assert.deepEqual(decideMovement(state, receiver), []);
+  assert.notEqual(decision.task, 'relay'); assert.equal(teamPlan(state, receiver).supports.size, 0);
   assert.equal(readiedPasser(state), null); assert.deepEqual(state, before);
   resolveAction(state, holder, { type: 'ready-pass' });
   assert.equal(teamPlan(state, receiver).supports.has(receiver.id), true); assert.equal(decideTurn(state, receiver).task, 'relay'); assertInvariants(state);
@@ -40,7 +40,7 @@ test('soutien : une réaction déjà dépensée ne peut pas déclencher un nouve
   const { state, holder, receiver } = supportFixture(); resolveAction(state, holder, { type: 'ready-pass' }); holder.reaction = false;
   // Defensive check for a stale flag: the AI must require an executable pass.
   assert.equal(readiedPasser(state), null); assert.equal(teamPlan(state, receiver).supports.size, 0);
-  assert.equal(decideTurn(state, receiver).task, 'standby'); assert.deepEqual(decideMovement(state, receiver), []);
+  assert.notEqual(decideTurn(state, receiver).task, 'relay');
 });
 
 test('ouverture : priorité au combat, sans faux démarquage vers une ancienne ancre', () => {

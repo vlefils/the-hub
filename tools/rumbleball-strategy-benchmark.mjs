@@ -3,24 +3,38 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createMatch } from '../rumbleball/engine.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PROFILES, STRATEGIES } from '../rumbleball/data.mjs';
 import { OPENINGS, OPENING_IDS } from '../rumbleball/openings.mjs';
 import { compilePlayer } from '../rumbleball/progression.mjs';
 import { blankTally, measureMatch, oppositeSide, tallySide } from './rumbleball-benchmark-metrics.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url)), strategies = Object.keys(STRATEGIES);
-let games = 1000, out = 'rumbleball/playtests/strategies-mixed-openings-1000-2026-10-17';
+let games = 1000, out = 'rumbleball/playtests/strategies-mixed-openings-1000-2026-10-17', seedPrefix = 'strategy-mix-2026-10-17-v1';
+let sourceRef;
 for (let i = 2; i < process.argv.length; i++) {
   if (process.argv[i] === '--matches') games = Number(process.argv[++i]);
   else if (process.argv[i] === '--out') out = process.argv[++i];
+  else if (process.argv[i] === '--seed-prefix') seedPrefix = process.argv[++i];
+  else if (process.argv[i] === '--source-ref') sourceRef = process.argv[++i];
   else throw new Error(`Argument inconnu : ${process.argv[i]}`);
 }
 assert.ok(Number.isSafeInteger(games) && games >= 50 && games % 50 === 0, 'Nombre de matchs multiple de 50 requis.');
-const prefix = resolve(root, out), seedPrefix = 'strategy-mix-2026-10-17-v1';
+assert.ok(seedPrefix.length > 0 && seedPrefix.length <= 65, 'Préfixe de graine requis, 65 caractères maximum.');
+let sourceDirectory = resolve(root, 'rumbleball');
+const engineCommit = execFileSync('git', ['rev-parse', '--verify', `${sourceRef ?? 'HEAD'}^{commit}`], { cwd: root, encoding: 'utf8' }).trim();
+if (sourceRef) {
+  mkdirSync(resolve(root, 'output'), { recursive: true });
+  sourceDirectory = mkdtempSync(resolve(root, 'output/strategy-snapshot-'));
+  const files = execFileSync('git', ['ls-tree', '-r', '--name-only', engineCommit, 'rumbleball'], { cwd: root, encoding: 'utf8' })
+    .trim().split(/\r?\n/).filter((f) => /^rumbleball\/[^/]+\.mjs$/.test(f) && !f.endsWith('.test.mjs'));
+  for (const file of files) writeFileSync(resolve(sourceDirectory, file.slice('rumbleball/'.length)),
+    execFileSync('git', ['show', `${engineCommit}:${file}`], { cwd: root, maxBuffer: 4 * 1024 * 1024 }));
+}
+const { createMatch, simulateMatch } = await import(pathToFileURL(resolve(sourceDirectory, 'engine.mjs')));
+const prefix = resolve(root, out);
 const roster = PROFILES.map((p, i) => compilePlayer({ id: `benchmark-${i}`, profile: i,
   name: p.trainingName, role: p.role, instruction: 'normal', xp: 0, fatigue: 0, implant: null }));
 const strategyPairs = strategies.flatMap((a, i) => strategies.slice(i + 1).map((b) => [a, b]));
@@ -36,11 +50,18 @@ for (let pairId = 0; pairId < games / 2; pairId++) {
 const configFor = (s) => ({ seed: s.seed, strategy: s.homeStrategy, awayStrategy: s.awayStrategy,
   openings: { home: s.homeOpening, away: s.awayOpening },
   rosters: { home: structuredClone(roster), away: structuredClone(roster) } });
+const hashSource = (source) => createHash('sha256').update(source.replaceAll('\r\n', '\n')).digest('hex');
+const sourcesSha256 = Object.fromEntries(['engine.mjs', 'ai.mjs', 'rules.mjs', 'data.mjs', 'classes.mjs',
+    'evasion.mjs', 'openings.mjs', 'deployment.mjs', 'progression.mjs'].filter((file) => existsSync(resolve(sourceDirectory, file))).map((file) => [file,
+    hashSource(readFileSync(resolve(sourceDirectory, file), 'utf8'))]));
+const committedSources = Object.entries(sourcesSha256).every(([file, hash]) => {
+  try { return hashSource(execFileSync('git', ['show', `${engineCommit}:rumbleball/${file}`],
+    { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })) === hash; }
+  catch { return false; }
+});
 const report = { generatedAt: new Date().toISOString(),
-  engineCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
-  sourcesSha256: Object.fromEntries(['engine.mjs', 'ai.mjs', 'rules.mjs', 'data.mjs', 'classes.mjs',
-    'openings.mjs', 'deployment.mjs', 'progression.mjs'].map((file) => [file,
-    createHash('sha256').update(readFileSync(resolve(root, 'rumbleball', file), 'utf8').replaceAll('\r\n', '\n')).digest('hex')])),
+  engineCommit: committedSources ? engineCommit : null, sourceBaseCommit: engineCommit,
+  sourceRef: sourceRef ?? null, sourceState: committedSources ? 'verified-commit' : 'working-tree', sourcesSha256,
   method: { games, pairs: games / 2, strategies, openings: OPENING_IDS, seedPrefix, rulesVersion: 5,
     level: 1, fatigue: 0, equipment: false, instructions: 'normal', roster,
     description: 'Current AI on both sides. Only different strategies face each other. Rotate strategy pairs modulo 3 and ordered opening pairs modulo 25, then replay each seed exchanging both strategy and opening sides. All 75 strategy-pair/opening-pair strata receive floor(pairs/75) or ceil(pairs/75) scenarios. Each opening has equal total exposure. The standardized win rate gives equal weight to each opponent strategy and each own/opponent opening combination. No career progression.',
@@ -73,7 +94,7 @@ for (const strategy of strategies) for (const opening of OPENING_IDS) {
 }
 const startedAt = performance.now();
 for (const scenario of schedule) {
-  const result = measureMatch(configFor(scenario)), match = { ...scenario, ...result,
+  const result = measureMatch(configFor(scenario), simulateMatch), match = { ...scenario, ...result,
     winnerStrategy: result.winnerSide ? scenario[`${result.winnerSide}Strategy`] : null };
   const t = report.totals; t.games++; t[match.winnerSide ? `${match.winnerSide}Wins` : 'draws']++;
   t.winsOpponentAllKo += Number(match.koWin); t.overtime += Number(match.rounds > 10);
@@ -133,7 +154,7 @@ const tables = {
     + strategies.flatMap((id) => OPENING_IDS.map((opening) => { const r = report.byStrategy[id].byOpening[opening], m = r.metrics; return `| ${STRATEGIES[id]} | ${OPENINGS[opening].name} | ${r.appearances} | ${pct(r.wins, r.appearances)} (${r.wins}) | ${r.winsOpponentAllKo} | ${m.passesCompleted}/${m.passesAttempted} | ${m.relayMovementTurns} |`; })).join('\n'),
 };
 const markdown = `# Rumbleball — ${games} matchs entre stratégies, ouvertures mélangées\n\n`
-  + `Moteur : \`${report.engineCommit}\`. Simulation : **${num(report.simulationSeconds)} secondes**.\n\n`
+  + `Moteur : \`${report.engineCommit ?? `copie de travail basée sur ${report.sourceBaseCommit} ; empreintes dans le JSON`}\`. Simulation : **${num(report.simulationSeconds)} secondes**.\n\n`
   + `## Protocole\n\n${games} matchs, ${games / 2} scénarios joués deux fois avec stratégie et ouverture échangées entre les côtés. Équilibrée, Conservation et Pressing s'affrontent ; aucun match n'oppose une stratégie à elle-même. Les trois duels reçoivent chacun ${Object.values(report.design.byStrategyPair).sort((a, b) => a - b).join(' / ')} scénarios. Le nombre d'apparitions diffère donc légèrement ; les comparaisons utilisent des taux et des moyennes par match.\n\n`
   + `Les 25 combinaisons d'ouvertures sont toutes utilisées, chacune sur ${games / 50} scénarios. Chacune des cinq ouvertures compte ${games * 2 / 5} apparitions au total. ${games >= 150 ? `Chaque duel de stratégies rencontre chacune des 25 combinaisons d'ouvertures sur ${Math.min(...Object.values(report.design.byJointStratum))} à ${Math.max(...Object.values(report.design.byJointStratum))} scénarios.` : 'Cet échantillon de calibration ne couvre pas encore toutes les 75 associations duel–ouvertures.'} La répartition stratégie–ouverture reste aussi proche que possible ; le détail est donné plus bas. Les deux matchs d'un scénario ont la même graine.\n\n`
   + `Mêmes profils des deux côtés : Nora (Capitaine/relais), Brique (Bélier/bloqueur), Zip (Escamoteur/porteur), Étau (Bélier/récupérateur), Vigie (Passeur/défenseur). Niveau 1, consignes normales, aucune fatigue ni équipement, aucune progression entre rencontres. Le moteur vérifie les invariants à chaque tour.\n\n`
@@ -144,7 +165,7 @@ const markdown = `# Rumbleball — ${games} matchs entre stratégies, ouvertures
   + `## Confrontations directes\n\n${tables.matchups}\n\n## Stratégies selon l'ouverture\n\n${tables.openings}\n\n`
   + `Ces sous-groupes décrivent les interactions observées avec les ouvertures ; leurs adversaires et graines diffèrent. Ils ne suffisent pas à prouver isolément qu'une ouverture cause un meilleur résultat. Les matchs d'une paire partagent la graine et ne doivent pas être considérés comme indépendants.\n\n`
   + `## Totaux et reproduction\n\n${report.totals.homeWins} victoires à domicile, ${report.totals.awayWins} à l'extérieur, ${report.totals.draws} nuls ; ${report.totals.winsOpponentAllKo} victoires avec cinq adversaires KO, ${report.totals.overtime} prolongations. Rounds moyens : ${num(report.totals.rounds / games, 2)} ; tours joués moyens : ${num(report.totals.turns / games, 2)}.\n\n`
-  + `Reproduction : \`node tools/rumbleball-strategy-benchmark.mjs --matches ${games} --out ${out.replaceAll('\\', '/')}\`, avec les sources de jeu du commit indiqué. Le JSON voisin conserve le plan d'expérience, les empreintes des sources et les ${games} résultats.\n`;
+  + `Reproduction : \`node tools/rumbleball-strategy-benchmark.mjs --matches ${games} --seed-prefix ${seedPrefix}${sourceRef ? ` --source-ref ${sourceRef}` : ''} --out ${out.replaceAll('\\', '/')}\`, avec les sources de jeu du commit indiqué. Le JSON voisin conserve le plan d'expérience, les empreintes des sources et les ${games} résultats.\n`;
 mkdirSync(dirname(prefix), { recursive: true });
 writeFileSync(`${prefix}.json`, JSON.stringify(report, null, 2) + '\n'); writeFileSync(`${prefix}.md`, markdown);
 console.log(JSON.stringify({ totals: report.totals, simulationSeconds: report.simulationSeconds,

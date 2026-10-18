@@ -138,7 +138,19 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
       if (legalAction(state, actor, basic)) action = basic;
     }
     const supportEnded = state.version >= 5 && decision.task === 'relay' && readiedPasser(state)?.id !== plannedPasser;
-    if (!legalAction(state, actor, action) || state.ball.carrierId === actor.id && previousHolder !== actor.id || supportEnded) {
+    // A reception interrupts movement at the first free passing lane. The new
+    // holder can use their real remaining movement before spending their action.
+    // Execute that path, then use the usual action-only fallback if interrupted.
+    if (state.version >= 5 && state.ball.carrierId === actor.id && previousHolder !== actor.id) {
+      const received = decideTurn(state, actor);
+      state.lastDecision = { playerId: actor.id, reason: received.reason, action: received.action.type };
+      emit(state, events, 'replan', `${actor.name} utilise son mouvement restant après réception : ${received.reason}`);
+      useClassAction(received.path); moveAlong(state, actor, received.path, events); useClassAction();
+      action = received.action;
+    }
+    if (actor.hp <= 0) { endTurn(state, actor, events); assertInvariants(state); advance(state, events); assertInvariants(state); return events; }
+    if (!legalAction(state, actor, action) || supportEnded && state.ball.carrierId !== actor.id
+      || state.version < 5 && state.ball.carrierId === actor.id && previousHolder !== actor.id) {
       const revised = decideTurn(state, { ...actor, movement: 0 });
       action = revised.action;
       state.lastDecision = { playerId: actor.id, reason: revised.reason, action: action.type };
