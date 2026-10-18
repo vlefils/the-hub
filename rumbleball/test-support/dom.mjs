@@ -33,7 +33,7 @@ export class TestNode {
   remove() { if (this.parentNode) this.parentNode.children = this.parentNode.children.filter((n) => n !== this); }
 }
 export const descendants = (node) => node.children.flatMap((n) => [n, ...descendants(n)]);
-export const button = (root, text) => descendants(root).find((n) => n.tagName === 'button' && n.textContent === text);
+export const button = (root, text) => descendants(root).find((n) => n.tagName === 'button' && (n.textContent === text || n.getAttribute('aria-label') === text));
 export const classNode = (root, cls) => root.querySelector(`.${cls}`);
 export function installTestDOM() {
   globalThis.Node = TestNode;

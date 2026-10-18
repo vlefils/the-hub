@@ -1,5 +1,15 @@
 // The same live controls are docked into the application header; no copies.
 // Embedded instances and the test DOM keep their ordinary inline navigation.
+import { el, btn } from './career-components.mjs';
+
+export function workspaceNavigation(active, onChange) {
+  const nav = el('nav', 'rb-workspace-navigation'); nav.setAttribute('aria-label', 'Navigation principale');
+  for (const label of ['Club', 'Ligue']) {
+    const button = btn(label, () => onChange(label)); button.setAttribute('aria-current', active === label ? 'page' : 'false'); nav.append(button);
+  }
+  return nav;
+}
+
 export function workspaceHeader({ context, navigation, tools } = {}) {
   const slots = { context: document.querySelector('[data-shell-context]'), navigation: document.querySelector('[data-shell-nav]'), tools: document.querySelector('[data-shell-tools]') };
   for (const [key, value] of Object.entries({ context, navigation, tools })) {

@@ -119,7 +119,7 @@ test('carrière : ouverture sauvegardée, figée au lancement et protégée cont
 
 test('interface : choisir une ouverture applique le placement, puis les ajustements et la sauvegarde restent stables', async () => {
   const e = environment(exportCareer(club())); mountCareer(e.root, mountMatch);
-  await button(e.root, 'Préparer le match').click();
+  await button(e.root, 'Club').click();
   const select = classNode(e.root, 'rb-opening-select'); select.value = 'fallback'; await select.emit('change');
   assert.equal(e.saved().clubs[0].opening, 'fallback'); assert.deepEqual(e.saved().clubs[0].deployment, openingDeployment('fallback'));
   const cell = descendants(classNode(e.root, 'rb-deployment')).find((n) => n.dataset.cell === '0,7'); await cell.click();

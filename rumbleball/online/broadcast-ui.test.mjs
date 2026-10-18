@@ -24,13 +24,14 @@ async function online(t, lobby = false) {
 
 test('broadcast : une saisie survit aux onglets, à un achat et à une erreur réseau ; annulation complète', async t => {
   const e = await online(t), base = e.state().members[0].club;
-  await button(e.root, 'Tactique').click();
+  assert.deepEqual(e.root.querySelector('.rb-workspace-navigation').children.map(n => n.textContent), ['Club', 'Ligue']);
   e.strategy().value = 'possession'; await e.strategy().emit('input');
   assert.equal(button(e.root, 'Enregistrer la préparation').disabled, false);
-  await button(e.root, 'Équipement').click(); await button(e.root, 'Acheter · 100 chromas').click(); await button(e.root, 'Équipe').click();
+  await button(e.root, 'Ligue').click(); await button(e.root, 'Club').click();
+  await button(e.root.querySelector('.rb-player-inspector'), 'Acheter et équiper · 100 chromas').click();
   assert.equal(e.strategy().value, 'possession'); assert.equal(e.state().members[0].draft.balance, base.balance - 100);
   e.failNext(); await e.root.querySelector('form').emit('submit'); assert.match(e.root.textContent, /Connexion interrompue/); assert.equal(e.strategy().value, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, false);
-  await e.root.querySelector('form').emit('submit'); assert.equal(e.state().members[0].draft.strategy, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); assert.equal(e.root.querySelector('form').dataset.teamView, 'Tactique');
+  await e.root.querySelector('form').emit('submit'); assert.equal(e.state().members[0].draft.strategy, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true);
   await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(e.strategy().value, base.strategy); assert.equal(e.state().members[0].club.balance, base.balance); e.mounted.stop();
 });
 
@@ -51,41 +52,39 @@ test('broadcast : enregistrer libère le rafraîchissement du lobby sans réacti
 
 test('équipement : joueur conservé après achat et transfert, réserve lisible et verrouillage respecté', async t => {
   const e = await online(t), target = e.state().members[0].club.players[1].id;
-  await button(e.root, 'Équipement').click();
-  const picker = () => e.root.querySelector('.rb-online-body').querySelector('select');
-  picker().value = target; await picker().emit('change');
-  await button(e.root, 'Acheter · 100 chromas').click();
-  assert.equal(picker().value, target);
+  await descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${e.state().members[0].club.players[1].name}`).click();
+  await button(e.root.querySelector('.rb-player-inspector'), 'Acheter et équiper · 100 chromas').click();
+  assert.match(e.root.querySelector('.rb-player-inspector').querySelector('.rb-player-shop').querySelector('select').getAttribute('aria-label'), new RegExp(e.state().members[0].club.players[1].name));
   const slots = e.root.querySelector('.rb-equipment-slots');
   assert.match(slots.textContent, /Plastron léger/); assert.ok(slots.querySelector('img'));
-  const assignment = e.root.querySelector('.rb-inventory-row').querySelector('select');
-  assert.equal(assignment.value, target); assignment.value = ''; await assignment.emit('change');
-  assert.equal(picker().value, target); assert.equal(e.state().members[0].draft.inventory[0].playerId, null);
+  const assignment = descendants(e.root).find(n => n.dataset.focusKey === 'player-protection');
+  assert.equal(assignment.value, e.state().members[0].draft.inventory[0].id); assignment.value = ''; await assignment.emit('change');
+  assert.equal(e.state().members[0].draft.inventory[0].playerId, null);
   assert.match(e.root.querySelector('.rb-equipment-slots').textContent, /Emplacement libre/);
   await e.lock();
-  assert.equal(picker().disabled, undefined);
-  assert.equal(e.root.querySelector('.rb-inventory-row').querySelector('select').disabled, true);
-  assert.ok(descendants(e.root).filter(n => n.tagName === 'button' && n.textContent.startsWith('Acheter ·')).every(n => n.disabled));
+  assert.equal(descendants(e.root).find(n => n.dataset.focusKey === 'player-protection').disabled, true);
+  assert.equal(button(e.root.querySelector('.rb-player-inspector'), 'Acheter et équiper · 100 chromas').disabled, true);
   e.mounted.stop();
 });
 
-test('composition : tactiques directement sous le joueur choisi et accès à son équipement', async t => {
+test('Club : rôle et consigne dans la fiche à droite avec l’équipement', async t => {
   const e = await online(t), player = e.state().members[0].club.players[2];
   const pick = descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${player.name}`); await pick.click();
-  const tactics = e.root.querySelector('.rb-player-tactics'); assert.equal(tactics.parentNode.dataset.playerId, player.id);
+  const tactics = e.root.querySelector('.rb-player-tactics'); assert.ok(e.root.querySelector('.rb-player-inspector').contains(tactics));
+  assert.equal(e.root.querySelector('.rb-broadcast-squad').querySelector('.rb-player-tactics'), null);
   const role = tactics.querySelector('select'); role.value = 'defender'; await role.emit('change');
   const inspector = e.root.querySelector('.rb-player-inspector');
   assert.equal(inspector.hidden, false);
   assert.match(inspector.querySelector('.rb-player-shop').querySelector('select').getAttribute('aria-label'), new RegExp(player.name));
-  await button(e.root, 'Équipe').click(); assert.equal(e.root.querySelector('.rb-player-tactics').querySelector('select').value, 'defender');
-  assert.equal(e.root.querySelector('.rb-player-tactics').parentNode.dataset.playerId, player.id);
+  await button(e.root, 'Club').click(); assert.equal(e.root.querySelector('.rb-player-tactics').querySelector('select').value, 'defender');
+  assert.ok(e.root.querySelector('.rb-player-inspector').contains(e.root.querySelector('.rb-player-tactics')));
   e.mounted.stop();
 });
 
 test('replays UI : consultation en période verrouillée, parcours et retour sans mutation de ligue', async t => {
   const e = await online(t); await e.finishNight(); await e.lock();
   const before = structuredClone(e.state());
-  await button(e.root, 'Replays').click(); assert.equal(button(e.root, 'Voir le replay').disabled, undefined);
+  await button(e.root, 'Ligue').click(); assert.equal(button(e.root, 'Voir le replay').disabled, undefined);
   await button(e.root, 'Voir le replay').click();
   assert.equal(e.root.querySelector('.rb-replay-area').hidden, false); assert.equal(e.root.querySelector('.rb-online-content').hidden, true);
   await button(e.root.querySelector('.rb-replay-area'), 'Round suivant').click();
@@ -120,4 +119,17 @@ test('fiche en préparation : achat du matériel pour un remplaçant sans quitte
   await button(e.root, `Faire entrer ${reserve.name}`).click(); await e.root.querySelector('form').emit('submit');
   assert.equal(e.state().members[0].draft.lineup[2], reserve.id);
   assert.deepEqual(e.state().members[0].draft.deployment[2], position); e.mounted.stop();
+});
+
+test('recrutement en ligne : modale, banc, saisie préservée et annulation de la préparation', async t => {
+  const e = await online(t), base = e.state().members[0].club, offer = base.market[0];
+  e.strategy().value = 'possession'; await e.strategy().emit('change');
+  await button(e.root, 'Recruter un joueur').click();
+  const dialog = e.root.querySelector('.rb-management-dialog'); assert.equal(dialog.hidden, false);
+  await button(dialog, 'Recruter · 300 chromas').click();
+  const next = e.state().members[0].draft; assert.equal(next.players.length, base.players.length + 1); assert.equal(next.balance, base.balance - 300); assert.deepEqual(next.lineup, base.lineup);
+  assert.equal(e.strategy().value, 'possession'); assert.match(e.root.querySelector('.rb-broadcast-bench').textContent, new RegExp(offer.name));
+  assert.equal(e.root.querySelector('.rb-broadcast-bench').parentNode, e.root.querySelector('.rb-court-workspace'));
+  await button(dialog, 'Fermer').click(); assert.equal(dialog.hidden, true);
+  await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(e.strategy().value, base.strategy); e.mounted.stop();
 });

@@ -1,4 +1,4 @@
-import { el, btn, field, select, money, statList, xpProgress, fatigue, equipmentSlots, portraitIdentity, table } from '../career-components.mjs';
+import { el, btn, field, select, money, statList, xpProgress, fatigue, equipmentSlots, portraitIdentity, table, disclosure } from '../career-components.mjs';
 import { ARCHETYPES } from '../classes.mjs';
 import { STRATEGIES, ROLES, INSTRUCTIONS } from '../data.mjs';
 import { compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
@@ -6,8 +6,9 @@ import { OPENINGS, openingDeployment } from '../openings.mjs';
 import { deploymentEditor, draggablePlayer, PLAYER_DRAG_TYPE } from '../deployment-ui.mjs';
 import { moveDeployment } from '../deployment.mjs';
 import { playerShop } from '../player-shop.mjs';
+import { playerInventory } from '../player-inventory.mjs';
 import { athletePortrait } from '../visuals.mjs';
-import { crestPicker, clubIdentity, compositionTabs, archetypeIcon } from '../broadcast-components.mjs';
+import { crestPicker, clubIdentity, archetypeIcon } from '../broadcast-components.mjs';
 
 export function preparationDraft(club) {
   return structuredClone({ lineup: club.lineup, assignments: Object.fromEntries(club.players.map(p => [p.id, { role: p.role, instruction: p.instruction }])), strategy: club.strategy, opening: club.opening, deployment: club.deployment, color: club.kitColor, crestId: club.crestId });
@@ -33,7 +34,7 @@ export function leagueContext(league) {
   }), { highlight: league.table.findIndex(r => r.id === league.club.id), caption: 'Classement de la ligue' }));
   root.append(schedule, ranking); return root;
 }
-export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onBuy }) {
+export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onBuy, onAssign, onSellGear, onRecruit }) {
   const ids = new Set(club.players.map(p => p.id));
   draft.lineup = draft.lineup.filter(id => ids.has(id));
   for (const p of club.players) {
@@ -42,7 +43,8 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   let selected = ids.has(draft.selected) ? draft.selected : draft.lineup[0];
   const root = el('form', 'rb-broadcast-preparation'), squad = el('section', 'rb-broadcast-squad'), slots = el('div'), detail = el('section', 'rb-squad-detail'), bench = el('section', 'rb-broadcast-bench'), tactics = el('section', 'rb-broadcast-tactics');
-  const sidebar = el('aside', 'rb-workspace-sidebar'), context = leagueContext(league), inspector = el('section', 'rb-player-inspector');
+  const sidebar = el('aside', 'rb-workspace-sidebar'), inspector = el('section', 'rb-player-inspector');
+  bench.setAttribute('aria-label', 'Banc des remplaçants');
   const playerTactics = el('div', 'rb-player-tactics');
   const strategy = select(STRATEGIES, draft.strategy), opening = select(Object.fromEntries(Object.entries(OPENINGS).map(([id, v]) => [id, v.name])), draft.opening), color = el('input', 'rb-kit-color'); color.type = 'color'; color.value = draft.color;
   const crest = crestPicker(draft.crestId, draft.color, locked);
@@ -52,14 +54,15 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
       if (!ids.has(id) || locked) return;
       const occupied = editor.value.findIndex(p => p.x === position.x && p.y === position.y), index = occupied >= 0 ? occupied : Math.max(0, draft.lineup.indexOf(editor.selectedPlayerId));
       draft.deployment = moveDeployment(editor.value, index, position); editor.update({ positions: draft.deployment }); replaceAt(index, id);
-    }, onSelect(id) { selected = draft.selected = draft.slotSelected = id; draft.detailsOpen = true; drawDetail(); highlight(); }, onChange(positions) { draft.deployment = positions; changed(); } });
+    }, onSelect(id) { selected = draft.selected = draft.slotSelected = id; drawDetail(); highlight(); }, onChange(positions) { draft.deployment = positions; changed(); } });
   const selectors = el('div', 'rb-broadcast-selectors'); selectors.append(field('Plan collectif', strategy), field('Ouverture', opening));
-  const kit = el('section', 'rb-kit-settings'); kit.append(el('h4', '', 'Identité du club'), field('Couleur des maillots', color), crest.root); context.append(kit);
+  const kit = disclosure('Identité du club', 'club-identity', field('Couleur des maillots', color), crest.root);
   const saveBar = el('div', 'rb-broadcast-save'), save = el('button', 'rb-button rb-button-primary', 'Enregistrer la préparation'), status = el('p', 'rb-form-status'); save.type = 'submit'; status.setAttribute('role', 'status');
-  saveBar.append(save, status); tactics.append(editor.root, selectors);
-  squad.append(bench, el('h4', '', 'Les cinq titulaires'), slots);
-  const mobile = compositionTabs(root, value => { draft.view = value; }, draft.view);
-  sidebar.append(inspector, context); root.append(mobile, squad, tactics, saveBar, sidebar);
+  const court = el('div', 'rb-court-workspace'); court.append(editor.root, bench);
+  saveBar.append(save, status); tactics.append(court, selectors);
+  const recruit = btn('Recruter un joueur', onRecruit); recruit.classList.add('rb-recruit-tile'); recruit.setAttribute('aria-haspopup', 'dialog'); recruit.setAttribute('data-readonly-control', 'true');
+  squad.append(el('h4', '', 'Les cinq titulaires'), slots, recruit, kit);
+  sidebar.append(inspector); root.append(squad, tactics, saveBar, sidebar);
   const baseline = JSON.stringify(preparationDraft(club));
   function read() {
     draft.strategy = strategy.value; draft.opening = opening.value; draft.color = color.value; draft.crestId = crest.value; draft.deployment = editor.value;
@@ -71,9 +74,6 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   function highlight() {
     for (const row of slots.children) row.classList.toggle('is-selected', row.dataset.playerId === selected);
-    const row = [...slots.children].find(row => row.dataset.playerId === selected);
-    if (row) row.append(playerTactics); else detail.append(playerTactics);
-    playerTactics.hidden = !draft.detailsOpen; inspector.hidden = !draft.detailsOpen; context.hidden = Boolean(draft.detailsOpen);
     editor.update({ selectedPlayerId: selected });
   }
   function drawDetail() {
@@ -88,9 +88,8 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     role.disabled = instruction.disabled = locked;
     const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
     playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
-    const close = btn('Programme et classement', () => { draft.detailsOpen = false; highlight(); }); close.classList.add('rb-inspector-back'); close.setAttribute('data-readonly-control', 'true');
     const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
-    detail.replaceChildren(close, portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, statList(compiled), equipmentSlots(p, club.inventory), playerShop(club, p, { locked, onBuy, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; } }));
+    detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, statList(compiled), equipmentSlots(p, club.inventory), playerShop(club, p, { locked, onBuy, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; } }), playerInventory(club, p, { locked, onAssign, onSell: onSellGear }));
     if (index >= 0) detail.append(field('Remplacer ce titulaire', replacement), order);
     else detail.append(el('p', 'rb-muted', 'Sur le banc · glissez ce joueur sur le terrain pour le faire entrer.'));
     detail.append(el('small', 'rb-muted', `${money(salary(p))} / journée`));
@@ -101,30 +100,30 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   function replaceAt(index, id) {
     const previous = draft.lineup[index], other = draft.lineup.indexOf(id); if (other >= 0 && other !== index) draft.lineup[other] = previous;
-    draft.lineup[index] = id; selected = draft.selected = draft.slotSelected = id; draft.detailsOpen = true; editor.update({ players: deployed(), selectedPlayerId: selected }); drawSquad(); drawDetail(); changed();
+    draft.lineup[index] = id; selected = draft.selected = draft.slotSelected = id; editor.update({ players: deployed(), selectedPlayerId: selected }); drawSquad(); drawDetail(); changed();
     detail.querySelector('select')?.focus({ preventScroll: true });
   }
   function drawSquad() {
-    slots.replaceChildren(); bench.replaceChildren(el('h4', '', 'Remplaçants'));
+    slots.replaceChildren(); bench.replaceChildren(el('h4', '', 'Banc'));
     for (const [i, id] of draft.lineup.entries()) {
       const p = club.players.find(p => p.id === id), compiled = compilePlayer(p, club.inventory), row = el('div', 'rb-squad-slot'); row.dataset.playerId = id;
-      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = draft.slotSelected = id; draft.detailsOpen = true; drawDetail(); highlight(); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
+      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = draft.slotSelected = id; drawDetail(); highlight(); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
       const portrait = athletePortrait(compiled, draft.color); draggablePlayer(portrait, id, locked); draggablePlayer(pick, id, locked);
       row.append(portrait, pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p)); slots.append(row);
     }
     const reserves = club.players.filter(p => !draft.lineup.includes(p.id));
     if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant.'));
-    else bench.append(el('p', 'rb-muted rb-drag-hint', 'Glissez un remplaçant sur le terrain.'));
+    else bench.append(el('p', 'rb-muted', 'Disponibles'));
     for (const p of reserves) {
-      const row = el('div', 'rb-bench-entry'), controls = el('div', 'rb-controls'), enter = btn(`Faire entrer ${p.name}`, () => {
+      const row = el('div', 'rb-bench-entry'), controls = el('div', 'rb-controls'), enter = btn('Faire entrer', () => {
         const i = Math.max(0, draft.lineup.indexOf(editor.selectedPlayerId)); replaceAt(i, p.id);
-      }); enter.disabled = locked;
+      }); enter.disabled = locked; enter.setAttribute('aria-label', `Faire entrer ${p.name}`);
       controls.append(enter);
-      const pick = btn(p.name, () => { selected = draft.selected = p.id; draft.detailsOpen = true; drawDetail(); highlight(); }); pick.setAttribute('data-readonly-control', 'true'); pick.classList.add('rb-bench-name');
-      const identity = portraitIdentity(compilePlayer(p, club.inventory), draft.color, pick, fatigue(p), controls); draggablePlayer(identity, p.id, locked);
+      const pick = btn('', () => { selected = draft.selected = p.id; drawDetail(); highlight(); }); pick.setAttribute('data-readonly-control', 'true'); pick.classList.add('rb-bench-name'); pick.setAttribute('aria-label', p.name);
+      pick.append(athletePortrait(compilePlayer(p, club.inventory), draft.color), el('span', '', p.name)); draggablePlayer(pick, p.id, locked);
       row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
       row.addEventListener('drop', event => { const index = draft.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); replaceAt(index, p.id); });
-      row.append(identity); bench.append(row);
+      row.append(pick, fatigue(p), controls); bench.append(row);
     }
     highlight();
   }

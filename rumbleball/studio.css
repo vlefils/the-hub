@@ -1,6 +1,7 @@
 /* Broadcast workspace: application chrome, arena, roster and player inspector.
    The existing SVG athletes and all game rules remain unchanged. */
 body.rb-app {
+  color-scheme: dark;
   --text: #edf4ff; --muted: #a2b6cd; --rb-accent: #ff682f; --rb-line: #20394c;
   --rb-surface: #0c2232; --rb-surface-soft: #071925; --rb-surface-raised: #163448;
   --rb-good: #32d5a1; --rb-gutter: clamp(1rem, 2vw, 3rem);
@@ -9,7 +10,8 @@ body.rb-app {
 .rb-app .rb-career { --rb-surface: #0c2232; --rb-surface-soft: #071925; gap: 1rem; }
 .rb-app-main { max-width: 115rem; padding-top: 0; }
 .rb-app :is(h2, h3, h4) { letter-spacing: -.025em; line-height: 1.15; }
-.rb-app :is(input, select) { background: linear-gradient(#102739, #091c2b); border-color: #3f607b; border-radius: 4px; box-shadow: inset 0 1px 2px #0005; }
+.rb-app :is(input, select) { color: #edf4ff; background: linear-gradient(#102739, #091c2b); border-color: #3f607b; border-radius: 4px; box-shadow: inset 0 1px 2px #0005; }
+.rb-app select, .rb-app option, .rb-app optgroup { color-scheme: dark; color: #edf4ff; background-color: #102739; }
 .rb-app .rb-button { background: linear-gradient(#173248, #102434); border-color: #39566d; box-shadow: inset 0 1px #ffffff0a; border-radius: 4px; }
 .rb-app .rb-button:hover:not(:disabled) { background: #20425a; border-color: #7797af; }
 .rb-app .rb-button-primary { background: linear-gradient(110deg, #ff7e39, #ff5325); border-color: #ff813e; color: #111b28; box-shadow: inset 0 1px #ffbf8260, 0 3px 9px #0004; }
@@ -42,6 +44,9 @@ body.rb-app {
 .rb-app .rb-shell-navigation :is(.rb-career-tabs, .rb-online-nav) { margin: .3rem 0 0; padding: 0; gap: .2rem; border: 0; }
 .rb-app .rb-shell-navigation .rb-button { padding: .6rem 1rem; font-size: .9rem; background: none; border: 0; box-shadow: none; color: #afc2d8; }
 .rb-app .rb-shell-navigation [aria-current='page'] { color: #fff; background: linear-gradient(0deg, #1d405654, transparent); border-bottom: 3px solid #ff672d; }
+.rb-workspace-navigation { display: flex; gap: .75rem; padding-block: .4rem; }
+.rb-app .rb-workspace-navigation > .rb-button { min-width: 8rem; min-height: 3rem; justify-content: center; font: 700 1.3rem/1.1 'Rajdhani', sans-serif; padding: .65rem 1.75rem; border: 1px solid #31566d; background: #102a3c; color: #b9cfdf; }
+.rb-app .rb-workspace-navigation > [aria-current='page'] { color: #fff; border-color: #ff7a3c; background: linear-gradient(110deg, #6d321e, #253347); box-shadow: inset 0 -3px #ff682f; }
 .rb-app .rb-shell-tools .rb-career-top { display: grid; gap: .3rem; padding: 0 0 0 1rem; margin: 0; border: 0; border-left: 1px solid var(--rb-line); }
 .rb-app .rb-shell-tools .rb-career-top > .rb-controls:first-child .rb-button { min-height: 2rem; font-size: .8rem; padding: .3rem .5rem; border: 0; box-shadow: none; }
 .rb-shell-tools .rb-save-status { font-size: .75rem; }
@@ -103,6 +108,20 @@ body.rb-app {
 .rb-app .rb-bench-name { background: none; border: 0; box-shadow: none; min-height: 1.5rem; padding: 0; text-align: left; font: 700 1.15rem/1.2 'Rajdhani', sans-serif; }
 .rb-bench-entry .rb-controls > .rb-button, .rb-app .rb-bench-player .rb-button:not(.rb-bench-name) { padding: .3rem .5rem; min-height: 2rem; font-size: .8rem; }
 .rb-drag-hint { margin: 0; font-size: .75rem !important; }
+.rb-app .rb-recruit-tile { display: flex; align-items: center; gap: .8rem; width: 100%; margin-top: .5rem; padding: .8rem; min-height: 4.5rem; background: #0c2839; border: 1px dashed #54809b; box-shadow: none; color: #b6dbf4; text-align: left; font: 700 1.2rem/1.2 'Rajdhani', sans-serif; }
+.rb-recruit-tile::before { content: '+'; display: grid; place-items: center; flex: 0 0 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid #54809b; font: 500 2rem/1 'Space Grotesk', sans-serif; }
+.rb-broadcast-squad > .rb-career-disclosure { margin-top: 1rem; }
+.rb-court-workspace { --rb-court-width: max(35rem, calc((100svh - 38rem) * 1.5)); display: grid; grid-template-columns: minmax(0, 1fr) minmax(5.5rem, 7rem); gap: .75rem; align-items: start; min-width: 0; width: min(100%, calc(var(--rb-court-width) + 7.75rem)); margin-inline: auto; }
+.rb-app .rb-court-workspace .rb-deployment-board { width: 100%; }
+.rb-app .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) { display: grid; gap: .65rem; margin: 0; padding: .75rem .5rem; min-width: 0; min-height: 12rem; background: #071b29; border: 1px dashed #4a728b; border-radius: 4px; }
+.rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) { display: grid; gap: .4rem; padding: .6rem 0; margin: 0; border: 0; border-top: 1px solid #29485c; background: none; }
+.rb-app .rb-court-workspace .rb-bench-name { display: grid; justify-items: center; gap: .4rem; text-align: center; width: 100%; font-size: 1rem; overflow-wrap: anywhere; }
+.rb-court-workspace .rb-bench-name .rb-athlete-portrait { width: 3.25rem; border-radius: 50%; border: 2px solid var(--rb-portrait-kit); }
+.rb-court-workspace .rb-fatigue { justify-content: center; flex-basis: auto; gap: .25rem; }
+.rb-court-workspace .rb-fatigue-meter { display: none; }
+.rb-court-workspace .rb-controls { justify-content: center; }
+.rb-app .rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) .rb-button:not(.rb-bench-name) { font-size: .7rem; padding: .3rem; min-height: 2rem; text-align: center; }
+.rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) > p { text-align: center; font-size: .75rem; }
 
 /* The court is a code drawn surface. Cells stay real accessible drop targets. */
 .rb-app .rb-deployment-layout { gap: .5rem; margin-top: .5rem; }
@@ -152,10 +171,10 @@ body.rb-app {
 .rb-app .rb-own-club { background: #16405a; }
 
 /* The selected player owns this inspector, including the live purchase action. */
-.rb-player-inspector { display: grid; gap: 1rem; padding: 1rem; background: linear-gradient(140deg, #123148, #071b2a 55%); border: 1px solid #31536b; border-radius: 5px; box-shadow: 0 6px 18px #0004; }
-.rb-squad-detail { border: 0; padding: 0; margin: 0; gap: .9rem; }
+.rb-player-inspector { display: grid; gap: .75rem; padding: .85rem; background: linear-gradient(140deg, #123148, #071b2a 55%); border: 1px solid #31536b; border-radius: 5px; box-shadow: 0 6px 18px #0004; }
+.rb-squad-detail { border: 0; padding: 0; margin: 0; gap: .65rem; }
 .rb-player-inspector > .rb-person-identity, .rb-squad-detail > .rb-person-identity { align-items: center; }
-.rb-player-inspector .rb-person-identity > .rb-athlete-portrait { width: 5rem; flex-basis: 5rem; }
+.rb-player-inspector .rb-person-identity > .rb-athlete-portrait { width: 4rem; flex-basis: 4rem; }
 .rb-player-inspector .rb-person-identity h3 { margin: 0; font-size: 1.8rem; }
 .rb-player-inspector .rb-person-identity .rb-archetype { margin-bottom: 0 !important; font-size: .8rem; }
 .rb-player-status-strip { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 1rem; }
@@ -170,6 +189,10 @@ body.rb-app {
 .rb-player-inspector .rb-equipment-slots :is(dt, dd) { font-size: .75rem; }
 .rb-player-inspector .rb-equipment-slots dd { margin-top: .25rem; min-height: 2rem; }
 .rb-player-inspector .rb-equipment-art { width: 2.8rem; height: 2.8rem; flex-basis: 2.8rem; }
+.rb-player-inspector :is(.rb-player-tactics, .rb-tactical-player) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; padding: .6rem 0; border-top: 1px solid #315367; }
+.rb-player-inspector :is(.rb-player-tactics, .rb-tactical-player) .rb-field { font-size: .8rem; }
+.rb-player-inspector > .rb-career-disclosure { margin: 0; }
+.rb-player-inspector .rb-career-disclosure p { font-size: .8rem; }
 .rb-player-shop { display: grid; gap: .65rem; padding-top: 1rem; border-top: 1px solid #2c4b60; }
 .rb-player-shop h4 { margin-bottom: 0; }
 .rb-player-shop-preview { display: grid; gap: .65rem; }
@@ -180,7 +203,7 @@ body.rb-app {
 /* Solo uses the same arena and inspector, with automatic preparation saves. */
 .rb-app .rb-career > .rb-broadcast-banner { margin-bottom: 0; }
 .rb-app .rb-sport-preparation > .rb-team-controls { gap: 0; }
-.rb-app .rb-sport-preparation .rb-deployment-board { width: min(100%, max(30rem, calc((100svh - 42rem) * 1.5))); }
+.rb-sport-preparation .rb-court-workspace { --rb-court-width: max(30rem, calc((100svh - 42rem) * 1.5)); }
 .rb-app .rb-sport-preparation .rb-lineup-slot { display: grid; grid-template-columns: minmax(0, 1fr); gap: .25rem; padding: .5rem; margin-bottom: .45rem; background: linear-gradient(115deg, #183348, #091d2b); border: 1px solid #213e53; border-radius: 4px; }
 .rb-app .rb-sport-preparation .rb-lineup-slot.is-selected { border-left: 3px solid #ff793d; }
 .rb-app .rb-sport-preparation .rb-lineup-slot > .rb-slot-copy { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: .25rem .65rem; }
@@ -207,10 +230,21 @@ body.rb-app {
 .rb-app :is(.rb-market-list, .rb-shop) > .rb-career-player { padding: 1.25rem; background: linear-gradient(140deg, #112e43, #081b2b); border: 1px solid #28485d; border-radius: 5px; }
 .rb-app .rb-equipment-player { padding: 1.2rem; background: linear-gradient(110deg, #14364b, #091b2b); border: 1px solid #31536b; border-radius: 5px; }
 .rb-app .rb-replay-entry { padding: 1rem; background: linear-gradient(120deg, #123046, #071a28); border: 1px solid #244256; border-radius: 4px; }
+.rb-online-body .rb-fixture-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #29465b; }
+.rb-online-body .rb-fixture-row > .rb-club-identity { flex: 1 1 0; }
 
-@media (min-width: 1440px) {
-  .rb-workspace-sidebar { max-height: max(40rem, calc(100svh - 17rem)); overflow-y: auto; scrollbar-width: thin; scrollbar-color: #3f647b transparent; padding-right: .2rem; }
-}
+.rb-management-dialog { width: min(72rem, calc(100% - 2rem)); max-height: calc(100svh - 3rem); margin: auto; padding: 0; overflow: auto; color: var(--text); background: #0b2031; border: 1px solid #42647e; border-radius: 6px; box-shadow: 0 20px 80px #000a; }
+.rb-management-dialog::backdrop { background: #020b15bb; }
+.rb-app:has(.rb-management-dialog[open]) { overflow: hidden; }
+.rb-modal-header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.5rem; background: #0b2031; border-bottom: 1px solid #315066; }
+.rb-modal-header h2 { margin: 0; font: 700 1.8rem/1.1 'Rajdhani', sans-serif; }
+.rb-modal-body { padding: 1.5rem; }
+.rb-modal-body .rb-section-heading { margin: 0 0 1.25rem; }
+.rb-modal-body .rb-market-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1rem; }
+.rb-modal-body .rb-market-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-block: 1rem; }
+.rb-modal-body .rb-career-player { display: grid; gap: .8rem; padding: 1rem; background: #102c40; border: 1px solid #2b4a61; border-radius: 4px; }
+.rb-modal-body .rb-player-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rb-modal-notice { margin: 1rem 1.5rem; color: #ffb0a0; }
 @media (max-width: 1439px) {
   .rb-app-header { grid-template-columns: 12rem minmax(0, 1fr) auto; gap: .2rem 1rem; }
   .rb-app-brand h1 { font-size: 2.3rem; }
@@ -257,7 +291,7 @@ body.rb-app {
   .rb-shell-context .rb-online-identity { display: flex; flex-wrap: wrap; }
   .rb-shell-context .rb-online-finances { flex: 1 1 100%; }
   .rb-shell-context .rb-club-header { flex-wrap: wrap; gap: .5rem; }
-  .rb-app .rb-shell-navigation :is(.rb-career-tabs, .rb-online-nav) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rb-app .rb-shell-navigation :is(.rb-career-tabs, .rb-online-nav) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .rb-app .rb-shell-navigation .rb-button { padding: .55rem .15rem; font-size: .8rem; }
   .rb-app .rb-broadcast-banner { grid-template-columns: minmax(0, 1fr) 4.5rem minmax(0, 1fr); padding: .8rem; gap: .5rem; min-height: 0; }
   .rb-broadcast-banner > .rb-club-identity, .rb-broadcast-banner > .rb-club-identity:nth-child(3) { flex-direction: column; text-align: center; gap: .4rem; font-size: 1.1rem; }
@@ -268,6 +302,12 @@ body.rb-app {
   .rb-broadcast-deadline { font-size: .75rem; }
   .rb-app .rb-tactical-player { grid-template-columns: minmax(0, 1fr); }
   .rb-player-inspector { padding: .85rem; }
+  .rb-workspace-navigation { width: 100%; }
+  .rb-app .rb-shell-navigation .rb-workspace-navigation > .rb-button { flex: 1; min-width: 0; font-size: 1.3rem; }
+  .rb-court-workspace { grid-template-columns: minmax(0, 1fr); }
+  .rb-app .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) { grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); min-height: 0; }
+  .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) > h4 { grid-column: 1 / -1; }
+  .rb-modal-header, .rb-modal-body { padding: 1rem; }
 }
 @media print {
   .rb-app { background: white; }

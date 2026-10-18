@@ -141,7 +141,7 @@ test('éditeur : clic, échange, clavier, contenu variable et lecture seule cons
 
 test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le terrain et la reprise sont cohérents', async () => {
   const e = environment(exportCareer(club())), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
-  await button(e.root, 'Préparer le match').click();
+  await button(e.root, 'Club').click();
   const form = classNode(e.root, 'rb-lineup-form'), editor = classNode(form, 'rb-deployment');
   await cell(editor, 0, 0).click(); assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 });
   await classNode(form, 'rb-lineup-slots').children[0].querySelector('button').click();

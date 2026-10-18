@@ -1,10 +1,11 @@
-import { el, btn, field, select, money, metric, table, stats, statList, xpProgress, fatigue, comparison, portraitIdentity, equipmentSlots, pageHeading } from '../career-components.mjs';
-import { CATALOGUE, compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
+import { el, btn, field, select, money, metric, table, statList, portraitIdentity, pageHeading } from '../career-components.mjs';
+import { compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
 import { mountMatch } from '../ui.mjs';
-import { crestPicker, clubIdentity, matchBanner, equipmentArtwork } from '../broadcast-components.mjs';
-import { mountTeamEditor, preparationDraft, leagueContext } from './team-ui.mjs';
+import { crestPicker, clubIdentity, matchBanner } from '../broadcast-components.mjs';
+import { mountTeamEditor, preparationDraft } from './team-ui.mjs';
 import { mountReplay } from '../replay-ui.mjs';
-import { workspaceHeader } from '../workspace-header.mjs';
+import { workspaceHeader, workspaceNavigation } from '../workspace-header.mjs';
+import { managementDialog } from '../management-dialog.mjs';
 
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
@@ -19,23 +20,24 @@ export async function mountOnline(root, config, connect) {
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
   const replayArea = el('section', 'rb-replay-area'); replayArea.hidden = true;
   root.append(top, notice, content, live, replayArea);
-  let teamDraft = null, shopPlayerId = null, replayView = null, replayOpen = false, replayLimit = 30;
-  let client, user, league, tab = 'Équipe', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false;
-  function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; }
-  async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
+  let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30;
+  const modal = managementDialog(root, () => { marketOpen = false; });
+  let client, user, league, tab = 'Club', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false;
+  function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; if (error && modal.visible) modal.message(text); }
+  async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; if (modal.visible) modal.message(''); try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
   async function send(action, payload = {}, id = league?.id) {
     const result = await client.request(action, id, payload);
     if (result.league) {
       const next = result.league, changed = !league || league.id !== next.id || revision !== result.revision || league.locked !== next.locked || league.status !== next.status;
       const entered = !league || league.id !== next.id, justLocked = next.locked && !league?.locked;
-      if (entered) shopPlayerId = null;
+      if (entered) { modal.close(); tab = 'Club'; }
       const discarded = justLocked && teamDraft?.dirty;
       if (entered || justLocked || ['configure', 'cancel'].includes(action)) {
-        const context = !entered && teamDraft ? { view: teamDraft.view, selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, detailsOpen: teamDraft.detailsOpen, shopItem: teamDraft.shopItem } : null;
+        const context = !entered && teamDraft ? { selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, shopItem: teamDraft.shopItem } : null;
         teamDraft = context ? { ...preparationDraft(next.club), ...context } : null; formDirty = false;
       }
       league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
-      if (action !== 'get' || changed || tab === 'Direct') renderLeague();
+      if (action !== 'get' || changed || tab === 'Ligue') renderLeague();
       if (discarded) message('Verrouillage de 20 h : les modifications non enregistrées n’ont pas été retenues. La dernière préparation enregistrée est utilisée.', false);
     }
     return result;
@@ -57,6 +59,7 @@ export async function mountOnline(root, config, connect) {
     return { stop() {} };
   }
   function renderAuth(recovery = false) {
+    modal.close();
     workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
     content.replaceChildren(); content.className = 'rb-online-auth'; live.hidden = true; identity.textContent = '';
@@ -85,6 +88,7 @@ export async function mountOnline(root, config, connect) {
     panel.append(actions, el('p', 'rb-muted', 'Votre compte Riftbound Tracker fonctionne aussi ici. Votre club et votre session Rumbleball restent séparés.'));
   }
   async function renderLobby() {
+    modal.close();
     workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
     content.className = 'rb-online-lobby';
@@ -129,26 +133,22 @@ export async function mountOnline(root, config, connect) {
     const otherId = fixture && (fixture.homeId === c.id ? fixture.awayId : fixture.homeId), opponent = league.members.find(m => m.userId === otherId);
     if (opponent) content.append(matchBanner(c, opponent, league.locked ? 'Soirée en cours' : league.nextLockAt ? '20 h · Paris' : 'Saison à préparer', lockMessage));
     else content.append(el('p', league.locked ? 'rb-online-lock' : 'rb-muted', lockMessage));
-    const nav = el('nav', 'rb-online-nav'); nav.setAttribute('aria-label', 'Gestion de la ligue');
-    for (const label of ['Équipe', 'Recrutement', 'Équipement', 'Ligue', 'Direct', 'Replays']) {
-      const b = btn(label, () => { replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; frameKey = null; renderLeague(); }); b.setAttribute('aria-current', tab === label ? 'page' : 'false'); nav.append(b);
-    }
-    content.append(nav);
-    workspaceHeader({ navigation: nav });
-    const mobile = select(Object.fromEntries(['Équipe', 'Recrutement', 'Équipement', 'Ligue', 'Direct', 'Replays'].map(label => [label, label])), tab);
-    mobile.addEventListener('change', () => { tab = mobile.value; frameKey = null; renderLeague(); });
-    const mobileField = field('Menu de la ligue', mobile); mobileField.classList.add('rb-mobile-nav'); content.append(mobileField);
+    const nav = workspaceNavigation(tab, label => { modal.close(); replayView?.stop(); view?.pause(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; frameKey = null; renderLeague(); });
+    content.append(nav); workspaceHeader({ navigation: nav });
     const body = el('section', 'rb-online-body'); content.append(body);
-    if (tab === 'Équipe') renderTeam(body, c);
-    if (tab === 'Recrutement') renderMarket(body, c);
-    if (tab === 'Équipement') renderShop(body, c);
+    if (tab === 'Club') renderTeam(body, c);
     if (tab === 'Ligue') {
-      body.append(table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points])));
-      for (const f of league.upcoming) body.append(el('p', '', `${league.members.find((m) => m.userId === f.homeId)?.name} — ${league.members.find((m) => m.userId === f.awayId)?.name}`));
-      for (const g of league.history.slice(-12).reverse()) body.append(el('p', 'rb-muted', `${date(g.endsAt)} · ${league.members.find((m) => m.userId === g.homeId)?.name} / ${league.members.find((m) => m.userId === g.awayId)?.name} · ${g.winnerId ? 'Victoire : ' + league.members.find((m) => m.userId === g.winnerId)?.name : 'Nul'}`));
+      const overview = el('div', 'rb-league-layout'), ranking = el('section'), programme = el('section');
+      body.append(pageHeading('La ligue', `Saison ${league.season} · journée ${league.day + 1}`));
+      ranking.append(el('h3', '', 'Classement'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id) }));
+      programme.append(el('h3', '', 'Programme de la soirée'));
+      for (const f of league.upcoming) {
+        const row = el('div', 'rb-fixture-row'); row.append(clubIdentity(league.members.find(m => m.userId === f.homeId), { compact: true }), clubIdentity(league.members.find(m => m.userId === f.awayId), { compact: true })); programme.append(row);
+      }
+      overview.append(ranking, programme); body.append(overview);
     }
-    if (tab === 'Direct') renderLive(body);
-    if (tab === 'Replays') renderReplays(body);
+    if (tab === 'Ligue') { renderLive(body); renderReplays(body); }
+    if (marketOpen) { modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); }
     if (league.hasDraft) {
       const cancel = el('div', 'rb-preparation-cancel');
       cancel.append(action('Annuler la préparation', 'cancel', {}), el('p', 'rb-muted', 'Rétablit la composition, les recrutements, les achats et le blason précédents, avant le verrouillage.'));
@@ -176,9 +176,9 @@ export async function mountOnline(root, config, connect) {
     control.disabled = true; control.textContent = 'Chargement du replay…';
     try { return await attempt(async () => {
       const { replay } = await client.request('replay', leagueId, { matchId });
-      if (league?.id !== leagueId || tab !== 'Replays' || stopped) return;
+      if (league?.id !== leagueId || tab !== 'Ligue' || stopped) return;
       replayView?.stop(); view?.pause(); replayOpen = true; content.hidden = true; live.hidden = true; replayArea.hidden = false;
-      const back = btn('Retour aux replays', () => { replayView?.stop(); replayView = null; replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = 'Replays'; renderLeague(); });
+      const back = btn('Retour aux replays', () => { replayView?.stop(); replayView = null; replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = 'Ligue'; renderLeague(); });
       const player = el('div'); replayArea.replaceChildren(back, pageHeading(`Replay · saison ${replay.season}, journée ${replay.day + 1}`), player);
       replayView = mountReplay(player, replay, mountMatch); replayArea.scrollIntoView({ block: 'start' }); back.focus();
     }); } finally { control.disabled = false; control.textContent = 'Voir le replay'; }
@@ -188,64 +188,26 @@ export async function mountOnline(root, config, connect) {
     const editor = mountTeamEditor({ club: c, league, draft: teamDraft, locked: league.locked, hasDraft: league.hasDraft,
       onDirty(dirty) { formDirty = dirty; }, onSave: payload => attempt(() => send('configure', payload)),
       onBuy: (itemId, playerId, replaceConfirmed) => attempt(() => send('buy', { itemId, playerId, replaceConfirmed })),
+      onAssign: (itemId, playerId) => attempt(() => send('equip', { itemId, playerId })),
+      onSellGear: itemId => attempt(() => send('sellProtection', { itemId })),
+      onRecruit() { marketOpen = true; modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); },
       onSell: playerId => attempt(() => send('sell', { playerId })) });
     body.append(editor.root);
   }
   function renderMarket(body, c) {
-    body.append(el('h3', '', 'Recrutement'), el('p', 'rb-muted', 'Les contrats de la préparation sont annulables avant 20 h. Les offres changent après chaque rencontre.'));
+    body.append(el('p', 'rb-muted', `${c.players.length}/8 places occupées · Contrats annulables avant 20 h. Les offres changent après chaque rencontre.`));
+    const list = el('div', 'rb-market-list'); body.append(list);
     for (const p of c.market) {
-      const row = el('div', 'rb-online-player'), copy = el('div'), price = recruitmentPrice(p);
-      copy.append(portraitIdentity(compilePlayer(p), c.kitColor, el('strong', '', p.name)), el('small', 'rb-muted', stats(compilePlayer(p))), xpProgress(p), el('small', 'rb-muted', `${money(salary(p))} / journée`)); row.append(copy);
-      const buy = action(`Recruter · ${money(price)}`, 'recruit', { playerId: p.id });
+      const row = el('section', 'rb-career-player'), price = recruitmentPrice(p), compiled = compilePlayer(p);
+      row.append(portraitIdentity(compiled, c.kitColor, el('h4', '', p.name)), el('p', 'rb-muted', `Niveau ${compiled.level} · ${money(salary(p))} / journée`), statList(compiled), el('p', 'rb-purchase-projection', `Après contrat : ${money(c.balance - price)}.`));
+      const buy = action(`Recruter · ${money(price)}`, 'recruit', { playerId: p.id }, true);
       const blocked = c.balance < 0 ? 'Salaires impayés : achats bloqués.' : c.players.length >= 8 ? 'Huit joueurs maximum.' : c.balance < price ? `Il manque ${price - c.balance} chromas.` : '';
-      if (blocked) { buy.disabled = true; row.append(el('small', 'rb-muted', blocked)); } row.append(buy); body.append(row);
+      if (blocked) { buy.disabled = true; row.append(el('small', 'rb-muted', blocked)); } row.append(buy); list.append(row);
     }
-  }
-  function renderShop(body, c) {
-    shopPlayerId = c.players.some(p => p.id === shopPlayerId) ? shopPlayerId : c.lineup[0];
-    const player = select(Object.fromEntries(c.players.map((p) => [p.id, p.name])), shopPlayerId), catalog = el('div', 'rb-online-equipment');
-    player.setAttribute('data-readonly-control', 'true');
-    body.append(pageHeading('Équipement sportif', 'Le matériel porté, les protections du club, puis les achats pour ce joueur.'), field('Joueur à équiper', player), catalog);
-    function draw() {
-      catalog.replaceChildren(); const p = c.players.find((p) => p.id === player.value), compiled = compilePlayer(p, c.inventory);
-      const identity = el('section', 'rb-equipment-player');
-      identity.append(portraitIdentity(compiled, c.kitColor, el('h4', '', p.name), xpProgress(p)), equipmentSlots(p, c.inventory), statList(compiled)); catalog.append(identity);
-      catalog.append(el('h4', '', 'Protections du club'), el('p', 'rb-muted', 'Les transferts sont gratuits. Une protection retirée reste disponible en réserve.'));
-      const reserve = el('div', 'rb-club-inventory');
-      if (!c.inventory.length) reserve.append(el('p', 'rb-empty-state', 'Votre réserve est vide. Les protections achetées pourront être réattribuées entre deux soirées.'));
-      for (const gear of c.inventory) {
-        const row = el('div', 'rb-inventory-row'), copy = el('div'), assignment = select({ '': 'Réserve', ...Object.fromEntries(c.players.map(p => [p.id, p.name])) }, gear.playerId ?? '');
-        assignment.disabled = league.locked;
-        assignment.addEventListener('change', () => attempt(() => send('equip', { itemId: gear.id, playerId: assignment.value || null })));
-        copy.append(el('strong', '', CATALOGUE[gear.itemId].name), field('Attribuer à · transfert gratuit', assignment));
-        row.append(equipmentArtwork(gear.itemId, CATALOGUE[gear.itemId].name), copy, action(`Revendre · ${money(CATALOGUE[gear.itemId].price / 2)}`, 'sellProtection', { itemId: gear.id })); reserve.append(row);
-      }
-      catalog.append(reserve, el('h4', '', 'Magasin'), el('p', 'rb-muted', `Les achats sont équipés sur ${p.name}. Le remplacement d’un implant détruit l’ancien.`));
-      for (const slot of ['protection', 'implant']) {
-        catalog.append(el('p', 'rb-eyebrow', slot === 'protection' ? 'Protections · transférables' : 'Implants · personnels'));
-        const list = el('div', 'rb-shop');
-        for (const [id, item] of Object.entries(CATALOGUE).filter(([, item]) => item.slot === slot)) {
-          const row = el('section', 'rb-career-player'), replace = input('checkbox', `Détruire l’ancien implant pour ${item.name}`); replace.required = false;
-          const after = { ...p, implant: item.slot === 'implant' ? id : p.implant }, inventory = item.slot === 'protection' ? [...c.inventory.filter((g) => g.playerId !== p.id), { itemId: id, playerId: p.id }] : c.inventory;
-          const heading = el('div', 'rb-equipment-heading'); heading.append(equipmentArtwork(id, ''), el('h4', '', item.name));
-          row.append(heading, el('p', 'rb-muted', item.effect), comparison(compiled, compilePlayer(after, inventory), p.implant, after.implant));
-          if (item.slot === 'implant' && p.implant && p.implant !== id) row.append(field(`Détruire ${CATALOGUE[p.implant].name} pour remplacer l’implant`, replace));
-          const buy = btn(`Acheter · ${money(item.price)}`, () => attempt(async () => {
-            if (item.slot === 'implant' && p.implant && !replace.checked) throw new Error('Confirmez la destruction de l’ancien implant avant le remplacement.');
-            await send('buy', { itemId: id, playerId: p.id, replaceConfirmed: replace.checked });
-          }));
-          const blocked = p.implant === id ? 'Cet implant est déjà équipé.' : c.balance < 0 ? 'Salaires impayés : achats bloqués.' : c.balance < item.price ? `Il manque ${item.price - c.balance} chromas.` : '';
-          row.append(el('p', 'rb-purchase-projection', `Après achat : ${money(c.balance - item.price)}`));
-          buy.disabled = league.locked || Boolean(blocked); row.append(buy); if (blocked) row.append(el('small', 'rb-muted', blocked)); list.append(row);
-        }
-        catalog.append(list);
-      }
-    }
-    player.addEventListener('change', () => { shopPlayerId = player.value; draw(); }); draw();
   }
   function renderLive(body) {
     body.append(el('h3', '', 'La soirée en direct'));
-    const schedule = el('details', 'rb-live-programme'); schedule.append(el('summary', '', 'Programme et classement'), leagueContext(league)); body.append(schedule);
+    body.append(live);
     const frame = league.broadcast;
     if (!frame) { view?.pause(); body.append(el('p', 'rb-muted', league.waitingForServer ? 'Diffusion retardée : attente du serveur. Reconnexion automatique en cours.' : league.status === 'broadcast' ? 'Pause entre deux rencontres. Prochain coup d’envoi indiqué ci-dessus.' : `Prochaine soirée : ${date(league.nextLockAt)}.`)); return; }
     live.hidden = false; if (!view) view = mountMatch(live);
@@ -257,7 +219,7 @@ export async function mountOnline(root, config, connect) {
     if (stopped || polling) return;
     polling = true;
     try {
-      if (!document.hidden && user && league && !busy && (league.status === 'lobby' && !formDirty || tab === 'Direct' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
+      if (!document.hidden && user && league && !busy && (league.status === 'lobby' && !formDirty || tab === 'Ligue' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
         await send('get');
       }
     } catch (error) { message(`Connexion interrompue. Nouvelle tentative automatique : ${error.message}`); }

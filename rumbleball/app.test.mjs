@@ -65,7 +65,7 @@ test('page autonome : carrière existante, lecture automatique sans section du l
   assert.equal(e.root.closest('[data-section]'), null);
   assert.match(classNode(e.root, 'rb-club-header').textContent, /Rebuts de l’intersection/);
   assert.deepEqual(e.saved(), c, 'Ouvrir la nouvelle page ne modifie pas la sauvegarde.');
-  await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
+  await button(e.root, 'Club').click(); await button(e.root, 'Lancer la rencontre').click();
   assert.equal(clock.pending.size, 1, 'La lecture démarre sans is-active du livre.');
   clock.until(() => e.saved().current.state.turns > 0);
   assert.equal(e.saved().current.state.round, 2);

@@ -51,7 +51,7 @@ test('interface : équipe préparée côté serveur puis annulation, et gestion 
   clock = state.nextLockAt; await button(e.root, 'Ligue').click();
   // A get uses authoritative time even if the scheduled worker has not fired yet.
   await button(e.root, 'Changer de ligue').click(); await button(e.root, `${state.name} · 2/2 clubs`).click();
-  await button(e.root, 'Équipe').click();
+  await button(e.root, 'Club').click();
   assert.match(e.root.textContent, /Équipes verrouillées/);
   const body = e.root.querySelector('.rb-online-body');
   assert.ok(descendants(body).filter((n) => n.tagName === 'select').length > 5);
