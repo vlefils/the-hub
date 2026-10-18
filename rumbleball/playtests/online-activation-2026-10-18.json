@@ -1,0 +1,64 @@
+{
+  "startedAt": "2026-10-18T07:58:21.935Z",
+  "runId": "117b0cb94daf",
+  "checks": [
+    "4 temporary accounts confirmed and signed in; no email sent",
+    "Non-member league access refused",
+    "Purchase preparation saved and cancellation fully restored funds",
+    "Direct browser access to private league state refused",
+    "Cron froze every team and paid income/wages exactly once; editing refused",
+    "Both hosted matches computed round by round; exact 120-second intermission scheduled",
+    "Two spectators receive the same first live match",
+    "Real intermission: next result hidden and teams remain locked",
+    "Two spectators receive the same second live match",
+    "Cron settled both matches once: income, wages, bonuses, XP, fatigue and management reopening",
+    "Fatigue verified against actual KO states; two extra worker calls changed no income, wages, XP or rewards",
+    "Temporary league and all four test accounts deleted; no e-mail sent",
+    "Password recovery redirect, password update and fresh login verified without e-mail"
+  ],
+  "workerMilliseconds": [
+    651,
+    802,
+    705,
+    852,
+    897,
+    1099,
+    1169,
+    2898,
+    1217,
+    1282,
+    2248,
+    1621,
+    3250,
+    4657,
+    2480,
+    5992
+  ],
+  "emailSent": false,
+  "matchRounds": [
+    10,
+    10
+  ],
+  "startsAt": "2026-10-18T07:58:36.895Z",
+  "endsAt": "2026-10-18T08:04:43.895Z",
+  "success": true,
+  "finishedAt": "2026-10-18T08:05:01.825Z",
+  "balances": [
+    720,
+    720,
+    820,
+    820
+  ],
+  "cleanup": {
+    "league": true,
+    "accounts": true
+  },
+  "serverSourceCommit": "d1395873e5af00ef240cdaaf71687c214757ee9c",
+  "sourcesSha256": {
+    "rumbleball/online/server.mjs": "c092526a0d1409aed2c36c396e83ab48e65caf4fc1f2634979a10979e62032bd",
+    "rumbleball/online/league.mjs": "03bff8db107d5e50ec89f96bfa8a691c83a19273c71ee1908e550a3b10f34cc6",
+    "supabase/functions/_shared/rumbleball.ts": "a173766b4d4e410c5d66d3702b5627b5b10b02287f74837c5f7821bef8a00dbd",
+    "supabase/functions/rumbleball-api/index.ts": "c4ce5e71f6578ae611f245247a5c5a76677cc514754ffd3c0f241b500c92610c",
+    "supabase/functions/rumbleball-worker/index.ts": "b19fa51b9c07a290c4236fe41af5adc8c81b7cac199376894360f4f02df37ab0"
+  }
+}

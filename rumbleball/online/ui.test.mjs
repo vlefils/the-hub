@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { environment, descendants, button } from '../test-support/dom.mjs';
-import { createLeague, joinLeague, startLeague, advanceLeague } from './league.mjs';
+import { createLeague, joinLeague, startLeague, advanceLeague, editPreparation } from './league.mjs';
 import { createLeagueService } from './server.mjs';
 import { connectOnline } from './client.mjs';
 import { mountOnline } from './ui.mjs';
@@ -12,7 +12,8 @@ import { createCourtPlayback } from '../playback.mjs';
 
 function setup(t) {
   const e = environment(); globalThis.location = new URL('http://127.0.0.1:8765/rumbleball/multi.html');
-  t.mock.method(globalThis, 'setTimeout', () => 1); t.mock.method(globalThis, 'clearTimeout', () => {});
+  e.pending = [];
+  t.mock.method(globalThis, 'setTimeout', (callback) => { e.pending.push(callback); return e.pending.length; }); t.mock.method(globalThis, 'clearTimeout', () => {});
   return e;
 }
 test('multi désactivé : parcours lisible, retour au solo et aucune création de compte ni requête', async (t) => {
@@ -65,6 +66,25 @@ test('spectateur : affiche un round fourni sans résoudre de tour ni offrir un r
   assert.equal(saves, 0); assert.deepEqual(step.state, before);
   const finish = button(e.root, 'Résultat immédiat'); if (finish) finish.click();
   assert.equal(saves, 0); assert.ok(e.root.querySelector('.rb-toolbar').hidden); view.pause();
+});
+test('lobby : les arrivées se mettent à jour sans reconstruire un formulaire inchangé ou en cours de saisie', async (t) => {
+  const e = setup(t), clock = '2026-10-18T10:00:00Z'; let revision = 1;
+  let state = createLeague({ id: 'league', userId: 'u0', name: 'Ligue des amis', clubName: 'Club', inviteCode: 'a'.repeat(32), seed: 'lobby-ui', capacity: 2 }, clock);
+  const store = { async get() { return { id: state.id, revision, state: structuredClone(state) }; },
+    async commit(id, expected, next) { assert.equal(expected, revision); state = next; return ++revision; },
+    async list() { return [{ id: state.id, name: state.name, members: state.members.length, capacity: 2 }]; } };
+  const service = createLeagueService(store, { now: () => clock });
+  const api = { auth: { async getSession() { return { data: { session: { user: { id: 'u0' } } } }; }, onAuthStateChange() {} }, request: (action, leagueId, payload) => service.command('u0', { action, leagueId, payload }) };
+  const mounted = await mountOnline(e.root, { enabled: true }, async () => api);
+  await button(e.root, 'Ligue des amis · 1/2 clubs').click();
+  const first = descendants(e.root).find((n) => n.tagName === 'form');
+  await e.pending.shift()(); assert.ok(e.root.contains(first), 'Un sondage inchangé préserve le formulaire et son focus.');
+  state = joinLeague(state, 'u1', { clubName: 'Ami' }, clock); revision++;
+  await e.pending.shift()(); assert.match(e.root.textContent, /2\/2 participants/); assert.equal(button(e.root, 'Lancer la saison').disabled, false);
+  const editing = descendants(e.root).find((n) => n.tagName === 'form'); await editing.emit('input');
+  state = editPreparation(state, 'u1', 'color', { color: '#aabbcc' }, clock); revision++;
+  await e.pending.shift()(); assert.ok(e.root.contains(editing), 'Une arrivée ou modification distante ne doit pas effacer la saisie locale.');
+  mounted.stop();
 });
 test('spectateur en retard : rejoint à six secondes du round et ne rejoue pas son début', () => {
   const before = createMatch({ seed: 'late-view' }), step = stepMatch(before); let frame, tick;

@@ -15,18 +15,23 @@ export async function mountOnline(root, config, connect) {
   const notice = el('p', 'rb-error rb-online-notice'); notice.hidden = true; notice.setAttribute('role', 'alert');
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
   root.append(top, notice, content, live);
-  let client, user, league, tab = 'Équipe', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0;
+  let client, user, league, tab = 'Équipe', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false;
   function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; }
   async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; try { await action(); } catch (error) { message(error.message); } finally { busy = false; } }
   async function send(action, payload = {}, id = league?.id) {
     const result = await client.request(action, id, payload);
-    if (result.league) { league = result.league; offset = Date.parse(league.serverTime) - Date.now(); renderLeague(); }
+    if (result.league) {
+      const next = result.league, changed = !league || league.id !== next.id || revision !== result.revision || league.locked !== next.locked || league.status !== next.status;
+      league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
+      if (action !== 'get' || changed || tab === 'Direct') renderLeague();
+    }
     return result;
   }
   function form(title, controls, submitLabel, action) {
     const node = el('form', 'rb-online-form'); node.append(el('h3', '', title), ...controls);
     const submit = el('button', 'rb-button rb-button-primary', submitLabel); submit.type = 'submit'; node.append(submit);
     node.addEventListener('submit', (event) => { event.preventDefault(); return attempt(async () => { submit.disabled = true; try { await action(); } finally { submit.disabled = false; } }); });
+    for (const event of ['input', 'change']) node.addEventListener(event, () => { formDirty = true; });
     return node;
   }
   if (!config.enabled) {
@@ -62,7 +67,7 @@ export async function mountOnline(root, config, connect) {
     content.append(actions, el('p', 'rb-muted', 'Les comptes utilisent le même service Supabase que Riftbound Tracker. La session Rumbleball et les clubs sont séparés.'));
   }
   async function renderLobby() {
-    league = null; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'), btn('Déconnexion', () => attempt(async () => { await client.auth.signOut(); user = null; renderAuth(); })));
+    league = null; revision = null; frameKey = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'), btn('Déconnexion', () => attempt(async () => { await client.auth.signOut(); user = null; renderAuth(); })));
     const { leagues } = await client.request('list');
     content.append(el('h2', '', 'Vos ligues'));
     const list = el('div', 'rb-online-actions');
@@ -78,12 +83,13 @@ export async function mountOnline(root, config, connect) {
   }
   function action(label, command, payload, primary = false) { const b = btn(label, () => attempt(() => send(command, payload)), primary); b.disabled = league.locked; return b; }
   function renderLeague() {
-    content.replaceChildren(); live.hidden = true;
+    content.replaceChildren(); live.hidden = true; formDirty = false;
     const c = league.club, heading = el('div', 'rb-online-identity'), copy = el('div');
     copy.append(el('p', 'rb-eyebrow', `${league.name} · saison ${league.season} · journée ${league.day + 1}`), el('h2', '', c.name));
-    heading.append(copy, btn('Changer de ligue', () => attempt(renderLobby))); content.append(heading);
+    const actions = el('div', 'rb-online-actions'); actions.append(btn('Actualiser', () => attempt(() => send('get'))), btn('Changer de ligue', () => attempt(renderLobby)));
+    heading.append(copy, actions); content.append(heading);
     const summary = el('div', 'rb-online-actions'); summary.append(metric('Solde prévu', money(c.balance)), metric('Prochains salaires', money(c.players.reduce((n, p) => n + salary(p), 0))), metric('Revenu / victoire', '210 / +100', 'chromas par journée'));
-    content.append(summary, el('p', league.locked ? 'rb-online-lock' : 'rb-muted', league.locked ? 'Équipes verrouillées pour la soirée. La gestion rouvrira après la dernière rencontre.' : `Modifiable jusqu’au ${date(league.nextLockAt)} · heure de Paris.`));
+    content.append(summary, el('p', league.locked ? 'rb-online-lock' : 'rb-muted', league.locked ? 'Équipes verrouillées pour la soirée. La gestion rouvrira après la dernière rencontre.' : league.nextLockAt ? `Modifiable jusqu’au ${date(league.nextLockAt)} · heure de Paris.` : 'Préparation libre jusqu’au lancement de la saison.'));
     if (league.hasDraft) content.append(el('p', 'rb-muted', 'Préparation enregistrée. Vous pouvez encore la modifier ou annuler tous ses changements avant le verrouillage.'), action('Annuler la préparation', 'cancel', {}));
     if (league.status === 'lobby') {
       content.append(el('p', 'rb-muted', `${league.members.length}/${league.capacity} participants. Partagez ce code avec vos amis :`), el('p', 'rb-online-code', league.inviteCode));
@@ -178,7 +184,7 @@ export async function mountOnline(root, config, connect) {
     if (stopped || polling) return;
     polling = true;
     try {
-      if (!document.hidden && user && league && !busy && (tab === 'Direct' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
+      if (!document.hidden && user && league && !busy && (league.status === 'lobby' && !formDirty || tab === 'Direct' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
         await send('get');
       }
     } catch (error) { message(`Connexion interrompue. Nouvelle tentative automatique : ${error.message}`); }

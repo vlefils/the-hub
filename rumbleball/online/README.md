@@ -1,14 +1,12 @@
-# Multijoueur — socle préparé
+# Multijoueur — ligues Supabase
 
 ## État de livraison
 
-Le code du navigateur, les transitions de ligue, les fonctions Edge, la migration et le déclencheur périodique sont préparés. L’interface est accessible par `../multi.html` et par **Multijoueur** dans le jeu.
+Le multijoueur est ouvert sur `../multi.html`, également accessible par **Multijoueur** dans le jeu. Les tables privées, l’API, le worker et le déclencheur périodique sont installés sur le projet Supabase de Riftbound Tracker. `config.mjs` active maintenant le service.
 
-**Les ligues en ligne ne sont pas encore ouvertes.** `config.mjs` conserve `enabled: false` jusqu’à l’installation du serveur. L’écran l’annonce ; il ne propose pas de créer des comptes pour un service indisponible.
+L’activation du 18 octobre 2026 a été vérifiée avec une vraie soirée de quatre clubs temporaires : deux matchs, deux minutes de pause, verrouillage, salaires, revenus, bonus et progression. Les comptes et la ligue de validation ont ensuite été supprimés. Le [compte rendu](../playtests/online-activation-2026-10-18.md) détaille les contrôles et leurs limites.
 
-La configuration publique et les accès API ont été récupérés du projet local Riftbound Tracker. Le contrôle distant du 18 octobre 2026 confirme Auth HTTP 200 et l’absence de `rb_leagues` HTTP 404. Aucune table distante, aucun compte utilisateur, aucun réglage Auth de Riftbound n’a été modifié. Les clés privées sont uniquement dans le dossier local ignoré `.local/` et ne doivent jamais être placées dans le code du site.
-
-La CLI Supabase 2.121.0 a ensuite retrouvé une session donnant accès au projet ; la lecture SQL via Management API a confirmé l’absence de Rumbleball et la disponibilité de Vault. L’installation distante n’a pas été exécutée : la vérification automatique a refusé la commande de migration/déploiement avec `--no-verify-jwt`, en demandant une autorisation explicite au-delà de la préparation. Il reste donc à autoriser puis appliquer la migration, déployer les deux fonctions et configurer le déclencheur.
+Seules les URLs de retour de Rumbleball ont été ajoutées aux réglages Auth ; les réglages et données de Riftbound ont été conservés. Les clés privées restent dans le dossier local ignoré `.local/` et dans les secrets du serveur. Le site utilise uniquement une clé publique.
 
 ## Règles retenues
 
@@ -44,7 +42,7 @@ L’animation d’un round implique d’en transmettre les événements au débu
 
 Les tables `rb_leagues` et `rb_memberships` sont isolées par leur préfixe. Leur RLS est active et les rôles navigateur n’ont aucun accès direct. Les états internes contiennent les futurs résultats ; seule la projection filtrée de l’API est consultable. La clé publique ne permet pas de lire ou d’écrire ces états. L’unique fonction d’écriture atomique est réservée au rôle serveur.
 
-## Activation du projet Supabase
+## Installation ou réinstallation du projet Supabase
 
 1. Ouvrir le bon projet, puis appliquer **uniquement** `../../supabase/migrations/20261018090000_rumbleball.sql` dans l’éditeur SQL. Le projet partagé possède déjà son historique Riftbound : ne pas lancer un reset ou une synchronisation de migrations globale depuis ce dépôt.
 2. Avec la CLI Supabase connectée à ce projet, déployer depuis la racine du dépôt :
@@ -67,7 +65,7 @@ Les tables `rb_leagues` et `rb_memberships` sont isolées par leur préfixe. Leu
    ```
 
    Vérifier aussi la confirmation d’e-mail et l’envoi des messages d’Auth. Ne pas remplacer l’URL principale Auth de Riftbound.
-6. Tester avec deux comptes : inscription, confirmation, connexion, création/invitation, annulation d’achat, verrouillage et une soirée complète. Ne pas utiliser de faux comptes ou un raccourci de simulation en production pour valider les finances.
+6. Tester avec des comptes de validation identifiés : confirmation, connexion, création/invitation, annulation d’achat, verrouillage et une soirée complète. Une éventuelle échéance avancée doit concerner uniquement une ligue de validation explicitement identifiée. Supprimer ces comptes et cette ligue après le test.
 7. Passer `enabled` à `true` dans `config.mjs` et publier le site lorsque ce parcours fonctionne. L’URL et la clé publiable peuvent être changées ici si un projet Supabase séparé est finalement retenu.
 
 Les comptes Auth sont partagés avec Riftbound lorsque le même projet est utilisé. La session du navigateur a une clé Rumbleball distincte et les clubs sont propres aux ligues. Pour des comptes totalement indépendants, utiliser un autre projet Supabase avant l’ouverture.
@@ -97,9 +95,9 @@ deno check --no-lock supabase/functions/rumbleball-api/index.ts supabase/functio
 
 Les tests couvrent les changements d’heure, l’annulation, les limites d’effectif reprises du mode solo, l’argent, le calendrier, deux saisons, les appels concurrents, le calcul fractionné équivalent au calcul complet, la projection privée, le mode spectateur et sa reprise en milieu de round. Les tests d’interface utilisent le DOM de test existant ; ils ne constituent pas une inspection visuelle en navigateur.
 
-## Limites avant ouverture
+## Limites de la première version
 
-- Le serveur n’a pas encore été déployé ou testé sur le projet Supabase distant. La mesure CPU et les délais réels du worker devront être contrôlés lors du premier essai hébergé.
+- Le serveur a été testé sur Supabase avec quatre clubs et deux matchs. Les temps réseau ne mesurent pas le CPU isolé ; une ouverture à grande échelle demandera une nouvelle mesure de charge.
 - Un retard initial du planificateur peut décaler le début de diffusion de quelques secondes ; le verrouillage reste à 20 h. En cas d’indisponibilité prolongée, une seule soirée est reprise et les journées manquées ne s’accumulent pas en saisons et revenus rétroactifs. Un round indisponible affiche une attente explicite, sans inventer un résultat local.
 - Les états de diffusion sont stockés dans un document privé par ligue. C’est adapté à cette première version de petites ligues ; pour une ouverture large, séparer les rounds en lignes ou objets de stockage et répartir davantage le travail. La liste des ligues utilise des colonnes légères et ne charge pas ces documents.
 - Pas encore de départ de ligue, dissolution, remplacement de participant, ligue publique ou chat. Huit ligues créées maximum par compte. L’historique conserve les scores, mais le lecteur ne propose pas encore les replays d’anciennes soirées.
