@@ -3,7 +3,9 @@ import { ARCHETYPES } from '../classes.mjs';
 import { STRATEGIES, ROLES, INSTRUCTIONS } from '../data.mjs';
 import { compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
 import { OPENINGS, openingDeployment } from '../openings.mjs';
-import { deploymentEditor } from '../deployment-ui.mjs';
+import { deploymentEditor, draggablePlayer, PLAYER_DRAG_TYPE } from '../deployment-ui.mjs';
+import { moveDeployment } from '../deployment.mjs';
+import { playerShop } from '../player-shop.mjs';
 import { athletePortrait } from '../visuals.mjs';
 import { crestPicker, clubIdentity, compositionTabs, archetypeIcon } from '../broadcast-components.mjs';
 
@@ -31,28 +33,33 @@ export function leagueContext(league) {
   }), { highlight: league.table.findIndex(r => r.id === league.club.id), caption: 'Classement de la ligue' }));
   root.append(schedule, ranking); return root;
 }
-export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onEquipment }) {
+export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onBuy }) {
   const ids = new Set(club.players.map(p => p.id));
   draft.lineup = draft.lineup.filter(id => ids.has(id));
   for (const p of club.players) {
     draft.assignments[p.id] ??= { role: p.role, instruction: p.instruction };
     if (draft.lineup.length < 5 && !draft.lineup.includes(p.id)) draft.lineup.push(p.id);
   }
-  let selected = draft.lineup.includes(draft.selected) ? draft.selected : draft.lineup[0];
-  const root = el('form', 'rb-broadcast-preparation'), squad = el('section', 'rb-broadcast-squad'), slots = el('div'), detail = el('details', 'rb-squad-detail'), bench = el('section', 'rb-broadcast-bench'), tactics = el('section', 'rb-broadcast-tactics');
+  let selected = ids.has(draft.selected) ? draft.selected : draft.lineup[0];
+  const root = el('form', 'rb-broadcast-preparation'), squad = el('section', 'rb-broadcast-squad'), slots = el('div'), detail = el('section', 'rb-squad-detail'), bench = el('section', 'rb-broadcast-bench'), tactics = el('section', 'rb-broadcast-tactics');
+  const sidebar = el('aside', 'rb-workspace-sidebar'), context = leagueContext(league), inspector = el('section', 'rb-player-inspector');
   const playerTactics = el('div', 'rb-player-tactics');
-  detail.open = Boolean(draft.detailsOpen); detail.addEventListener('toggle', () => { draft.detailsOpen = detail.open; });
   const strategy = select(STRATEGIES, draft.strategy), opening = select(Object.fromEntries(Object.entries(OPENINGS).map(([id, v]) => [id, v.name])), draft.opening), color = el('input', 'rb-kit-color'); color.type = 'color'; color.value = draft.color;
   const crest = crestPicker(draft.crestId, draft.color, locked);
   const deployed = () => draft.lineup.map((id, i) => ({ ...compilePlayer(club.players.find(p => p.id === id), club.inventory), id, number: i + 1 }));
-  const editor = deploymentEditor({ players: deployed(), positions: draft.deployment, color: draft.color, disabled: locked, selectedPlayerId: selected,
-    onSelect(id) { selected = draft.selected = id; drawDetail(); detail.open = true; draft.detailsOpen = true; highlight(); }, onChange(positions) { draft.deployment = positions; changed(); } });
-  const selectors = el('div', 'rb-broadcast-selectors'); selectors.append(field('Plan collectif', strategy), field('Ouverture', opening), field('Couleur des maillots', color), crest.root);
+  const editor = deploymentEditor({ players: deployed(), positions: draft.deployment, color: draft.color, disabled: locked, selectedPlayerId: draft.lineup.includes(selected) ? selected : draft.slotSelected,
+    interactivePlayers: true, onDropPlayer(id, position) {
+      if (!ids.has(id) || locked) return;
+      const occupied = editor.value.findIndex(p => p.x === position.x && p.y === position.y), index = occupied >= 0 ? occupied : Math.max(0, draft.lineup.indexOf(editor.selectedPlayerId));
+      draft.deployment = moveDeployment(editor.value, index, position); editor.update({ positions: draft.deployment }); replaceAt(index, id);
+    }, onSelect(id) { selected = draft.selected = draft.slotSelected = id; draft.detailsOpen = true; drawDetail(); highlight(); }, onChange(positions) { draft.deployment = positions; changed(); } });
+  const selectors = el('div', 'rb-broadcast-selectors'); selectors.append(field('Plan collectif', strategy), field('Ouverture', opening));
+  const kit = el('section', 'rb-kit-settings'); kit.append(el('h4', '', 'Identité du club'), field('Couleur des maillots', color), crest.root); context.append(kit);
   const saveBar = el('div', 'rb-broadcast-save'), save = el('button', 'rb-button rb-button-primary', 'Enregistrer la préparation'), status = el('p', 'rb-form-status'); save.type = 'submit'; status.setAttribute('role', 'status');
   saveBar.append(save, status); tactics.append(editor.root, selectors);
-  squad.append(el('h4', '', 'Les cinq titulaires'), slots, bench);
+  squad.append(bench, el('h4', '', 'Les cinq titulaires'), slots);
   const mobile = compositionTabs(root, value => { draft.view = value; }, draft.view);
-  root.append(mobile, squad, tactics, saveBar, leagueContext(league));
+  sidebar.append(inspector, context); root.append(mobile, squad, tactics, saveBar, sidebar);
   const baseline = JSON.stringify(preparationDraft(club));
   function read() {
     draft.strategy = strategy.value; draft.opening = opening.value; draft.color = color.value; draft.crestId = crest.value; draft.deployment = editor.value;
@@ -64,7 +71,9 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   function highlight() {
     for (const row of slots.children) row.classList.toggle('is-selected', row.dataset.playerId === selected);
-    [...slots.children].find(row => row.dataset.playerId === selected)?.append(playerTactics, detail);
+    const row = [...slots.children].find(row => row.dataset.playerId === selected);
+    if (row) row.append(playerTactics); else detail.append(playerTactics);
+    playerTactics.hidden = !draft.detailsOpen; inspector.hidden = !draft.detailsOpen; context.hidden = Boolean(draft.detailsOpen);
     editor.update({ selectedPlayerId: selected });
   }
   function drawDetail() {
@@ -79,33 +88,43 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     role.disabled = instruction.disabled = locked;
     const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
     playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
-    if (onEquipment) { const gear = btn('Équiper ce joueur', () => onEquipment(p.id)); gear.setAttribute('data-readonly-control', 'true'); playerTactics.append(gear); }
-    detail.replaceChildren(el('summary', '', `Fiche de ${p.name}`), label, field('Remplacer ce titulaire', replacement), order, xpProgress(p), fatigue(p), statList(compiled), equipmentSlots(p, club.inventory), el('small', 'rb-muted', `${money(salary(p))} / journée`));
+    const close = btn('Programme et classement', () => { draft.detailsOpen = false; highlight(); }); close.classList.add('rb-inspector-back'); close.setAttribute('data-readonly-control', 'true');
+    const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
+    detail.replaceChildren(close, portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, statList(compiled), equipmentSlots(p, club.inventory), playerShop(club, p, { locked, onBuy, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; } }));
+    if (index >= 0) detail.append(field('Remplacer ce titulaire', replacement), order);
+    else detail.append(el('p', 'rb-muted', 'Sur le banc · glissez ce joueur sur le terrain pour le faire entrer.'));
+    detail.append(el('small', 'rb-muted', `${money(salary(p))} / journée`));
+    inspector.replaceChildren(detail);
     highlight();
     if (club.players.length > 5) { const sell = btn(`Céder ${p.name} · ${money(recruitmentPrice(p) / 2)}`, () => onSell(p.id)); sell.disabled = locked; detail.append(sell); }
     for (const control of [role, instruction]) control.addEventListener('change', () => { draft.assignments[p.id] = { role: role.value, instruction: instruction.value }; changed(); });
   }
   function replaceAt(index, id) {
     const previous = draft.lineup[index], other = draft.lineup.indexOf(id); if (other >= 0 && other !== index) draft.lineup[other] = previous;
-    draft.lineup[index] = id; selected = draft.selected = id; editor.update({ players: deployed(), selectedPlayerId: selected }); drawSquad(); drawDetail(); changed();
-    detail.open = true; draft.detailsOpen = true;
+    draft.lineup[index] = id; selected = draft.selected = draft.slotSelected = id; draft.detailsOpen = true; editor.update({ players: deployed(), selectedPlayerId: selected }); drawSquad(); drawDetail(); changed();
     detail.querySelector('select')?.focus({ preventScroll: true });
   }
   function drawSquad() {
     slots.replaceChildren(); bench.replaceChildren(el('h4', '', 'Remplaçants'));
     for (const [i, id] of draft.lineup.entries()) {
       const p = club.players.find(p => p.id === id), compiled = compilePlayer(p, club.inventory), row = el('div', 'rb-squad-slot'); row.dataset.playerId = id;
-      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = id; drawDetail(); detail.open = true; draft.detailsOpen = true; highlight(); playerTactics.scrollIntoView({ block: 'nearest' }); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
-      row.append(athletePortrait(compiled, draft.color), pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p)); slots.append(row);
+      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = draft.slotSelected = id; draft.detailsOpen = true; drawDetail(); highlight(); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
+      const portrait = athletePortrait(compiled, draft.color); draggablePlayer(portrait, id, locked); draggablePlayer(pick, id, locked);
+      row.append(portrait, pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p)); slots.append(row);
     }
     const reserves = club.players.filter(p => !draft.lineup.includes(p.id));
     if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant.'));
+    else bench.append(el('p', 'rb-muted rb-drag-hint', 'Glissez un remplaçant sur le terrain.'));
     for (const p of reserves) {
       const row = el('div', 'rb-bench-entry'), controls = el('div', 'rb-controls'), enter = btn(`Faire entrer ${p.name}`, () => {
-        const i = Math.max(0, draft.lineup.indexOf(selected)); draft.lineup[i] = p.id; selected = draft.selected = p.id; editor.update({ players: deployed(), selectedPlayerId: selected }); drawSquad(); drawDetail(); changed();
+        const i = Math.max(0, draft.lineup.indexOf(editor.selectedPlayerId)); replaceAt(i, p.id);
       }); enter.disabled = locked;
-      controls.append(enter); if (club.players.length > 5) { const sell = btn(`Céder · ${money(recruitmentPrice(p) / 2)}`, () => onSell(p.id)); sell.disabled = locked; controls.append(sell); }
-      row.append(portraitIdentity(compilePlayer(p, club.inventory), draft.color, el('strong', '', p.name), el('small', 'rb-muted', `${money(salary(p))} / journée`)), fatigue(p), controls); bench.append(row);
+      controls.append(enter);
+      const pick = btn(p.name, () => { selected = draft.selected = p.id; draft.detailsOpen = true; drawDetail(); highlight(); }); pick.setAttribute('data-readonly-control', 'true'); pick.classList.add('rb-bench-name');
+      const identity = portraitIdentity(compilePlayer(p, club.inventory), draft.color, pick, fatigue(p), controls); draggablePlayer(identity, p.id, locked);
+      row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
+      row.addEventListener('drop', event => { const index = draft.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); replaceAt(index, p.id); });
+      row.append(identity); bench.append(row);
     }
     highlight();
   }

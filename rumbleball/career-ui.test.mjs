@@ -6,6 +6,7 @@ import { createCareer, confirmDraft, buyItem, launchCareerMatch, saveCareerTurn 
 import { simulateMatch } from './engine.mjs';
 import { exportCareer } from './career-storage.mjs';
 import { xpProgress } from './career-components.mjs';
+import { PLAYER_DRAG_TYPE } from './deployment-ui.mjs';
 
 import { descendants, button, classNode, environment } from './test-support/dom.mjs';
 
@@ -21,8 +22,10 @@ test('parcours UI : création, échange de titulaires, consignes, équipement et
   let c = e.saved(); assert.equal(c.balance, 900); assert.equal(c.lineup.length, 5);
   assert.ok(classNode(e.root, 'rb-fixture-hero')); assert.equal(classNode(e.root, 'rb-lineup-form'), null);
   await button(e.root, 'Préparer le match').click();
-  const form = classNode(e.root, 'rb-lineup-form'), slots = descendants(classNode(e.root, 'rb-lineup-slots')).filter((n) => n.tagName === 'select');
-  const [first, second] = c.lineup; slots[0].value = second; await slots[0].emit('change');
+  const form = classNode(e.root, 'rb-lineup-form');
+  await classNode(e.root, 'rb-lineup-slots').children[0].querySelector('button').click();
+  const replacement = descendants(classNode(e.root, 'rb-player-inspector')).find(n => n.dataset.focusKey === 'lineup-0');
+  const [first, second] = c.lineup; replacement.value = second; await replacement.emit('change');
   c = e.saved(); assert.deepEqual(c.lineup.slice(0, 2), [second, first]);
   const strategy = descendants(form).find(n => n.dataset.focusKey === 'strategy'); strategy.value = 'pressing'; await strategy.emit('change'); assert.equal(e.saved().clubs[0].strategy, 'pressing');
   await button(e.root, 'Équipement').click();
@@ -152,7 +155,7 @@ test('effectif : comparaison sans formulaire, fiche liée à l’équipement et 
   let c = createCareer('Les Cartographes', 'ui-roster'); c = confirmDraft(c, c.market.slice(0, 7).map((p) => p.id));
   c.clubs[0].players[1].xp = 20; c.clubs[0].players[1].fatigue = 5;
   const e = environment(exportCareer(c)); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
-  await button(e.root, 'Équipe').click();
+  await button(e.root, 'Effectif').click();
   assert.ok(classNode(e.root, 'rb-roster-table')); assert.equal(classNode(e.root, 'rb-lineup-form'), null);
   assert.match(classNode(e.root, 'rb-roster-table').textContent, /compétences physiques/);
   const pick = descendants(e.root).find((n) => n.dataset.focusKey === `player-${c.clubs[0].players[1].id}`); await pick.click();
@@ -171,8 +174,25 @@ test('préparation : sélection liée au terrain, rotation, retour sur une ouver
   const role = descendants(e.root).find((n) => n.dataset.focusKey === 'active-role'); role.focus(); role.value = 'defender'; await role.emit('change');
   assert.equal(classNode(e.root, 'rb-tactical-player').parentNode, descendants(e.root).find(n => n.classList.contains('rb-lineup-slot') && n.classList.contains('is-selected')));
   assert.equal(e.saved().clubs[0].players[2].role, 'defender'); assert.equal(document.activeElement, role);
-  const substitute = c.clubs[0].players[5]; await button(e.root, `Faire entrer ${substitute.name}`).click(); assert.equal(e.saved().lineup[2], substitute.id); assert.deepEqual(e.saved().clubs[0].deployment, formation);
+  const substitute = c.clubs[0].players[5], balance = e.saved().balance;
+  await button(e.root, substitute.name).click();
+  await button(classNode(e.root, 'rb-player-inspector'), 'Acheter et équiper · 100 chromas').click();
+  assert.equal(e.saved().balance, balance - 100); assert.equal(e.saved().inventory[0].playerId, substitute.id); assert.deepEqual(e.saved().lineup, c.lineup);
+  await button(e.root, `Faire entrer ${substitute.name}`).click(); assert.equal(e.saved().lineup[2], substitute.id); assert.deepEqual(e.saved().clubs[0].deployment, formation);
   assert.equal(classNode(e.root, 'rb-deployment-player').value, '2');
+});
+
+test('préparation solo : glisser depuis le banc remplace la bonne place et conserve cinq positions uniques', async () => {
+  let c = createCareer('Les Mobiles', 'ui-drag'); c = confirmDraft(c, c.market.slice(0, 6).map(p => p.id));
+  const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  await button(e.root, 'Équipe').click();
+  const reserve = c.clubs[0].players[5], position = c.clubs[0].deployment[3];
+  const target = descendants(classNode(e.root, 'rb-deployment')).find(n => n.dataset.cell === `${position.x},${position.y}`);
+  await target.emit('drop', { dataTransfer: { types: [PLAYER_DRAG_TYPE], getData: () => reserve.id } });
+  assert.equal(e.saved().lineup[3], reserve.id); assert.equal(new Set(e.saved().lineup).size, 5);
+  assert.deepEqual(e.saved().clubs[0].deployment[3], position);
+  assert.equal(new Set(e.saved().clubs[0].deployment.map(p => `${p.x},${p.y}`)).size, 5);
+  assert.match(classNode(e.root, 'rb-player-inspector').textContent, new RegExp(reserve.name));
 });
 
 test('équipement : matériel possédé avant magasin, transfert sans argent et comparaison de fatigue', async () => {

@@ -19,7 +19,9 @@ export function clubIdentity(club, { compact = false } = {}) {
 }
 export function matchBanner(home, away, title, status = '') {
   const banner = el('section', 'rb-broadcast-banner'); banner.setAttribute('aria-label', 'Prochaine rencontre');
-  const center = el('div', 'rb-broadcast-versus'); center.append(el('span', 'rb-eyebrow', 'Prochaine rencontre'), el('strong', '', title));
+  const center = el('div', 'rb-broadcast-versus'), evening = title === '20 h · Paris', day = /^Journée (\d+)$/u.exec(title);
+  center.append(el('span', 'rb-eyebrow', evening ? 'Ce soir' : day ? 'Journée' : 'Prochaine rencontre'), el('strong', '', evening ? '20 H' : day ? day[1] : title));
+  if (evening) center.append(el('span', 'rb-broadcast-city', 'Paris'));
   banner.append(clubIdentity(home), center, clubIdentity(away));
   if (status) { const note = el('p', 'rb-broadcast-deadline', status); banner.append(note); }
   return banner;
@@ -36,7 +38,7 @@ export function careerContext(career) {
   schedule.append(el('h4', '', `Journée ${Math.min(10, career.day + 1)}`));
   for (const f of career.schedule[Math.min(9, career.day)] ?? []) {
     const row = el('div', `rb-broadcast-fixture${[f.homeId, f.awayId].includes('club') ? ' is-own' : ''}`);
-    row.append(clubIdentity(career.clubs.find(c => c.id === f.homeId), { compact: true }), clubIdentity(career.clubs.find(c => c.id === f.awayId), { compact: true }), el('small', 'rb-muted', f.result ? f.result.winnerId ? 'Rencontre terminée' : 'Match nul' : 'À jouer')); schedule.append(row);
+    row.append(el('small', 'rb-muted', f.result ? f.result.winnerId ? 'Rencontre terminée' : 'Match nul' : 'À jouer'), clubIdentity(career.clubs.find(c => c.id === f.homeId), { compact: true }), clubIdentity(career.clubs.find(c => c.id === f.awayId), { compact: true })); schedule.append(row);
   }
   ranking.append(el('h4', '', 'Classement'), table(['Club', 'Joués', 'Points'], career.table.map((r, i) => {
     const label = el('span'); label.append(el('span', 'rb-muted', `${i + 1}. `), clubIdentity(career.clubs.find(c => c.id === r.clubId), { compact: true })); return [label, r.played, r.points];

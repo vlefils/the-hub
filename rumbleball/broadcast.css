@@ -136,7 +136,7 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
 .rb-replay-entry > .rb-button { justify-self: start; }
 .rb-replay-controls { margin-bottom: 1rem; }
 .rb-replay-area input[type='range'] { width: 100%; min-height: 2.75rem; accent-color: var(--rb-accent); }
-.rb-squad-detail:not([open]) > :not(summary) { display: none; }
+details.rb-squad-detail:not([open]) > :not(summary) { display: none; }
 .rb-squad-detail > summary { min-height: 2.75rem; cursor: pointer; font-weight: 600; }
 .rb-squad-detail .rb-player-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .rb-broadcast-bench { margin-top: 1.5rem; display: grid; gap: 1rem; }

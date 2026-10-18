@@ -6,8 +6,10 @@ import { CAREER_KEY, loadCareer, persistCareer, exportCareer, importCareer } fro
 import { KIT_COLORS, clubKit } from './appearance.mjs';
 import { playerPortrait, teamCrest, athletePortrait } from './visuals.mjs';
 import { crestPicker, clubIdentity, matchBanner, equipmentArtwork, compositionTabs, careerContext } from './broadcast-components.mjs';
-import { deploymentEditor } from './deployment-ui.mjs';
-import { clubDeployment } from './deployment.mjs';
+import { deploymentEditor, draggablePlayer, PLAYER_DRAG_TYPE } from './deployment-ui.mjs';
+import { clubDeployment, moveDeployment } from './deployment.mjs';
+import { workspaceHeader } from './workspace-header.mjs';
+import { playerShop } from './player-shop.mjs';
 import { clubOpening, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
 import { el, btn, field, select, money, signed, keyed, kitPicker, portraitIdentity, pageHeading, metric, table, stats, statList, xpProgress, fatigue, comparison, equipmentSlots, disclosure } from './career-components.mjs';
@@ -22,6 +24,7 @@ export function mountCareer(root, mountMatch) {
   const loaded = loadCareer(storage);
   let career = loaded.career, tab = 'Club', teamView = 'Effectif', mode = 'career', unsaved = false, selectedPlayer = null, selectedShopPlayer = null, draftIds = new Set(), pendingImport = null;
   let rosterSort = 'lineup', rosterDetailOpen = false, rosterScroll = 0, marketFilter = '', comparePlayer = null, calendarDay = null, formationUndo = null;
+  let preparationInspectorOpen = false, preparationShopItem, preparationSlotPlayer;
   const sectionScroll = new Map(); let confirmationId = 0, importRequestId = 0;
   const top = el('div', 'rb-career-top'), modes = el('div', 'rb-controls'), tools = el('div', 'rb-controls');
   const careerMode = btn('Carrière', () => showMode('career')), exhibitionMode = btn('Exhibition', () => showMode('exhibition'));
@@ -46,6 +49,7 @@ export function mountCareer(root, mountMatch) {
   matchActions.append(btn('Retour au club · mettre en pause', () => { view.pause(); matchArea.hidden = true; manager.hidden = false; if (career.current?.settled) tab = 'Bilan'; renderManagement(); }));
   matchArea.append(matchActions, matchRoot); matchArea.hidden = true;
   root.append(top, notice, importPreview, manager, matchArea);
+  workspaceHeader({ tools: top });
   const view = mountMatch(matchRoot, {
     onTurn(state, events) {
       career = saveCareerTurn(career, state, events);
@@ -67,6 +71,7 @@ export function mountCareer(root, mountMatch) {
       career = null; loaded.hasSave = false; unsaved = false; retry.hidden = true; notice.hidden = true;
       importRequestId++; pendingImport = null; importPreview.replaceChildren(); importPreview.hidden = true; draftIds.clear();
       selectedPlayer = selectedShopPlayer = comparePlayer = calendarDay = formationUndo = null;
+      preparationInspectorOpen = false; preparationShopItem = preparationSlotPlayer = undefined;
       tab = 'Club'; teamView = 'Effectif'; rosterSort = 'lineup'; rosterDetailOpen = false; rosterScroll = 0; marketFilter = ''; sectionScroll.clear();
       saveStatus.textContent = 'Sauvegarde locale automatique'; saveTools.open = false;
       showMode('career'); manager.querySelector('input')?.focus();
@@ -81,7 +86,7 @@ export function mountCareer(root, mountMatch) {
   }
   function showMode(nextMode) {
     view.pause(); mode = nextMode; importPreview.hidden = true;
-    if (mode === 'exhibition') { manager.hidden = true; matchArea.hidden = false; matchActions.hidden = true; view.exhibition(); }
+    if (mode === 'exhibition') { workspaceHeader({ context: null, navigation: null }); manager.hidden = true; matchArea.hidden = false; matchActions.hidden = true; view.exhibition(); }
     else { matchArea.hidden = true; manager.hidden = false; matchActions.hidden = false; renderManagement(); }
     careerMode.setAttribute('aria-pressed', String(mode === 'career')); exhibitionMode.setAttribute('aria-pressed', String(mode === 'exhibition'));
   }
@@ -104,6 +109,7 @@ export function mountCareer(root, mountMatch) {
   function renderManagement(preserve = true) {
     const focusKey = preserve && manager.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null;
     const scroll = window.scrollY ?? 0, openKeys = new Set([...manager.querySelectorAll('details')].filter((n) => n.open).map((n) => n.dataset.sectionKey));
+    workspaceHeader({ context: null, navigation: null });
     manager.replaceChildren(); exportButton.disabled = !career; importButton.disabled = managementLocked(career ?? {}); restartButton.disabled = !career && !loaded.hasSave;
     if (!career) { renderCreation(); restoreContext(); return; }
     if (career.status === 'draft') { renderDraft(); restoreContext(); return; }
@@ -119,23 +125,23 @@ export function mountCareer(root, mountMatch) {
     }
     const headerActions = el('div', 'rb-header-actions'); headerActions.append(finances);
     if (!locked && opponent && tab !== 'Club' && !(tab === 'Équipe' && teamView === 'Préparation') && tab !== 'Bilan') headerActions.append(btn('Préparer le match', () => go('Équipe', 'Préparation')));
-    const badgeIdentity = el('div', 'rb-club-identity'); badgeIdentity.append(teamCrest(club), identity); header.append(badgeIdentity, headerActions); manager.append(header);
+    const badgeIdentity = el('div', 'rb-club-identity'); badgeIdentity.append(teamCrest(club), identity); header.append(badgeIdentity, headerActions); if (!workspaceHeader({ context: header })) manager.append(header);
     if (locked) {
       const matchStrip = el('div', 'rb-next-match');
       matchStrip.append(el('p', '', `Rencontre en cours contre ${career.current.config.teamNames.away}. Gestion en lecture seule. La reprise se fait en pause.`), btn('Reprendre la rencontre', () => openMatch(), true));
       manager.append(matchStrip);
     }
     if (career.balance < 0) manager.append(el('p', 'rb-career-debt', 'Achats bloqués. Primes et ventes remboursent les salaires impayés. Vous pouvez jouer, modifier la composition et transférer vos protections gratuitement.'));
-    const destinations = ['Club', 'Équipe', 'Recrutement', 'Équipement', 'Ligue'];
+    const destinations = ['Club', 'Équipe', 'Effectif', 'Recrutement', 'Équipement', 'Ligue'];
+    const destination = tab === 'Équipe' && teamView === 'Effectif' ? 'Effectif' : tab;
+    const navigate = label => label === 'Effectif' ? go('Équipe', 'Effectif') : label === 'Équipe' ? go('Équipe', 'Préparation') : go(label);
     const tabs = el('nav', 'rb-career-tabs'); tabs.setAttribute('aria-label', 'Gestion du club');
-    for (const label of destinations) { const b = keyed(btn(label, () => go(label)), `nav-${label}`); b.setAttribute('aria-current', tab === label ? 'page' : 'false'); tabs.append(b); }
+    for (const label of destinations) { const b = keyed(btn(label, () => navigate(label)), `nav-${label}`); b.setAttribute('aria-current', destination === label ? 'page' : 'false'); tabs.append(b); }
     const mobileDestinations = Object.fromEntries(destinations.map((label) => [label, label])); if (tab === 'Bilan') mobileDestinations.Bilan = 'Bilan de la journée';
-    const mobileNav = keyed(select(mobileDestinations, tab), 'mobile-section');
-    mobileNav.addEventListener('change', () => go(mobileNav.value)); const mobileField = field('Menu du club', mobileNav); mobileField.classList.add('rb-mobile-nav'); manager.append(tabs, mobileField);
+    const mobileNav = keyed(select(mobileDestinations, destination), 'mobile-section');
+    mobileNav.addEventListener('change', () => navigate(mobileNav.value)); const mobileField = field('Menu du club', mobileNav); mobileField.classList.add('rb-mobile-nav'); if (!workspaceHeader({ navigation: tabs })) manager.append(tabs); manager.append(mobileField);
     if (tab === 'Club') renderClub(locked, fixture, opponent);
     if (tab === 'Équipe') {
-      const subnav = el('nav', 'rb-team-tabs'); subnav.setAttribute('aria-label', 'Vues de l’équipe');
-      for (const label of ['Effectif', 'Préparation']) { const b = btn(label, () => go('Équipe', label)); b.setAttribute('aria-current', teamView === label ? 'page' : 'false'); subnav.append(b); } manager.append(subnav);
       if (teamView === 'Effectif') renderRoster(locked); else renderPreparation(locked);
     }
     if (tab === 'Recrutement') renderMarket(locked);
@@ -264,53 +270,71 @@ export function mountCareer(root, mountMatch) {
     const preparation = el('div', 'rb-preparation rb-sport-preparation'), teamControls = el('div', 'rb-team-controls rb-broadcast-squad'), teamPlans = el('div', 'rb-team-plans');
     const assignments = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, { role: p.role, instruction: p.instruction }]));
     const lineup = el('div', 'rb-lineup-slots'), slotControls = [], slotCopies = [], active = el('section', 'rb-tactical-player'), bench = el('div', 'rb-bench');
+    const sidebar = el('aside', 'rb-workspace-sidebar'), context = careerContext(career), inspector = el('section', 'rb-player-inspector'); sidebar.append(inspector, context);
     const names = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, p.name]));
-    selectedPlayer = career.lineup.includes(selectedPlayer) ? selectedPlayer : career.lineup[0];
+    selectedPlayer = ownedPlayers(career).some(p => p.id === selectedPlayer) ? selectedPlayer : career.lineup[0];
     const deploymentPlayers = () => career.lineup.map((id) => compilePlayer(ownedPlayers(career).find((p) => p.id === id), career.inventory));
     const positions = locked ? career.current.config.deployments?.home ?? STARTS.map(([x, y]) => ({ x, y })) : clubDeployment(career.clubs[0]);
-    const deployment = deploymentEditor({ players: deploymentPlayers(), positions, color: clubKit(career.clubs[0]), disabled: locked, selectedPlayerId: selectedPlayer,
-      onSelect: (id) => { selectedPlayer = id; renderActive(); }, onChange: () => attempt(commitLineup) });
+    const deployment = deploymentEditor({ players: deploymentPlayers(), positions, color: clubKit(career.clubs[0]), disabled: locked, selectedPlayerId: career.lineup.includes(selectedPlayer) ? selectedPlayer : preparationSlotPlayer, interactivePlayers: true,
+      onDropPlayer: (id, position) => attempt(() => {
+        if (locked || !ownedPlayers(career).some(p => p.id === id)) return;
+        const occupied = deployment.value.findIndex(p => p.x === position.x && p.y === position.y), index = occupied >= 0 ? occupied : Math.max(0, career.lineup.indexOf(deployment.selectedPlayerId));
+        deployment.update({ positions: moveDeployment(deployment.value, index, position) }); slotControls[index].value = id; selectedPlayer = id; preparationInspectorOpen = true; commitLineup(); renderActive();
+      }), onSelect: (id) => { selectedPlayer = preparationSlotPlayer = id; preparationInspectorOpen = true; renderActive(); }, onChange: () => attempt(commitLineup) });
     const undo = btn('Rétablir le placement précédent', () => attempt(() => { if (!formationUndo || locked) return; deployment.update({ positions: formationUndo.positions }); opening.update(formationUndo.opening); formationUndo = null; undo.hidden = true; commitLineup(); })); undo.hidden = !formationUndo; undo.disabled = locked;
-    const opening = openingPicker({ value: locked ? career.current.config.openings?.home ?? 'none' : clubOpening(career.clubs[0]), disabled: locked,
+    const opening = openingPicker({ value: locked ? career.current.config.openings?.home ?? 'none' : clubOpening(career.clubs[0]), disabled: locked, label: 'Ouverture',
       onChange: (value) => attempt(() => { formationUndo = { positions: deployment.value, opening: clubOpening(career.clubs[0]) }; deployment.update({ positions: openingDeployment(value) }); undo.hidden = false; commitLineup(); }) });
     const strategyHelp = el('p', 'rb-muted');
     function describeStrategy() { strategyHelp.textContent = { balanced: 'Une répartition équilibrée entre progression, soutien et défense.', possession: 'Protège le porteur par des blocages, des sorties de pression et des relais sûrs.', pressing: 'Met la pression sur le porteur adverse et conteste les accès au ballon.' }[strategy.value]; }
-    describeStrategy(); teamPlans.append(field('Plan collectif', strategy), strategyHelp, opening.root, undo);
-    teamControls.append(el('h4', '', 'Les cinq titulaires'), lineup, bench);
+    describeStrategy(); teamPlans.append(field('Plan collectif', strategy), opening.root, undo);
+    teamControls.append(bench, el('h4', '', 'Les cinq titulaires'), lineup);
     for (const [index, id] of career.lineup.entries()) {
       const s = keyed(select(names, id), `lineup-${index}`); s.disabled = locked; slotControls.push(s);
-      const row = el('div', 'rb-lineup-slot'), copy = el('div', 'rb-slot-copy'), pick = btn('Régler', () => { selectedPlayer = s.value; deployment.update({ selectedPlayerId: selectedPlayer }); renderActive(); });
-      pick.classList.add('rb-slot-select'); pick.setAttribute('aria-label', `Sélectionner le titulaire ${index + 1} sur le terrain`);
-      row.append(field(`Titulaire ${index + 1}`, s), copy, pick); lineup.append(row); slotCopies.push({ row, copy });
+      const row = el('div', 'rb-lineup-slot'), copy = el('div', 'rb-slot-copy'), pick = btn('', () => { selectedPlayer = preparationSlotPlayer = s.value; preparationInspectorOpen = true; deployment.update({ selectedPlayerId: selectedPlayer }); renderActive(); });
+      pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Sélectionner le titulaire ${index + 1} sur le terrain`);
+      row.append(copy); lineup.append(row); slotCopies.push({ row, copy, pick });
       s.addEventListener('change', () => attempt(() => {
         const duplicate = slotControls.find((other, otherIndex) => otherIndex !== index && other.value === s.value);
-        if (duplicate) duplicate.value = career.lineup[index]; selectedPlayer = s.value; commitLineup(); renderActive();
+        if (duplicate) duplicate.value = career.lineup[index]; selectedPlayer = preparationSlotPlayer = s.value; commitLineup(); renderActive();
       }));
     }
     const formNotice = el('p', 'rb-form-status', 'Toute modification est enregistrée automatiquement.'); formNotice.setAttribute('role', 'status');
     function refreshSlots() {
-      for (const [index, { row, copy }] of slotCopies.entries()) {
+      for (const [index, { row, copy, pick }] of slotCopies.entries()) {
         const p = ownedPlayers(career).find((p) => p.id === slotControls[index].value);
-        row.classList.toggle('is-selected', p.id === selectedPlayer); copy.replaceChildren(portraitIdentity(compilePlayer(p, career.inventory), clubKit(career.clubs[0]), el('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`)), fatigue(p));
+        const compiled = compilePlayer(p, career.inventory); pick.textContent = `${index + 1} · ${p.name}`;
+        row.classList.toggle('is-selected', p.id === selectedPlayer); copy.replaceChildren(athletePortrait(compiled, clubKit(career.clubs[0])), pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p));
         if (p.id === selectedPlayer) row.append(active);
+        draggablePlayer(copy.children[0], p.id, locked);
       }
-      const target = ownedPlayers(career).find((p) => p.id === selectedPlayer);
+      const target = ownedPlayers(career).find((p) => p.id === (career.lineup.includes(selectedPlayer) ? selectedPlayer : deployment.selectedPlayerId));
       bench.replaceChildren(el('h4', '', 'Remplaçants'));
       const reserves = ownedPlayers(career).filter((p) => !career.lineup.includes(p.id));
       if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant. Un joueur au repos récupère 3 fatigue et gagne 4 XP.'));
-      else bench.append(el('p', 'rb-muted', `Entrer à la place de ${target.name}. Sélectionnez un autre titulaire avec « Régler » pour changer la cible.`));
+      else bench.append(el('p', 'rb-muted', `Entrer à la place de ${target.name}.`));
       for (const p of reserves) {
-        const b = keyed(blocked(btn(`Faire entrer ${p.name}`, () => { const index = Math.max(0, career.lineup.indexOf(selectedPlayer)); slotControls[index].value = p.id; selectedPlayer = p.id; attempt(() => { commitLineup(); renderActive(); active.querySelector('select')?.focus({ preventScroll: true }); }); }), locked ? 'Rencontre en cours.' : ''), `bench-${p.id}`);
-        const row = el('div', 'rb-bench-player'); row.append(portraitIdentity(compilePlayer(p, career.inventory), clubKit(career.clubs[0]), el('strong', '', p.name)), fatigue(p), b); bench.append(row);
+        const b = keyed(blocked(btn(`Faire entrer ${p.name}`, () => { const index = Math.max(0, career.lineup.indexOf(deployment.selectedPlayerId)); slotControls[index].value = p.id; selectedPlayer = p.id; attempt(() => { commitLineup(); renderActive(); active.querySelector('select')?.focus({ preventScroll: true }); }); }), locked ? 'Rencontre en cours.' : ''), `bench-${p.id}`);
+        const row = el('div', 'rb-bench-player'), pick = btn(p.name, () => { selectedPlayer = p.id; preparationInspectorOpen = true; renderActive(); }); pick.classList.add('rb-bench-name');
+        const identity = portraitIdentity(compilePlayer(p, career.inventory), clubKit(career.clubs[0]), pick, fatigue(p), b); draggablePlayer(identity, p.id, locked);
+        row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
+        row.addEventListener('drop', event => attempt(() => { const index = career.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); slotControls[index].value = p.id; selectedPlayer = p.id; preparationInspectorOpen = true; commitLineup(); renderActive(); }));
+        row.append(identity); bench.append(row);
       }
+      active.hidden = !preparationInspectorOpen; inspector.hidden = !preparationInspectorOpen; context.hidden = preparationInspectorOpen;
+      if (!career.lineup.includes(selectedPlayer)) inspector.append(active);
     }
     function renderActive() {
       const p = ownedPlayers(career).find((p) => p.id === selectedPlayer); if (!p) return;
       const role = keyed(select(ROLES, assignments[p.id].role), 'active-role'), instruction = keyed(select(INSTRUCTIONS, assignments[p.id].instruction), 'active-instruction'); role.disabled = instruction.disabled = locked;
-      const help = el('p', 'rb-muted', ROLE_DESCRIPTIONS[role.value]);
-      active.replaceChildren(el('p', 'rb-eyebrow', 'Réglages du joueur sélectionné'), el('h4', '', p.name), field('Rôle · sa mission', role), field('Consigne · son comportement', instruction), help);
-      active.append(btn('Équiper ce joueur', () => { selectedShopPlayer = p.id; go('Équipement'); }));
-      for (const control of [role, instruction]) control.addEventListener('change', () => attempt(() => { assignments[p.id] = { role: role.value, instruction: instruction.value }; commitLineup(); help.textContent = ROLE_DESCRIPTIONS[role.value]; }));
+      active.replaceChildren(el('p', 'rb-eyebrow', 'Réglages du joueur sélectionné'), el('h4', '', p.name), field('Rôle', role), field('Consigne', instruction));
+      role.title = ROLE_DESCRIPTIONS[role.value];
+      const compiled = compilePlayer(p, career.inventory), close = btn('Programme et classement', () => { preparationInspectorOpen = false; refreshSlots(); }); close.classList.add('rb-inspector-back');
+      const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
+      inspector.replaceChildren(close, portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', archetypeLabel(compiled))), progress, statList(compiled), equipmentSlots(p, career.inventory), playerShop({ ...own, balance: career.balance, inventory: career.inventory }, p, {
+        locked, selectedItem: preparationShopItem, onItem: id => { preparationShopItem = id; }, onBuy: (id, playerId, confirmed) => update(() => buyItem(career, id, playerId, confirmed))
+      }));
+      const slot = career.lineup.indexOf(p.id); if (slot >= 0) inspector.append(field('Remplacer ce titulaire', slotControls[slot]));
+      for (const control of [role, instruction]) control.addEventListener('change', () => attempt(() => { assignments[p.id] = { role: role.value, instruction: instruction.value }; commitLineup(); role.title = ROLE_DESCRIPTIONS[role.value]; }));
       refreshSlots();
     }
     function commitLineup() {
@@ -319,14 +343,14 @@ export function mountCareer(root, mountMatch) {
       const message = saved ? 'Composition, placement et consignes enregistrés.' : 'Modifications en mémoire ; sauvegarde à réessayer.'; if (formNotice.textContent !== message) formNotice.textContent = message;
     }
     strategy.addEventListener('change', () => attempt(() => { describeStrategy(); commitLineup(); }));
-    const crest = crestPicker(own.crestId, clubKit(own), locked); crest.choice.addEventListener('change', () => attempt(commitLineup)); teamPlans.append(crest.root);
+    const crest = crestPicker(own.crestId, clubKit(own), locked); crest.choice.addEventListener('change', () => attempt(commitLineup)); context.append(crest.root);
     const tactics = el('section', 'rb-broadcast-tactics'); tactics.append(deployment.root, teamPlans);
-    preparation.append(compositionTabs(preparation), teamControls, tactics, careerContext(career)); form.append(preparation, formNotice);
+    preparation.append(compositionTabs(preparation), teamControls, tactics, sidebar); form.append(preparation);
     const launch = el('div', 'rb-launch-bar'), copy = el('div');
     copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : !nextFixture(career) ? 'La saison est terminée' : `${money(payroll(career))} de salaires au coup d’envoi`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : !nextFixture(career) ? 'Commencez la saison suivante depuis Club.' : `Solde après prélèvement : ${money(career.balance - payroll(career))}. Les primes seront versées après le match.`));
-    launch.append(copy, blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : !nextFixture(career) ? 'La saison est terminée. Commencez la suivante depuis Club.' : '')); form.append(launch);
+    launch.append(copy, blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : !nextFixture(career) ? 'La saison est terminée. Commencez la suivante depuis Club.' : '')); tactics.append(formNotice, launch);
     form.addEventListener('submit', (event) => event.preventDefault()); manager.append(form); renderActive();
-    manager.append(disclosure('Comprendre la préparation', 'preparation-help', el('p', 'rb-muted', 'L’archétype définit les techniques. Le rôle donne une mission ; la consigne règle le comportement. Le plan collectif guide l’équipe, tandis que l’ouverture fixe le placement et le premier tour. Choisir un titulaire déjà présent échange leurs positions. Aucun remplacement pendant le match.')));
+    manager.append(disclosure('Comprendre la préparation', 'preparation-help', el('p', 'rb-muted', 'L’archétype définit les techniques. Le rôle donne une mission ; la consigne règle le comportement. Le plan collectif guide l’équipe, tandis que l’ouverture fixe le placement et le premier tour. Choisir un titulaire déjà présent échange leurs positions. Aucun remplacement pendant le match.'), strategyHelp, ...opening.root.querySelectorAll('p')));
   }
   function renderMarket(locked) {
     manager.append(pageHeading('Marché des recrues', `${ownedPlayers(career).length}/8 places occupées · Offres conservées jusqu’à la fin de la journée, puis six nouvelles recrues.`));
@@ -445,7 +469,7 @@ export function mountCareer(root, mountMatch) {
   }
   function openMatch(autoplay = false) {
     if (unsaved && !save()) return;
-    manager.hidden = true; matchArea.hidden = false; matchActions.hidden = false; view.load(career.current, autoplay, { kickoff: autoplay });
+    workspaceHeader({ navigation: null }); manager.hidden = true; matchArea.hidden = false; matchActions.hidden = false; view.load(career.current, autoplay, { kickoff: autoplay });
     matchArea.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   showMode('career');

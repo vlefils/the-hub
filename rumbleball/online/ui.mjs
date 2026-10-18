@@ -4,6 +4,7 @@ import { mountMatch } from '../ui.mjs';
 import { crestPicker, clubIdentity, matchBanner, equipmentArtwork } from '../broadcast-components.mjs';
 import { mountTeamEditor, preparationDraft, leagueContext } from './team-ui.mjs';
 import { mountReplay } from '../replay-ui.mjs';
+import { workspaceHeader } from '../workspace-header.mjs';
 
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
@@ -13,7 +14,7 @@ export async function mountOnline(root, config, connect) {
   const top = el('div', 'rb-online-top'), back = el('a', 'rb-button', 'Carrière solo et exhibition'); back.href = './index.html';
   const identity = el('span', 'rb-muted'); top.append(back, identity);
   const accountSlot = document.querySelector('[data-online-account]');
-  if (accountSlot) { const menu = el('details', 'rb-account-menu'), panel = el('div', 'rb-account-panel'); panel.append(back, identity); menu.append(el('summary', '', 'Menu'), panel); accountSlot.append(menu); top.hidden = true; }
+  if (accountSlot) { const menu = el('details', 'rb-account-menu'), panel = el('div', 'rb-account-panel'); panel.append(identity); menu.append(el('summary', '', 'Compte'), panel); accountSlot.append(back, menu); top.hidden = true; }
   const notice = el('p', 'rb-error rb-online-notice'); notice.hidden = true; notice.setAttribute('role', 'alert');
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
   const replayArea = el('section', 'rb-replay-area'); replayArea.hidden = true;
@@ -30,7 +31,7 @@ export async function mountOnline(root, config, connect) {
       if (entered) shopPlayerId = null;
       const discarded = justLocked && teamDraft?.dirty;
       if (entered || justLocked || ['configure', 'cancel'].includes(action)) {
-        const context = !entered && teamDraft ? { view: teamDraft.view, selected: teamDraft.selected, detailsOpen: teamDraft.detailsOpen } : null;
+        const context = !entered && teamDraft ? { view: teamDraft.view, selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, detailsOpen: teamDraft.detailsOpen, shopItem: teamDraft.shopItem } : null;
         teamDraft = context ? { ...preparationDraft(next.club), ...context } : null; formDirty = false;
       }
       league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
@@ -56,6 +57,7 @@ export async function mountOnline(root, config, connect) {
     return { stop() {} };
   }
   function renderAuth(recovery = false) {
+    workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
     content.replaceChildren(); content.className = 'rb-online-auth'; live.hidden = true; identity.textContent = '';
     const introduction = el('section', 'rb-auth-intro'), panel = el('section', 'rb-auth-panel');
@@ -83,6 +85,7 @@ export async function mountOnline(root, config, connect) {
     panel.append(actions, el('p', 'rb-muted', 'Votre compte Riftbound Tracker fonctionne aussi ici. Votre club et votre session Rumbleball restent séparés.'));
   }
   async function renderLobby() {
+    workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
     content.className = 'rb-online-lobby';
     league = null; teamDraft = null; revision = null; frameKey = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'), btn('Déconnexion', () => attempt(async () => { await client.auth.signOut(); user = null; renderAuth(); })));
@@ -112,9 +115,9 @@ export async function mountOnline(root, config, connect) {
     heading.append(copy, actions); content.append(heading);
     const summary = el('div', 'rb-online-finances'); summary.append(metric('Solde prévu', money(c.balance)), metric('Prochains salaires', money(c.players.reduce((n, p) => n + salary(p), 0))), metric('Revenu / victoire', '210 / +100', 'chromas par journée'));
     heading.replaceChildren(copy, summary, actions);
+    workspaceHeader({ context: heading });
     const lockMessage = league.locked ? 'Équipes verrouillées pour la soirée.' : league.nextLockAt ? `Modifiable jusqu’au ${date(league.nextLockAt)} · heure de Paris.` : 'Préparation libre jusqu’au lancement de la saison.';
     summary.setAttribute('aria-label', 'Finances en chromas');
-    if (league.hasDraft) content.append(el('p', 'rb-muted', 'Préparation enregistrée. L’annulation rétablit la composition, les recrutements, les achats et le blason précédents, avant le verrouillage.'), action('Annuler la préparation', 'cancel', {}));
     if (league.status === 'lobby') {
       content.append(el('p', 'rb-muted', `${league.members.length}/${league.capacity} participants. Partagez ce code avec vos amis :`), el('p', 'rb-online-code', league.inviteCode), btn('Copier le code', () => attempt(async () => {
         if (!globalThis.navigator?.clipboard?.writeText) { message('Sélectionnez le code affiché pour le copier.', false); return; }
@@ -128,9 +131,10 @@ export async function mountOnline(root, config, connect) {
     else content.append(el('p', league.locked ? 'rb-online-lock' : 'rb-muted', lockMessage));
     const nav = el('nav', 'rb-online-nav'); nav.setAttribute('aria-label', 'Gestion de la ligue');
     for (const label of ['Équipe', 'Recrutement', 'Équipement', 'Ligue', 'Direct', 'Replays']) {
-      const b = btn(label, () => { tab = label; frameKey = null; renderLeague(); }); b.setAttribute('aria-current', tab === label ? 'page' : 'false'); nav.append(b);
+      const b = btn(label, () => { replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; frameKey = null; renderLeague(); }); b.setAttribute('aria-current', tab === label ? 'page' : 'false'); nav.append(b);
     }
     content.append(nav);
+    workspaceHeader({ navigation: nav });
     const mobile = select(Object.fromEntries(['Équipe', 'Recrutement', 'Équipement', 'Ligue', 'Direct', 'Replays'].map(label => [label, label])), tab);
     mobile.addEventListener('change', () => { tab = mobile.value; frameKey = null; renderLeague(); });
     const mobileField = field('Menu de la ligue', mobile); mobileField.classList.add('rb-mobile-nav'); content.append(mobileField);
@@ -145,6 +149,11 @@ export async function mountOnline(root, config, connect) {
     }
     if (tab === 'Direct') renderLive(body);
     if (tab === 'Replays') renderReplays(body);
+    if (league.hasDraft) {
+      const cancel = el('div', 'rb-preparation-cancel');
+      cancel.append(action('Annuler la préparation', 'cancel', {}), el('p', 'rb-muted', 'Rétablit la composition, les recrutements, les achats et le blason précédents, avant le verrouillage.'));
+      (body.querySelector('.rb-broadcast-save') ?? body).append(cancel);
+    }
     // Read-only applies to forms as well as mutation buttons.
     if (league.locked) for (const tag of ['input', 'select', 'button']) for (const control of body.querySelectorAll(tag)) if (control.getAttribute('data-readonly-control') !== 'true') control.disabled = true;
   }
@@ -178,7 +187,7 @@ export async function mountOnline(root, config, connect) {
     teamDraft ??= preparationDraft(c);
     const editor = mountTeamEditor({ club: c, league, draft: teamDraft, locked: league.locked, hasDraft: league.hasDraft,
       onDirty(dirty) { formDirty = dirty; }, onSave: payload => attempt(() => send('configure', payload)),
-      onEquipment(playerId) { shopPlayerId = playerId; tab = 'Équipement'; renderLeague(); },
+      onBuy: (itemId, playerId, replaceConfirmed) => attempt(() => send('buy', { itemId, playerId, replaceConfirmed })),
       onSell: playerId => attempt(() => send('sell', { playerId })) });
     body.append(editor.root);
   }

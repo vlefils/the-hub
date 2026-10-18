@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480">
+  <defs>
+    <linearGradient id="concrete" x2=".8" y2="1"><stop stop-color="#435563"/><stop offset=".48" stop-color="#283d4b"/><stop offset="1" stop-color="#152936"/></linearGradient>
+    <linearGradient id="steel" x2=".2" y2="1"><stop stop-color="#8a99a0"/><stop offset=".22" stop-color="#344a58"/><stop offset=".5" stop-color="#748590"/><stop offset="1" stop-color="#1b303e"/></linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".54" numOctaves="3" seed="13"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".15"/></feComponentTransfer><feBlend in="SourceGraphic" mode="soft-light"/></filter>
+    <pattern id="slabs" width="120" height="120" patternUnits="userSpaceOnUse"><path d="M0 0H120V120H0Z" fill="none" stroke="#04121c" opacity=".16"/><path d="m20 70 9-5 7 4 13-9m42 33 5-9 4 2 6-14M70 15l11 7 5-2 7 12" fill="none" stroke="#a4b5bb" stroke-width=".5" opacity=".14"/></pattern>
+  </defs>
+  <rect width="720" height="480" fill="url(#concrete)"/>
+  <rect x="5" y="5" width="710" height="470" fill="url(#concrete)" filter="url(#grain)"/>
+  <rect width="720" height="480" fill="url(#slabs)"/>
+  <g fill="none" stroke-linejoin="bevel">
+    <path d="M17 4H703L716 17V463L703 476H17L4 463V17Z" stroke="#07151e" stroke-width="10"/>
+    <path d="M17 4H703L716 17V463L703 476H17L4 463V17Z" stroke="url(#steel)" stroke-width="6"/>
+    <path d="M20 10H700L710 20V460L700 470H20L10 460V20Z" stroke="#a4b3b7" stroke-width="1" opacity=".62"/>
+    <path d="M37 5h72m36 0h25m380 0h25m36 0h72M37 475h72m36 0h25m380 0h25m36 0h72M5 145v35m0 120v35m710-190v35m0 120v35" stroke="#f16a30" stroke-width="3"/>
+    <path d="M10 188h8l9 12v80l-9 12h-8m700-104h-8l-9 12v80l9 12h8" stroke="#ee703a" stroke-width="2"/>
+  </g>
+  <g fill="#a2afb6" stroke="#0c1c28" stroke-width="1"><circle cx="17" cy="17" r="3"/><circle cx="703" cy="17" r="3"/><circle cx="17" cy="463" r="3"/><circle cx="703" cy="463" r="3"/></g>
+  <path d="M22 21h37M21 22v37m678-38h-37m37 1v37M22 459h37m-38-1v-37m678 38h-37m37-1v-37" fill="none" stroke="#d9e0dd" stroke-width="2" opacity=".52"/>
+</svg>

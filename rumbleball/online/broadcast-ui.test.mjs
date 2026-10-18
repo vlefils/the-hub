@@ -4,6 +4,7 @@ import { environment, descendants, button } from '../test-support/dom.mjs';
 import { mountOnline } from './ui.mjs';
 import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague } from './league.mjs';
 import { createLeagueService } from './server.mjs';
+import { PLAYER_DRAG_TYPE } from '../deployment-ui.mjs';
 
 async function online(t, lobby = false) {
   const e = environment(); globalThis.location = new URL('http://127.0.0.1:8767/rumbleball/multi.html');
@@ -73,8 +74,9 @@ test('composition : tactiques directement sous le joueur choisi et accès à son
   const pick = descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${player.name}`); await pick.click();
   const tactics = e.root.querySelector('.rb-player-tactics'); assert.equal(tactics.parentNode.dataset.playerId, player.id);
   const role = tactics.querySelector('select'); role.value = 'defender'; await role.emit('change');
-  await button(e.root, 'Équiper ce joueur').click();
-  assert.equal(e.root.querySelector('.rb-online-body').querySelector('select').value, player.id);
+  const inspector = e.root.querySelector('.rb-player-inspector');
+  assert.equal(inspector.hidden, false);
+  assert.match(inspector.querySelector('.rb-player-shop').querySelector('select').getAttribute('aria-label'), new RegExp(player.name));
   await button(e.root, 'Équipe').click(); assert.equal(e.root.querySelector('.rb-player-tactics').querySelector('select').value, 'defender');
   assert.equal(e.root.querySelector('.rb-player-tactics').parentNode.dataset.playerId, player.id);
   e.mounted.stop();
@@ -90,4 +92,32 @@ test('replays UI : consultation en période verrouillée, parcours et retour san
   await button(e.root, 'Retour aux replays').click();
   assert.equal(e.root.querySelector('.rb-replay-area').hidden, true); assert.equal(e.root.querySelector('.rb-online-content').hidden, false);
   assert.deepEqual(e.state(), before); e.mounted.stop();
+});
+
+test('terrain : un joueur du banc remplace un titulaire par dépôt, sauvegarde puis verrouillage respectés', async t => {
+  const e = await online(t), club = e.state().members[0].club, reserve = club.players.find(p => !club.lineup.includes(p.id));
+  const index = 1, position = club.deployment[index], previous = club.lineup[index];
+  const target = () => descendants(e.root).find(n => n.dataset.cell === `${position.x},${position.y}`);
+  const dataTransfer = { types: [PLAYER_DRAG_TYPE], getData: () => reserve.id };
+  await target().emit('drop', { dataTransfer });
+  assert.equal(button(e.root, 'Enregistrer la préparation').disabled, false);
+  await e.root.querySelector('form').emit('submit');
+  const draft = e.state().members[0].draft; assert.equal(draft.lineup[index], reserve.id); assert.equal(draft.lineup.includes(previous), false);
+  assert.equal(new Set(draft.lineup).size, 5); assert.deepEqual(draft.deployment[index], position);
+  await e.lock(); const before = structuredClone(e.state()); await target().emit('drop', { dataTransfer }); assert.deepEqual(e.state(), before); e.mounted.stop();
+});
+
+test('fiche en préparation : achat du matériel pour un remplaçant sans quitter le terrain', async t => {
+  const e = await online(t), club = e.state().members[0].club, reserve = club.players.find(p => !club.lineup.includes(p.id));
+  const position = club.deployment[2];
+  await descendants(e.root).find(n => n.dataset.cell === `${position.x},${position.y}`).click();
+  await button(e.root, reserve.name).click();
+  const inspector = e.root.querySelector('.rb-player-inspector'); assert.equal(inspector.hidden, false);
+  await button(inspector, 'Acheter et équiper · 100 chromas').click();
+  const next = e.state().members[0].draft; assert.equal(next.inventory[0].playerId, reserve.id); assert.equal(next.balance, club.balance - 100);
+  assert.deepEqual(next.lineup, club.lineup); assert.equal(e.root.querySelector('.rb-broadcast-preparation') !== null, true);
+  assert.equal(button(e.root.querySelector('.rb-player-inspector'), 'Acheter et équiper · 100 chromas').disabled, true);
+  await button(e.root, `Faire entrer ${reserve.name}`).click(); await e.root.querySelector('form').emit('submit');
+  assert.equal(e.state().members[0].draft.lineup[2], reserve.id);
+  assert.deepEqual(e.state().members[0].draft.deployment[2], position); e.mounted.stop();
 });

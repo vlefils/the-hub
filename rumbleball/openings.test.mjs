@@ -124,7 +124,7 @@ test('interface : choisir une ouverture applique le placement, puis les ajusteme
   assert.equal(e.saved().clubs[0].opening, 'fallback'); assert.deepEqual(e.saved().clubs[0].deployment, openingDeployment('fallback'));
   const cell = descendants(classNode(e.root, 'rb-deployment')).find((n) => n.dataset.cell === '0,7'); await cell.click();
   const custom = e.saved().clubs[0].deployment; assert.deepEqual(custom[0], { x: 0, y: 7 });
-  const strategy = classNode(e.root, 'rb-lineup-form').querySelector('select'); strategy.value = 'pressing'; await strategy.emit('change');
+  const strategy = descendants(classNode(e.root, 'rb-lineup-form')).find(n => n.dataset.focusKey === 'strategy'); strategy.value = 'pressing'; await strategy.emit('change');
   assert.deepEqual(e.saved().clubs[0].deployment, custom); assert.equal(e.saved().clubs[0].opening, 'fallback');
   await button(e.root, 'Lancer la rencontre').click();
   await button(e.root, 'Retour au club · mettre en pause').click(); assert.equal(classNode(e.root, 'rb-opening-select').disabled, true);

@@ -462,6 +462,7 @@ export function mountMatch(root, callbacks = {}) {
     }
     for (const [index, id] of ['home', 'away'].entries()) legend.children[index].lastChild.textContent = teamLabel(id);
     setup.hidden = started;
+    stage.hidden = !started;
     toolbar.hidden = !started || state.finished;
     if (context === 'broadcast') toolbar.hidden = true;
     next.disabled = state.finished; finish.disabled = state.finished; pause.disabled = state.finished;

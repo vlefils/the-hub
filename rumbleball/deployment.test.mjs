@@ -144,7 +144,8 @@ test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le t
   await button(e.root, 'Préparer le match').click();
   const form = classNode(e.root, 'rb-lineup-form'), editor = classNode(form, 'rb-deployment');
   await cell(editor, 0, 0).click(); assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 });
-  const slots = classNode(form, 'rb-lineup-slots').children.map(row => row.children[0].querySelector('select')); slots[0].value = slots[1].value; await slots[0].emit('change');
+  await classNode(form, 'rb-lineup-slots').children[0].querySelector('button').click();
+  const replacement = descendants(classNode(form, 'rb-player-inspector')).find(n => n.dataset.focusKey === 'lineup-0'); replacement.value = e.saved().lineup[1]; await replacement.emit('change');
   assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 }); assert.match(editor.querySelector('select').children[0].textContent, /Brique/);
   await button(e.root, 'Lancer la rencontre').click();
   assert.deepEqual(e.saved().current.state.players[0].position, { x: 0, y: 0 }); assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'hidden');
@@ -157,10 +158,13 @@ test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le t
 
 test('exhibition : déploiement libre dans le vestiaire ; ballon masqué avant le coup d’envoi', async () => {
   const e = environment(), { mountMatch } = await import('./ui.mjs'), view = mountMatch(e.root);
+  assert.equal(classNode(e.root, 'rb-match-stage').hidden, true);
+  assert.equal(classNode(e.root, 'rb-setup').querySelectorAll('.rb-deployment-portrait').length, 5);
   await cell(classNode(e.root, 'rb-setup'), 0, 7).click();
   const pawn = descendants(e.root).find((n) => n.getAttribute('data-player') === 'home-0'); assert.equal(pawn.getAttribute('transform'), 'translate(30 450)');
   assert.equal(classNode(classNode(e.root, 'rb-ball-layer'), 'rb-ball').parentNode.getAttribute('transform'), 'translate(360 240)');
   assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
   await classNode(e.root, 'rb-setup').emit('submit'); view.pause();
   assert.equal(pawn.getAttribute('transform'), 'translate(30 450)'); assert.equal(classNode(e.root, 'rb-setup').hidden, true);
+  assert.equal(classNode(e.root, 'rb-match-stage').hidden, false); assert.ok(pawn.querySelector('.rb-person-body'));
 });

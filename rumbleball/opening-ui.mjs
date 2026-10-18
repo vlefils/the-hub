@@ -1,9 +1,9 @@
 import { DEFAULT_OPENING, OPENINGS, validOpening } from './openings.mjs';
 
 let instance = 0;
-export function openingPicker({ value = DEFAULT_OPENING, disabled = false, onChange = () => {} } = {}) {
+export function openingPicker({ value = DEFAULT_OPENING, disabled = false, label: labelText = 'Ouverture · placement et premier tour', onChange = () => {} } = {}) {
   const root = document.createElement('div'); root.className = 'rb-opening-picker';
-  const label = document.createElement('label'); label.className = 'rb-field'; label.textContent = 'Ouverture · placement et premier tour';
+  const label = document.createElement('label'); label.className = 'rb-field'; label.textContent = labelText;
   const select = document.createElement('select'); select.className = 'rb-opening-select'; select.name = 'rb-opening'; select.disabled = disabled;
   for (const [id, spec] of Object.entries(OPENINGS)) { const option = document.createElement('option'); option.value = id; option.textContent = spec.name; select.append(option); }
   select.value = validOpening(value) ? value : DEFAULT_OPENING;
