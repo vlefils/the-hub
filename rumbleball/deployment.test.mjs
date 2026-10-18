@@ -93,7 +93,7 @@ test('échange et dernier engagement : aucune superposition, retour aux position
   const initial = defaultDeployment(), swapped = moveDeployment(initial, 0, initial[1]);
   assert.deepEqual(swapped[1], initial[0]); assert.deepEqual(swapped[0], initial[1]); assert.ok(validDeployment(swapped)); assert.notDeepEqual(initial, swapped);
   assert.throws(() => moveDeployment(initial, 0, { x: 6, y: 3 }));
-  const state = createMatch({ deployments: { home: swapped } }), a = state.players[0]; state.players.forEach((p) => { p.hp = p.id === a.id ? 9 : 0; });
+  const state = createMatch({ rulesVersion: 5, deployments: { home: swapped } }), a = state.players[0]; state.players.forEach((p) => { p.hp = p.id === a.id ? 9 : 0; });
   state.round = 12; state.phase = 'overtime'; state.initiative = [a.id]; a.speed = 0; a.movement = 0; a.position = { x: 0, y: 0 };
   const next = stepMatch(state).state; assert.equal(next.round, 13); assert.ok(isCenterBall(next)); assert.equal(next.players[0].hp, 9);
   assert.deepEqual(next.players.map((p) => p.position), state.players.map((p) => p.startPosition));
@@ -144,7 +144,7 @@ test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le t
   await button(e.root, 'Préparer le match').click();
   const form = classNode(e.root, 'rb-lineup-form'), editor = classNode(form, 'rb-deployment');
   await cell(editor, 0, 0).click(); assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 });
-  const slots = descendants(classNode(form, 'rb-lineup-slots')).filter((n) => n.tagName === 'select'); slots[0].value = slots[1].value; await slots[0].emit('change');
+  const slots = classNode(form, 'rb-lineup-slots').children.map(row => row.children[0].querySelector('select')); slots[0].value = slots[1].value; await slots[0].emit('change');
   assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 }); assert.match(editor.querySelector('select').children[0].textContent, /Brique/);
   await button(e.root, 'Lancer la rencontre').click();
   assert.deepEqual(e.saved().current.state.players[0].position, { x: 0, y: 0 }); assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'hidden');

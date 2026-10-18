@@ -306,6 +306,7 @@ test('aide expirée au prochain tour de l’aidant ; esquive non cumulée', () =
 });
 test('dernier engagement : conserve les PV et permet une victoire au round 13', () => {
   const { state, a } = fixture(['home-0']);
+  state.version = 5;
   state.round = 12; state.phase = 'overtime'; state.initiative = [a.id];
   // No movement on the last overtime turn; the restart must preserve injuries and reposition.
   a.hp = 9; a.speed = 0; a.movement = 0; a.position = { x: 0, y: 0 };
@@ -403,6 +404,7 @@ test('désengagement et déplacement forcé ne provoquent pas d’opportunité',
 });
 test('une nouvelle action ne recharge pas la réaction ; début de round oui', () => {
   const { state, a, events } = fixture(['home-0']); a.reaction = false;
+  state.version = 5;
   beginTurn(state, a, events); assert.equal(a.reaction, false);
   state.initiative = [a.id]; state.turnIndex = 0;
   const next = stepMatch(state).state;
@@ -413,20 +415,22 @@ test('action illégale : aucun effet ni consommation de hasard', () => {
   assert.equal(resolveAction(state, a, { type: 'attack', targetId: a.id }, events), false);
   assert.deepEqual(state, before); assert.equal(events.length, 0);
 });
-test('victoire à la fin du round 10, jamais aux KO seuls', () => {
+test('ancienne v5 : victoire à la fin du round 10, jamais aux KO seuls', () => {
   const { state, a, events } = fixture(['home-0']); giveBall(state, a, events);
+  state.version = 5;
   state.round = 10; state.initiative = [a.id];
   const result = finishFrom(state).state;
   assert.equal(result.result.winnerId, 'home'); assert.equal(result.round, 10);
 });
 test('prolongation : possession contrôlée en fin de round 11', () => {
   const { state, a, events } = fixture(['home-0']); giveBall(state, a, events);
+  state.version = 5;
   state.round = 11; state.phase = 'overtime'; state.initiative = [a.id];
   const result = finishFrom(state).state;
   assert.equal(result.round, 11); assert.equal(result.result.winnerId, 'home');
 });
 test('tous KO : prolongations, dernier engagement et nul borné au round 13', () => {
-  const { state } = fixture([]); const result = finishFrom(state);
+  const { state } = fixture([]); state.version = 5; const result = finishFrom(state);
   assert.equal(result.state.round, 13); assert.equal(result.state.result.winnerId, null);
   assert.ok(result.events.some((e) => e.type === 'overtime')); assert.ok(result.events.some((e) => e.type === 'restart'));
 });

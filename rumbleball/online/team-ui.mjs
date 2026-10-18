@@ -31,7 +31,7 @@ export function leagueContext(league) {
   }), { highlight: league.table.findIndex(r => r.id === league.club.id), caption: 'Classement de la ligue' }));
   root.append(schedule, ranking); return root;
 }
-export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty }) {
+export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onEquipment }) {
   const ids = new Set(club.players.map(p => p.id));
   draft.lineup = draft.lineup.filter(id => ids.has(id));
   for (const p of club.players) {
@@ -40,6 +40,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   let selected = draft.lineup.includes(draft.selected) ? draft.selected : draft.lineup[0];
   const root = el('form', 'rb-broadcast-preparation'), squad = el('section', 'rb-broadcast-squad'), slots = el('div'), detail = el('details', 'rb-squad-detail'), bench = el('section', 'rb-broadcast-bench'), tactics = el('section', 'rb-broadcast-tactics');
+  const playerTactics = el('div', 'rb-player-tactics');
   detail.open = Boolean(draft.detailsOpen); detail.addEventListener('toggle', () => { draft.detailsOpen = detail.open; });
   const strategy = select(STRATEGIES, draft.strategy), opening = select(Object.fromEntries(Object.entries(OPENINGS).map(([id, v]) => [id, v.name])), draft.opening), color = el('input', 'rb-kit-color'); color.type = 'color'; color.value = draft.color;
   const crest = crestPicker(draft.crestId, draft.color, locked);
@@ -49,7 +50,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   const selectors = el('div', 'rb-broadcast-selectors'); selectors.append(field('Plan collectif', strategy), field('Ouverture', opening), field('Couleur des maillots', color), crest.root);
   const saveBar = el('div', 'rb-broadcast-save'), save = el('button', 'rb-button rb-button-primary', 'Enregistrer la préparation'), status = el('p', 'rb-form-status'); save.type = 'submit'; status.setAttribute('role', 'status');
   saveBar.append(save, status); tactics.append(editor.root, selectors);
-  squad.append(el('h4', '', 'Les cinq titulaires'), slots, detail, bench);
+  squad.append(el('h4', '', 'Les cinq titulaires'), slots, bench);
   const mobile = compositionTabs(root, value => { draft.view = value; }, draft.view);
   root.append(mobile, squad, tactics, saveBar, leagueContext(league));
   const baseline = JSON.stringify(preparationDraft(club));
@@ -63,6 +64,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   function highlight() {
     for (const row of slots.children) row.classList.toggle('is-selected', row.dataset.playerId === selected);
+    [...slots.children].find(row => row.dataset.playerId === selected)?.append(playerTactics, detail);
     editor.update({ selectedPlayerId: selected });
   }
   function drawDetail() {
@@ -76,7 +78,10 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     }
     role.disabled = instruction.disabled = locked;
     const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
-    detail.replaceChildren(el('summary', '', `Fiche de ${p.name}`), label, field('Remplacer ce titulaire', replacement), order, xpProgress(p), fatigue(p), statList(compiled), equipmentSlots(p, club.inventory), field('Rôle', role), field('Consigne', instruction), el('small', 'rb-muted', `${money(salary(p))} / journée`));
+    playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
+    if (onEquipment) { const gear = btn('Équiper ce joueur', () => onEquipment(p.id)); gear.setAttribute('data-readonly-control', 'true'); playerTactics.append(gear); }
+    detail.replaceChildren(el('summary', '', `Fiche de ${p.name}`), label, field('Remplacer ce titulaire', replacement), order, xpProgress(p), fatigue(p), statList(compiled), equipmentSlots(p, club.inventory), el('small', 'rb-muted', `${money(salary(p))} / journée`));
+    highlight();
     if (club.players.length > 5) { const sell = btn(`Céder ${p.name} · ${money(recruitmentPrice(p) / 2)}`, () => onSell(p.id)); sell.disabled = locked; detail.append(sell); }
     for (const control of [role, instruction]) control.addEventListener('change', () => { draft.assignments[p.id] = { role: role.value, instruction: instruction.value }; changed(); });
   }
@@ -90,7 +95,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     slots.replaceChildren(); bench.replaceChildren(el('h4', '', 'Remplaçants'));
     for (const [i, id] of draft.lineup.entries()) {
       const p = club.players.find(p => p.id === id), compiled = compilePlayer(p, club.inventory), row = el('div', 'rb-squad-slot'); row.dataset.playerId = id;
-      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = id; drawDetail(); detail.open = true; draft.detailsOpen = true; highlight(); detail.scrollIntoView({ block: 'nearest' }); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
+      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = id; drawDetail(); detail.open = true; draft.detailsOpen = true; highlight(); playerTactics.scrollIntoView({ block: 'nearest' }); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
       row.append(athletePortrait(compiled, draft.color), pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p)); slots.append(row);
     }
     const reserves = club.players.filter(p => !draft.lineup.includes(p.id));

@@ -175,7 +175,7 @@ export function mountMatch(root, callbacks = {}) {
   const rules = element('details', 'rb-rules'); rules.append(element('summary', '', 'Règles et conventions de ce prototype'));
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
-    `10 rounds de ${ROUND_DURATION / 1000} secondes, soit deux minutes à ×1. La possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul.`,
+    `10 rounds de ${ROUND_DURATION / 1000} secondes, soit deux minutes à ×1. Une équipe dont les cinq joueurs sont KO perd immédiatement. Sinon, la possession à la fin du dixième round donne la victoire. Balle libre : deux rounds de prolongation, puis un dernier engagement d’un round. Sans possession, match nul. Les rencontres déjà commencées sous les anciennes règles les conservent jusqu’à leur fin.`,
     'Engagement : après le décompte, les joueurs des quatre cases F4, G4, F5 et G5 peuvent intercepter le ballon en réaction avant les déplacements. Lutte ou Acrobaties : DD 10 sans adversaire, meilleur jet opposé si les deux équipes contestent ; égalité départagée par l’initiative. Les jets se font par ordre d’initiative. Chaque participant dépense sa réaction, conserve son action et son mouvement et peut passer, fuir ou frapper pendant son tour.',
     `Lecture simultanée : un round dure ${ROUND_DURATION / 1000} secondes à ×1. Les actions indépendantes se chevauchent ; les contacts et échanges de balle gardent leur ordre. La lecture « Détail des tours » permet d’examiner chaque tour séparément.`,
     'Par tour : mouvement, une action et une interaction. Une réaction par round, renouvelée au début du round. Recevoir une passe est une action libre. Intercepter, passer en réaction et frapper en opportunité partagent la même réaction.',
@@ -422,8 +422,9 @@ export function mountMatch(root, callbacks = {}) {
     const winner = state.teams.find((t) => t.id === state.result.winnerId);
     const holder = state.players.find((p) => p.id === state.result.carrierId);
     resultPanel.dataset.winner = winner?.id ?? 'draw';
-    resultPanel.append(element('p', 'rb-eyebrow', 'À la sirène'), element('h3', '', winner ? `${winner.name} remportent le match` : 'Match nul'),
-      element('p', '', holder ? `${holder.name} tient la balle à la fin du round ${state.result.round}.` : 'La balle reste libre après le dernier engagement.'));
+    const elimination = state.result.reason === 'elimination', doubleKO = state.result.reason === 'double-knockout';
+    resultPanel.append(element('p', 'rb-eyebrow', elimination || doubleKO ? `Fin au round ${state.result.round}` : 'À la sirène'), element('h3', '', winner ? `${winner.name} remportent le match` : 'Match nul'),
+      element('p', '', elimination ? 'Tous les joueurs adverses sont KO. Victoire immédiate.' : doubleKO ? 'Les deux équipes sont entièrement KO.' : holder ? `${holder.name} tient la balle à la fin du round ${state.result.round}.` : 'La balle reste libre après le dernier engagement.'));
     const table = element('table', 'rb-stats-table');
     const caption = element('caption', 'rb-sr-only', 'Bilan des deux équipes'); table.append(caption);
     const thead = element('thead'), tr = element('tr'); for (const name of ['Bilan', ...state.teams.map((t) => t.name)]) { const th = element('th', '', name); th.scope = 'col'; tr.append(th); } thead.append(tr); table.append(thead);
@@ -541,14 +542,15 @@ export function mountMatch(root, callbacks = {}) {
   return {
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
-    broadcast(frame, elapsed = 0) {
+    broadcast(frame, elapsed = 0, { speed = 1, animate = true } = {}) {
       setRunning(false); resetKickoff(); context = 'broadcast'; started = true; ballReady = Boolean(frame.turns.length);
       state = structuredClone(frame.turns.at(-1)?.after ?? frame.initial);
       selectedId = state.players.some((p) => p.id === selectedId) ? selectedId : null;
       journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
+      for (const events of frame.previousEvents ?? []) appendEvents(events);
       for (const turn of frame.turns) appendEvents(turn.events);
       render(frame.turns.at(-1)?.events ?? []);
-      if (frame.turns.length) courtPlayback.playRound(frame.turns, { speed: 1, elapsed });
+      if (frame.turns.length && animate) courtPlayback.playRound(frame.turns, { speed, elapsed });
       toolbar.hidden = true;
     },
     load(current, autoplay = false, { kickoff: freshKickoff = false } = {}) {

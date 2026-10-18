@@ -102,6 +102,8 @@ test('tour complet : ramassage puis déplacement et esquive utilisent les vrais 
 
 test('après une frappe : ramasser la balle libérée utilise seulement l’interaction restante', () => {
   const { state, actor, enemy } = fixture({ position: [5, 3], opponent: [6, 3] });
+  // Another opponent remains in play: this knockout must not end the match.
+  state.players[6].hp = state.players[6].maxHp; state.players[6].position = { x: 11, y: 7 };
   state.ball = { carrierId: enemy.id, position: { ...enemy.position } }; enemy.hp = 1;
   actor.attack.bonus = 100; enemy.armor = -100; actor.speed = 0;
   // Choose a non-fumble before running the turn; the action itself still rolls.

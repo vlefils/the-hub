@@ -8,6 +8,8 @@ L’activation du 18 octobre 2026 a été vérifiée avec une vraie soirée de q
 
 Seules les URLs de retour de Rumbleball ont été ajoutées aux réglages Auth ; les réglages et données de Riftbound ont été conservés. Les clés privées restent dans le dossier local ignoré `.local/` et dans les secrets du serveur. Le site utilise uniquement une clé publique.
 
+Le batch replays/KO du 18 octobre est validé localement. Le propriétaire a confirmé l’application de la migration `20261018210000_rumbleball_replays.sql` et le déploiement réussi des deux fonctions. La publication des fichiers du site complète cette mise à jour ; les contrôles locaux ne remplacent pas une nouvelle soirée de validation hébergée.
+
 ## Règles retenues
 
 - Ligue privée de 2, 4, 6 ou 8 clubs, six par défaut ; un utilisateur possède un club par ligue. Le créateur partage un code et lance la saison lorsque tous les clubs sont présents.
@@ -16,6 +18,7 @@ Seules les URLs de retour de Rumbleball ont été ajoutées aux réglages Auth ;
 - **20 h Europe/Paris**, en tenant compte des changements d’heure. Toutes les équipes sont figées à cette heure, y compris celles qui joueront plus tard.
 - Matchs successifs dans chaque ligue. Le match suivant commence deux minutes après la fin du précédent. Les autres ligues peuvent avoir leur propre soirée en parallèle.
 - Décompte réservé de 3,5 secondes, puis dix rounds de douze secondes. Les prolongations du moteur prolongent aussi le créneau de diffusion avant la pause.
+- Les nouvelles rencontres utilisent les règles v6 : cinq joueurs KO dans une équipe entraînent sa défaite immédiate. Les rencontres déjà calculées ou commencées sous les règles v2 à v5 les conservent jusqu’à leur fin.
 - La gestion rouvre après la dernière rencontre de la soirée. Sans nouvelle préparation, le club reconduit automatiquement son équipe.
 - **210 chromas par journée**, versés au verrouillage, puis prélèvement des salaires de tout l’effectif. **+100 en cas de victoire**, au terme de sa diffusion ; aucune prime supplémentaire pour nul/défaite ni prime de classement dans ce mode.
 - 210 couvre six salaires au niveau 5. Les septième et huitième joueurs augmentent les dépenses. Les achats ne créent pas de découvert ; seuls les salaires peuvent le faire. Le revenu et les ventes réduisent une dette existante.
@@ -40,11 +43,19 @@ Le navigateur demande une projection de la ligue toutes les quatre secondes pend
 
 L’animation d’un round implique d’en transmettre les événements au début de ses douze secondes : un client inspectant ses requêtes peut voir ces actions avant leur présentation à l’écran. Le verrouillage empêche d’en tirer parti pour modifier l’équipe. Ce n’est pas un protocole de jeu avec actions secrètes pendant le match.
 
+## Replays
+
+L’onglet **Replays** affiche les rencontres terminées de la ligue, par soirée décroissante. Le lecteur propose lecture, pause à la fin du round courant, vitesses ×1/×2/×4/×8, retour au début et parcours des fins de round. Il lit les images et le journal archivés, sans relancer le moteur, les salaires ou les récompenses. Il reste accessible pendant le verrouillage de la soirée suivante. Sur mobile, Équipement et Replays sont directement visibles dans la navigation ; les réglages individuels se trouvent sous le joueur sélectionné.
+
+La table privée `rb_replays` archive les images au moment où le résultat est réglé, dans la même transaction PostgreSQL. Les archives résistent au remplacement de la soirée courante et ne sont pas réécrites par un nouvel appel du worker. L’action API `replay` vérifie l’appartenance à la ligue et la fin de la rencontre avant de lire l’archive ; elle filtre les graines et l’état du hasard comme la diffusion en direct. Aucun accès navigateur direct n’est accordé à cette table.
+
+La migration récupère aussi les matchs terminés de la dernière soirée encore stockée. Les soirées plus anciennes dont les images ont déjà été remplacées restent dans l’historique, avec une indication d’indisponibilité. Les replays deviennent durables à partir de l’installation de la migration.
+
 Les tables `rb_leagues` et `rb_memberships` sont isolées par leur préfixe. Leur RLS est active et les rôles navigateur n’ont aucun accès direct. Les états internes contiennent les futurs résultats ; seule la projection filtrée de l’API est consultable. La clé publique ne permet pas de lire ou d’écrire ces états. L’unique fonction d’écriture atomique est réservée au rôle serveur.
 
 ## Installation ou réinstallation du projet Supabase
 
-1. Ouvrir le bon projet, puis appliquer **uniquement** `../../supabase/migrations/20261018090000_rumbleball.sql` dans l’éditeur SQL. Le projet partagé possède déjà son historique Riftbound : ne pas lancer un reset ou une synchronisation de migrations globale depuis ce dépôt.
+1. Ouvrir le bon projet, puis appliquer dans cet ordre `../../supabase/migrations/20261018090000_rumbleball.sql` et `../../supabase/migrations/20261018210000_rumbleball_replays.sql` dans l’éditeur SQL. Si la base Rumbleball est déjà installée, appliquer seulement la seconde migration. Le projet partagé possède déjà son historique Riftbound : ne pas lancer un reset ou une synchronisation de migrations globale depuis ce dépôt.
 2. Avec la CLI Supabase connectée à ce projet, déployer depuis la racine du dépôt :
 
    ```sh
@@ -53,6 +64,7 @@ Les tables `rb_leagues` et `rb_memberships` sont isolées par leur préfixe. Leu
    ```
 
    La vérification de session de l’API est explicite dans le code ; le worker vérifie son secret. La désactivation de la vérification JWT du relais ne rend pas ces routes publiques.
+   Sous Windows, si `supabase` n’est pas dans le PATH, remplacer ce mot par `npx.cmd --yes supabase` dans les commandes ci-dessus. La CLI peut demander une connexion préalable avec `npx.cmd --yes supabase login`.
 3. Générer un secret aléatoire long pour `RB_WORKER_SECRET` et le configurer comme secret de fonction. `RB_ALLOWED_ORIGINS` peut préciser les origines du site et du développement local, séparées par des virgules. Les variables `SUPABASE_*` du serveur sont fournies par Supabase ; ne pas publier le fichier de clés local.
 4. Dans Supabase Vault, créer `rb_project_url` avec l’URL du projet et `rb_worker_secret` avec **le même secret** que celui du worker. Puis appliquer `../../supabase/rumbleball-cron.sql` : il appelle le worker pour chaque ligue due, toutes les dix secondes, avec un maximum de dix ligues par passage.
 5. Ajouter aux URLs de redirection Auth autorisées, en conservant toutes les URLs existantes de Riftbound :
@@ -93,14 +105,14 @@ Avec Deno disponible :
 deno check --no-lock supabase/functions/rumbleball-api/index.ts supabase/functions/rumbleball-worker/index.ts
 ```
 
-Les tests couvrent les changements d’heure, l’annulation, les limites d’effectif reprises du mode solo, l’argent, le calendrier, deux saisons, les appels concurrents, le calcul fractionné équivalent au calcul complet, la projection privée, le mode spectateur et sa reprise en milieu de round. Les tests d’interface utilisent le DOM de test existant ; ils ne constituent pas une inspection visuelle en navigateur.
+Les tests couvrent les changements d’heure, l’annulation, les limites d’effectif reprises du mode solo, l’argent, le calendrier, deux saisons, les appels concurrents, le calcul fractionné équivalent au calcul complet, la projection privée, le mode spectateur et sa reprise en milieu de round. Ils vérifient aussi la consultation des replays après le changement de soirée, les refus d’accès, le filtrage et l’absence de mutation par le lecteur. Le test PostgreSQL contrôle l’archivage atomique, la reprise des anciennes images, l’idempotence et les permissions. Les tests d’interface utilisent le DOM de test existant ; l’inspection visuelle en navigateur est documentée séparément.
 
 ## Limites de la première version
 
 - Le serveur a été testé sur Supabase avec quatre clubs et deux matchs. Les temps réseau ne mesurent pas le CPU isolé ; une ouverture à grande échelle demandera une nouvelle mesure de charge.
 - Un retard initial du planificateur peut décaler le début de diffusion de quelques secondes ; le verrouillage reste à 20 h. En cas d’indisponibilité prolongée, une seule soirée est reprise et les journées manquées ne s’accumulent pas en saisons et revenus rétroactifs. Un round indisponible affiche une attente explicite, sans inventer un résultat local.
 - Les états de diffusion sont stockés dans un document privé par ligue. C’est adapté à cette première version de petites ligues ; pour une ouverture large, séparer les rounds en lignes ou objets de stockage et répartir davantage le travail. La liste des ligues utilise des colonnes légères et ne charge pas ces documents.
-- Pas encore de départ de ligue, dissolution, remplacement de participant, ligue publique ou chat. Huit ligues créées maximum par compte. L’historique conserve les scores, mais le lecteur ne propose pas encore les replays d’anciennes soirées.
+- Pas encore de départ de ligue, dissolution, remplacement de participant, ligue publique ou chat. Huit ligues créées maximum par compte. Les images de soirées remplacées avant l’installation de l’archivage ne peuvent pas être récupérées.
 - Le protocole d’état est en version 1 ; une migration de données sera nécessaire lors d’un changement incompatible de moteur ou de format de ligue. Ne pas changer le moteur d’une soirée en cours.
 
 Références : [Auth](https://supabase.com/docs/guides/auth/passwords), [permissions RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [planification](https://supabase.com/docs/guides/functions/schedule-functions), [limites Edge](https://supabase.com/docs/guides/functions/limits), [requêtes pg_net](https://supabase.com/docs/guides/database/extensions/pg_net).

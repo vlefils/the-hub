@@ -161,7 +161,7 @@ test('frontière de round : les créneaux KO sont sautés sans exécuter le prem
 });
 
 test('tous KO : chaque round reste borné, jusqu’au même nul et au même journal', () => {
-  const initial = createMatch(); initial.players.forEach((p) => { p.hp = 0; });
+  const initial = createMatch({ rulesVersion: 5 }); initial.players.forEach((p) => { p.hp = 0; });
   let state = initial, rounds = 0; const events = [];
   while (!state.finished) { const turns = round(state); assert.ok(++rounds <= 13); events.push(...turns.flatMap((t) => t.events)); state = turns.at(-1).after; }
   const direct = stepMatch(initial); assert.deepEqual(state, direct.state); assert.deepEqual(events, direct.events); assert.equal(rounds, 13);

@@ -9,8 +9,8 @@ export class TestNode {
   get value() { return this._value ?? (this.tagName === 'select' ? (this.children.find((c) => c.selected) ?? this.children[0])?.value : '') ?? ''; }
   set value(value) { this._value = String(value); }
   get classList() { return { contains: (c) => this.className.split(' ').includes(c), add: (...cs) => { for (const c of cs) if (!this.classList.contains(c)) this.className += ` ${c}`; }, toggle: (c, value) => { const set = new Set(this.className.split(' ').filter(Boolean)); if (value ?? !set.has(c)) set.add(c); else set.delete(c); this.className = [...set].join(' '); } }; }
-  append(...nodes) { for (let node of nodes) { if (!(node instanceof TestNode)) node = new TestNode('#text', String(node)); node.parentNode = this; this.children.push(node); } }
-  prepend(node) { node.parentNode = this; this.children.unshift(node); }
+  append(...nodes) { for (let node of nodes) { if (!(node instanceof TestNode)) node = new TestNode('#text', String(node)); node.remove(); node.parentNode = this; this.children.push(node); } }
+  prepend(node) { node.remove(); node.parentNode = this; this.children.unshift(node); }
   replaceChildren(...nodes) { this._text = ''; this.children = []; this.append(...nodes); }
   setAttribute(key, value) { this.attributes[key] = String(value); if (key === 'class') this.className = String(value); }
   getAttribute(key) { return this.attributes[key]; }

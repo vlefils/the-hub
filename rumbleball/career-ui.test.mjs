@@ -169,6 +169,7 @@ test('préparation : sélection liée au terrain, rotation, retour sur une ouver
   const selector = classNode(e.root, 'rb-deployment-player'); selector.value = '2'; await selector.emit('change');
   assert.match(classNode(e.root, 'rb-tactical-player').textContent, new RegExp(c.clubs[0].players[2].name));
   const role = descendants(e.root).find((n) => n.dataset.focusKey === 'active-role'); role.focus(); role.value = 'defender'; await role.emit('change');
+  assert.equal(classNode(e.root, 'rb-tactical-player').parentNode, descendants(e.root).find(n => n.classList.contains('rb-lineup-slot') && n.classList.contains('is-selected')));
   assert.equal(e.saved().clubs[0].players[2].role, 'defender'); assert.equal(document.activeElement, role);
   const substitute = c.clubs[0].players[5]; await button(e.root, `Faire entrer ${substitute.name}`).click(); assert.equal(e.saved().lineup[2], substitute.id); assert.deepEqual(e.saved().clubs[0].deployment, formation);
   assert.equal(classNode(e.root, 'rb-deployment-player').value, '2');

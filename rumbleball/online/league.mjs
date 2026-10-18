@@ -143,7 +143,7 @@ function settle(s, game) {
     identifyClub(c, `${s.id}:${id}`, c.market);
   }
   game.settled = true;
-  s.history.push({ id: game.id, season: s.season, day: s.day, homeId: game.homeId, awayId: game.awayId, winnerId, rounds: state.round, endsAt: game.endsAt });
+  s.history.push({ id: game.id, season: s.season, day: s.day, homeId: game.homeId, awayId: game.awayId, winnerId, rounds: state.round, endsAt: game.endsAt, replayAvailable: true });
 }
 export function advanceLeague(input, now, { maxRounds = Infinity } = {}) {
   const s = copy(input), t = instant(now);
@@ -178,6 +178,17 @@ export function leagueTable(s) {
 function publicState(state, id) {
   const view = copy(state); view.seed = id; view.rng = 0; return view;
 }
+export function replayProjection(s, userId, matchId, archive, now) {
+  need(s.members.some(m => m.userId === userId), 'Accès réservé aux participants.');
+  const result = s.history.find(g => g.id === matchId);
+  need(result && instant(result.endsAt) <= instant(now), 'Replay disponible uniquement après la fin de la rencontre.');
+  const recent = s.night?.games.find(g => g.id === matchId && g.settled);
+  const data = archive ?? (recent ? { initial: recent.broadcast.initial, rounds: recent.broadcast.rounds } : null);
+  need(data?.initial && Array.isArray(data.rounds) && data.rounds.length, 'Les images de cette ancienne rencontre ne sont plus disponibles.');
+  return { id: matchId, season: result.season, day: result.day, endsAt: result.endsAt,
+    initial: publicState(data.initial, matchId), rounds: data.rounds.map(round => ({ round: round.round,
+      turns: round.turns.map(turn => ({ before: publicState(turn.before, matchId), after: publicState(turn.after, matchId), events: copy(turn.events) })) })) };
+}
 export function leagueProjection(s, userId, now) {
   const member = s.members.find((m) => m.userId === userId); need(member, 'Accès réservé aux participants.');
   const ownClub = identifyClub(copy(member.draft ?? member.club), `${s.id}:${userId}`, []);
@@ -203,5 +214,5 @@ export function leagueProjection(s, userId, now) {
     members: s.members.map((m) => ({ userId: m.userId, name: m.club.name, kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
     serverTime: iso(t), nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
     club: ownClub, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
-    history: copy(s.history), upcoming: fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
+    history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

@@ -240,7 +240,7 @@ test('observation : pas de gain à distance ni par un observateur KO', () => {
 });
 
 test('dernier engagement : les réserves ne sont pas restaurées après les prolongations', () => {
-  const state = createMatch(); state.round = 12; state.turnIndex = state.initiative.length - 1;
+  const state = createMatch({ rulesVersion: 5 }); state.round = 12; state.turnIndex = state.initiative.length - 1;
   state.players.forEach((p) => { p.hp = 0; p.classState.adrenaline = 0; p.classState.focus = 0; p.classState.calls = 0; });
   const turn = stepMatch(state);
   assert.ok(turn.events.some((e) => e.type === 'restart')); assert.ok(turn.state.finished);

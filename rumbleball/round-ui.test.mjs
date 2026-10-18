@@ -64,7 +64,7 @@ test('UI : ×8 attend 1 500 ms par round et le résultat reste caché jusqu’à
   globalThis.matchMedia = () => ({ matches: false });
   const view = mountMatch(e.root, { onTurn: (state) => { saved.push(state); return true; } });
   const speed = descendants(e.root).find((n) => n.getAttribute('aria-label') === 'Vitesse de lecture'); speed.value = '8'; await speed.emit('change');
-  view.load({ config: {}, state: createMatch(), turns: [] }, true); c.elapse(0); assert.equal(saved.at(-1).round, 2);
+  view.load({ config: {}, state: createMatch({ rulesVersion: 5 }), turns: [] }, true); c.elapse(0); assert.equal(saved.at(-1).round, 2);
   const count = saved.length; c.elapse(750); assert.equal(saved.length, count); assert.equal(classNode(e.root, 'rb-clock').textContent, '01:54');
   c.elapse(750); assert.equal(saved.at(-1).round, 3); assert.equal(classNode(e.root, 'rb-phase').textContent, 'Round 2/10');
   // Ten 1.5-second rounds at ×8 represent exactly two minutes at ×1.
@@ -73,6 +73,24 @@ test('UI : ×8 attend 1 500 ms par round et le résultat reste caché jusqu’à
   assert.equal(classNode(e.root, 'rb-toolbar').hidden, false);
   c.elapse(1500); assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:00');
   assert.equal(c.frames.size, 0); assert.equal(c.timers.size, 0); view.pause();
+});
+
+test('UI v6 : le dernier KO reste animé avant l’affichage de la victoire anticipée', async (t) => {
+  const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
+  globalThis.matchMedia = () => ({ matches: false });
+  const view = mountMatch(e.root, { onTurn: state => { saved.push(state); return true; } });
+  const speed = descendants(e.root).find(n => n.getAttribute('aria-label') === 'Vitesse de lecture'); speed.value = '8'; await speed.emit('change');
+  const state = createMatch({ seed: 'last-knockout', classes: false, strategy: 'pressing' }), a = state.players[0], b = state.players[5];
+  state.players.filter(p => p.teamId === 'away' && p !== b).forEach(p => { p.hp = 0; });
+  a.position = { x: 2, y: 1 }; b.position = { x: 3, y: 1 }; b.hp = 1; b.armor = 1;
+  a.attack = { bonus: 100, die: 4, flat: 100 }; a.role = 'blocker'; a.instruction = 'aggressive'; a.speed = a.movement = 0;
+  state.initiative = [a.id, ...state.initiative.filter(id => id !== a.id)];
+  view.load({ config: {}, state, turns: [] }, true); c.elapse(0);
+  assert.equal(saved.at(-1).result.reason, 'elimination'); assert.equal(saved.at(-1).round, 1);
+  assert.equal(classNode(e.root, 'rb-result').hidden, true); assert.equal(classNode(e.root, 'rb-toolbar').hidden, false);
+  c.elapse(1499); assert.equal(classNode(e.root, 'rb-result').hidden, true);
+  c.elapse(1); assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.match(classNode(e.root, 'rb-result').textContent, /Victoire immédiate/);
+  view.pause();
 });
 
 test('carrière : sauvegarde après chaque tour du lot, arrêt sur erreur intermédiaire et reprise sans doublon', async () => {

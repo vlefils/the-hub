@@ -8,7 +8,7 @@ import { defaultOpening, openingDeployment, validOpening } from './openings.mjs'
 import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
-export const CURRENT_RULES = 5;
+export const CURRENT_RULES = 6;
 export function seedHash(seed) {
   let n = 2166136261;
   for (const char of String(seed)) n = Math.imul(n ^ char.charCodeAt(0), 16777619);
@@ -24,7 +24,7 @@ function centerBall(state) {
 export function createMatch(config = {}) {
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
-  const version = [2, 3, 4].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
+  const version = [2, 3, 4, 5].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
   const deployments = {}, openings = {};
   if (version >= 3) for (const side of ['home', 'away']) {
     openings[side] = config.openings?.[side] ?? defaultOpening(side === 'home' ? config.strategy : config.awayStrategy);
@@ -66,14 +66,22 @@ export function createMatch(config = {}) {
   assertInvariants(state);
   return state;
 }
-function finish(state, events, winner) {
+function finish(state, events, winner, reason = winner ? 'possession' : 'draw') {
   state.finished = true;
   state.calls = [];
   for (const p of state.players) { cancelReadiedPass(state, p, events, 'fin du match'); p.classState.targetId = null; p.classState.flaw = 0; }
   state.result = { winnerId: winner?.teamId ?? null, carrierId: winner?.id ?? null, round: state.round,
-    reason: winner ? 'possession' : 'draw' };
+    reason };
   const team = state.teams.find((t) => t.id === winner?.teamId);
-  emit(state, events, 'finish', winner ? `${team.name} remportent le match : ${winner.name} possède la balle à la sirène.` : 'Match nul : la balle reste libre après le dernier engagement.');
+  emit(state, events, 'finish', reason === 'elimination' ? `${team.name} remportent le match : tous les joueurs adverses sont KO.` : reason === 'double-knockout' ? 'Match nul : les deux équipes sont entièrement KO.' : winner ? `${team.name} remportent le match : ${winner.name} possède la balle à la sirène.` : 'Match nul : la balle reste libre après le dernier engagement.');
+}
+function finishByKnockouts(state, events) {
+  if (state.version < 6) return false;
+  if (state.finished) return true;
+  const remaining = state.teams.filter(team => state.players.some(p => p.teamId === team.id && p.hp > 0));
+  if (remaining.length === 2) return false;
+  finish(state, events, remaining.length ? { teamId: remaining[0].id, id: null } : null, remaining.length ? 'elimination' : 'double-knockout');
+  assertInvariants(state); return true;
 }
 function endRound(state, events) {
   const holder = carrier(state);
@@ -94,12 +102,14 @@ function endRound(state, events) {
   for (const p of state.players) p.reaction = p.hp > 0;
 }
 function advance(state, events) {
+  if (finishByKnockouts(state, events)) return;
   state.turnIndex++;
   if (state.turnIndex === state.initiative.length) endRound(state, events);
 }
 function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   const events = [];
   if (state.finished) return events;
+  if (finishByKnockouts(state, events)) return events;
   // Skip KO slots without granting turns or reactions. Also handles both teams entirely KO.
   let actor;
   while (!state.finished) {
@@ -118,18 +128,25 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   state.turns++;
   beginTurn(state, actor, events);
   resolveReadiedPass(state, actor, events);
+  if (finishByKnockouts(state, events)) return events;
   const useClassAction = (path = []) => {
     const choice = decideClassAction(state, actor, path);
     if (choice) resolveClassAction(state, actor, choice, events);
   };
   useClassAction();
+  if (finishByKnockouts(state, events)) return events;
   const decision = decideTurn(state, actor);
   const plannedPasser = decision.task === 'relay' ? readiedPasser(state)?.id : null;
   state.lastDecision = { playerId: actor.id, reason: decision.reason, action: decision.action.type };
   emit(state, events, 'decision', `${actor.name} · ${decision.reason}`, { playerId: actor.id, action: decision.action.type,
     ...(state.version >= 5 ? { task: decision.task, ...(plannedPasser ? { supportPasserId: plannedPasser } : {}) } : {}) });
   const previousHolder = state.ball.carrierId;
-  useClassAction(decision.path); moveAlong(state, actor, decision.path, events); useClassAction();
+  const followPath = (path) => {
+    useClassAction(path); if (finishByKnockouts(state, events)) return true;
+    moveAlong(state, actor, path, events); if (finishByKnockouts(state, events)) return true;
+    useClassAction(); return finishByKnockouts(state, events);
+  };
+  if (followPath(decision.path)) return events;
   if (actor.hp > 0) {
     // A reaction may remove possession during movement. Reconsider only actions legal
     // at the reached cell; a fresh full-turn plan could require another unexecuted path.
@@ -146,7 +163,7 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
       const received = decideTurn(state, actor);
       state.lastDecision = { playerId: actor.id, reason: received.reason, action: received.action.type };
       emit(state, events, 'replan', `${actor.name} utilise son mouvement restant après réception : ${received.reason}`);
-      useClassAction(received.path); moveAlong(state, actor, received.path, events); useClassAction();
+      if (followPath(received.path)) return events;
       action = received.action;
     }
     if (actor.hp <= 0) { endTurn(state, actor, events); assertInvariants(state); advance(state, events); assertInvariants(state); return events; }
@@ -158,15 +175,17 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
       emit(state, events, 'replan', `${actor.name} adapte son plan après le déplacement : ${revised.reason}`);
     }
     if (!resolveAction(state, actor, action, events)) throw new Error(`Action illégale du bot : ${actor.id} ${action.type}`);
+    if (finishByKnockouts(state, events)) return events;
     // A pickup may spend only an interaction or an engagement reaction.
     // Use the remaining action without granting an extra one.
     if (actor.action && actor.hp > 0) {
       const followup = decideTurn(state, actor);
-      useClassAction(followup.path); moveAlong(state, actor, followup.path, events); useClassAction();
+      if (followPath(followup.path)) return events;
       if (actor.hp > 0) {
         const basic = { ...followup.action }; delete basic.technique;
         const next = legalAction(state, actor, followup.action) ? followup.action : legalAction(state, actor, basic) ? basic : { type: 'dodge' };
         if (!resolveAction(state, actor, next, events)) throw new Error(`Action de suivi illégale : ${actor.id}`);
+        if (finishByKnockouts(state, events)) return events;
       }
     }
     // Damage or a failed pass can leave the ball at the actor's feet after the
@@ -178,7 +197,8 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
       const held = state.players.find((p) => p.id === actor.grappling);
       emit(state, events, 'hold-position', `${actor.name} maintient sa prise sur ${held.name} et conserve sa position ; le mouvement restant n’est pas dépensé.`);
     } else {
-      const path = decideMovement(state, actor); useClassAction(path); moveAlong(state, actor, path, events);
+      const path = decideMovement(state, actor); useClassAction(path); if (finishByKnockouts(state, events)) return events;
+      moveAlong(state, actor, path, events); if (finishByKnockouts(state, events)) return events;
     }
   }
   endTurn(state, actor, events);

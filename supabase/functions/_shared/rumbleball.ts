@@ -5,6 +5,10 @@ const checked = ({ data, error }: any) => { if (error) throw new Error(error.mes
 export const store = {
   async get(id: string) { return checked(await admin.from('rb_leagues').select('*').eq('id', id).maybeSingle()); },
   async invite(code: string) { return checked(await admin.from('rb_leagues').select('*').eq('invite_code', code).maybeSingle()); },
+  async replay(leagueId: string, matchId: string) {
+    const row = checked(await admin.from('rb_replays').select('replay').eq('league_id', leagueId).eq('match_id', matchId).maybeSingle());
+    return row?.replay ?? null;
+  },
   async commit(id: string, revision: number, state: unknown, preparation: boolean) {
     return checked(await admin.rpc('rb_commit_league', { p_id: id, p_expected_revision: revision, p_state: state, p_preparation: preparation }));
   },

@@ -1,5 +1,5 @@
 // Transport-independent handlers, exercised with a fake DB and real game engine.
-import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague, leagueProjection } from './league.mjs';
+import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague, leagueProjection, replayProjection } from './league.mjs';
 const need = (ok, message) => { if (!ok) throw new Error(message); };
 export function createLeagueService(store, { now = () => new Date().toISOString(), uuid = () => crypto.randomUUID() } = {}) {
   async function update(id, transition, preparation) {
@@ -27,6 +27,13 @@ export function createLeagueService(store, { now = () => new Date().toISOString(
     const row = await store.get(leagueId);
     need(row?.state.members.some((m) => m.userId === userId), 'Accès réservé aux participants.');
     if (action === 'get') return { league: leagueProjection(row.state, userId, now()), revision: row.revision };
+    if (action === 'replay') {
+      need(typeof payload.matchId === 'string' && payload.matchId.length <= 200, 'Identifiant de rencontre invalide.');
+      const result = row.state.history.find(g => g.id === payload.matchId);
+      need(result && Date.parse(result.endsAt) <= Date.parse(now()), 'Replay disponible uniquement après la fin de la rencontre.');
+      const archive = await store.replay?.(leagueId, payload.matchId);
+      return { replay: replayProjection(row.state, userId, payload.matchId, archive, now()) };
+    }
     const updated = await update(leagueId, (s, time) => action === 'start' ? startLeague(s, userId, time) : editPreparation(s, userId, action, payload, time), true);
     return { league: leagueProjection(updated.state, userId, now()), revision: updated.revision };
   }

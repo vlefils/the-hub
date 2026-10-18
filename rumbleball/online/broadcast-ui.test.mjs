@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { environment, descendants, button } from '../test-support/dom.mjs';
 import { mountOnline } from './ui.mjs';
-import { createLeague, joinLeague, startLeague, editPreparation } from './league.mjs';
+import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague } from './league.mjs';
 import { createLeagueService } from './server.mjs';
 
 async function online(t, lobby = false) {
@@ -18,7 +18,7 @@ async function online(t, lobby = false) {
   await button(e.root, 'Ligue · 2/2 clubs').click();
   const strategy = () => descendants(e.root.querySelector('.rb-online-body')).find(n => n.tagName === 'select' && n.children.some(o => o.value === 'possession'));
   const poll = async () => { const [id, fn] = [...pending][0]; pending.delete(id); await fn(); };
-  return { ...e, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); } };
+  return { ...e, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); }, async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
 }
 
 test('broadcast : une saisie survit aux onglets, à un achat et à une erreur réseau ; annulation complète', async t => {
@@ -66,4 +66,28 @@ test('équipement : joueur conservé après achat et transfert, réserve lisible
   assert.equal(e.root.querySelector('.rb-inventory-row').querySelector('select').disabled, true);
   assert.ok(descendants(e.root).filter(n => n.tagName === 'button' && n.textContent.startsWith('Acheter ·')).every(n => n.disabled));
   e.mounted.stop();
+});
+
+test('composition : tactiques directement sous le joueur choisi et accès à son équipement', async t => {
+  const e = await online(t), player = e.state().members[0].club.players[2];
+  const pick = descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${player.name}`); await pick.click();
+  const tactics = e.root.querySelector('.rb-player-tactics'); assert.equal(tactics.parentNode.dataset.playerId, player.id);
+  const role = tactics.querySelector('select'); role.value = 'defender'; await role.emit('change');
+  await button(e.root, 'Équiper ce joueur').click();
+  assert.equal(e.root.querySelector('.rb-online-body').querySelector('select').value, player.id);
+  await button(e.root, 'Équipe').click(); assert.equal(e.root.querySelector('.rb-player-tactics').querySelector('select').value, 'defender');
+  assert.equal(e.root.querySelector('.rb-player-tactics').parentNode.dataset.playerId, player.id);
+  e.mounted.stop();
+});
+
+test('replays UI : consultation en période verrouillée, parcours et retour sans mutation de ligue', async t => {
+  const e = await online(t); await e.finishNight(); await e.lock();
+  const before = structuredClone(e.state());
+  await button(e.root, 'Replays').click(); assert.equal(button(e.root, 'Voir le replay').disabled, undefined);
+  await button(e.root, 'Voir le replay').click();
+  assert.equal(e.root.querySelector('.rb-replay-area').hidden, false); assert.equal(e.root.querySelector('.rb-online-content').hidden, true);
+  await button(e.root.querySelector('.rb-replay-area'), 'Round suivant').click();
+  await button(e.root, 'Retour aux replays').click();
+  assert.equal(e.root.querySelector('.rb-replay-area').hidden, true); assert.equal(e.root.querySelector('.rb-online-content').hidden, false);
+  assert.deepEqual(e.state(), before); e.mounted.stop();
 });

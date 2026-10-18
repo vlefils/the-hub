@@ -276,7 +276,7 @@ export function mountCareer(root, mountMatch) {
     const strategyHelp = el('p', 'rb-muted');
     function describeStrategy() { strategyHelp.textContent = { balanced: 'Une répartition équilibrée entre progression, soutien et défense.', possession: 'Protège le porteur par des blocages, des sorties de pression et des relais sûrs.', pressing: 'Met la pression sur le porteur adverse et conteste les accès au ballon.' }[strategy.value]; }
     describeStrategy(); teamPlans.append(field('Plan collectif', strategy), strategyHelp, opening.root, undo);
-    teamControls.append(el('h4', '', 'Les cinq titulaires'), lineup, active, bench);
+    teamControls.append(el('h4', '', 'Les cinq titulaires'), lineup, bench);
     for (const [index, id] of career.lineup.entries()) {
       const s = keyed(select(names, id), `lineup-${index}`); s.disabled = locked; slotControls.push(s);
       const row = el('div', 'rb-lineup-slot'), copy = el('div', 'rb-slot-copy'), pick = btn('Régler', () => { selectedPlayer = s.value; deployment.update({ selectedPlayerId: selectedPlayer }); renderActive(); });
@@ -292,6 +292,7 @@ export function mountCareer(root, mountMatch) {
       for (const [index, { row, copy }] of slotCopies.entries()) {
         const p = ownedPlayers(career).find((p) => p.id === slotControls[index].value);
         row.classList.toggle('is-selected', p.id === selectedPlayer); copy.replaceChildren(portraitIdentity(compilePlayer(p, career.inventory), clubKit(career.clubs[0]), el('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`)), fatigue(p));
+        if (p.id === selectedPlayer) row.append(active);
       }
       const target = ownedPlayers(career).find((p) => p.id === selectedPlayer);
       bench.replaceChildren(el('h4', '', 'Remplaçants'));
@@ -308,6 +309,7 @@ export function mountCareer(root, mountMatch) {
       const role = keyed(select(ROLES, assignments[p.id].role), 'active-role'), instruction = keyed(select(INSTRUCTIONS, assignments[p.id].instruction), 'active-instruction'); role.disabled = instruction.disabled = locked;
       const help = el('p', 'rb-muted', ROLE_DESCRIPTIONS[role.value]);
       active.replaceChildren(el('p', 'rb-eyebrow', 'Réglages du joueur sélectionné'), el('h4', '', p.name), field('Rôle · sa mission', role), field('Consigne · son comportement', instruction), help);
+      active.append(btn('Équiper ce joueur', () => { selectedShopPlayer = p.id; go('Équipement'); }));
       for (const control of [role, instruction]) control.addEventListener('change', () => attempt(() => { assignments[p.id] = { role: role.value, instruction: instruction.value }; commitLineup(); help.textContent = ROLE_DESCRIPTIONS[role.value]; }));
       refreshSlots();
     }

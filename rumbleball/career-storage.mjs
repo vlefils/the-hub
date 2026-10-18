@@ -53,7 +53,7 @@ export function validateCareer(c) {
       check(name(f.id) && name(f.seed) && !fixtureIds.has(f.id)); fixtureIds.add(f.id);
       check(clubIds.includes(f.homeId) && clubIds.includes(f.awayId) && f.homeId !== f.awayId); participants.push(f.homeId, f.awayId);
       const key = `${f.homeId}:${f.awayId}`; pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
-      check(f.result === null || (typeof f.result === 'object' && (f.result.winnerId === null || [f.homeId, f.awayId].includes(f.result.winnerId)) && integer(f.result.round, 10) && f.result.round <= 13));
+      check(f.result === null || (typeof f.result === 'object' && (f.result.winnerId === null || [f.homeId, f.awayId].includes(f.result.winnerId)) && integer(f.result.round, 1) && f.result.round <= 13));
       check(day < c.day ? f.result !== null : f.result === null);
     }
     check(new Set(participants).size === 6);
@@ -87,10 +87,10 @@ export function validateCareer(c) {
     check(integer(m.state.rng) && m.state.rng <= 4294967295 && Array.isArray(m.state.teams) && m.state.teams.length === 2);
     check(m.state.teams.every((t, i) => t.id === (i ? 'away' : 'home') && name(t.name) && Object.hasOwn(STRATEGIES, t.strategy) && (t.kitColor === undefined || validKitColor(t.kitColor)) && (t.crestId === undefined || validCrest(t.crestId)) && t.crestId === m.config.crestIds?.[t.id]));
     check(['regular', 'overtime', 'final'].includes(m.state.phase));
-    if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, 10));
+    if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, m.state.version >= 6 ? 1 : 10));
     else check(m.state.result === null);
     check(['home', 'away'].every((side) => m.state.stats?.[side] && ['passesAttempted', 'passesCompleted', 'recoveries', 'knockouts'].every((key) => integer(m.state.stats[side][key]))));
-    check([2, 3, 4, 5].includes(m.state.version));
+    check([2, 3, 4, 5, 6].includes(m.state.version));
     check(m.config.rulesVersion === undefined || m.config.rulesVersion === m.state.version);
     const initial = createMatch({ ...m.config, rulesVersion: m.state.version });
     if (m.state.version >= 4) check(m.state.teams.every((team, i) => validOpening(team.opening) && team.opening === initial.teams[i].opening));
