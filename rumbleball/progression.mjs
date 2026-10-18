@@ -21,7 +21,7 @@ export function compilePlayer(player, inventory = []) {
   const base = clone(PROFILES[player.profile]);
   if (!base) throw new Error('Profil de joueur inconnu.');
   const level = levelOf(player), tiers = Number(level >= 3) + Number(level >= 5);
-  const result = { ...base, name: player.name, playerId: player.id, level,
+  const result = { ...base, name: player.name, playerId: player.id, level, ...(player.portraitId ? { portraitId: player.portraitId } : {}),
     role: player.role, instruction: player.instruction, fatigue: player.fatigue };
   result.maxHp += (level - 1) * 2;
   for (const key of ['wrestling', 'athletics', 'acrobatics']) {

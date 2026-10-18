@@ -2,6 +2,7 @@ import { clone, PROFILES, STARTS, ROLES, INSTRUCTIONS, STRATEGIES } from './data
 import { decideClassAction, decideGroundPickup, decideMovement, decideTurn } from './ai.mjs';
 import { ARCHETYPES, initialClassState } from './classes.mjs';
 import { matchKits } from './appearance.mjs';
+import { validCrest } from './identity.mjs';
 import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
 import { defaultOpening, openingDeployment, validOpening } from './openings.mjs';
 import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat } from './rules.mjs';
@@ -35,8 +36,8 @@ export function createMatch(config = {}) {
     version, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
     phase: 'regular', finished: false, result: null, turns: 0, aids: [], calls: [], lastDecision: null,
     teams: [
-      { id: 'home', kitColor: kits.home, name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced', ...(version >= 4 ? { opening: openings.home } : {}) },
-      { id: 'away', kitColor: kits.away, name: config.teamNames?.away ?? 'Les Charognards', strategy: Object.hasOwn(STRATEGIES, config.awayStrategy) ? config.awayStrategy : 'balanced', ...(version >= 4 ? { opening: openings.away } : {}) },
+      { id: 'home', kitColor: kits.home, ...(validCrest(config.crestIds?.home) ? { crestId: config.crestIds.home } : {}), name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced', ...(version >= 4 ? { opening: openings.home } : {}) },
+      { id: 'away', kitColor: kits.away, ...(validCrest(config.crestIds?.away) ? { crestId: config.crestIds.away } : {}), name: config.teamNames?.away ?? 'Les Charognards', strategy: Object.hasOwn(STRATEGIES, config.awayStrategy) ? config.awayStrategy : 'balanced', ...(version >= 4 ? { opening: openings.away } : {}) },
     ],
     stats: { home: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 }, away: { passesAttempted: 0, passesCompleted: 0, recoveries: 0, knockouts: 0 } },
     players: ['home', 'away'].flatMap((teamId) => {

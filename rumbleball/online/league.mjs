@@ -1,6 +1,7 @@
 // Authoritative league transitions. This module runs on the server; browser
 // projections deliberately omit seeds, private clubs and future match frames.
-import { createCareer, confirmDraft, configureTeam, recruit, sellPlayer, buyItem, assignProtection, sellProtection, setClubColor } from '../career.mjs';
+import { createCareer, confirmDraft, configureTeam, recruit, sellPlayer, buyItem, assignProtection, sellProtection, setClubColor, setClubCrest } from '../career.mjs';
+import { identifyClub, validCrest, cosmeticHash, CRESTS } from '../identity.mjs';
 import { createMatch, stepMatch, CURRENT_RULES } from '../engine.mjs';
 import { compilePlayer, salary, progressPlayer } from '../progression.mjs';
 import { clubDeployment } from '../deployment.mjs';
@@ -27,9 +28,14 @@ export function nextLock(now, includeToday = true) {
   throw new Error('Prochain verrouillage introuvable.');
 }
 
-export function makeClub(userId, name, seed, color = '#35bdb3') {
+export function makeClub(userId, name, seed, color = '#35bdb3', crestId, cosmeticNamespace = userId) {
   let career = createCareer(text(name, 'Nom du club'), seed, color);
   career = confirmDraft(career, career.market.slice(0, 6).map((p) => p.id));
+  // Public cosmetic choices must not encode any part of the secret match seed.
+  delete career.clubs[0].crestId;
+  for (const p of [...career.clubs[0].players, ...career.market]) delete p.portraitId;
+  identifyClub(career.clubs[0], cosmeticNamespace, career.market);
+  if (crestId !== undefined) { need(validCrest(crestId), 'Blason inconnu.'); career = setClubCrest(career, crestId); }
   return { ...career.clubs[0], id: userId, lineup: career.lineup, inventory: career.inventory, market: career.market,
     balance: career.balance, transactions: career.transactions };
 }
@@ -39,26 +45,27 @@ function careerView(club, day) {
 }
 const edits = {
   configure: (c, p) => {
-    const configured = configureTeam(c, p.lineup, p.assignments ?? {}, p.strategy, p.deployment, p.opening);
-    return p.color === undefined ? configured : setClubColor(configured, p.color);
+    let configured = configureTeam(c, p.lineup, p.assignments ?? {}, p.strategy, p.deployment, p.opening);
+    if (p.color !== undefined) configured = setClubColor(configured, p.color);
+    return p.crestId === undefined ? configured : setClubCrest(configured, p.crestId);
   },
   recruit: (c, p) => recruit(c, p.playerId), sell: (c, p) => sellPlayer(c, p.playerId),
   buy: (c, p) => buyItem(c, p.itemId, p.playerId ?? null, p.replaceConfirmed === true),
   equip: (c, p) => assignProtection(c, p.itemId, p.playerId ?? null), sellProtection: (c, p) => sellProtection(c, p.itemId),
   color: (c, p) => setClubColor(c, p.color),
 };
-export function createLeague({ id, userId, name, clubName, color, inviteCode, seed, capacity = 6 }, now) {
+export function createLeague({ id, userId, name, clubName, color, crestId, inviteCode, seed, capacity = 6 }, now) {
   need([2, 4, 6, 8].includes(capacity), 'Une ligue accueille 2, 4, 6 ou 8 clubs.');
   need(typeof inviteCode === 'string' && inviteCode.length >= 16, 'Code d’invitation invalide.');
   return { version: 1, id, name: text(name, 'Nom de ligue'), ownerId: userId, inviteCode, seed, capacity, status: 'lobby',
     season: 1, day: 0, completedDays: 0, nextLockAt: null, night: null, history: [],
-    members: [{ userId, club: makeClub(userId, clubName, `${seed}:${userId}`, color), draft: null }], createdAt: iso(instant(now)) };
+    members: [{ userId, club: makeClub(userId, clubName, `${seed}:${userId}`, color, crestId, `${id}:${userId}`), draft: null }], createdAt: iso(instant(now)) };
 }
-export function joinLeague(input, userId, { clubName, color }, now) {
+export function joinLeague(input, userId, { clubName, color, crestId }, now) {
   const s = copy(input); need(s.status === 'lobby', 'Cette saison a déjà commencé.');
   need(!s.members.some((m) => m.userId === userId), 'Vous participez déjà à cette ligue.');
   need(s.members.length < s.capacity, 'La ligue est complète.');
-  s.members.push({ userId, club: makeClub(userId, clubName, `${s.seed}:${userId}`, color), draft: null }); return s;
+  s.members.push({ userId, club: makeClub(userId, clubName, `${s.seed}:${userId}`, color, crestId, `${s.id}:${userId}`), draft: null }); return s;
 }
 export function startLeague(input, userId, now) {
   const s = copy(input); need(s.ownerId === userId, 'Seul le créateur peut lancer la saison.');
@@ -72,7 +79,9 @@ export function editPreparation(input, userId, command, payload, now) {
   need(['lobby', 'preparation'].includes(s.status), 'Préparation indisponible.');
   if (command === 'cancel') { member.draft = null; return s; }
   need(Object.hasOwn(edits, command), 'Commande inconnue.');
-  const c = edits[command](careerView(member.draft ?? member.club, s.completedDays % 10), payload);
+  const source = copy(member.draft ?? member.club);
+  identifyClub(source, `${s.id}:${userId}`, source.market);
+  const c = edits[command](careerView(source, s.completedDays % 10), payload);
   member.draft = { ...c.clubs[0], lineup: c.lineup, inventory: c.inventory, market: c.market, balance: c.balance, transactions: c.transactions };
   return s;
 }
@@ -83,7 +92,7 @@ export function fixturesFor(s) {
 }
 function configFor(s, [homeId, awayId], seed) {
   const home = s.members.find((m) => m.userId === homeId).club, away = s.members.find((m) => m.userId === awayId).club;
-  return { seed, rulesVersion: CURRENT_RULES, teamNames: { home: home.name, away: away.name }, kitColors: { home: home.kitColor, away: away.kitColor },
+  return { seed, rulesVersion: CURRENT_RULES, teamNames: { home: home.name, away: away.name }, kitColors: { home: home.kitColor, away: away.kitColor }, crestIds: { home: home.crestId, away: away.crestId },
     strategy: home.strategy, awayStrategy: away.strategy, openings: { home: clubOpening(home), away: clubOpening(away) },
     deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') },
     rosters: Object.fromEntries([['home', home], ['away', away]].map(([side, c]) => [side, c.lineup.map((id) => compilePlayer(c.players.find((p) => p.id === id), c.inventory))])) };
@@ -103,6 +112,7 @@ function freezeNight(s, now) {
   const start = Math.max(instant(s.nextLockAt), instant(now));
   for (const m of s.members) {
     if (m.draft) m.club = m.draft;
+    identifyClub(m.club, `${s.id}:${m.userId}`, m.club.market);
     m.draft = null;
     transaction(m.club, ONLINE_RULES.dailyIncome, 'Revenu de ligue', `income-${s.completedDays}`);
     transaction(m.club, -m.club.players.reduce((n, p) => n + salary(p), 0), 'Salaires de la journée', `wages-${s.completedDays}`);
@@ -129,6 +139,8 @@ function settle(s, game) {
     const offers = createCareer(c.name, `${s.seed}:${id}:market:${s.completedDays + 1}`, c.kitColor).market;
     const indices = [0, 1, 2, 4, 8, 10];
     c.market = indices.map((i, n) => ({ ...offers[i], id: `offer-${s.completedDays + 1}-${n}`, xp: [0, 20, 50, 90, 140][Math.min(4, Math.floor((s.completedDays + 1) / 5))] }));
+    for (const p of c.market) delete p.portraitId;
+    identifyClub(c, `${s.id}:${id}`, c.market);
   }
   game.settled = true;
   s.history.push({ id: game.id, season: s.season, day: s.day, homeId: game.homeId, awayId: game.awayId, winnerId, rounds: state.round, endsAt: game.endsAt });
@@ -168,6 +180,8 @@ function publicState(state, id) {
 }
 export function leagueProjection(s, userId, now) {
   const member = s.members.find((m) => m.userId === userId); need(member, 'Accès réservé aux participants.');
+  const ownClub = identifyClub(copy(member.draft ?? member.club), `${s.id}:${userId}`, []);
+  identifyClub(ownClub, `${s.id}:${userId}`, ownClub.market);
   const t = instant(now), night = s.night;
   const games = night?.games.map((g) => {
     const ended = Boolean(g.endsAt && t >= instant(g.endsAt)), started = Boolean(g.startsAt && t >= instant(g.startsAt));
@@ -186,8 +200,8 @@ export function leagueProjection(s, userId, now) {
       turns: t < instant(active.playsAt) ? [] : round.turns.map((turn) => ({ before: publicState(turn.before, active.id), after: publicState(turn.after, active.id), events: copy(turn.events) })) };
   }
   return { id: s.id, name: s.name, ownerId: s.ownerId, capacity: s.capacity, status: s.status, season: s.season, day: s.day,
-    members: s.members.map((m) => ({ userId: m.userId, name: m.club.name })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
+    members: s.members.map((m) => ({ userId: m.userId, name: m.club.name, kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
     serverTime: iso(t), nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
-    club: copy(member.draft ?? member.club), hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
+    club: ownClub, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
     history: copy(s.history), upcoming: fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

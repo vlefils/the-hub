@@ -1,7 +1,10 @@
+import { PROFILES as IDENTITY_PROFILES } from './data.mjs';
+import { PORTRAITS } from './identity.mjs';
+import { crestPicker } from './broadcast-components.mjs';
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, CURRENT_RULES, DEFAULT_SEED, seedHash, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
-import { arenaBackdrop, ballArtwork, pawnArtwork, playerPortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
+import { arenaBackdrop, ballArtwork, pawnArtwork, playerPortrait, athletePortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
 import { KIT_COLORS, characterKey, readableKit, sportingWeapon, visibleGear } from './appearance.mjs';
 import { CATALOGUE } from './progression.mjs';
 import { narrateTurn } from './narration.mjs';
@@ -25,9 +28,13 @@ const options = (values, selected) => Object.entries(values).map(([value, label]
 });
 const button = (text, cls = 'rb-button') => { const el = element('button', cls, text); el.type = 'button'; return el; };
 
+function exhibitionIdentity(config = {}) {
+  return { ...config, crestIds: config.crestIds ?? { home: 'hound', away: 'skull' }, rosters: config.rosters ?? Object.fromEntries(['home', 'away'].map((side, n) => [side, IDENTITY_PROFILES.map((p, i) => ({ ...structuredClone(p), name: side === 'home' ? p.trainingName : p.name, playerId: 'exhibition-' + side + '-' + i, portraitId: PORTRAITS[n * 5 + i].id }))])) };
+}
+
 export function mountMatch(root, callbacks = {}) {
   const section = root.closest('[data-section]');
-  let state = createMatch(), lastConfig = null, started = false, running = false, timer = null, nextRoundAt = 0;
+  let state = createMatch(exhibitionIdentity()), lastConfig = null, started = false, running = false, timer = null, nextRoundAt = 0;
   let context = 'exhibition', ballReady = false;
   const teamLabel = (id) => state.teams.find((t) => t.id === id)?.name ?? '';
   let selectedId = null, speed = 1, journalCount = 0, lastTurnEvents = [], playbackMode = 'round', displayFrame = null, healthSignature = '';
@@ -45,12 +52,13 @@ export function mountMatch(root, callbacks = {}) {
   strategyLabel.append(strategySelect);
   const colorLabel = element('label', 'rb-field', 'Couleur des maillots'), colorInput = element('input', 'rb-kit-color');
   colorInput.type = 'color'; colorInput.value = KIT_COLORS[0]; colorInput.setAttribute('aria-label', 'Couleur des maillots'); colorLabel.append(colorInput);
-  const setupOptions = element('div', 'rb-kit-options'); setupOptions.append(strategyLabel, colorLabel); setupHead.append(setupCopy, setupOptions); setup.append(setupHead);
+  const setupCrest = crestPicker('hound', colorInput.value); setupCrest.choice.addEventListener('change', updatePreview); colorInput.addEventListener('input', () => setupCrest.updateColor(colorInput.value));
+  const setupOptions = element('div', 'rb-kit-options'); setupOptions.append(strategyLabel, colorLabel, setupCrest.root); setupHead.append(setupCopy, setupOptions); setup.append(setupHead);
   const setupRows = element('div', 'rb-setup-rows');
   const rowControls = state.players.filter((p) => p.teamId === 'home').map((p, index) => {
     const row = element('div', 'rb-setup-row');
     const identity = element('div', 'rb-identity');
-    const portrait = element('div', 'rb-portrait-wrap'); portrait.append(playerPortrait(p, colorInput.value)); identity.append(portrait);
+    const portrait = element('div', 'rb-portrait-wrap'); portrait.append(athletePortrait(p, colorInput.value)); identity.append(portrait);
     const copy = element('div'); copy.append(element('strong', '', p.name), element('span', 'rb-archetype', archetypeLabel(p)), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString('fr-FR')} m · attaque +${p.attack.bonus}, 1d${p.attack.die}+${p.attack.flat}`));
     identity.append(copy);
     const roleLabel = element('label', 'rb-field', 'Rôle'); const role = element('select'); role.name = `rb-role-${index}`;
@@ -63,7 +71,7 @@ export function mountMatch(root, callbacks = {}) {
     row.append(identity, roleLabel, instructionLabel, description); setupRows.append(row);
     return { role, instruction, portrait };
   });
-  const preparation = element('div', 'rb-preparation'); preparation.append(setupRows);
+  const preparation = element('div', 'rb-preparation rb-exhibition-preparation'); preparation.append(setupRows);
   const deployment = deploymentEditor({ players: state.players.filter((p) => p.teamId === 'home'), positions: defaultDeployment(), color: colorInput.value, onChange: updatePreview });
   const opening = openingPicker({ value: DEFAULT_OPENING, onChange: (value) => { deployment.update({ positions: openingDeployment(value) }); updatePreview(); } });
   setupRows.prepend(opening.root);
@@ -184,12 +192,12 @@ export function mountMatch(root, callbacks = {}) {
 
   function config() {
     const seed = seedInput.value.trim() || DEFAULT_SEED;
-    return { seed, rulesVersion: CURRENT_RULES, openings: { home: opening.value, away: OPENING_IDS[seedHash(`${seed}:opening:away`) % OPENING_IDS.length] }, deployments: { home: deployment.value }, strategy: strategySelect.value, kitColors: { home: colorInput.value },
+    return { seed, rulesVersion: CURRENT_RULES, openings: { home: opening.value, away: OPENING_IDS[seedHash(`${seed}:opening:away`) % OPENING_IDS.length] }, deployments: { home: deployment.value }, strategy: strategySelect.value, kitColors: { home: colorInput.value }, crestIds: { home: setupCrest.value, away: 'skull' },
       players: rowControls.map(({ role, instruction }) => ({ role: role.value, instruction: instruction.value })) };
   }
   function updatePreview() {
     if (started) return;
-    state = createMatch(config()); selectedId = null; render();
+    state = createMatch(exhibitionIdentity(config())); selectedId = null; render();
     deployment.update({ players: state.players.filter((p) => p.teamId === 'home'), color: colorInput.value });
   }
   function setRunning(value) {
@@ -368,6 +376,7 @@ export function mountMatch(root, callbacks = {}) {
     for (const [name, value] of [['CA', p.armor], ['PV', `${p.hp}/${p.maxHp}`], ['Vitesse', p.grappledBy ? '0 m · agrippé' : `${speedText} m${p.grappling ? ' · lutte' : ''}`], ['FOR', p.abilities.strength], ['DEX', p.abilities.dexterity], ['CON', p.abilities.constitution], ['Lutte', signed(p.skills.wrestling ?? modifier(p.abilities.strength))], ['Acrobaties', signed(p.skills.acrobatics ?? modifier(p.abilities.dexterity))]]) {
       const item = element('div'); item.append(element('dt', '', name), element('dd', '', String(value))); stats.append(item);
     }
+    heading.prepend(athletePortrait(p, state.teams.find(t => t.id === p.teamId)?.kitColor, { large: true }));
     selected.append(heading, element('p', 'rb-archetype', archetypeLabel(p)), stats,
       element('p', 'rb-muted', `${sportingWeapon(p).name} · attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants.`));
     const gear = visibleGear(p);
@@ -388,7 +397,7 @@ export function mountMatch(root, callbacks = {}) {
     rosters.replaceChildren();
     for (const team of state.teams) {
       const block = element('section', `rb-roster rb-roster-${team.id}`); const header = element('div', 'rb-roster-heading');
-      const teamTitle = element('div', 'rb-roster-title'); teamTitle.append(teamCrest(team.id), element('h3', `rb-${team.id}`, team.name));
+      const teamTitle = element('div', 'rb-roster-title'); teamTitle.append(teamCrest(team), element('h3', `rb-${team.id}`, team.name));
       header.append(teamTitle, element('span', 'rb-muted', `${visiblePlayers().filter((p) => p.teamId === team.id && p.hp > 0).length}/5 en jeu`)); block.append(header);
       for (const p of visiblePlayers().filter((p) => p.teamId === team.id)) {
         const row = element('div', `rb-roster-row${p.hp === 0 ? ' is-ko' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
@@ -399,7 +408,7 @@ export function mountMatch(root, callbacks = {}) {
         const meter = element('meter'); meter.min = 0; meter.max = p.maxHp; meter.value = p.hp; meter.setAttribute('aria-label', `Points de vie de ${p.name}`); health.append(meter);
         const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', p.readiedPass ? 'Passe prête' : '', (displayFrame?.ball ?? state.ball).carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
         const resource = element('small', 'rb-resource', p.hp === 0 ? 'Hors jeu' : p.reaction ? 'Réaction disponible' : 'Réaction dépensée');
-        row.append(copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource,
+        row.append(athletePortrait(p, state.teams.find(t => t.id === p.teamId)?.kitColor), copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource,
           element('small', 'rb-class-resource', classResources(p, state.players))); block.append(row);
       }
       rosters.append(block);
@@ -442,10 +451,14 @@ export function mountMatch(root, callbacks = {}) {
       const color = team.kitColor ?? KIT_COLORS[index];
       root.style.setProperty(`--rb-${team.id}`, readableKit(color)); root.style.setProperty(`--rb-kit-${team.id}`, color);
     }
-    if (!started) for (const [i, p] of state.players.filter((p) => p.teamId === 'home').entries()) rowControls[i].portrait.replaceChildren(playerPortrait(p, colorInput.value));
+    if (!started) for (const [i, p] of state.players.filter((p) => p.teamId === 'home').entries()) rowControls[i].portrait.replaceChildren(athletePortrait(p, colorInput.value));
     homeScore.querySelector('small').textContent = `${STRATEGIES[state.teams[0].strategy]} · ${OPENINGS[state.teams[0].opening]?.name ?? 'votre équipe'}`;
     awayScore.querySelector('small').textContent = `${STRATEGIES[state.teams[1].strategy]} · ${OPENINGS[state.teams[1].opening]?.name ?? 'adversaire'}`;
-    for (const [index, score] of [homeScore, awayScore].entries()) score.querySelector('strong').textContent = state.teams[index].name;
+    for (const [index, score] of [homeScore, awayScore].entries()) {
+      const team = state.teams[index], key = team.crestId + ':' + team.kitColor;
+      score.querySelector('strong').textContent = team.name;
+      if (score.dataset.crest !== key) { score.children[0].remove(); score.prepend(teamCrest(team)); score.dataset.crest = key; }
+    }
     for (const [index, id] of ['home', 'away'].entries()) legend.children[index].lastChild.textContent = teamLabel(id);
     setup.hidden = started;
     toolbar.hidden = !started || state.finished;
@@ -496,7 +509,7 @@ export function mountMatch(root, callbacks = {}) {
   function tick() { timer = null; if (!visible()) { setRunning(false); return; } advance(); if (running) scheduleNextTurn(); }
   function launch(configuration) {
     context = 'exhibition';
-    setRunning(false); resetKickoff(); lastConfig = structuredClone(configuration); state = createMatch(lastConfig);
+    setRunning(false); resetKickoff(); lastConfig = structuredClone(configuration); state = createMatch(exhibitionIdentity(lastConfig));
     started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
     render(); kickoff.start(); setRunning(true);
     pause.focus({ preventScroll: true }); scoreboard.scrollIntoView({ block: 'start', behavior: 'instant' });

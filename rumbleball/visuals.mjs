@@ -1,4 +1,5 @@
 import { KIT_COLORS, playerLook, sportingWeapon, visibleGear } from './appearance.mjs';
+import { portraitById, crestById, validCrest } from './identity.mjs';
 // Presentation only. Match rules and player positions stay in the simulation modules.
 export function svg(tag, attributes = {}, text) {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -28,9 +29,21 @@ export function ballArtwork() {
   return sprite;
 }
 
-export function teamCrest(teamId) {
+let crestSequence = 0;
+export function teamCrest(team) {
+  const teamId = typeof team === 'string' ? team : team.id;
   const crest = svg('svg', { viewBox: '0 0 64 72', class: `rb-crest rb-${teamId}`, 'aria-hidden': 'true', focusable: 'false' });
+  if (typeof team === 'object' && team.kitColor) crest.style.setProperty('color', team.kitColor);
   crest.append(svg('path', { d: 'M6 5H58V43L32 65 6 43Z', class: 'rb-crest-shield' }));
+  if (typeof team === 'object' && validCrest(team.crestId)) {
+    const id = `rb-emblem-${++crestSequence}`, defs = svg('defs'), mask = svg('mask', { id, x: 6, y: 6, width: 52, height: 52, maskUnits: 'userSpaceOnUse' });
+    const image = svg('image', { href: crestById(team.crestId).src, x: 7, y: 7, width: 50, height: 50 });
+    const fallback = svg('path', { d: 'M36 14 18 36H29L25 52 46 28H34Z', fill: 'currentColor' });
+    image.addEventListener('load', () => fallback.setAttribute('visibility', 'hidden'));
+    image.addEventListener('error', () => fallback.setAttribute('visibility', 'visible'));
+    mask.append(image); defs.append(mask); crest.append(defs, fallback, svg('rect', { x: 6, y: 6, width: 52, height: 52, fill: 'currentColor', mask: `url(#${id})` }));
+    return crest;
+  }
   if (teamId === 'home') {
     crest.append(svg('path', { d: 'M36 14 18 36H29L25 52 46 28H34Z', fill: 'currentColor' }));
     crest.append(svg('path', { d: 'M14 14V25M50 38V48', class: 'rb-crest-detail' }));
@@ -42,18 +55,37 @@ export function teamCrest(teamId) {
   return crest;
 }
 
+export function athletePortrait(player, color = KIT_COLORS[0], { large = false } = {}) {
+  const node = document.createElement('span'); node.className = 'rb-athlete-portrait'; node.style.setProperty('--rb-portrait-kit', color);
+  node.setAttribute('role', 'img'); node.setAttribute('aria-label', player.name);
+  const fallback = playerPortrait(player, color); fallback.setAttribute('aria-hidden', 'true'); node.append(fallback);
+  const portrait = portraitById(player.portraitId);
+  if (portrait) {
+    const image = document.createElement('img'); image.src = large ? portrait.src : portrait.thumb;
+    image.alt = ''; image.width = image.height = large ? 512 : 128; image.loading = 'lazy'; image.decoding = 'async';
+    image.addEventListener('error', () => { image.hidden = true; }); node.append(image);
+  }
+  if (player.archetype) node.append(archetypeIcon(player.archetype));
+  return node;
+}
+export function archetypeIcon(id) {
+  const paths = { belier: 'M4 7h16v9H4zM8 4v16M16 4v16M1 10h3M20 10h3', escamoteur: 'M14 2 5 13h7l-2 9 10-13h-7z', capitaine: 'M3 6 8 10 12 3 16 10 21 6 19 19H5z', passeur: 'M3 15q4-12 17-8M15 3l6 4-5 5M3 18h9' };
+  const node = svg('svg', { viewBox: '0 0 24 24', class: 'rb-archetype-icon', 'aria-hidden': 'true', focusable: 'false' });
+  node.append(svg('path', { d: paths[id] ?? paths.capitaine, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.8, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' })); return node;
+}
+
 export function arenaBackdrop(wetCells) {
   const background = svg('g', { 'aria-hidden': 'true' });
   const definitions = svg('defs');
   const floor = svg('pattern', { id: 'rb-floor', width: 60, height: 60, patternUnits: 'userSpaceOnUse' });
-  floor.append(svg('rect', { width: 60, height: 60, fill: '#202a2b' }),
+  floor.append(svg('rect', { width: 60, height: 60, fill: '#202b3f' }),
     svg('path', { d: 'M3 3H57V57H3ZM6 53 25 34M37 21 53 5', stroke: '#bac2b1', 'stroke-width': 1, fill: 'none', opacity: .045 }));
   const stripes = svg('pattern', { id: 'rb-hazard', width: 14, height: 14, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
   stripes.append(svg('rect', { width: 7, height: 14, fill: '#c8cc78' }));
   const wet = svg('pattern', { id: 'rb-wet-floor', width: 12, height: 12, patternUnits: 'userSpaceOnUse' });
   wet.append(svg('rect', { width: 12, height: 12, fill: '#3e5c66' }), svg('path', { d: 'M0 10 10 0M8 14 14 8', stroke: '#a1c2c5', 'stroke-width': 1, opacity: .18 }));
   definitions.append(floor, stripes, wet); background.append(definitions);
-  background.append(svg('rect', { x: -28, y: -36, width: 776, height: 540, fill: '#131a1b', stroke: '#46514e', 'stroke-width': 1 }));
+  background.append(svg('rect', { x: -28, y: -36, width: 776, height: 540, fill: '#111b2e', stroke: '#465570', 'stroke-width': 1 }));
   for (const x of [60, 560]) background.append(svg('rect', { x, y: -33, width: 100, height: 6, fill: 'url(#rb-hazard)', opacity: .6 }));
   for (const [x, y] of [[-21, -29], [741, -29], [-21, 497], [741, 497]]) background.append(svg('circle', { cx: x, cy: y, r: 2, fill: '#68716a' }));
   background.append(svg('rect', { width: 720, height: 480, fill: 'url(#rb-floor)' }));
@@ -129,6 +161,14 @@ export function pawnArtwork(player, color = KIT_COLORS[player.teamId === 'away' 
   if (look.hairStyle === 'braids') hair.append(svg('path', { d: 'M-7 0L-8 7M7 0L8 7', 'stroke-width': 4, stroke: look.hair, 'stroke-linecap': 'round' }));
   if (look.hairStyle === 'bald') hair.append(svg('path', { d: 'M-5-6Q-4-9-1-9', fill: 'none', stroke: '#f4e4ca', opacity: .35 }));
   facing.append(hair);
+  // Permanent facial traits are cosmetic; purchased sporting implants remain separate.
+  const face = svg('g', { 'data-face-detail': look.faceDetail ?? 'none', ...outline });
+  if (look.faceDetail === 'jaw') face.append(svg('path', { d: 'M-9-13L-6-17H6L9-13L7-10H-7Z', fill: '#b8c5cc' }), svg('path', { d: 'M-4-14H4', stroke: '#526473', 'stroke-width': 1.5 }));
+  if (look.faceDetail === 'optic') face.append(svg('circle', { cx: -4, cy: -13, r: 2.4, fill: '#ff793d', stroke: '#c8d7e5' }));
+  if (look.faceDetail === 'visor') face.append(svg('path', { d: 'M-8-15H8V-11H-8Z', fill: '#4266e9', stroke: '#b6c8ec' }));
+  if (look.faceDetail === 'paint') face.append(svg('path', { d: 'M-7-15L-4-10M5-15L7-10', stroke: '#f28abb', 'stroke-width': 2.5 }));
+  if (look.faceDetail === 'patch') face.append(svg('path', { d: 'M-8-15H-1V-10H-8Z', fill: '#ffb94f' }));
+  facing.append(face);
   if (gear.implant === 'interface') facing.append(svg('path', { d: 'M-8-13H8V-9H-8Z', fill: '#273d46', ...outline }), svg('path', { d: 'M-6-11H6', stroke: '#83efe1', 'stroke-width': 1.5 }));
   body.append(facing); group.append(body);
   if (Number.isInteger(player.number)) {

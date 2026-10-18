@@ -122,7 +122,7 @@ test('ancienne rencontre : import et reprise gardent version, initiative, placem
 test('éditeur : clic, échange, clavier, contenu variable et lecture seule conservent cinq cases valides', async () => {
   environment(); const state = createMatch(), changes = [], editor = deploymentEditor({ players: state.players.slice(0, 5), onChange: (value) => changes.push(value) });
   assert.equal(editor.root.querySelectorAll('.rb-deployment-cell').length, 48);
-  assert.equal(editor.root.querySelectorAll('.rb-deployment-opponent').length, 8);
+  assert.equal(editor.root.querySelectorAll('.rb-deployment-opponent').length, 48);
   assert.ok(editor.root.querySelectorAll('.rb-deployment-opponent').every((n) => n.tagName === 'span' && n.getAttribute('aria-hidden') === 'true'));
   assert.match(cell(editor.root, 5, 3).getAttribute('aria-label'), /zone d’engagement/);
   assert.match(cell(editor.root, 5, 4).getAttribute('aria-label'), /zone d’engagement/);

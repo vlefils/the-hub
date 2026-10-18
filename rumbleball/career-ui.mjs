@@ -1,10 +1,11 @@
 import { ROLES, ROLE_DESCRIPTIONS, INSTRUCTIONS, STRATEGIES, STARTS } from './data.mjs';
 import { ARCHETYPES, archetypeLabel, classAbilities } from './classes.mjs';
 import { CATALOGUE, XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice } from './progression.mjs';
-import { createCareer, confirmDraft, configureTeam, setClubColor, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
+import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
 import { loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
 import { KIT_COLORS, clubKit } from './appearance.mjs';
-import { playerPortrait } from './visuals.mjs';
+import { playerPortrait, teamCrest, athletePortrait } from './visuals.mjs';
+import { crestPicker, clubIdentity, matchBanner, equipmentArtwork, compositionTabs, careerContext } from './broadcast-components.mjs';
 import { deploymentEditor } from './deployment-ui.mjs';
 import { clubDeployment } from './deployment.mjs';
 import { clubOpening, openingDeployment } from './openings.mjs';
@@ -97,7 +98,7 @@ export function mountCareer(root, mountMatch) {
     }
     const headerActions = el('div', 'rb-header-actions'); headerActions.append(finances);
     if (!locked && opponent && tab !== 'Club' && !(tab === 'Équipe' && teamView === 'Préparation') && tab !== 'Bilan') headerActions.append(btn('Préparer le match', () => go('Équipe', 'Préparation')));
-    header.append(identity, headerActions); manager.append(header);
+    const badgeIdentity = el('div', 'rb-club-identity'); badgeIdentity.append(teamCrest(club), identity); header.append(badgeIdentity, headerActions); manager.append(header);
     if (locked) {
       const matchStrip = el('div', 'rb-next-match');
       matchStrip.append(el('p', '', `Rencontre en cours contre ${career.current.config.teamNames.away}. Gestion en lecture seule. La reprise se fait en pause.`), btn('Reprendre la rencontre', () => openMatch(), true));
@@ -141,7 +142,7 @@ export function mountCareer(root, mountMatch) {
       const line = el('div', 'rb-team-preview');
       for (const [index, id] of career.lineup.entries()) {
         const p = ownedPlayers(career).find((p) => p.id === id), b = btn('', () => { selectedPlayer = id; rosterDetailOpen = true; go('Équipe', 'Effectif'); });
-        b.setAttribute('aria-label', `Voir ${p.name}, titulaire ${index + 1}`); b.append(playerPortrait({ ...compilePlayer(p, career.inventory), number: index + 1 }, clubKit(career.clubs[0])), el('small', '', p.name)); line.append(b);
+        b.setAttribute('aria-label', `Voir ${p.name}, titulaire ${index + 1}`); b.append(athletePortrait(compilePlayer(p, career.inventory), clubKit(career.clubs[0])), el('small', '', p.name)); line.append(b);
       } hero.append(line);
     } else {
       const rank = standings(career).findIndex((r) => r.clubId === 'club') + 1;
@@ -166,7 +167,8 @@ export function mountCareer(root, mountMatch) {
     const color = kitPicker(clubKit(career.clubs[0]), locked), kitPreview = el('div', 'rb-kit-preview');
     function updateKitPreview() { kitPreview.replaceChildren(...career.lineup.slice(0, 4).map((id) => playerPortrait(compilePlayer(ownedPlayers(career).find((p) => p.id === id), career.inventory), color.value))); }
     updateKitPreview(); color.addEventListener('input', updateKitPreview); color.addEventListener('change', () => attempt(() => { career = setClubColor(career, color.value); save(); renderManagement(); }));
-    manager.append(disclosure('Identité du club', 'club-identity', field('Couleur des maillots', color), kitPreview, el('p', 'rb-muted', 'Le changement de tenue est gratuit. Les apparences des joueurs sont conservées.')));
+    const crest = crestPicker(career.clubs[0].crestId, color.value, locked); crest.choice.addEventListener('change', () => update(() => setClubCrest(career, crest.value))); color.addEventListener('input', () => crest.updateColor(color.value));
+    manager.append(disclosure('Identité du club', 'club-identity', field('Couleur des maillots', color), crest.root, kitPreview, el('p', 'rb-muted', 'Le changement de tenue et de blason est gratuit. Les apparences des joueurs sont conservées.')));
   }
   function resultLabel() { return career.current.state.result.winnerId === 'home' ? 'Victoire' : career.current.state.result.winnerId === 'away' ? 'Défaite' : 'Match nul'; }
   function renderCreation() {
@@ -180,15 +182,16 @@ export function mountCareer(root, mountMatch) {
     const color = kitPicker(KIT_COLORS[0]), preview = el('div', 'rb-kit-preview');
     const showKit = () => preview.replaceChildren(...[0, 1, 2, 4].map((profile) => playerPortrait(compilePlayer({ id: `preview-${profile}`, name: 'Aperçu', profile, xp: 0, fatigue: 0 }), color.value)));
     color.addEventListener('input', showKit); showKit(); form.append(field('Couleur des maillots', color), preview);
+    const crest = crestPicker('hound', color.value); color.addEventListener('input', () => crest.updateColor(color.value)); form.append(crest.root);
     let replace;
     if (loaded.hasSave) { replace = el('input'); replace.type = 'checkbox'; replace.required = true; form.append(field('Remplacer la sauvegarde existante, après avoir conservé une copie si nécessaire.', replace)); }
     const submit = btn('Choisir les premières recrues', () => {}, true); submit.type = 'submit'; form.append(submit);
-    form.addEventListener('submit', (event) => { event.preventDefault(); const seed = `club-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`; update(() => createCareer(input.value, seed, color.value)); });
+    form.addEventListener('submit', (event) => { event.preventDefault(); const seed = `club-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`; update(() => setClubCrest(createCareer(input.value, seed, color.value), crest.value)); });
     welcome.append(introduction, form); manager.append(welcome);
   }
   function renderDraft() {
     manager.append(el('p', 'rb-eyebrow', career.clubs[0].name), el('h3', '', 'Choisir votre effectif initial'), el('p', 'rb-muted', 'Sélection réversible. Les contrats sont payés ensemble à la validation. Les cinq premières recrues sélectionnées seront titulaires ; leur ordre restera modifiable.'));
-    const color = kitPicker(clubKit(career.clubs[0])); color.addEventListener('change', () => update(() => setClubColor(career, color.value))); manager.append(field('Couleur des maillots', color));
+    const color = kitPicker(clubKit(career.clubs[0])); color.addEventListener('change', () => update(() => setClubColor(career, color.value))); manager.append(field('Couleur des maillots', color)); const crest = crestPicker(career.clubs[0].crestId, color.value); crest.choice.addEventListener('change', () => update(() => setClubCrest(career, crest.value))); manager.append(crest.root);
     const list = el('div', 'rb-candidate-list'), footer = el('div', 'rb-draft-total'), total = el('strong'), confirm = btn('Valider les contrats', () => update(() => confirmDraft(career, [...draftIds])), true);
     function totals() { const chosen = career.market.filter((p) => draftIds.has(p.id)), cost = chosen.reduce((sum, p) => sum + recruitmentPrice(p), 0), wages = chosen.reduce((sum, p) => sum + salary(p), 0); total.textContent = `${draftIds.size}/8 joueurs · contrats ${money(cost)} · reste ${money(2400 - cost)} · après les premiers salaires : ${money(2400 - cost - wages)}${2400 - cost - wages < 0 ? ' (salaires impayés autorisés)' : ''}`; confirm.disabled = draftIds.size < 5 || draftIds.size > 8 || cost > 2400; }
     for (const p of career.market) {
@@ -234,9 +237,10 @@ export function mountCareer(root, mountMatch) {
     }
   }
   function renderPreparation(locked) {
-    manager.append(pageHeading('Préparer la rencontre', 'Cinq titulaires, un plan collectif et votre placement au coup d’envoi.'));
+    const own = career.clubs[0], fixture = nextFixture(career), other = fixture && career.clubs.find(c => c.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
+    if (other) manager.append(matchBanner(own, other, 'Journée ' + (career.day + 1), locked ? 'Composition figée pour cette rencontre' : 'Composition enregistrée automatiquement · modifiable avant le lancement'));
     const form = el('form', 'rb-lineup-form'), strategy = keyed(select(STRATEGIES, career.clubs[0].strategy), 'strategy'); strategy.disabled = locked;
-    const preparation = el('div', 'rb-preparation'), teamControls = el('div', 'rb-team-controls'), teamPlans = el('div', 'rb-team-plans');
+    const preparation = el('div', 'rb-preparation rb-sport-preparation'), teamControls = el('div', 'rb-team-controls rb-broadcast-squad'), teamPlans = el('div', 'rb-team-plans');
     const assignments = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, { role: p.role, instruction: p.instruction }]));
     const lineup = el('div', 'rb-lineup-slots'), slotControls = [], slotCopies = [], active = el('section', 'rb-tactical-player'), bench = el('div', 'rb-bench');
     const names = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, p.name]));
@@ -250,7 +254,7 @@ export function mountCareer(root, mountMatch) {
       onChange: (value) => attempt(() => { formationUndo = { positions: deployment.value, opening: clubOpening(career.clubs[0]) }; deployment.update({ positions: openingDeployment(value) }); undo.hidden = false; commitLineup(); }) });
     const strategyHelp = el('p', 'rb-muted');
     function describeStrategy() { strategyHelp.textContent = { balanced: 'Une répartition équilibrée entre progression, soutien et défense.', possession: 'Protège le porteur par des blocages, des sorties de pression et des relais sûrs.', pressing: 'Met la pression sur le porteur adverse et conteste les accès au ballon.' }[strategy.value]; }
-    describeStrategy(); teamPlans.append(field('Plan collectif', strategy), strategyHelp, opening.root, undo); form.append(teamPlans);
+    describeStrategy(); teamPlans.append(field('Plan collectif', strategy), strategyHelp, opening.root, undo);
     teamControls.append(el('h4', '', 'Les cinq titulaires'), lineup, active, bench);
     for (const [index, id] of career.lineup.entries()) {
       const s = keyed(select(names, id), `lineup-${index}`); s.disabled = locked; slotControls.push(s);
@@ -287,12 +291,14 @@ export function mountCareer(root, mountMatch) {
       refreshSlots();
     }
     function commitLineup() {
-      career = configureTeam(career, slotControls.map((s) => s.value), assignments, strategy.value, deployment.value, opening.value);
+      career = setClubCrest(configureTeam(career, slotControls.map((s) => s.value), assignments, strategy.value, deployment.value, opening.value), crest.value);
       const saved = save(); deployment.update({ players: deploymentPlayers(), selectedPlayerId: selectedPlayer }); refreshSlots();
       const message = saved ? 'Composition, placement et consignes enregistrés.' : 'Modifications en mémoire ; sauvegarde à réessayer.'; if (formNotice.textContent !== message) formNotice.textContent = message;
     }
     strategy.addEventListener('change', () => attempt(() => { describeStrategy(); commitLineup(); }));
-    preparation.append(deployment.root, teamControls); form.append(preparation, formNotice);
+    const crest = crestPicker(own.crestId, clubKit(own), locked); crest.choice.addEventListener('change', () => attempt(commitLineup)); teamPlans.append(crest.root);
+    const tactics = el('section', 'rb-broadcast-tactics'); tactics.append(deployment.root, teamPlans);
+    preparation.append(compositionTabs(preparation), teamControls, tactics, careerContext(career)); form.append(preparation, formNotice);
     const launch = el('div', 'rb-launch-bar'), copy = el('div');
     copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : !nextFixture(career) ? 'La saison est terminée' : `${money(payroll(career))} de salaires au coup d’envoi`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : !nextFixture(career) ? 'Commencez la saison suivante depuis Club.' : `Solde après prélèvement : ${money(career.balance - payroll(career))}. Les primes seront versées après le match.`));
     launch.append(copy, blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : !nextFixture(career) ? 'La saison est terminée. Commencez la suivante depuis Club.' : '')); form.append(launch);
@@ -334,7 +340,7 @@ export function mountCareer(root, mountMatch) {
       const row = el('div', 'rb-inventory-row'), assignment = keyed(select({ '': 'Réserve', ...Object.fromEntries(players.map((p) => [p.id, p.name])) }, item.playerId ?? ''), `gear-${item.id}`); assignment.disabled = locked;
       assignment.addEventListener('change', () => update(() => assignProtection(career, item.id, assignment.value || null)));
       const transfer = el('div'); transfer.append(el('strong', '', CATALOGUE[item.itemId].name), field('Attribuer à · transfert gratuit', assignment));
-      row.append(transfer, keyed(blocked(btn(`Revendre · ${money(CATALOGUE[item.itemId].price / 2)}`, () => update(() => sellProtection(career, item.id))), locked ? 'Rencontre en cours.' : ''), `resell-${item.id}`)); inventory.append(row);
+      row.append(equipmentArtwork(item.itemId, CATALOGUE[item.itemId].name), transfer, keyed(blocked(btn(`Revendre · ${money(CATALOGUE[item.itemId].price / 2)}`, () => update(() => sellProtection(career, item.id))), locked ? 'Rencontre en cours.' : ''), `resell-${item.id}`)); inventory.append(row);
     }
     manager.append(inventory, el('h4', '', 'Magasin'), el('p', 'rb-muted', `Les achats sont équipés sur ${p.name}. Un implant est attaché au joueur ; son remplacement détruit l’ancien.`));
     for (const slot of ['protection', 'implant']) {
@@ -344,6 +350,7 @@ export function mountCareer(root, mountMatch) {
         const row = el('section', 'rb-career-player'), afterPlayer = structuredClone(p), afterInventory = structuredClone(career.inventory);
         if (item.slot === 'implant') afterPlayer.implant = id;
         else { for (const old of afterInventory) if (old.playerId === p.id) old.playerId = null; afterInventory.push({ id: 'preview', itemId: id, playerId: p.id }); }
+        row.append(equipmentArtwork(id, item.name));
         row.append(portraitIdentity(compilePlayer(afterPlayer, afterInventory), clubKit(career.clubs[0]), el('h4', '', item.name), el('small', 'rb-muted', 'Aperçu sur le joueur')), el('p', '', item.effect), comparison(before, compilePlayer(afterPlayer, afterInventory), p.implant, afterPlayer.implant));
         if (p.implant && item.slot === 'implant' && p.implant !== id) row.append(el('p', 'rb-loss', `Remplace et détruit : ${CATALOGUE[p.implant].name}.`));
         const available = career.inventory.find((i) => i.itemId === id && i.playerId !== p.id);
@@ -360,7 +367,7 @@ export function mountCareer(root, mountMatch) {
   function renderLeague() {
     const rows = standings(career), layout = el('div', 'rb-league-layout'), ranking = el('section'), calendar = el('section', 'rb-league-calendar');
     manager.append(pageHeading('La ligue', `Saison ${career.season} · Six clubs, dix journées, une place à prendre.`));
-    ranking.append(el('h4', '', 'Classement'), table(['Club', 'Joués', 'V', 'N', 'D', 'Points'], rows.map((r, i) => [`${i + 1}. ${r.name}`, r.played, r.wins, r.draws, r.losses, r.points]), { highlight: rows.findIndex((r) => r.clubId === 'club'), caption: 'Classement de la saison. V : victoires, N : nuls, D : défaites.' }),
+    ranking.append(el('h4', '', 'Classement'), table(['Club', 'Joués', 'V', 'N', 'D', 'Points'], rows.map((r) => [clubIdentity(career.clubs.find(c => c.id === r.clubId), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: rows.findIndex((r) => r.clubId === 'club'), caption: 'Classement de la saison. V : victoires, N : nuls, D : défaites.' }),
       el('p', 'rb-muted', 'Victoire : 3 points · nul : 1. Départage par victoires, puis ordre fixé en début de saison.'), disclosure('Primes de classement', 'league-prizes', el('p', 'rb-muted', '1er : 600 · 2e : 400 · 3e : 200 · 4e à 6e : 100 chromas.')));
     calendarDay = Math.min(9, Math.max(0, calendarDay ?? career.day));
     const day = keyed(select(Object.fromEntries(career.schedule.map((_, i) => [i, `Journée ${i + 1}${i < career.day ? ' · terminée' : i === career.day ? ' · à jouer' : ''}`])), calendarDay), 'calendar-day');
@@ -368,7 +375,7 @@ export function mountCareer(root, mountMatch) {
     for (const f of career.schedule[calendarDay]) {
       const home = career.clubs.find((c) => c.id === f.homeId), away = career.clubs.find((c) => c.id === f.awayId), own = [f.homeId, f.awayId].includes('club');
       const row = el('div', `rb-fixture-row${own ? ' is-own' : ''}`);
-      row.append(el('strong', '', `${home.name} — ${away.name}`), el('p', 'rb-muted', !f.result ? 'À jouer' : f.result.winnerId ? `Victoire : ${career.clubs.find((c) => c.id === f.result.winnerId).name}` : 'Match nul')); calendar.append(row);
+      row.append(clubIdentity(home, { compact: true }), clubIdentity(away, { compact: true }), el('p', 'rb-muted', !f.result ? 'À jouer' : f.result.winnerId ? `Victoire : ${career.clubs.find((c) => c.id === f.result.winnerId).name}` : 'Match nul')); calendar.append(row);
     } layout.append(ranking, calendar); manager.append(layout);
     const opponents = disclosure('Clubs adverses et rotation', 'league-opponents');
     for (const club of career.clubs.slice(1)) { opponents.append(el('h4', '', `${club.name} · ${club.style}`), table(['Joueur', 'Niveau', 'XP', 'Fatigue'], club.players.map((p) => [p.name, levelOf(p), p.xp, `${p.fatigue}/6`]))); }

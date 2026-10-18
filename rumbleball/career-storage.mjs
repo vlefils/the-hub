@@ -3,6 +3,7 @@ import { CATALOGUE } from './progression.mjs';
 import { assertInvariants } from './rules.mjs';
 import { createMatch } from './engine.mjs';
 import { validKitColor } from './appearance.mjs';
+import { validCrest, validPortrait } from './identity.mjs';
 import { validDeployment } from './deployment.mjs';
 import { validOpening } from './openings.mjs';
 
@@ -18,12 +19,14 @@ export function validateCareer(c) {
   const clubIds = c.clubs.map((club) => club.id); check(new Set(clubIds).size === 6);
   const playerIds = new Set();
   const validatePlayer = (p) => {
+    check(p.portraitId === undefined || validPortrait(p.portraitId));
     check(p && name(p.id) && name(p.name) && integer(p.profile) && p.profile < PROFILES.length && integer(p.xp) && integer(p.fatigue) && p.fatigue <= 6);
     check(Object.hasOwn(ROLES, p.role) && Object.hasOwn(INSTRUCTIONS, p.instruction));
     check(p.implant === null || CATALOGUE[p.implant]?.slot === 'implant');
     check(!playerIds.has(p.id)); playerIds.add(p.id);
   };
   for (const [index, club] of c.clubs.entries()) {
+    check(club.crestId === undefined || validCrest(club.crestId));
     check(club.kitColor === undefined || validKitColor(club.kitColor));
     check(club.deployment === undefined || validDeployment(club.deployment));
     check(club.opening === undefined || validOpening(club.opening));
@@ -82,7 +85,7 @@ export function validateCareer(c) {
     check(m.config.rosters && ['home', 'away'].every((side) => Array.isArray(m.config.rosters[side]) && m.config.rosters[side].length === 5));
     check(name(m.config.teamNames?.home) && name(m.config.teamNames?.away));
     check(integer(m.state.rng) && m.state.rng <= 4294967295 && Array.isArray(m.state.teams) && m.state.teams.length === 2);
-    check(m.state.teams.every((t, i) => t.id === (i ? 'away' : 'home') && name(t.name) && Object.hasOwn(STRATEGIES, t.strategy) && (t.kitColor === undefined || validKitColor(t.kitColor))));
+    check(m.state.teams.every((t, i) => t.id === (i ? 'away' : 'home') && name(t.name) && Object.hasOwn(STRATEGIES, t.strategy) && (t.kitColor === undefined || validKitColor(t.kitColor)) && (t.crestId === undefined || validCrest(t.crestId)) && t.crestId === m.config.crestIds?.[t.id]));
     check(['regular', 'overtime', 'final'].includes(m.state.phase));
     if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, 10));
     else check(m.state.result === null);
@@ -93,6 +96,7 @@ export function validateCareer(c) {
     if (m.state.version >= 4) check(m.state.teams.every((team, i) => validOpening(team.opening) && team.opening === initial.teams[i].opening));
     check(initial.players.every((p, i) => {
       const saved = m.state.players[i];
+      check(p.portraitId === undefined || validPortrait(p.portraitId)); check(p.portraitId === saved.portraitId);
       check(name(p.name) && integer(p.level, 1) && p.level <= 5 && integer(p.maxHp, 1) && integer(p.armor, 1) && Number.isFinite(p.speed) && p.speed > 0);
       check(Object.values(p.skills).every(Number.isFinite) && Object.values(p.abilities).every(Number.isFinite) && Object.values(p.attack).every(Number.isFinite));
       check(integer(saved.hp) && Number.isFinite(saved.movement) && saved.movement >= 0 && saved.classState && Array.isArray(m.state.aids) && Array.isArray(m.state.calls));

@@ -1,0 +1,1317 @@
+{
+  "generator": "image_gen built-in",
+  "direction": "Broadcast sportif",
+  "portraits": [
+    {
+      "id": "p01",
+      "skin": "#f2c7a5",
+      "hair": "#242525",
+      "hairStyle": "crop",
+      "description": "woman, age 24, light warm skin, black short close cropped hair, square jaw and thoughtful expression"
+    },
+    {
+      "id": "p02",
+      "skin": "#dca27c",
+      "hair": "#513628",
+      "hairStyle": "sweep",
+      "description": "man, age 31, light tan skin, dark brown side swept short hair, angular face and confident expression"
+    },
+    {
+      "id": "p03",
+      "skin": "#bb805b",
+      "hair": "#815032",
+      "hairStyle": "mohawk",
+      "description": "androgynous adult, age 38, medium warm brown skin, chestnut short mohawk, rounded face and focused expression"
+    },
+    {
+      "id": "p04",
+      "skin": "#975e40",
+      "hair": "#cc9b4c",
+      "hairStyle": "bald",
+      "description": "woman, age 45, bronze brown skin, bald, broad cheekbones and determined expression"
+    },
+    {
+      "id": "p05",
+      "skin": "#704630",
+      "hair": "#b5b2a6",
+      "hairStyle": "bun",
+      "description": "man, age 52, deep brown skin, silver gray hair tied in a small bun, long face and calm expression"
+    },
+    {
+      "id": "p06",
+      "skin": "#493025",
+      "hair": "#b95f42",
+      "hairStyle": "braids",
+      "description": "androgynous adult, age 27, very dark brown skin, copper red close scalp braids, square jaw and thoughtful expression"
+    },
+    {
+      "id": "p07",
+      "skin": "#f2c7a5",
+      "hair": "#597b82",
+      "hairStyle": "crop",
+      "description": "woman, age 34, light warm skin, muted teal short close cropped hair, angular face and confident expression"
+    },
+    {
+      "id": "p08",
+      "skin": "#dca27c",
+      "hair": "#9d577e",
+      "hairStyle": "sweep",
+      "description": "man, age 41, light tan skin, muted violet side swept short hair, rounded face and focused expression"
+    },
+    {
+      "id": "p09",
+      "skin": "#bb805b",
+      "hair": "#242525",
+      "hairStyle": "mohawk",
+      "description": "androgynous adult, age 48, medium warm brown skin, black short mohawk, broad cheekbones and determined expression"
+    },
+    {
+      "id": "p10",
+      "skin": "#975e40",
+      "hair": "#513628",
+      "hairStyle": "bald",
+      "description": "woman, age 55, bronze brown skin, bald, long face and calm expression"
+    },
+    {
+      "id": "p11",
+      "skin": "#704630",
+      "hair": "#815032",
+      "hairStyle": "bun",
+      "description": "man, age 30, deep brown skin, chestnut hair tied in a small bun, square jaw and thoughtful expression"
+    },
+    {
+      "id": "p12",
+      "skin": "#493025",
+      "hair": "#cc9b4c",
+      "hairStyle": "braids",
+      "description": "androgynous adult, age 37, very dark brown skin, golden blond close scalp braids, angular face and confident expression"
+    },
+    {
+      "id": "p13",
+      "skin": "#f2c7a5",
+      "hair": "#b5b2a6",
+      "hairStyle": "crop",
+      "description": "woman, age 44, light warm skin, silver gray short close cropped hair, rounded face and focused expression"
+    },
+    {
+      "id": "p14",
+      "skin": "#dca27c",
+      "hair": "#b95f42",
+      "hairStyle": "sweep",
+      "description": "man, age 51, light tan skin, copper red side swept short hair, broad cheekbones and determined expression"
+    },
+    {
+      "id": "p15",
+      "skin": "#bb805b",
+      "hair": "#597b82",
+      "hairStyle": "mohawk",
+      "description": "androgynous adult, age 26, medium warm brown skin, muted teal short mohawk, long face and calm expression"
+    },
+    {
+      "id": "p16",
+      "skin": "#975e40",
+      "hair": "#9d577e",
+      "hairStyle": "bald",
+      "description": "woman, age 33, bronze brown skin, bald, square jaw and thoughtful expression"
+    },
+    {
+      "id": "p17",
+      "skin": "#704630",
+      "hair": "#242525",
+      "hairStyle": "bun",
+      "description": "man, age 40, deep brown skin, black hair tied in a small bun, angular face and confident expression"
+    },
+    {
+      "id": "p18",
+      "skin": "#493025",
+      "hair": "#513628",
+      "hairStyle": "braids",
+      "description": "androgynous adult, age 47, very dark brown skin, dark brown close scalp braids, rounded face and focused expression"
+    },
+    {
+      "id": "p19",
+      "skin": "#f2c7a5",
+      "hair": "#815032",
+      "hairStyle": "crop",
+      "description": "woman, age 54, light warm skin, chestnut short close cropped hair, broad cheekbones and determined expression"
+    },
+    {
+      "id": "p20",
+      "skin": "#dca27c",
+      "hair": "#cc9b4c",
+      "hairStyle": "sweep",
+      "description": "man, age 29, light tan skin, golden blond side swept short hair, long face and calm expression"
+    },
+    {
+      "id": "p21",
+      "skin": "#bb805b",
+      "hair": "#b5b2a6",
+      "hairStyle": "mohawk",
+      "description": "androgynous adult, age 36, medium warm brown skin, silver gray short mohawk, square jaw and thoughtful expression"
+    },
+    {
+      "id": "p22",
+      "skin": "#975e40",
+      "hair": "#b95f42",
+      "hairStyle": "bald",
+      "description": "woman, age 43, bronze brown skin, bald, angular face and confident expression"
+    },
+    {
+      "id": "p23",
+      "skin": "#704630",
+      "hair": "#597b82",
+      "hairStyle": "bun",
+      "description": "man, age 50, deep brown skin, muted teal hair tied in a small bun, rounded face and focused expression"
+    },
+    {
+      "id": "p24",
+      "skin": "#493025",
+      "hair": "#9d577e",
+      "hairStyle": "braids",
+      "description": "androgynous adult, age 25, very dark brown skin, muted violet close scalp braids, broad cheekbones and determined expression"
+    },
+    {
+      "id": "p25",
+      "skin": "#f2c7a5",
+      "hair": "#242525",
+      "hairStyle": "crop",
+      "description": "woman, age 32, light warm skin, black short close cropped hair, long face and calm expression"
+    },
+    {
+      "id": "p26",
+      "skin": "#dca27c",
+      "hair": "#513628",
+      "hairStyle": "sweep",
+      "description": "man, age 39, light tan skin, dark brown side swept short hair, square jaw and thoughtful expression"
+    },
+    {
+      "id": "p27",
+      "skin": "#bb805b",
+      "hair": "#815032",
+      "hairStyle": "mohawk",
+      "description": "androgynous adult, age 46, medium warm brown skin, chestnut short mohawk, angular face and confident expression"
+    },
+    {
+      "id": "p28",
+      "skin": "#975e40",
+      "hair": "#cc9b4c",
+      "hairStyle": "bald",
+      "description": "woman, age 53, bronze brown skin, bald, rounded face and focused expression"
+    },
+    {
+      "id": "p29",
+      "skin": "#704630",
+      "hair": "#b5b2a6",
+      "hairStyle": "bun",
+      "description": "man, age 28, deep brown skin, silver gray hair tied in a small bun, broad cheekbones and determined expression"
+    },
+    {
+      "id": "p30",
+      "skin": "#493025",
+      "hair": "#b95f42",
+      "hairStyle": "braids",
+      "description": "androgynous adult, age 35, very dark brown skin, copper red close scalp braids, long face and calm expression"
+    },
+    {
+      "id": "p31",
+      "skin": "#f2c7a5",
+      "hair": "#597b82",
+      "hairStyle": "crop",
+      "description": "woman, age 42, light warm skin, muted teal short close cropped hair, square jaw and thoughtful expression"
+    },
+    {
+      "id": "p32",
+      "skin": "#dca27c",
+      "hair": "#9d577e",
+      "hairStyle": "sweep",
+      "description": "man, age 49, light tan skin, muted violet side swept short hair, angular face and confident expression"
+    }
+  ],
+  "crests": [
+    {
+      "id": "hound",
+      "name": "Molosse",
+      "description": "a snarling cyber sporting hound head"
+    },
+    {
+      "id": "helmet",
+      "name": "Casque",
+      "description": "a sharp angular full face sporting helmet"
+    },
+    {
+      "id": "raven",
+      "name": "Corbeau",
+      "description": "a raven head with angular beak"
+    },
+    {
+      "id": "circuit",
+      "name": "Circuit",
+      "description": "a circular circuit with three heavy connecting nodes"
+    },
+    {
+      "id": "bolt",
+      "name": "Éclair",
+      "description": "a powerful angular lightning bolt"
+    },
+    {
+      "id": "fist",
+      "name": "Poing",
+      "description": "a clenched sporting fist"
+    },
+    {
+      "id": "skull",
+      "name": "Crâne",
+      "description": "a simplified skull with angular eye sockets"
+    },
+    {
+      "id": "shark",
+      "name": "Requin",
+      "description": "a shark head in profile"
+    },
+    {
+      "id": "cobra",
+      "name": "Cobra",
+      "description": "a cobra with open hood"
+    },
+    {
+      "id": "ram",
+      "name": "Bélier",
+      "description": "a ram head with broad curled horns"
+    },
+    {
+      "id": "fox",
+      "name": "Renard",
+      "description": "an angular fox head"
+    },
+    {
+      "id": "gear",
+      "name": "Engrenage",
+      "description": "a mechanical cog with a small ball at center"
+    },
+    {
+      "id": "wings",
+      "name": "Ailes",
+      "description": "two bold angular wings"
+    },
+    {
+      "id": "bull",
+      "name": "Taureau",
+      "description": "a charging bull head"
+    },
+    {
+      "id": "claw",
+      "name": "Griffe",
+      "description": "three bold claw slashes"
+    },
+    {
+      "id": "comet",
+      "name": "Comète",
+      "description": "a round sporting ball with a comet tail"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "portrait-p01",
+      "kind": "portraits",
+      "key": "p01",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 24, light warm skin, black short close cropped hair, square jaw and thoughtful expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p02",
+      "kind": "portraits",
+      "key": "p02",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 31, light tan skin, dark brown side swept short hair, angular face and confident expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p03",
+      "kind": "portraits",
+      "key": "p03",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 38, medium warm brown skin, chestnut short mohawk, rounded face and focused expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p04",
+      "kind": "portraits",
+      "key": "p04",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 45, bronze brown skin, bald, broad cheekbones and determined expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p05",
+      "kind": "portraits",
+      "key": "p05",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 52, deep brown skin, silver gray hair tied in a small bun, long face and calm expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p06",
+      "kind": "portraits",
+      "key": "p06",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 27, very dark brown skin, copper red close scalp braids, square jaw and thoughtful expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p07",
+      "kind": "portraits",
+      "key": "p07",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 34, light warm skin, muted teal short close cropped hair, angular face and confident expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p08",
+      "kind": "portraits",
+      "key": "p08",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 41, light tan skin, muted violet side swept short hair, rounded face and focused expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p09",
+      "kind": "portraits",
+      "key": "p09",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 48, medium warm brown skin, black short mohawk, broad cheekbones and determined expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p10",
+      "kind": "portraits",
+      "key": "p10",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 55, bronze brown skin, bald, long face and calm expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p11",
+      "kind": "portraits",
+      "key": "p11",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 30, deep brown skin, chestnut hair tied in a small bun, square jaw and thoughtful expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p12",
+      "kind": "portraits",
+      "key": "p12",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 37, very dark brown skin, golden blond close scalp braids, angular face and confident expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p13",
+      "kind": "portraits",
+      "key": "p13",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 44, light warm skin, silver gray short close cropped hair, rounded face and focused expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p14",
+      "kind": "portraits",
+      "key": "p14",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 51, light tan skin, copper red side swept short hair, broad cheekbones and determined expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p15",
+      "kind": "portraits",
+      "key": "p15",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 26, medium warm brown skin, muted teal short mohawk, long face and calm expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p16",
+      "kind": "portraits",
+      "key": "p16",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 33, bronze brown skin, bald, square jaw and thoughtful expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p17",
+      "kind": "portraits",
+      "key": "p17",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 40, deep brown skin, black hair tied in a small bun, angular face and confident expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p18",
+      "kind": "portraits",
+      "key": "p18",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 47, very dark brown skin, dark brown close scalp braids, rounded face and focused expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p19",
+      "kind": "portraits",
+      "key": "p19",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 54, light warm skin, chestnut short close cropped hair, broad cheekbones and determined expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p20",
+      "kind": "portraits",
+      "key": "p20",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 29, light tan skin, golden blond side swept short hair, long face and calm expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p21",
+      "kind": "portraits",
+      "key": "p21",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 36, medium warm brown skin, silver gray short mohawk, square jaw and thoughtful expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p22",
+      "kind": "portraits",
+      "key": "p22",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 43, bronze brown skin, bald, angular face and confident expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p23",
+      "kind": "portraits",
+      "key": "p23",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 50, deep brown skin, muted teal hair tied in a small bun, rounded face and focused expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p24",
+      "kind": "portraits",
+      "key": "p24",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 25, very dark brown skin, muted violet close scalp braids, broad cheekbones and determined expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p25",
+      "kind": "portraits",
+      "key": "p25",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 32, light warm skin, black short close cropped hair, long face and calm expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p26",
+      "kind": "portraits",
+      "key": "p26",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 39, light tan skin, dark brown side swept short hair, square jaw and thoughtful expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p27",
+      "kind": "portraits",
+      "key": "p27",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 46, medium warm brown skin, chestnut short mohawk, angular face and confident expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p28",
+      "kind": "portraits",
+      "key": "p28",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 53, bronze brown skin, bald, rounded face and focused expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p29",
+      "kind": "portraits",
+      "key": "p29",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 28, deep brown skin, silver gray hair tied in a small bun, broad cheekbones and determined expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p30",
+      "kind": "portraits",
+      "key": "p30",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: androgynous adult, age 35, very dark brown skin, copper red close scalp braids, long face and calm expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p31",
+      "kind": "portraits",
+      "key": "p31",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: woman, age 42, light warm skin, muted teal short close cropped hair, square jaw and thoughtful expression",
+      "transparent": false
+    },
+    {
+      "id": "portrait-p32",
+      "kind": "portraits",
+      "key": "p32",
+      "prompt": "Use case: stylized-concept. Production game asset, one individual character portrait for a coherent cyberpunk sports manager roster. Polished hand painted graphic novel sports illustration, crisp confident contours, controlled soft cel shading, semi realistic human anatomy, grounded adult athlete, energetic sports broadcast identity. Head and upper shoulders centered, front three-quarter facing slightly right, eyes toward viewer, same eye line and medium close crop for every roster portrait. Soft cool key light from upper left, subtle warm orange rim light from right. Plain opaque dark navy #101729 background, no scenery. Neutral charcoal athletic undershirt, no team logo, no visible armour, no weapons, no goggles, no implants, no text, no frame, no badge, no watermark. Diverse normal human features; professional team portrait, not a glamour photograph. Square composition, high resolution. Exact character appearance: man, age 49, light tan skin, muted violet side swept short hair, angular face and confident expression",
+      "transparent": false
+    },
+    {
+      "id": "crest-hound",
+      "kind": "crests",
+      "key": "hound",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a snarling cyber sporting hound head. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation.",
+      "transparent": true
+    },
+    {
+      "id": "crest-helmet",
+      "kind": "crests",
+      "key": "helmet",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a sharp angular full face sporting helmet. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation.",
+      "transparent": true
+    },
+    {
+      "id": "crest-raven",
+      "kind": "crests",
+      "key": "raven",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a raven head with angular beak. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation.",
+      "transparent": true
+    },
+    {
+      "id": "crest-circuit",
+      "kind": "crests",
+      "key": "circuit",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a circular circuit with three heavy connecting nodes. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation.",
+      "transparent": true
+    },
+    {
+      "id": "crest-bolt",
+      "kind": "crests",
+      "key": "bolt",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a powerful angular lightning bolt. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-fist",
+      "kind": "crests",
+      "key": "fist",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a clenched sporting fist. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-skull",
+      "kind": "crests",
+      "key": "skull",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a simplified skull with angular eye sockets. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-shark",
+      "kind": "crests",
+      "key": "shark",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a shark head in profile. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-cobra",
+      "kind": "crests",
+      "key": "cobra",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a cobra with open hood. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-ram",
+      "kind": "crests",
+      "key": "ram",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a ram head with broad curled horns. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-fox",
+      "kind": "crests",
+      "key": "fox",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: an angular fox head. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-gear",
+      "kind": "crests",
+      "key": "gear",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a mechanical cog with a small ball at center. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-wings",
+      "kind": "crests",
+      "key": "wings",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: two bold angular wings. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-bull",
+      "kind": "crests",
+      "key": "bull",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a charging bull head. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-claw",
+      "kind": "crests",
+      "key": "claw",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: three bold claw slashes. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "crest-comet",
+      "kind": "crests",
+      "key": "comet",
+      "prompt": "Use case: logo-brand. One production sporting club emblem: a round sporting ball with a comet tail. Bold compact vector-like white monochrome silhouette, clever large transparent internal negative spaces, strong esports sporting visual identity with cyberpunk angular geometry, beautiful simple balanced icon readable at 24 pixels. Only white filled shapes on a genuinely transparent background. Single isolated emblem centered with 12 percent padding, square composition. No shield or outer border because the game composes the shield. No gray, no black background, no gradients, no lighting, no shadows, no text, no letters, no watermark, no image of a logo presentation. Perfectly solid smooth shapes. No sketch lines, grain, hatching or distressed edges.",
+      "transparent": true
+    },
+    {
+      "id": "gear-vest",
+      "kind": "equipment",
+      "key": "vest",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a lightweight sleeveless padded sports chest protector. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "gear-armor",
+      "kind": "equipment",
+      "key": "armor",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a reinforced sports chest armor with broad shoulder guards. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "gear-gloves",
+      "kind": "equipment",
+      "key": "gloves",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a pair of reinforced wrestling gloves. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "gear-soles",
+      "kind": "equipment",
+      "key": "soles",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a pair of adhesive grip sports shoe soles. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "gear-legs",
+      "kind": "equipment",
+      "key": "legs",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a pair of mechanical augmented athletic legs. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "gear-fibers",
+      "kind": "equipment",
+      "key": "fibers",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a compact synthetic muscle fiber bundle for an upper arm. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "gear-interface",
+      "kind": "equipment",
+      "key": "interface",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a small visor-like visuomotor interface implant module. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "gear-regulator",
+      "kind": "equipment",
+      "key": "regulator",
+      "prompt": "Use case: product-mockup. One production game inventory illustration: a compact back mounted effort regulation module. Cyberpunk athletic arena equipment, polished graphic novel illustration, crisp outlined shapes, controlled cel shading, deep neutral gray material, restrained orange and cobalt details. Three-quarter object view, object fills 76 percent of square canvas, centered. Genuine transparent background. Standalone item only, no wearer or person, no box, no price, no text, no UI, no logo, no watermark. Visually practical sporting equipment, not military weaponry.",
+      "transparent": true
+    },
+    {
+      "id": "broadcast-banner",
+      "kind": "banner",
+      "key": "arena",
+      "prompt": "Use case: illustration-story. Wide panoramic background illustration for a cyberpunk sports broadcast match banner, landscape 3:1 composition. View from upper arena concourse toward a distant futuristic brutalist city and floodlit athletic arena. Restrained graphic novel painted style matching professional sports manager portraits. Deep midnight navy #101729, slate, muted cobalt #4266e9, a few restrained warm orange #ff793d lights. Architectural details concentrated at far left and right edges; middle two thirds low contrast dark atmospheric open space to support readable UI titles over it. Opaque image, no typography, no logos, no watermark, no UI, no identifiable existing franchise imagery, no people in foreground, no neon glow overload.",
+      "transparent": false
+    }
+  ],
+  "sourcesDirectory": "output/rumbleball-broadcast-sources",
+  "sources": [
+    {
+      "id": "portrait-p01",
+      "file": "portrait-p01.png",
+      "sha256": "4e02ec9d82d185fe4c3b0a8393fff8aab0790297b2a38a3fdb5cda9420534030"
+    },
+    {
+      "id": "portrait-p02",
+      "file": "portrait-p02.png",
+      "sha256": "2a11fb953625dfd0d0a45b2c37609ca7ce5316644520bd577c0dca8a758e2f59"
+    },
+    {
+      "id": "portrait-p03",
+      "file": "portrait-p03.png",
+      "sha256": "00eecd75727252c6546427c2af4f173051643b9085fa53e8a028eb76e334ccf7"
+    },
+    {
+      "id": "portrait-p04",
+      "file": "portrait-p04.png",
+      "sha256": "2ff1c22f012f366c4e1c0377a7d8c566ab4b5634d43bc0699412ab4943d5b67c"
+    },
+    {
+      "id": "portrait-p05",
+      "file": "portrait-p05.png",
+      "sha256": "35b5574209ad4dac85fbba1134329da88e8b6cd4188a873028aa5e40455922c7"
+    },
+    {
+      "id": "portrait-p06",
+      "file": "portrait-p06.png",
+      "sha256": "7d1cbfa802dbd1f9a83a657d2c7e7335a3ef89520d5f12a9bc69d59bc3fcc429"
+    },
+    {
+      "id": "portrait-p07",
+      "file": "portrait-p07.png",
+      "sha256": "f6809f67d714c9af60b905d7690880f2d1dcdf24b18c8f2df23506c2fcfbb512"
+    },
+    {
+      "id": "portrait-p08",
+      "file": "portrait-p08.png",
+      "sha256": "984fd3735415cc5c1dd28727483039366a961b8f986f5ed8bc531c0cf642f456"
+    },
+    {
+      "id": "portrait-p09",
+      "file": "portrait-p09.png",
+      "sha256": "0ef6b8d8640b39df187cc6419d4a968e8aeb2b2bd42d518907c9a389fb6f5d61"
+    },
+    {
+      "id": "portrait-p10",
+      "file": "portrait-p10.png",
+      "sha256": "3473e7da7a8fcbff8681c13c8c4f58330601b70a0ac52de02a856b578f94b1e3"
+    },
+    {
+      "id": "portrait-p11",
+      "file": "portrait-p11.png",
+      "sha256": "119713f8de718c590ed6b75817ede48ac250b73127505c1966e750d911562996"
+    },
+    {
+      "id": "portrait-p12",
+      "file": "portrait-p12.png",
+      "sha256": "dc86f73f073b477687eb168662880b0d168a3a6a9b3583595d71ef3bb37eef35"
+    },
+    {
+      "id": "portrait-p13",
+      "file": "portrait-p13.png",
+      "sha256": "b831982c36c42070198fe66c4c4507011aa8157a2daf67a328509ff64d76656d"
+    },
+    {
+      "id": "portrait-p14",
+      "file": "portrait-p14.png",
+      "sha256": "6b1f4948de1c1397b0b2f6d583fc03c8e7f23244347783868855b08c73204677"
+    },
+    {
+      "id": "portrait-p15",
+      "file": "portrait-p15.png",
+      "sha256": "bee5271712d1f900402dbc3d9a8d746239d44801f0bed87cd783d5ebd0877c6b"
+    },
+    {
+      "id": "portrait-p16",
+      "file": "portrait-p16.png",
+      "sha256": "a42c87d28b3f163fd44b9337d553cc3165407e9dbd19e05b1346b7a3e272d7dd"
+    },
+    {
+      "id": "portrait-p17",
+      "file": "portrait-p17.png",
+      "sha256": "8203b8e6765f964861d730a1c355c15332ac44e8492e9ad7bdd2f6ea6aada00f"
+    },
+    {
+      "id": "portrait-p18",
+      "file": "portrait-p18.png",
+      "sha256": "ec98ffa506a5e3d74875af45d415d1ed6f10bd4388d027be6cd6705683c415f0"
+    },
+    {
+      "id": "portrait-p19",
+      "file": "portrait-p19.png",
+      "sha256": "805ca22424ec904d48fce8f2c440c1bb7f12f41b951466f122018645810aecaa"
+    },
+    {
+      "id": "portrait-p20",
+      "file": "portrait-p20.png",
+      "sha256": "775ae9051d6b917dbd50c053bba812a80a351674c4b6c9f003cd6743414d39c7"
+    },
+    {
+      "id": "portrait-p21",
+      "file": "portrait-p21.png",
+      "sha256": "25f7c791b1c8b7eeb9798a53612a5640cb9cbc30594e00a473196d5bc72e666b"
+    },
+    {
+      "id": "portrait-p22",
+      "file": "portrait-p22.png",
+      "sha256": "f3e7cef7131772070bf95e14574e218cec62aeaf502d69a70025eac3737dbda8"
+    },
+    {
+      "id": "portrait-p23",
+      "file": "portrait-p23.png",
+      "sha256": "1d73b379488d522656e80c26e084888e897a0df39c9b07bc615c346115e6cdd3"
+    },
+    {
+      "id": "portrait-p24",
+      "file": "portrait-p24.png",
+      "sha256": "61c572554b316855d111a27e4f2c81889672ebb01bb141e00f0c450b8074f4e3"
+    },
+    {
+      "id": "portrait-p25",
+      "file": "portrait-p25.png",
+      "sha256": "a461dbea8b7dbe16fb0461950c810bcb366cf5baae9d224ec2e9825eb42edb62"
+    },
+    {
+      "id": "portrait-p26",
+      "file": "portrait-p26.png",
+      "sha256": "95150e08837f55ecabe3806684122223ca64facf535b7af8377f5ed43f91f81b"
+    },
+    {
+      "id": "portrait-p27",
+      "file": "portrait-p27.png",
+      "sha256": "37afe552f7acf8968c054c9e314a6fc20aad9e0d9a44e9e3cfc1d9126dbf0a3f"
+    },
+    {
+      "id": "portrait-p28",
+      "file": "portrait-p28.png",
+      "sha256": "804b719ffdcc9c6e7fc2760350afeb37d29bfcaeb632cae04624802b9185263e"
+    },
+    {
+      "id": "portrait-p29",
+      "file": "portrait-p29.png",
+      "sha256": "b48af85ef884b4cf3a5a1db84f7fd35ec0798dda0849bb5eb644103f51cb0916"
+    },
+    {
+      "id": "portrait-p30",
+      "file": "portrait-p30.png",
+      "sha256": "7f9f5ce0a835440eee906b2f17c82b037e00e3d7ca087e5caf83ad33ab73a166"
+    },
+    {
+      "id": "portrait-p31",
+      "file": "portrait-p31.png",
+      "sha256": "a0239b2b781cd9d6e3d8af0d7b6d17ac49b49f8fde77fe45445ca09382f6488f"
+    },
+    {
+      "id": "portrait-p32",
+      "file": "portrait-p32.png",
+      "sha256": "74e97cecc701d08554ddae707aa8de2e8254d9d6a5858094df95b8b4f2d4e8f6"
+    },
+    {
+      "id": "crest-hound",
+      "file": "crest-hound.png",
+      "sha256": "cad2f98a4db25d9b91de73b915f62cde33cf962b5565e662fc8c8a78aa962ec7"
+    },
+    {
+      "id": "crest-helmet",
+      "file": "crest-helmet.png",
+      "sha256": "64e5b285dee3d9a1f4064a50db72bb794c5e24c6c6ef698a271eb79dd2cd8a5a"
+    },
+    {
+      "id": "crest-raven",
+      "file": "crest-raven.png",
+      "sha256": "5b198218366d7b0d3c3af693f721e903154b7da58ebc9e8b2a93070ad0bcfeaa"
+    },
+    {
+      "id": "crest-circuit",
+      "file": "crest-circuit.png",
+      "sha256": "58550aea59570243555b2d9c6a3c1b19a02e99908075ab09afb871809edf24c3"
+    },
+    {
+      "id": "crest-bolt",
+      "file": "crest-bolt.png",
+      "sha256": "d4ab8b6fcd04a45a2e655fac8ae46f40647ee68a4cdd39cd371f86d121e729a5"
+    },
+    {
+      "id": "crest-fist",
+      "file": "crest-fist.png",
+      "sha256": "a15e69301c14685fe5448539bb323e5f7cf5ded856cb4fd4cb38462010cd8139"
+    },
+    {
+      "id": "crest-skull",
+      "file": "crest-skull.png",
+      "sha256": "c0b6673ff8069c820b33fa9627b075f29e25483e0ad345b8f4cbe1bd839e4441"
+    },
+    {
+      "id": "crest-shark",
+      "file": "crest-shark.png",
+      "sha256": "352f0dbc95673c4f106c2079af5eab4e295b93a797adf79150bc8157dbf9b63b"
+    },
+    {
+      "id": "crest-cobra",
+      "file": "crest-cobra.png",
+      "sha256": "7c410e97ee93376cb3fe3a2fa156f6404151b87bc1e066487d4be6111b2e71e5"
+    },
+    {
+      "id": "crest-ram",
+      "file": "crest-ram.png",
+      "sha256": "a53d20849ae4e9fcefeb4a874a38de3056180d337e053c49efe7db843a39987d"
+    },
+    {
+      "id": "crest-fox",
+      "file": "crest-fox.png",
+      "sha256": "3ce25d5f395ce3106cac03f7698cac272faae469f987000bbe2443480c69f8d4"
+    },
+    {
+      "id": "crest-gear",
+      "file": "crest-gear.png",
+      "sha256": "92df33fc039471288eca2bf47a4862053f93db598d3fd2f3b5726c0554e9804c"
+    },
+    {
+      "id": "crest-wings",
+      "file": "crest-wings.png",
+      "sha256": "6fa59154f8685f6a9512147092c67ea10aef4f413c5dcfa9ff84fc212c0e69a9"
+    },
+    {
+      "id": "crest-bull",
+      "file": "crest-bull.png",
+      "sha256": "d30dd7a7f47c2a346063940d219f156e9f0b454a19caadfb6fee762c2633cb95"
+    },
+    {
+      "id": "crest-claw",
+      "file": "crest-claw.png",
+      "sha256": "1e2d7213773667270a0eaffb515d8ac3321e7e7eeb7adeb23da7020953c9eacb"
+    },
+    {
+      "id": "crest-comet",
+      "file": "crest-comet.png",
+      "sha256": "deb7df786a13397d870762f6332a6053f6b4afec8cb7ab59175549b8aae13dc9"
+    },
+    {
+      "id": "gear-vest",
+      "file": "gear-vest.png",
+      "sha256": "a3137c6607e325131d1d67d78761f93363fe2ad1fc85c68a2dd1505ce2606ecc"
+    },
+    {
+      "id": "gear-armor",
+      "file": "gear-armor.png",
+      "sha256": "578509f2ed49367a05a007a3b0f363ae5b7434dfcd9c3fa135d524047763d091"
+    },
+    {
+      "id": "gear-gloves",
+      "file": "gear-gloves.png",
+      "sha256": "5060217475716678f41c8b9ebc6a3762ba3790a399e4397c4f7d21c3a3515a81"
+    },
+    {
+      "id": "gear-soles",
+      "file": "gear-soles.png",
+      "sha256": "f03f98129e2795a6b38fe182810e21ae76a11dff63c5b1f6992533c92f39455b"
+    },
+    {
+      "id": "gear-legs",
+      "file": "gear-legs.png",
+      "sha256": "06ff0ff9d54d410555a5c4b27be5797f5c69ee6edef6e13b37650baebb773bb0"
+    },
+    {
+      "id": "gear-fibers",
+      "file": "gear-fibers.png",
+      "sha256": "f19ab9b86573841fafb146e4589ecd5cb6fce0e1ffa0f7016d4bac7ec28cd5cc"
+    },
+    {
+      "id": "gear-interface",
+      "file": "gear-interface.png",
+      "sha256": "4f8b3422518f14c68c1e9255f484cd7a0d17eca55963ae620353c353fe8db14e"
+    },
+    {
+      "id": "gear-regulator",
+      "file": "gear-regulator.png",
+      "sha256": "1041c4abb79b66cf9a62c679aa8e84057eabacddd8f23fee6cc1c06950702a33"
+    },
+    {
+      "id": "broadcast-banner",
+      "file": "broadcast-banner.png",
+      "sha256": "f24e9ea1e222d6c99a4063a61eab52d5e721a2fbb6b7a94a045a7c3a0f0058b5"
+    }
+  ],
+  "revisions": [
+    {
+      "date": "2026-10-18",
+      "request": "Quatre profils classiques, majorité cyberpunk et personnages funs.",
+      "portraits": [
+        {
+          "id": "portrait-p05-v2",
+          "kind": "portraits",
+          "key": "p05",
+          "category": "cyberpunk",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A deep brown skinned veteran man with silver gray hair tied in a bun. Half his jaw is brushed titanium, one ear replaced by chunky audio hardware, worn geometric circuit tattoos across the temple. Calm intimidating stadium enforcer.",
+          "transparent": false,
+          "source": "portrait-p05-v2.png",
+          "sha256": "896b8302b27b5366e0bc23305ab357b803d3ba56933221cbd63b042f9e411237"
+        },
+        {
+          "id": "portrait-p06-v2",
+          "kind": "portraits",
+          "key": "p06",
+          "category": "fun",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A very dark brown skinned androgynous athlete with copper red scalp braids, a huge cheeky gap-toothed grin, a bright orange transparent prosthetic jaw with a single gold tooth, and comically oversized stud earrings shaped like tiny bolts. Irreverent sporting personality.",
+          "transparent": false,
+          "source": "portrait-p06-v2.png",
+          "sha256": "999a9909dc6fde6be087b296733be2400b253949cba3ac33a1a03045da9bb6f9"
+        },
+        {
+          "id": "portrait-p07-v2",
+          "kind": "portraits",
+          "key": "p07",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light warm skinned woman with short close cropped muted teal hair. One eye is a clearly mechanical cobalt cyber optic with visible tiny lens rings, one cheek has a striking metallic implant seam. Tough cyberpunk team captain, athletic and confident.",
+          "transparent": false,
+          "source": "portrait-p07-v2.png",
+          "sha256": "01c52d63f83d4dd5d76e4b89fa74f44af1adc62149d9f4f9320a869554d094e9"
+        },
+        {
+          "id": "portrait-p08-v2",
+          "kind": "portraits",
+          "key": "p08",
+          "category": "cyberpunk",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light tan skinned man with short side swept muted violet hair. Heavy angular lower-face respirator prosthesis permanently integrated into his jaw, asymmetrical ear jacks and a small electric blue subdermal circuit line. Grounded sporting cyberpunk.",
+          "transparent": false,
+          "source": "portrait-p08-v2.png",
+          "sha256": "a17de54f2462318822be34a1284a5819055e275577fd0f85fefbcdfef7d06003"
+        },
+        {
+          "id": "portrait-p09-v2",
+          "kind": "portraits",
+          "key": "p09",
+          "category": "fun",
+          "faceDetail": "paint",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A medium brown skinned androgynous adult athlete with a short black mohawk styled like a tiny dramatic rooster crest. One eyebrow is a bright cyan electronic display strip with no text. Mischievous sideways grin, chipped front tooth and playful black grease war paint. Arena troublemaker with real personality.",
+          "transparent": false,
+          "source": "portrait-p09-v2.png",
+          "sha256": "633243f0e2b8b9852c9816a9d649159335b4e68c780bd86e7edc7d502271ab01"
+        },
+        {
+          "id": "portrait-p10-v2",
+          "kind": "portraits",
+          "key": "p10",
+          "category": "fun",
+          "faceDetail": "patch",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A bronze brown skinned bald older woman athlete with a formidable deadpan expression, small round magnifying goggles perched ON TOP of her bald scalp, several tiny adhesive bandages and a patchwork metal ear. Tough comic sporting grandma, dignified and funny rather than grotesque.",
+          "transparent": false,
+          "source": "portrait-p10-v2.png",
+          "sha256": "d1d97457c994794ba249c2dc3bd866508b98367438ad5d044b37a9e43b22fdd6"
+        },
+        {
+          "id": "portrait-p11-v2",
+          "kind": "portraits",
+          "key": "p11",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A deep brown skinned man with chestnut hair tied in a bun, braided short beard, one large retro mechanical eye made of exposed brass and cobalt optics, heavy cranial cable socket behind the temple. Serious cyberpunk street athlete.",
+          "transparent": false,
+          "source": "portrait-p11-v2.png",
+          "sha256": "ffb257e114f8e3f7c4779fcbe70e5d363507b47831c85b0f3affaaaca02527d3"
+        },
+        {
+          "id": "portrait-p12-v2",
+          "kind": "portraits",
+          "key": "p12",
+          "category": "fun",
+          "faceDetail": "paint",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A very dark brown skinned androgynous adult with golden blond scalp braids. A ridiculous brilliant green transparent protective mouthguard visible in a broad grin, one oversized retro cybernetic ear and purple cheek stripes like an arena fan. Charming overconfident show-off.",
+          "transparent": false,
+          "source": "portrait-p12-v2.png",
+          "sha256": "7765d6dc14644e1f18ee098bb4b9f30e2455f2acfc6cfe929dc95b79b8551256"
+        },
+        {
+          "id": "portrait-p13-v2",
+          "kind": "portraits",
+          "key": "p13",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light warm skinned mature woman athlete with short close cropped silver gray hair, an elegant but conspicuous chrome cheekbone, mechanical neck tendons and a bright cyan prosthetic eye. Weathered precise cyberpunk professional, not a beauty shoot.",
+          "transparent": false,
+          "source": "portrait-p13-v2.png",
+          "sha256": "cb117fe2dbca11edf5dd2654889a6b958be76a1303feb15e387e93d08e962c30"
+        },
+        {
+          "id": "portrait-p14-v2",
+          "kind": "portraits",
+          "key": "p14",
+          "category": "cyberpunk",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light tan skinned mature man with side swept copper red hair, pronounced eyebrows, a dense patch of metal plating on his left forehead, large spinal connector visible above the shirt collar, and scarred augmented lower jaw. Gritty cyberpunk sports veteran.",
+          "transparent": false,
+          "source": "portrait-p14-v2.png",
+          "sha256": "98a218fc56f25fc8117d6cd6788e22478bc1cc1217c0fdf47819d2e4bd25e329"
+        },
+        {
+          "id": "portrait-p15-v2",
+          "kind": "portraits",
+          "key": "p15",
+          "category": "fun",
+          "faceDetail": "paint",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A medium brown skinned androgynous adult athlete with a tall muted teal mohawk, bright fuchsia theatrical sports eye paint and a huge wry grin. One cheek is a recycled transparent circuit casing held by visible colorful screws. Punk arena clown with credible athletic build.",
+          "transparent": false,
+          "source": "portrait-p15-v2.png",
+          "sha256": "13eb932fdd0a63ee98af6ae959153a2a07c83cf09e0b80d8781ac6a33c2c26a8"
+        },
+        {
+          "id": "portrait-p16-v2",
+          "kind": "portraits",
+          "key": "p16",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A bronze brown skinned bald woman athlete with a severe expression, symmetrical tiny titanium cranial studs, one very prominent orange cyber optic lens, subtle neck circuit tattoos and clean metal seams around the temple. Strong cyberpunk identity.",
+          "transparent": false,
+          "source": "portrait-p16-v2.png",
+          "sha256": "dbd566f49d1f1a2174f3e4dd0b60c305584f35771cb2a5b5f86f8dc6abccba14"
+        },
+        {
+          "id": "portrait-p17-v2",
+          "kind": "portraits",
+          "key": "p17",
+          "category": "cyberpunk",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A deep brown skinned man with black hair tied in a bun, a massive permanent titanium jaw with exposed mechanical hinges, one eyebrow shaved into a circuit pattern and industrial ports in the neck. Broad athletic face, measured confident expression.",
+          "transparent": false,
+          "source": "portrait-p17-v2.png",
+          "sha256": "95d31d2625c28cb9ed6e910c68adc339efe436712a224f363fdddbeabc5aa71b"
+        },
+        {
+          "id": "portrait-p18-v2",
+          "kind": "portraits",
+          "key": "p18",
+          "category": "fun",
+          "faceDetail": "visor",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A very dark brown skinned androgynous adult with dark brown scalp braids and wonderfully exaggerated very large round cybernetic glasses with one cobalt lens and one orange lens. A battered tiny foam mascot crown is pinned between the braids. Unflappable deadpan sports tactician.",
+          "transparent": false,
+          "source": "portrait-p18-v2.png",
+          "sha256": "c608377d94e66b247e60b42d4c8ac88ca362d364401f3d4558b3be7d71aee2ab"
+        },
+        {
+          "id": "portrait-p19-v2",
+          "kind": "portraits",
+          "key": "p19",
+          "category": "cyberpunk",
+          "faceDetail": "visor",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light warm skinned woman with short close cropped chestnut hair. A wide single-piece dark cobalt cyber visor permanently replaces the eyes, visible side attachment plates, light cosmetic chrome around the ear and a focused neutral mouth. Cyberpunk arena professional.",
+          "transparent": false,
+          "source": "portrait-p19-v2.png",
+          "sha256": "182b511ee026dd51ba1b58f5e95a40db2681f32429d9a2615bd7e8bc8a06c53d"
+        },
+        {
+          "id": "portrait-p20-v2",
+          "kind": "portraits",
+          "key": "p20",
+          "category": "fun",
+          "faceDetail": "paint",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light tan skinned man with side swept golden blond hair, an absurd perfectly groomed blond moustache, tiny mismatched mechanical ear plates and a pink heart-shaped patch on the cheek. Cheerful swaggering arena showman with visible laugh lines, theatrical but not childish.",
+          "transparent": false,
+          "source": "portrait-p20-v2.png",
+          "sha256": "c0701ffaccf9e19194ab1d3895c1a0ec120488477410ec669c5ef3e308a3821a"
+        },
+        {
+          "id": "portrait-p21-v2",
+          "kind": "portraits",
+          "key": "p21",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A medium brown skinned androgynous athlete with short silver gray mohawk. A transparent magenta cranial panel with exposed circuitry covers one temple, the opposite eye has a chunky mechanical optic, and metal tendons are visible along the side of the neck.",
+          "transparent": false,
+          "source": "portrait-p21-v2.png",
+          "sha256": "1f76ed2e83566f510345d3f73fe092851c8443612e276019c6f4fe1b992dc3b4"
+        },
+        {
+          "id": "portrait-p22-v2",
+          "kind": "portraits",
+          "key": "p22",
+          "category": "fun",
+          "faceDetail": "patch",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A bronze brown skinned bald elderly woman athlete with bright copper eyebrows, a compact handmade cyber optic patched with yellow tape, angular cheek sports paint and a delighted slightly wicked grin. Wily veteran who clearly enjoys arena chaos.",
+          "transparent": false,
+          "source": "portrait-p22-v2.png",
+          "sha256": "878c8aa0260ce957d5f394ded18b72fcaddb44404d89fa4d681085d1bcdfecea"
+        },
+        {
+          "id": "portrait-p23-v2",
+          "kind": "portraits",
+          "key": "p23",
+          "category": "cyberpunk",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A deep brown skinned man with muted teal hair tied in a bun. A permanent dark metal jaw respirator with orange valve, visible cyber connectors behind the ear and a sharply geometric shaved hairline. No-nonsense street athlete.",
+          "transparent": false,
+          "source": "portrait-p23-v2.png",
+          "sha256": "67fb8822993695a50b216e0327c1fe94563a7fa71640a297dba64f3cfedba92c"
+        },
+        {
+          "id": "portrait-p24-v2",
+          "kind": "portraits",
+          "key": "p24",
+          "category": "fun",
+          "faceDetail": "paint",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A very dark brown skinned androgynous athlete with muted violet scalp braids shaped into two playful short antenna-like tufts, a rounded silver prosthetic nose and asymmetrical orange and cobalt face paint. A small mischievous grin, athletic sports portrait.",
+          "transparent": false,
+          "source": "portrait-p24-v2.png",
+          "sha256": "912cb9998363a818232dc93f705669f8e5c1a74a1de6f0d4bf2fd1441cf68bc6"
+        },
+        {
+          "id": "portrait-p25-v2",
+          "kind": "portraits",
+          "key": "p25",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light warm skinned woman with short black cropped hair, visible metallic plating spanning one side of her face, a vivid pink mechanical eye and compact neck ports. Different facial features from the other roster women: strong broad nose, freckles and a confident crooked smile.",
+          "transparent": false,
+          "source": "portrait-p25-v2.png",
+          "sha256": "af5168fe47ba0c165697356db5cf3b63f0361e5a33360a857c566c2393e4f99d"
+        },
+        {
+          "id": "portrait-p26-v2",
+          "kind": "portraits",
+          "key": "p26",
+          "category": "cyberpunk",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light tan skinned man with side swept dark brown hair, a full jaw made of exposed black and chrome mechanisms, a narrow cobalt augmented-eye strip and a rough scar across the brow. Rugged middle aged cyberpunk athlete.",
+          "transparent": false,
+          "source": "portrait-p26-v2.png",
+          "sha256": "708e7fad324f326c05338409ee0e6fa92620343b5d55754d1b78c7ec28ae3950"
+        },
+        {
+          "id": "portrait-p27-v2",
+          "kind": "portraits",
+          "key": "p27",
+          "category": "fun",
+          "faceDetail": "paint",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A medium brown skinned androgynous athlete with a large chestnut mohawk, oversized rounded cheek plates decorated with tiny orange dots, a bright cyan moustache-shaped face paint mark and an intensely serious expression that makes the look funny. Eccentric arena brawler.",
+          "transparent": false,
+          "source": "portrait-p27-v2.png",
+          "sha256": "8037cef612f90830865a61e98a8672856506ee01effcc81ad19c6b94ca718f5a"
+        },
+        {
+          "id": "portrait-p28-v2",
+          "kind": "portraits",
+          "key": "p28",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A bronze brown skinned bald woman with a sculptural chrome implant wrapping from one temple to the ear, bright cobalt eye lenses, geometric tattoos and a confident expression. Strong athletic jaw, visible mechanical collarbone fittings.",
+          "transparent": false,
+          "source": "portrait-p28-v2.png",
+          "sha256": "8ed88d19da947ef7bfb76f7ba359dac968b5dc5baf0e2a226eeba446224f3644"
+        },
+        {
+          "id": "portrait-p29-v2",
+          "kind": "portraits",
+          "key": "p29",
+          "category": "cyberpunk",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A deep brown skinned older man with silver gray hair tied in a bun and gray beard, a bulky orange-tinted prosthetic eye and mechanically reconstructed cheek, a few old repair rivets and a stubborn battle-worn expression.",
+          "transparent": false,
+          "source": "portrait-p29-v2.png",
+          "sha256": "fafc604fb80888665f36e62119ecab9f7aa62a8b87ba16063fe9cafe9a58f20c"
+        },
+        {
+          "id": "portrait-p30-v2",
+          "kind": "portraits",
+          "key": "p30",
+          "category": "fun",
+          "faceDetail": "visor",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A very dark brown skinned androgynous athlete with copper red scalp braids, a broad comic grin and very round luminous green mechanical goggles with mismatched lenses. An absurd tiny worn rubber-duck accessory is fixed to one goggle bracket. Confident cyberpunk arena eccentric.",
+          "transparent": false,
+          "source": "portrait-p30-v2.png",
+          "sha256": "155dfde5811b9d73e40011aee593773875cbe87feb95c674c3ec4d25a041e36f"
+        },
+        {
+          "id": "portrait-p31-v2",
+          "kind": "portraits",
+          "key": "p31",
+          "category": "cyberpunk",
+          "faceDetail": "jaw",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light warm skinned woman with muted teal cropped hair, a prominent titanium lower face with human lips preserved, visible cheek ventilation slits and bright pink subdermal dots along one temple. Serious cyberpunk professional athlete.",
+          "transparent": false,
+          "source": "portrait-p31-v2.png",
+          "sha256": "9538b36da0b0ac6d3c1d18c6c4ee0d10fc9da082d61d2941174163d8f86c0de2"
+        },
+        {
+          "id": "portrait-p32-v2",
+          "kind": "portraits",
+          "key": "p32",
+          "category": "fun",
+          "faceDetail": "optic",
+          "prompt": "Use case: stylized-concept. One final production portrait for the Rumbleball Manager cyberpunk sports roster, with a BOLD and memorable character design. Polished graphic novel sports illustration, clearly illustrated confident contours, controlled cel shading, expressive adult human face, credible athletic anatomy. Same consistent front three-quarter pose facing slightly right, head and upper shoulders centered, same eye line and medium close crop. Cool soft key light upper left, subtle warm orange rim light right, plain opaque dark midnight navy #101729 background. Neutral charcoal athletic undershirt, shoulders stay inside crop. The cybernetic facial features are permanent cosmetic character identity, NOT a purchased sports upgrade. Make the personality and visible augmentations unmistakable even at thumbnail size. No weapon, no team crest, no lettering, no frame, no watermark, no background scene. Not a conventional glamour photograph. High resolution square artwork. Character: A light tan skinned man with side swept muted violet hair, a flamboyant huge black handlebar moustache, one retro copper cyber eye with an oversized lens, and comically self-assured raised eyebrow. Aging arena celebrity, playful charisma.",
+          "transparent": false,
+          "source": "portrait-p32-v2.png",
+          "sha256": "555f36e460166bc75b022e243469910222400187c7614458016a78d1a1bfb4ee"
+        }
+      ]
+    }
+  ]
+}

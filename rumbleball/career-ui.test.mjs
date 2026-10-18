@@ -24,7 +24,7 @@ test('parcours UI : création, échange de titulaires, consignes, équipement et
   const form = classNode(e.root, 'rb-lineup-form'), slots = descendants(classNode(e.root, 'rb-lineup-slots')).filter((n) => n.tagName === 'select');
   const [first, second] = c.lineup; slots[0].value = second; await slots[0].emit('change');
   c = e.saved(); assert.deepEqual(c.lineup.slice(0, 2), [second, first]);
-  const strategy = form.querySelector('select'); strategy.value = 'pressing'; await strategy.emit('change'); assert.equal(e.saved().clubs[0].strategy, 'pressing');
+  const strategy = descendants(form).find(n => n.dataset.focusKey === 'strategy'); strategy.value = 'pressing'; await strategy.emit('change'); assert.equal(e.saved().clubs[0].strategy, 'pressing');
   await button(e.root, 'Équipement').click();
   const buyVest = descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Acheter et équiper') && n.textContent.endsWith('100 chromas'));
   await buyVest.click(); assert.equal(e.saved().inventory.length, 1); assert.equal(e.saved().balance, 800);

@@ -1,5 +1,5 @@
 import { CATALOGUE, XP_THRESHOLDS, levelOf } from './progression.mjs';
-import { playerPortrait } from './visuals.mjs';
+import { athletePortrait } from './visuals.mjs';
 
 export const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 export const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}` , text); b.type = 'button'; b.addEventListener('click', action); return b; };
@@ -14,7 +14,9 @@ export function kitPicker(value, disabled = false) {
 }
 export function portraitIdentity(p, color, ...copy) {
   const identity = el('div', 'rb-person-identity'), text = el('div'); text.append(...copy);
-  identity.append(playerPortrait(p, color), text); return identity;
+  const portrait = athletePortrait(p, color);
+  if (text.textContent.includes(p.name)) portrait.setAttribute('aria-hidden', 'true');
+  identity.append(portrait, text); return identity;
 }
 export function pageHeading(title, description = '') {
   const head = el('div', 'rb-section-heading'), h = el('h3', '', title); h.setAttribute('tabindex', '-1'); head.append(h);

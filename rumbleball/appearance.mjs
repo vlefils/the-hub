@@ -1,3 +1,4 @@
+import { portraitById } from './identity.mjs';
 // Cosmetic identity has its own hash and never consumes the match RNG.
 export const KIT_COLORS = ['#79decb', '#f4a070', '#b8a0e8', '#76b9ed', '#e4cc6d', '#e789ab'];
 export const SKIN_COLORS = ['#f2c7a5', '#dca27c', '#bb805b', '#975e40', '#704630', '#493025'];
@@ -16,6 +17,8 @@ export function readableKit(color) {
   return `#${rgb(validKitColor(color) ? color : KIT_COLORS[0]).map((n) => Math.max(140, n).toString(16).padStart(2, '0')).join('')}`;
 }
 export function playerLook(player) {
+  const portrait = portraitById(player.portraitId);
+  if (portrait) return { skin: portrait.skin, hair: portrait.hair, hairStyle: portrait.hairStyle, ...(portrait.faceDetail ? { faceDetail: portrait.faceDetail } : {}) };
   let hash = 2166136261;
   for (const char of String(player.playerId ?? player.id ?? player.name)) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;
   return { skin: SKIN_COLORS[hash % SKIN_COLORS.length], hair: HAIR_COLORS[(hash >>> 5) % HAIR_COLORS.length],

@@ -1,0 +1,240 @@
+/* Shared sports broadcast identity. Layout first; artwork stays secondary. */
+body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line: #33415a; --rb-ball: #f4d783; --rb-surface: #172236; --rb-surface-raised: #1e2c43; --rb-good: #8be0be; --rb-warning: #f0c363; --rb-bad: #fa9580; background: #101729; color: var(--text); font-size: 1rem; }
+.rb-app .rb-career { --rb-surface: #172236; --rb-surface-soft: #131e32; max-width: none; gap: .85rem; }
+.rb-app-header { background: #101729; border-color: var(--rb-line); padding-block: .85rem; }
+.rb-app-brand h1 { font-style: italic; letter-spacing: -.015em; }
+.rb-app-brand h1 span { color: var(--rb-accent); font-size: .875rem; letter-spacing: .16em; }
+.rb-hub-link { border-color: var(--rb-line); }
+.rb-hub-link:hover { background: var(--rb-surface-raised); }
+.rb-app-main { max-width: 152rem; }
+.rb-app :is(button, input, select) { font: inherit; }
+.rb-app :is(input, select) { min-width: 0; min-height: 2.75rem; color: var(--text); background: #101b2e; border: 1px solid #53627b; border-radius: 3px; }
+.rb-app input[type='color'] { width: 3.5rem; padding: .2rem; }
+.rb-app .rb-button { min-height: 2.75rem; color: var(--text); background: #1c2b42; border: 1px solid #53627b; border-radius: 3px; font-weight: 600; }
+.rb-app .rb-button:hover:not(:disabled) { background: #293c58; border-color: #a8b7cf; }
+.rb-app .rb-button-primary { color: #151c2d; background: #ff793d; border-color: #ff793d; }
+.rb-app .rb-button-primary:hover:not(:disabled) { background: #ff9869; border-color: #ff9869; }
+.rb-app :is(button, input, select):disabled { cursor: not-allowed; opacity: .6; }
+.rb-app :focus-visible { outline: 3px solid #8bacff; outline-offset: 3px; }
+.rb-app :is(small, .rb-eyebrow, .rb-muted, .rb-field, .rb-fatigue, .rb-player-xp, .rb-resource, .rb-class-resource) { font-size: .875rem; }
+.rb-app :is(.rb-player-stats dt, .rb-career-finances dt, .rb-save-status, .rb-deployment-columns, .rb-deployment-direction, .rb-deployment-legend) { font-size: .875rem; }
+.rb-app :is(h2, h3, h4) { font-family: 'Rajdhani', 'Arial Narrow', sans-serif; }
+.rb-app h3 { font-size: 1.625rem; }
+.rb-app .rb-muted { color: var(--muted); }
+.rb-app .rb-archetype { color: #b8c8ed; }
+.rb-app .rb-class-resource { color: var(--muted); }
+.rb-app .rb-field { display: grid; align-content: start; gap: .4rem; }
+.rb-app .rb-error { color: #ffb6ac; }
+.rb-app .rb-gain { color: #8be0be; }
+.rb-app .rb-loss { color: #ffb6ac; }
+.rb-app .rb-fatigue-meter i { background: #35435d; }
+.rb-app .rb-fatigue-meter .is-filled { background: #65ccb7; }
+.rb-app .rb-fatigue.is-tired .is-filled { background: #f0c363; }
+.rb-app .rb-fatigue.is-exhausted .is-filled { background: #fa9580; }
+.rb-app .rb-athlete-portrait { position: relative; isolation: isolate; display: inline-block; flex: 0 0 3.5rem; width: 3.5rem; aspect-ratio: 1; overflow: hidden; background: #18263b; border-bottom: 3px solid var(--rb-portrait-kit, #79decb); border-radius: 3px; vertical-align: middle; }
+.rb-athlete-portrait > :is(img, svg) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.rb-athlete-portrait > img { z-index: 1; }
+.rb-athlete-portrait > .rb-archetype-icon { inset: auto 0 0 auto; z-index: 2; width: 1.25rem; height: 1.25rem; padding: 2px; background: #101729; color: #adc0ed; }
+.rb-person-identity { min-width: 0; gap: .8rem; }
+.rb-person-identity > div { min-width: 0; }
+.rb-person-identity :is(strong, h4) { overflow-wrap: anywhere; }
+.rb-player-detail .rb-athlete-portrait, .rb-equipment-player .rb-athlete-portrait { width: 6rem; flex-basis: 6rem; }
+.rb-club-identity { display: flex; align-items: center; gap: .85rem; min-width: 0; }
+.rb-club-identity strong { overflow-wrap: anywhere; }
+.rb-club-identity .rb-crest { flex: 0 0 4rem; width: 4rem; }
+.rb-club-identity.is-compact { font-size: .875rem; gap: .5rem; }
+.rb-club-identity.is-compact .rb-crest { width: 2rem; flex-basis: 2rem; }
+.rb-crest-shield { fill: #10192a; stroke: currentColor; }
+.rb-crest-picker { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.rb-crest-picker .rb-field { flex: 1; }
+.rb-crest-preview .rb-crest { width: 3rem; }
+.rb-archetype-icon { display: inline-block; width: 1.25rem; height: 1.25rem; flex: 0 0 1.25rem; vertical-align: middle; }
+.rb-equipment-art { width: 5rem; height: 5rem; object-fit: contain; flex: 0 0 5rem; }
+.rb-broadcast-banner { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 1rem 2rem; padding: clamp(1rem, 2.5vw, 2rem); margin-block: 1rem 1.5rem; background: linear-gradient(90deg, #101729c9, #101729ed 38%, #101729ed 62%, #101729c9), url('assets/broadcast/banner/arena.webp') center / cover; border-block: 1px solid #42516b; }
+.rb-broadcast-banner > .rb-club-identity { font: 700 clamp(1.25rem, 2.3vw, 2.5rem)/1.1 'Rajdhani', sans-serif; text-transform: uppercase; }
+.rb-broadcast-banner > .rb-club-identity:nth-child(3) { flex-direction: row-reverse; text-align: right; }
+.rb-broadcast-versus { display: grid; justify-items: center; text-align: center; gap: .35rem; }
+.rb-broadcast-versus strong { font: 700 clamp(1.25rem, 2vw, 2rem)/1.15 'Rajdhani', sans-serif; color: #ff9869; }
+.rb-broadcast-deadline { grid-column: 1 / -1; color: var(--muted); font-size: .875rem; text-align: center; }
+.rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) { display: flex; flex-wrap: nowrap; gap: .5rem; overflow-x: auto; padding-block: .4rem; border-bottom: 1px solid var(--rb-line); }
+.rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) > .rb-button { flex: 0 0 auto; white-space: nowrap; background: transparent; border-color: transparent; border-radius: 0; }
+.rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) [aria-current='page'] { color: var(--text); border-bottom: 3px solid var(--rb-accent); }
+.rb-app .rb-mobile-nav { display: none; }
+.rb-app .rb-career-top { border-color: var(--rb-line); }
+.rb-app .rb-career-top { margin-bottom: .75rem; padding-bottom: .65rem; }
+.rb-app .rb-team-tabs { padding-block: 0; }
+.rb-app .rb-club-header { padding-block: 1.25rem; border-color: var(--rb-line); }
+.rb-club-header > .rb-club-identity { align-items: center; }
+.rb-club-header .rb-club-identity > .rb-crest { width: 3.5rem; flex-basis: 3.5rem; }
+.rb-app .rb-fixture-hero { background: linear-gradient(90deg, #101729ed, #101729b0), url('assets/broadcast/banner/arena.webp') center / cover; border-color: var(--rb-line); }
+.rb-app :is(.rb-career-create, .rb-career-import, .rb-career-summary, .rb-career-dialog) { background: var(--rb-surface); border-color: var(--rb-line); }
+.rb-app .rb-career-introduction::before { background-image: linear-gradient(0deg, #101729, transparent 60%), url('assets/broadcast/banner/arena.webp'); }
+.rb-app .rb-career-finances dd { font-variant-numeric: tabular-nums; }
+.rb-app .rb-online-top { padding-bottom: .85rem; margin-bottom: 1rem; border-bottom: 1px solid var(--rb-line); }
+.rb-online-account { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; margin-left: auto; min-width: 0; }
+.rb-online-account > span { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.rb-online-account .rb-button { font-size: .875rem; background: transparent; padding-inline: .6rem; }
+.rb-online-account > span > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 20ch; }
+.rb-account-menu { position: relative; font-size: .875rem; }
+.rb-account-menu > summary { min-height: 2.75rem; display: flex; align-items: center; padding: .5rem .75rem; border: 1px solid var(--rb-line); cursor: pointer; }
+.rb-account-menu[open] { z-index: 8; }
+.rb-account-menu[open] > .rb-account-panel { position: absolute; right: 0; top: calc(100% + .5rem); display: grid; gap: .85rem; width: min(22rem, 85vw); margin: 0; padding: .85rem; background: #1c2b42; border: 1px solid var(--rb-line); }
+.rb-account-panel > span { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; overflow-wrap: anywhere; }
+.rb-app .rb-online-identity { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 1rem 2rem; margin-bottom: .6rem; }
+.rb-online-identity > div:first-child > .rb-club-identity { font: 700 1.65rem/1.2 'Rajdhani', sans-serif; margin-top: .4rem; }
+.rb-online-identity > div:first-child .rb-crest { width: 2.75rem; flex-basis: 2.75rem; }
+.rb-online-identity .rb-eyebrow { color: var(--muted); }
+.rb-app .rb-online-identity h2 { font: 700 clamp(1.75rem, 3vw, 2.6rem)/1.1 'Rajdhani', sans-serif; margin: .25rem 0; }
+.rb-online-finances { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem 2rem; padding-block: .75rem; }
+.rb-online-finances .rb-metric { padding: 0; border: 0; background: transparent; }
+.rb-online-finances .rb-metric strong { font: 700 1.25rem/1.2 'Space Grotesk', sans-serif; }
+.rb-app .rb-broadcast-banner { padding: .85rem 1.25rem; gap: .6rem 1.25rem; margin-block: .75rem 1rem; }
+.rb-online-notice { padding: .85rem 1rem; background: #1c2c44; border-left: 3px solid #ff9869; }
+.rb-app .rb-online-form { max-width: 42rem; gap: 1.1rem; }
+.rb-online-columns .rb-online-form { max-width: none; padding: clamp(1rem, 2vw, 2rem); background: var(--rb-surface); border-top: 2px solid #4266e9; }
+.rb-online-form > h3 { margin-bottom: .5rem; }
+.rb-online-auth { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(20rem, .9fr); align-items: start; gap: clamp(1.5rem, 4vw, 4rem); max-width: 86rem; margin: clamp(1rem, 4vw, 4rem) auto; }
+.rb-auth-intro { min-width: 0; padding-top: 10rem; background: linear-gradient(0deg, #101729 8%, transparent 95%), url('assets/broadcast/banner/arena.webp') top center / auto 14rem no-repeat; }
+.rb-auth-intro h2 { font: 700 clamp(2rem, 4vw, 3.5rem)/1.05 'Rajdhani', sans-serif; margin: .5rem 0 1rem; }
+.rb-auth-intro > p:last-child { max-width: 50ch; color: var(--muted); }
+.rb-auth-panel { min-width: 0; padding: clamp(1rem, 2.5vw, 2rem); background: var(--rb-surface); border-top: 2px solid #4266e9; }
+.rb-auth-panel .rb-online-form { margin-block: 0 1.5rem; }
+.rb-auth-panel > p { margin-top: 1.25rem; }
+.rb-online-roster .rb-online-player, .rb-online-player { align-items: start; padding-block: 1rem; border-color: var(--rb-line); }
+.rb-online-player > .rb-person-identity { flex-basis: 20rem; }
+.rb-online-code { font-size: 1rem; letter-spacing: .08em; padding: .75rem 1rem; background: #17243a; }
+.rb-app .rb-online-lock { color: #ffd18c; }
+.rb-app .rb-online-nav { margin-block: .75rem 1.25rem; }
+.rb-app .rb-broadcast-preparation { display: grid; gap: 1.5rem; max-width: none; margin: 0; align-items: start; }
+.rb-broadcast-preparation > h3 { grid-column: 1 / -1; }
+.rb-broadcast-squad, .rb-broadcast-tactics, .rb-broadcast-context { min-width: 0; }
+.rb-broadcast-squad > h4, .rb-broadcast-context h4 { margin: 0 0 1rem; font-size: 1.35rem; }
+.rb-squad-slot { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: .2rem .75rem; padding: .65rem .5rem; border-bottom: 1px solid var(--rb-line); border-left: 3px solid transparent; }
+.rb-squad-slot.is-selected { background: #1c2c44; border-left-color: #ff793d; }
+.rb-squad-slot > .rb-fatigue { display: flex; align-items: center; grid-column: 2 / -1; gap: .5rem; margin: 0; }
+.rb-squad-slot > .rb-fatigue > small { display: none; }
+.rb-squad-slot .rb-archetype { grid-column: 2 / -1; }
+.rb-squad-slot > .rb-athlete-portrait { grid-row: 1 / 4; align-self: center; }
+.rb-app .rb-squad-slot > .rb-squad-name { min-height: 2.75rem; padding: .25rem 0; background: transparent; border: 0; text-align: left; justify-self: stretch; overflow-wrap: anywhere; }
+.rb-squad-detail { padding-block: 1rem; border-top: 1px solid var(--rb-line); margin-top: 1rem; display: grid; gap: .85rem; }
+.rb-squad-detail:not([open]) > :not(summary) { display: none; }
+.rb-squad-detail > summary { min-height: 2.75rem; cursor: pointer; font-weight: 600; }
+.rb-squad-detail .rb-player-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rb-broadcast-bench { margin-top: 1.5rem; display: grid; gap: 1rem; }
+.rb-bench-entry { display: grid; gap: .6rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rb-line); }
+.rb-bench-entry > .rb-controls { gap: .5rem; }
+.rb-broadcast-tactics { display: grid; gap: 1.15rem; }
+.rb-broadcast-selectors { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rb-broadcast-save { display: flex; align-items: center; gap: .75rem 1.25rem; flex-wrap: wrap; padding-block: .75rem; }
+.rb-broadcast-preparation > .rb-broadcast-save { min-width: 0; }
+.rb-broadcast-save .rb-button-primary { flex: 1 1 15rem; }
+.rb-broadcast-save p { flex: 1 1 14rem; font-size: .875rem; color: var(--muted); }
+.rb-broadcast-context { display: grid; gap: 1.75rem; }
+.rb-broadcast-fixture { display: grid; gap: .5rem; padding: .85rem .5rem; border-bottom: 1px solid var(--rb-line); }
+.rb-broadcast-fixture.is-own { border-left: 3px solid #ff793d; padding-left: .8rem; background: #192940; }
+.rb-broadcast-fixture > small { color: var(--muted); }
+.rb-broadcast-context .rb-stats-table { font-size: .875rem; }
+.rb-broadcast-context .rb-stats-table :is(th, td) { padding: .6rem .35rem; }
+.rb-app .rb-deployment-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.rb-app .rb-deployment-scroll { min-width: 0; width: 100%; overflow-x: auto; }
+.rb-app .rb-deployment-board { width: 100%; max-width: none; min-width: 36rem; }
+.rb-app .rb-career .rb-deployment-board { max-width: none; }
+.rb-app .rb-deployment-columns, .rb-app .rb-deployment-grid { grid-template-columns: 1.25rem repeat(12, minmax(0, 1fr)); gap: 2px; }
+.rb-app .rb-deployment-cell, .rb-app .rb-deployment-opponent { aspect-ratio: 1; min-width: 0; min-height: 0; padding: 0; }
+.rb-app .rb-deployment-opponent { background: #172033; opacity: .55; }
+.rb-app .rb-deployment-cell { background: #26364a; border-color: #485971; }
+.rb-app .rb-deployment-cell.is-selected { border-color: #ff9869; box-shadow: inset 0 0 0 1px #ff9869; }
+.rb-app .rb-deployment-cell.is-center { background: #42443b; }
+.rb-app .rb-deployment-markings { left: calc(1.25rem + 2px); width: calc(100% - 1.25rem - 2px); height: 100%; }
+.rb-app .rb-deployment-controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+.rb-app .rb-deployment { margin: 0; padding: 0; border: 0; min-width: 0; }
+.rb-app .rb-deployment > h4 { font-size: 1.35rem; margin-bottom: .5rem; }
+.rb-app .rb-deployment > p, .rb-app .rb-deployment-controls > p { font-size: .875rem; }
+.rb-app .rb-deployment-direction { color: var(--muted); }
+.rb-composition-tabs { display: none; }
+.rb-app .rb-preparation.rb-sport-preparation { display: grid; gap: 1.5rem; align-items: start; }
+.rb-sport-preparation .rb-team-controls, .rb-sport-preparation .rb-team-plans { min-width: 0; }
+.rb-sport-preparation .rb-team-plans { display: grid; gap: 1rem; }
+.rb-sport-preparation .rb-team-plans { grid-template-columns: minmax(0, 1fr); }
+.rb-sport-preparation .rb-team-plans .rb-opening-picker { grid-column: auto; grid-row: auto; }
+.rb-app .rb-sport-preparation .rb-lineup-slot { grid-template-columns: minmax(0, 1fr); gap: .4rem; }
+.rb-app .rb-sport-preparation .rb-lineup-slot > .rb-slot-copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.rb-app .rb-sport-preparation .rb-slot-select { justify-self: start; font-size: .875rem; }
+.rb-sport-preparation .rb-slot-copy .rb-person-identity > div { font-size: .875rem; }
+.rb-app .rb-lineup-slot { background: transparent; border-color: var(--rb-line); }
+.rb-app .rb-lineup-slot.is-selected { background: #1c2c44; border-color: #ff793d; }
+.rb-app .rb-setup { max-width: 145rem; }
+.rb-app .rb-setup, .rb-app .rb-scoreboard, .rb-app .rb-result { background-color: #131e32; border-color: var(--rb-line); }
+.rb-app .rb-setup-row { background: transparent; border-color: var(--rb-line); }
+.rb-app .rb-scoreboard { background: #131e32; }
+.rb-app .rb-scoreboard .rb-crest { width: 3.5rem; flex-basis: 3.5rem; }
+.rb-app .rb-roster { background: #131e32; border-color: var(--rb-line); }
+.rb-roster-row > .rb-athlete-portrait { width: 2.75rem; flex-basis: 2.75rem; grid-row: 1 / 4; }
+.rb-app .rb-roster-row { grid-template-columns: auto minmax(0, 1fr) auto; }
+.rb-app .rb-roster-row > .rb-resource { grid-column: 3; }
+.rb-app .rb-roster-row > .rb-class-resource { grid-column: 2 / -1; }
+.rb-app .rb-roster-row :is(small, .rb-health) { font-size: .875rem; }
+.rb-app .rb-roster-heading > .rb-muted { font-size: .875rem; }
+.rb-app .rb-journal-panel { background: transparent; }
+.rb-app .rb-journal { font-size: .9375rem; }
+.rb-app .rb-order-token { min-width: 2.75rem; min-height: 2.75rem; }
+.rb-app .rb-stats-table { background: transparent; }
+.rb-app .rb-stats-table th { color: var(--text); }
+.rb-app .rb-own-club { background: #21304a; }
+@media (min-width: 1024px) {
+  .rb-app .rb-broadcast-preparation { grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr); grid-template-rows: min-content 1fr; }
+  .rb-broadcast-context { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rb-broadcast-preparation > .rb-broadcast-squad { grid-column: 1; grid-row: 1 / span 2; }
+  .rb-broadcast-preparation > .rb-broadcast-tactics { grid-column: 2; grid-row: 1; }
+  .rb-broadcast-preparation > .rb-broadcast-save { grid-column: 2; grid-row: 2; align-self: start; }
+  .rb-broadcast-preparation > .rb-broadcast-context { grid-column: 1 / -1; grid-row: 3; }
+  .rb-app .rb-preparation.rb-sport-preparation { grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr); }
+  .rb-sport-preparation > .rb-broadcast-context { grid-column: 1 / -1; }
+  .rb-app .rb-exhibition-preparation { grid-template-columns: minmax(19rem, 1fr) minmax(0, 2fr); }
+}
+@media (min-width: 1440px) {
+  .rb-app .rb-broadcast-preparation, .rb-app .rb-preparation.rb-sport-preparation { grid-template-columns: minmax(0, 22fr) minmax(0, 54fr) minmax(0, 24fr); }
+  .rb-broadcast-context, .rb-sport-preparation > .rb-broadcast-context { grid-column: auto; grid-template-columns: minmax(0, 1fr); }
+  .rb-broadcast-preparation > .rb-broadcast-context { grid-column: 3; grid-row: 1 / span 2; }
+}
+@media (max-width: 1023px) {
+  .rb-online-auth { grid-template-columns: minmax(0, 1fr); }
+  .rb-auth-intro { padding-top: 4rem; background-size: auto 10rem; }
+  .rb-app .rb-online-identity { grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+  .rb-online-identity .rb-online-finances { padding-block: .25rem; }
+  .rb-composition-tabs { display: flex; gap: .5rem; grid-column: 1 / -1; }
+  .rb-composition-tabs .rb-button { flex: 1; }
+  .rb-composition-tabs [aria-pressed='true'] { border-color: #ff793d; color: #ffb18c; }
+  [data-team-view='Composition'] > .rb-broadcast-tactics { display: none; }
+  [data-team-view='Tactique'] > .rb-broadcast-squad { display: none; }
+  .rb-app .rb-preparation.rb-sport-preparation { grid-template-columns: minmax(0, 1fr); }
+  .rb-broadcast-save[data-dirty='true'] { position: sticky; bottom: 0; z-index: 4; background: #101729; padding: .75rem .5rem max(.75rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--rb-line); }
+  .rb-broadcast-save[data-dirty='true'] > p { flex-basis: 100%; }
+  .rb-app .rb-broadcast-preparation { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .rb-app .rb-deployment-controls { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 650px) {
+  .rb-app-header { position: static; gap: .5rem; }
+  .rb-online-account { order: initial; width: auto; margin-left: auto; }
+  .rb-online-account > span > span { display: none; }
+  .rb-app-brand h1 { font-size: 1.25rem; }
+  .rb-app-brand h1 span { letter-spacing: .06em; }
+  .rb-app-brand img { width: 1.5rem; }
+  .rb-hub-link { padding-inline: .5rem; font-size: .875rem; }
+  .rb-hub-link { max-width: 6rem; margin-left: 0; text-align: center; }
+  .rb-broadcast-banner { gap: .85rem .5rem; padding: 1rem .5rem; }
+  .rb-broadcast-banner > .rb-club-identity { flex-direction: column; text-align: center; gap: .5rem; font-size: 1.2rem; }
+  .rb-broadcast-banner > .rb-club-identity:nth-child(3) { flex-direction: column; text-align: center; }
+  .rb-broadcast-banner .rb-crest { width: 2.75rem; flex-basis: 2.75rem; }
+  .rb-broadcast-versus .rb-eyebrow { display: none; }
+  .rb-broadcast-banner .rb-club-identity strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .rb-broadcast-versus strong { font-size: 1.35rem; }
+  .rb-broadcast-selectors { grid-template-columns: minmax(0, 1fr); }
+  .rb-online-top { align-items: start; }
+  .rb-online-top > span { overflow-wrap: anywhere; min-width: 0; }
+  .rb-online-finances { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }
+  .rb-online-finances .rb-metric { min-width: 0; display: grid; grid-template-rows: minmax(2.5em, auto) auto; align-content: start; }
+  .rb-online-finances .rb-metric strong { font-size: 1rem; white-space: nowrap; }
+  .rb-online-finances .rb-metric > small { display: none; }
+  .rb-app .rb-online-identity > .rb-online-actions > .rb-button { background: transparent; border-color: transparent; padding: .4rem .5rem; font-size: .875rem; }
+}

@@ -14,11 +14,11 @@ export function deploymentEditor({ players, positions = defaultDeployment(), col
   help.id = `rb-deployment-help-${++instance}`;
   const layout = el('div', 'rb-deployment-layout'), controls = el('div', 'rb-deployment-controls'), field = el('label', 'rb-field', 'Joueur à placer'), select = el('select', 'rb-deployment-player');
   select.setAttribute('aria-label', 'Joueur à placer'); field.append(select);
-  const info = el('p', 'rb-muted', 'Placez vos joueurs dans les colonnes A à F. La colonne G montre le camp adverse et reste inaccessible. Au coup d’envoi, les joueurs en F4 et F5 peuvent tenter l’interception du ballon, à l’intersection du carré doré.'), status = el('p', 'rb-deployment-status');
+  const info = el('p', 'rb-muted', 'Placez vos joueurs dans les colonnes A à F. Les colonnes G à L montrent le camp adverse et restent inaccessibles. En F4 et F5, vos joueurs peuvent tenter l’interception à l’engagement.'), status = el('p', 'rb-deployment-status');
   status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite'); controls.append(field, info, status);
   const scroll = el('div', 'rb-deployment-scroll'), board = el('div', 'rb-deployment-board'), columns = el('div', 'rb-deployment-columns'), body = el('div', 'rb-deployment-body'), grid = el('div', 'rb-deployment-grid');
   grid.setAttribute('role', 'group'); grid.setAttribute('aria-label', 'Cases de votre moitié de terrain, A à F. Camp adverse à droite. Zone d’engagement : F4 et F5.'); grid.setAttribute('aria-describedby', help.id);
-  columns.append(el('span')); for (let x = 0; x < 7; x++) columns.append(el('span', x === 6 ? 'rb-deployment-opponent-label' : '', String.fromCharCode(65 + x)));
+  columns.append(el('span')); for (let x = 0; x < 12; x++) columns.append(el('span', x >= 6 ? 'rb-deployment-opponent-label' : '', String.fromCharCode(65 + x)));
   const buttons = [];
   for (let y = 0; y < 8; y++) {
     grid.append(el('span', 'rb-deployment-row-number', String(y + 1)));
@@ -40,10 +40,12 @@ export function deploymentEditor({ players, positions = defaultDeployment(), col
       });
       grid.append(button); buttons.push(button);
     }
-    const opponent = el('span', `rb-deployment-opponent${[3, 4].includes(y) ? ' is-center' : ''}`);
-    opponent.setAttribute('aria-hidden', 'true'); grid.append(opponent);
+    for (let x = 6; x < 12; x++) {
+      const opponent = el('span', `rb-deployment-opponent${x === 6 && [3, 4].includes(y) ? ' is-center' : ''}`);
+      opponent.setAttribute('aria-hidden', 'true'); grid.append(opponent);
+    }
   }
-  const markings = svg('svg', { viewBox: '0 0 420 480', preserveAspectRatio: 'none', class: 'rb-deployment-markings', 'aria-hidden': 'true', focusable: 'false' });
+  const markings = svg('svg', { viewBox: '0 0 720 480', preserveAspectRatio: 'none', class: 'rb-deployment-markings', 'aria-hidden': 'true', focusable: 'false' });
   markings.append(svg('circle', { cx: 360, cy: 240, r: 58, fill: 'none', stroke: '#b0b8ad', 'stroke-width': 1.5, opacity: .5 }),
     svg('line', { x1: 360, y1: 0, x2: 360, y2: 480, stroke: '#dce6d4', 'stroke-width': 3, class: 'rb-deployment-midline' }),
     svg('rect', { x: 300, y: 180, width: 120, height: 120, fill: 'none', stroke: '#f2dc83', 'stroke-width': 2, 'stroke-dasharray': '6 4', class: 'rb-deployment-engagement' }));

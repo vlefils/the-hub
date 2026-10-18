@@ -53,9 +53,9 @@ test('interface : équipe préparée côté serveur puis annulation, et gestion 
   await button(e.root, 'Changer de ligue').click(); await button(e.root, `${state.name} · 2/2 clubs`).click();
   await button(e.root, 'Équipe').click();
   assert.match(e.root.textContent, /Équipes verrouillées/);
-  const body = descendants(e.root).find((n) => n.tagName === 'section');
+  const body = e.root.querySelector('.rb-online-body');
   assert.ok(descendants(body).filter((n) => n.tagName === 'select').length > 5);
-  assert.ok(descendants(body).filter((n) => ['input', 'select', 'button'].includes(n.tagName)).every((n) => n.disabled));
+  assert.ok(descendants(body).filter((n) => ['input', 'select', 'button'].includes(n.tagName) && n.getAttribute('data-readonly-control') !== 'true').every((n) => n.disabled));
   state = advanceLeague(state, clock); assert.equal(state.status, 'broadcast'); mounted.stop();
 });
 test('spectateur : affiche un round fourni sans résoudre de tour ni offrir un résultat immédiat', (t) => {
@@ -81,7 +81,8 @@ test('lobby : les arrivées se mettent à jour sans reconstruire un formulaire i
   await e.pending.shift()(); assert.ok(e.root.contains(first), 'Un sondage inchangé préserve le formulaire et son focus.');
   state = joinLeague(state, 'u1', { clubName: 'Ami' }, clock); revision++;
   await e.pending.shift()(); assert.match(e.root.textContent, /2\/2 participants/); assert.equal(button(e.root, 'Lancer la saison').disabled, false);
-  const editing = descendants(e.root).find((n) => n.tagName === 'form'); await editing.emit('input');
+  const editing = descendants(e.root).find((n) => n.tagName === 'form');
+  const strategy = descendants(editing).find(n => n.tagName === 'select' && n.children.some(o => o.value === 'possession')); strategy.value = 'possession'; await strategy.emit('input');
   state = editPreparation(state, 'u1', 'color', { color: '#aabbcc' }, clock); revision++;
   await e.pending.shift()(); assert.ok(e.root.contains(editing), 'Une arrivée ou modification distante ne doit pas effacer la saisie locale.');
   mounted.stop();

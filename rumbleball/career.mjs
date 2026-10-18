@@ -2,6 +2,7 @@ import { PROFILES, ROLES, INSTRUCTIONS, STRATEGIES, clone } from './data.mjs';
 import { createMatch, simulateMatch, seedHash, CURRENT_RULES } from './engine.mjs';
 import { compilePlayer, recruitmentPrice, salary, levelOf, progressPlayer, CATALOGUE, XP_THRESHOLDS } from './progression.mjs';
 import { KIT_COLORS, clubKit, validKitColor } from './appearance.mjs';
+import { identifyCareer, validCrest } from './identity.mjs';
 import { clubDeployment, validDeployment } from './deployment.mjs';
 import { DEFAULT_OPENING, clubOpening, openingDeployment, validOpening } from './openings.mjs';
 
@@ -22,6 +23,7 @@ function shuffle(values, seed) {
 }
 const need = (condition, message) => { if (!condition) throw new Error(message); };
 const team = (career) => career.clubs[0];
+const identifiedCopy = (career) => identifyCareer(clone(career));
 export const ownedPlayers = (career) => team(career).players;
 export const payroll = (career) => ownedPlayers(career).reduce((sum, p) => sum + salary(p), 0);
 export const managementLocked = (career) => Boolean(career.current && !career.current.settled);
@@ -73,17 +75,17 @@ export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0])
   career.market = generateMarket(career, true);
   career.tieOrder = shuffle(career.clubs.map((c) => c.id), `${career.seed}:ties:1`);
   career.schedule = seasonSchedule(career); career.table = standings(career);
-  return career;
+  return identifyCareer(career);
 }
 export function confirmDraft(input, ids) {
-  const c = clone(input); need(c.status === 'draft', 'Club déjà créé.');
+  const c = identifiedCopy(input); need(c.status === 'draft', 'Club déjà créé.');
   need(new Set(ids).size === ids.length && ids.length >= 5 && ids.length <= 8, 'Sélectionnez de cinq à huit joueurs différents.');
   const selected = ids.map((id) => c.market.find((p) => p.id === id)); need(selected.every(Boolean), 'Candidat inconnu.');
   spend(c, selected.reduce((sum, p) => sum + recruitmentPrice(p), 0), 'Contrats initiaux');
   team(c).players = selected; c.lineup = ids.slice(0, 5); c.market = c.market.filter((p) => !ids.includes(p.id)); c.status = 'active'; return c;
 }
 export function configureTeam(input, lineup, assignments, strategy, deployment, opening) {
-  const c = clone(input); editable(c);
+  const c = identifiedCopy(input); editable(c);
   need(lineup.length === 5 && new Set(lineup).size === 5 && lineup.every((id) => ownedPlayers(c).some((p) => p.id === id)), 'Choisissez exactement cinq titulaires distincts.');
   need(Object.hasOwn(STRATEGIES, strategy), 'Plan collectif inconnu.');
   if (opening !== undefined) { need(validOpening(opening), 'Ouverture inconnue.'); team(c).opening = opening; }
@@ -92,16 +94,20 @@ export function configureTeam(input, lineup, assignments, strategy, deployment, 
   c.lineup = [...lineup]; team(c).strategy = strategy; return c;
 }
 export function setClubColor(input, color) {
-  const c = clone(input); need(!managementLocked(c), 'La gestion est verrouillée pendant la rencontre.');
+  const c = identifiedCopy(input); need(!managementLocked(c), 'La gestion est verrouillée pendant la rencontre.');
   need(validKitColor(color), 'Couleur de maillot invalide.'); team(c).kitColor = color.toLowerCase(); return c;
 }
+export function setClubCrest(input, crestId) {
+  const c = identifiedCopy(input); need(!managementLocked(c), 'La gestion est verrouillée pendant la rencontre.');
+  need(validCrest(crestId), 'Blason inconnu.'); team(c).crestId = crestId; return c;
+}
 export function recruit(input, id) {
-  const c = clone(input); editable(c); need(ownedPlayers(c).length < 8, 'Effectif complet : huit joueurs maximum.');
+  const c = identifiedCopy(input); editable(c); need(ownedPlayers(c).length < 8, 'Effectif complet : huit joueurs maximum.');
   const p = c.market.find((q) => q.id === id); need(p, 'Offre indisponible.'); spend(c, recruitmentPrice(p), `Recrutement : ${p.name}`);
   team(c).players.push(p); c.market = c.market.filter((q) => q.id !== id); return c;
 }
 export function sellPlayer(input, id) {
-  const c = clone(input); editable(c); need(ownedPlayers(c).length > 5, 'Cinq joueurs minimum dans le club.');
+  const c = identifiedCopy(input); editable(c); need(ownedPlayers(c).length > 5, 'Cinq joueurs minimum dans le club.');
   const p = ownedPlayers(c).find((q) => q.id === id); need(p, 'Joueur inconnu.');
   transact(c, recruitmentPrice(p) / 2, `Cession : ${p.name}`);
   for (const item of c.inventory) if (item.playerId === id) item.playerId = null;
@@ -110,7 +116,7 @@ export function sellPlayer(input, id) {
   return c;
 }
 export function buyItem(input, itemId, playerId = null, replaceConfirmed = false) {
-  const c = clone(input); editable(c); const item = CATALOGUE[itemId]; need(item, 'Article inconnu.');
+  const c = identifiedCopy(input); editable(c); const item = CATALOGUE[itemId]; need(item, 'Article inconnu.');
   const p = ownedPlayers(c).find((q) => q.id === playerId);
   if (item.slot === 'implant') { need(p, 'Sélectionnez un joueur.'); need(!p.implant || replaceConfirmed, 'Le remplacement détruit l’ancien implant. Confirmez ce remplacement.'); }
   spend(c, item.price, `${item.name}${p ? ` : ${p.name}` : ''}`);
@@ -124,9 +130,9 @@ function assignProtectionMutable(c, id, playerId) {
   if (playerId) for (const old of c.inventory) if (old.playerId === playerId) old.playerId = null;
   item.playerId = playerId;
 }
-export function assignProtection(input, id, playerId) { const c = clone(input); editable(c); assignProtectionMutable(c, id, playerId); return c; }
+export function assignProtection(input, id, playerId) { const c = identifiedCopy(input); editable(c); assignProtectionMutable(c, id, playerId); return c; }
 export function sellProtection(input, id) {
-  const c = clone(input); editable(c); const item = c.inventory.find((q) => q.id === id); need(item, 'Protection inconnue.');
+  const c = identifiedCopy(input); editable(c); const item = c.inventory.find((q) => q.id === id); need(item, 'Protection inconnue.');
   transact(c, CATALOGUE[item.itemId].price / 2, `Vente : ${CATALOGUE[item.itemId].name}`); c.inventory = c.inventory.filter((q) => q.id !== id); return c;
 }
 export function aiLineup(club) {
@@ -135,11 +141,11 @@ export function aiLineup(club) {
 function matchConfig(c, fixture) {
   // Keep the managed club on the left of the broadcast, even in an away fixture.
   const home = team(c), away = c.clubs.find((club) => club.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
-  return { seed: fixture.seed, rulesVersion: CURRENT_RULES, openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home), away: clubKit(away, c.clubs.indexOf(away)) }, strategy: home.strategy, awayStrategy: away.strategy,
+  return { seed: fixture.seed, rulesVersion: CURRENT_RULES, openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home), away: clubKit(away, c.clubs.indexOf(away)) }, crestIds: { home: home.crestId, away: away.crestId }, strategy: home.strategy, awayStrategy: away.strategy,
     rosters: { home: c.lineup.map((id) => compilePlayer(home.players.find((p) => p.id === id), c.inventory)), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id))) } };
 }
 export function launchCareerMatch(input) {
-  const c = clone(input); editable(c); const fixture = nextFixture(c); need(fixture && !fixture.result, 'La saison est terminée.');
+  const c = identifiedCopy(input); editable(c); const fixture = nextFixture(c); need(fixture && !fixture.result, 'La saison est terminée.');
   need(c.lineup.length === 5 && new Set(c.lineup).size === 5 && c.lineup.every((id) => ownedPlayers(c).some((p) => p.id === id)), 'Cinq titulaires sont nécessaires.');
   const config = matchConfig(c, fixture), wages = payroll(c);
   transact(c, -wages, 'Salaires de la journée', fixture.id);
@@ -158,7 +164,7 @@ function recordFixture(c, fixture, state, homeId, awayId) {
   return homeProgress;
 }
 export function settleCareerMatch(input) {
-  const c = clone(input), current = c.current;
+  const c = identifiedCopy(input), current = c.current;
   need(current, 'Aucune rencontre en cours.'); if (current.settled) return c;
   need(current.state.finished, 'La rencontre n’est pas terminée.');
   const fixture = c.schedule[c.day].find((f) => f.id === current.fixtureId); need(fixture && !fixture.result, 'Cette rencontre a déjà été réglée.');
@@ -172,7 +178,7 @@ export function settleCareerMatch(input) {
   }
   const reward = current.state.result.winnerId === 'home' ? 350 : current.state.result.winnerId === 'away' ? 200 : 275;
   const debtBefore = Math.max(0, -c.balance); transact(c, reward, 'Prime de match', fixture.id);
-  c.day++; c.completedDays++; c.market = generateMarket(c); c.table = standings(c);
+  c.day++; c.completedDays++; c.market = generateMarket(c); identifyCareer(c); c.table = standings(c);
   let seasonPrize = 0, rank = null;
   if (c.day === 10) {
     rank = c.table.findIndex((row) => row.clubId === 'club') + 1; seasonPrize = SEASON_PRIZES[rank - 1];
@@ -184,13 +190,13 @@ export function settleCareerMatch(input) {
   return c;
 }
 export function saveCareerTurn(input, state, events) {
-  const c = clone(input); need(managementLocked(c), 'Aucune rencontre à poursuivre.');
+  const c = identifiedCopy(input); need(managementLocked(c), 'Aucune rencontre à poursuivre.');
   need(state.seed === c.current.state.seed && state.turns >= c.current.state.turns, 'État de rencontre incompatible.');
   c.current.state = clone(state); c.current.turns.push(JSON.parse(JSON.stringify(events)));
   return state.finished ? settleCareerMatch(c) : c;
 }
 export function nextSeason(input) {
-  const c = clone(input); editable(c); need(c.day === 10, 'Terminez les dix journées.');
+  const c = identifiedCopy(input); editable(c); need(c.day === 10, 'Terminez les dix journées.');
   c.season++; c.day = 0; c.current = null;
   for (const club of c.clubs) for (const p of club.players) p.fatigue = 0;
   c.tieOrder = shuffle(c.clubs.map((club) => club.id), `${c.seed}:ties:${c.season}`);
