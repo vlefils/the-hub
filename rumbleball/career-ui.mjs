@@ -2,7 +2,7 @@ import { ROLES, ROLE_DESCRIPTIONS, INSTRUCTIONS, STRATEGIES, STARTS } from './da
 import { ARCHETYPES, archetypeLabel, classAbilities } from './classes.mjs';
 import { CATALOGUE, XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice } from './progression.mjs';
 import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
-import { loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
+import { CAREER_KEY, loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
 import { KIT_COLORS, clubKit } from './appearance.mjs';
 import { playerPortrait, teamCrest, athletePortrait } from './visuals.mjs';
 import { crestPicker, clubIdentity, matchBanner, equipmentArtwork, compositionTabs, careerContext } from './broadcast-components.mjs';
@@ -18,11 +18,11 @@ function download(text, filename) {
 export function mountCareer(root, mountMatch) {
   root.replaceChildren(); root.classList.add('rb');
   // Access localStorage lazily, including browsers that reject the property getter.
-  const storage = { getItem: (key) => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value) };
+  const storage = { getItem: (key) => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value), removeItem: (key) => window.localStorage.removeItem(key) };
   const loaded = loadCareer(storage);
   let career = loaded.career, tab = 'Club', teamView = 'Effectif', mode = 'career', unsaved = false, selectedPlayer = null, selectedShopPlayer = null, draftIds = new Set(), pendingImport = null;
   let rosterSort = 'lineup', rosterDetailOpen = false, rosterScroll = 0, marketFilter = '', comparePlayer = null, calendarDay = null, formationUndo = null;
-  const sectionScroll = new Map(); let confirmationId = 0;
+  const sectionScroll = new Map(); let confirmationId = 0, importRequestId = 0;
   const top = el('div', 'rb-career-top'), modes = el('div', 'rb-controls'), tools = el('div', 'rb-controls');
   const careerMode = btn('Carrière', () => showMode('career')), exhibitionMode = btn('Exhibition', () => showMode('exhibition'));
   modes.setAttribute('aria-label', 'Mode de jeu'); modes.append(careerMode, exhibitionMode);
@@ -30,9 +30,15 @@ export function mountCareer(root, mountMatch) {
   const exportButton = btn('Exporter', () => attempt(() => download(exportCareer(career), `rumbleball-saison-${career.season}.json`)));
   const importInput = el('input'); importInput.type = 'file'; importInput.accept = '.json,application/json'; importInput.hidden = true;
   const importButton = btn('Importer', () => importInput.click());
+  const restartButton = keyed(btn('Redémarrer la campagne', () => {
+    view.pause();
+    showConfirmation('Redémarrer la campagne ? Le club, les joueurs et toute la progression seront supprimés, y compris la rencontre en cours. Vous repartirez de la création d’un club. Exportez votre carrière avant de continuer si vous souhaitez en garder une copie.', restartCareer, 'Redémarrer');
+  }), 'restart-career');
+  restartButton.classList.add('rb-destructive-action');
   const retry = btn('Réessayer la sauvegarde', () => { save(); renderManagement(); }); retry.hidden = true;
   const saveStatus = el('span', 'rb-save-status', 'Sauvegarde locale automatique'); saveStatus.setAttribute('role', 'status'); saveStatus.setAttribute('aria-live', 'polite');
-  const saveTools = disclosure('Sauvegarde', 'save-tools', el('p', 'rb-muted', 'Cette carrière est conservée dans ce navigateur. Exportez une copie pour la garder sur un autre appareil.'), exportButton, importButton, importInput);
+  const saveActions = el('div', 'rb-controls rb-save-actions'); saveActions.append(exportButton, importButton, restartButton);
+  const saveTools = disclosure('Sauvegarde', 'save-tools', el('p', 'rb-muted', 'Cette carrière est conservée dans ce navigateur. Exportez une copie pour la garder sur un autre appareil.'), saveActions, importInput);
   tools.append(saveStatus, saveTools, retry); top.append(modes, tools);
   const notice = el('p', 'rb-career-notice'); notice.setAttribute('role', 'alert'); notice.hidden = !loaded.error; notice.textContent = loaded.error ?? '';
   const importPreview = el('section', 'rb-career-import'); importPreview.hidden = true;
@@ -54,6 +60,18 @@ export function mountCareer(root, mountMatch) {
     catch (error) { unsaved = true; retry.hidden = false; if (saveStatus.textContent !== 'Progression non enregistrée') saveStatus.textContent = 'Progression non enregistrée'; notice.hidden = false; notice.textContent = `Progression non enregistrée : ${error.message} La dernière sauvegarde valide est conservée. Réessayez ou exportez votre progression avant de fermer cette page.`; return false; }
   }
   function update(action) { attempt(() => { career = action(); save(); renderManagement(); }); }
+  function restartCareer() {
+    attempt(() => {
+      try { storage.removeItem(CAREER_KEY); }
+      catch (error) { throw new Error(`Redémarrage impossible : ${error.message} Votre campagne est conservée.`); }
+      career = null; loaded.hasSave = false; unsaved = false; retry.hidden = true; notice.hidden = true;
+      importRequestId++; pendingImport = null; importPreview.replaceChildren(); importPreview.hidden = true; draftIds.clear();
+      selectedPlayer = selectedShopPlayer = comparePlayer = calendarDay = formationUndo = null;
+      tab = 'Club'; teamView = 'Effectif'; rosterSort = 'lineup'; rosterDetailOpen = false; rosterScroll = 0; marketFilter = ''; sectionScroll.clear();
+      saveStatus.textContent = 'Sauvegarde locale automatique'; saveTools.open = false;
+      showMode('career'); manager.querySelector('input')?.focus();
+    });
+  }
   function blocked(b, reason) { b.disabled = Boolean(reason); if (reason) b.title = reason; return b; }
   function go(nextTab, nextTeamView = teamView) {
     sectionScroll.set(`${tab}:${teamView}`, window.scrollY ?? 0);
@@ -69,21 +87,24 @@ export function mountCareer(root, mountMatch) {
   }
   importInput.addEventListener('change', async () => {
     const file = importInput.files[0]; importInput.value = ''; if (!file) return;
+    const requestId = ++importRequestId;
     try {
       if (managementLocked(career ?? {})) throw new Error('Terminez la rencontre avant de remplacer la carrière.');
       if (file.size > 8_000_000) throw new Error('Fichier JSON trop volumineux.');
-      pendingImport = importCareer(await file.text());
+      const imported = importCareer(await file.text());
+      if (requestId !== importRequestId) return;
+      pendingImport = imported;
       if (managementLocked(career ?? {})) throw new Error('Terminez la rencontre avant de remplacer la carrière.');
       importPreview.replaceChildren(el('h3', '', 'Importer cette carrière'), el('p', '', `${pendingImport.clubs[0].name} · saison ${pendingImport.season} · ${money(pendingImport.balance)}. La carrière locale actuelle sera remplacée.`),
         btn('Confirmer le remplacement', () => attempt(() => { if (managementLocked(career ?? {})) throw new Error('Terminez la rencontre avant de remplacer la carrière.'); view.pause(); career = pendingImport; pendingImport = null; draftIds.clear(); selectedPlayer = selectedShopPlayer = comparePlayer = calendarDay = formationUndo = null; tab = 'Club'; teamView = 'Effectif'; sectionScroll.clear(); importPreview.hidden = true; save(); showMode('career'); }), true),
         btn('Annuler', () => { pendingImport = null; importPreview.hidden = true; }));
       importPreview.hidden = false;
-    } catch (error) { notice.hidden = false; notice.textContent = `Import refusé : ${error.message}`; }
+    } catch (error) { if (requestId !== importRequestId) return; notice.hidden = false; notice.textContent = `Import refusé : ${error.message}`; }
   });
   function renderManagement(preserve = true) {
     const focusKey = preserve && manager.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null;
     const scroll = window.scrollY ?? 0, openKeys = new Set([...manager.querySelectorAll('details')].filter((n) => n.open).map((n) => n.dataset.sectionKey));
-    manager.replaceChildren(); exportButton.disabled = !career; importButton.disabled = managementLocked(career ?? {});
+    manager.replaceChildren(); exportButton.disabled = !career; importButton.disabled = managementLocked(career ?? {}); restartButton.disabled = !career && !loaded.hasSave;
     if (!career) { renderCreation(); restoreContext(); return; }
     if (career.status === 'draft') { renderDraft(); restoreContext(); return; }
     const locked = managementLocked(career), club = career.clubs[0], fixture = nextFixture(career);
@@ -350,8 +371,8 @@ export function mountCareer(root, mountMatch) {
         const row = el('section', 'rb-career-player'), afterPlayer = structuredClone(p), afterInventory = structuredClone(career.inventory);
         if (item.slot === 'implant') afterPlayer.implant = id;
         else { for (const old of afterInventory) if (old.playerId === p.id) old.playerId = null; afterInventory.push({ id: 'preview', itemId: id, playerId: p.id }); }
-        row.append(equipmentArtwork(id, item.name));
-        row.append(portraitIdentity(compilePlayer(afterPlayer, afterInventory), clubKit(career.clubs[0]), el('h4', '', item.name), el('small', 'rb-muted', 'Aperçu sur le joueur')), el('p', '', item.effect), comparison(before, compilePlayer(afterPlayer, afterInventory), p.implant, afterPlayer.implant));
+        const heading = el('div', 'rb-equipment-heading'); heading.append(equipmentArtwork(id, ''), el('h4', '', item.name));
+        row.append(heading, el('p', '', item.effect), comparison(before, compilePlayer(afterPlayer, afterInventory), p.implant, afterPlayer.implant));
         if (p.implant && item.slot === 'implant' && p.implant !== id) row.append(el('p', 'rb-loss', `Remplace et détruit : ${CATALOGUE[p.implant].name}.`));
         const available = career.inventory.find((i) => i.itemId === id && i.playerId !== p.id);
         if (available) row.append(blocked(btn('Utiliser un exemplaire du club · gratuit', () => update(() => assignProtection(career, available.id, p.id))), locked ? 'Rencontre en cours.' : ''));
@@ -378,7 +399,7 @@ export function mountCareer(root, mountMatch) {
       row.append(clubIdentity(home, { compact: true }), clubIdentity(away, { compact: true }), el('p', 'rb-muted', !f.result ? 'À jouer' : f.result.winnerId ? `Victoire : ${career.clubs.find((c) => c.id === f.result.winnerId).name}` : 'Match nul')); calendar.append(row);
     } layout.append(ranking, calendar); manager.append(layout);
     const opponents = disclosure('Clubs adverses et rotation', 'league-opponents');
-    for (const club of career.clubs.slice(1)) { opponents.append(el('h4', '', `${club.name} · ${club.style}`), table(['Joueur', 'Niveau', 'XP', 'Fatigue'], club.players.map((p) => [p.name, levelOf(p), p.xp, `${p.fatigue}/6`]))); }
+    for (const club of career.clubs.slice(1)) { opponents.append(clubIdentity(club), el('p', 'rb-muted', club.style), table(['Joueur', 'Niveau', 'XP', 'Fatigue'], club.players.map((p) => [portraitIdentity(compilePlayer(p, []), clubKit(club), el('strong', '', p.name)), levelOf(p), p.xp, fatigue(p)]))); }
     manager.append(opponents);
     for (const past of career.seasonHistory) manager.append(disclosure(`Saison ${past.season} · classement final`, `season-${past.season}`, table(['Club', 'Points'], past.table.map((r, i) => [`${i + 1}. ${r.name}`, r.points]), { highlight: past.table.findIndex((r) => r.clubId === 'club') })));
   }
@@ -389,23 +410,28 @@ export function mountCareer(root, mountMatch) {
     const metrics = el('div', 'rb-summary-metrics'); metrics.append(metric('Variation après salaires', `${signed(summary.reward + summary.seasonPrize - summary.wages)} chromas`), metric('Disponible à la fin de la journée', money(summary.available)), metric('Niveaux gagnés', String(summary.progress.reduce((sum, p) => sum + p.level - p.beforeLevel, 0)))); panel.append(metrics);
     for (const progress of summary.progress.filter((p) => p.level > p.beforeLevel)) {
       const owner = ownedPlayers(career).find((p) => p.id === progress.playerId), promotion = el('div', 'rb-level-gain');
-      promotion.append(el('strong', '', `${progress.name} · niveau ${progress.beforeLevel} → ${progress.level}`));
+      const label = el('strong', '', `${progress.name} · niveau ${progress.beforeLevel} → ${progress.level}`);
+      promotion.append(owner ? portraitIdentity(compilePlayer(owner, career.inventory), clubKit(career.clubs[0]), label) : label);
       if (owner) {
         const before = compilePlayer({ ...owner, xp: XP_THRESHOLDS[progress.beforeLevel - 1], fatigue: 0, implant: null }), after = compilePlayer({ ...owner, xp: XP_THRESHOLDS[progress.level - 1], fatigue: 0, implant: null });
         promotion.append(comparison(before, after));
         for (const [key, label] of [['adrenaline', 'Adrénaline'], ['calls', 'Appels de jeu'], ['focus', 'Concentration']]) if (after.caps[key] > before.caps[key]) promotion.append(el('p', 'rb-gain', `${label} : ${before.caps[key]} → ${after.caps[key]}`));
       } panel.append(promotion);
     }
-    panel.append(table(['Joueur', 'XP gagnée', 'Niveau', 'Fatigue'], summary.progress.map((p) => [p.name, `+${p.xp}${p.ko ? ' · KO' : ''}`, p.level > p.beforeLevel ? `${p.beforeLevel} → ${p.level}` : p.level, `${p.beforeFatigue} → ${p.fatigue}/6`])));
+    panel.append(table(['Joueur', 'XP gagnée', 'Niveau', 'Fatigue'], summary.progress.map((p) => {
+      const owner = ownedPlayers(career).find((player) => player.id === p.playerId);
+      const name = owner ? portraitIdentity(compilePlayer(owner, career.inventory), clubKit(career.clubs[0]), el('strong', '', p.name)) : p.name;
+      return [name, `+${p.xp}${p.ko ? ' · KO' : ''}`, p.level > p.beforeLevel ? `${p.beforeLevel} → ${p.level}` : p.level, `${p.beforeFatigue} → ${p.fatigue}/6`];
+    })));
     panel.append(disclosure('Détail des primes et salaires', 'summary-finances', el('p', '', `Prime brute : ${money(summary.reward)} · Salaires prélevés au coup d’envoi : ${money(summary.wages)}${summary.seasonPrize ? ` · Prime de classement (${summary.rank}e) : ${money(summary.seasonPrize)}` : ''}`), el('p', 'rb-muted', `Dont ${money(summary.debtRepaid)} absorbés par les impayés. Ce remboursement est déjà compris dans le solde. Dette restante : ${money(summary.remainingDebt)}.`)));
     const actions = el('div', 'rb-controls'); actions.append(btn(career.day === 10 ? 'Retour au club · saison terminée' : 'Préparer la prochaine rencontre', () => go(career.day === 10 ? 'Club' : 'Équipe', 'Préparation'), true), btn('Faire tourner l’effectif', () => go('Équipe', 'Effectif')), btn('Revoir le terrain et le fil du match · sans récompense supplémentaire', () => openMatch())); panel.append(actions); manager.append(panel);
   }
-  function showConfirmation(text, action) {
+  function showConfirmation(text, action, confirmLabel = 'Confirmer') {
     const dialog = el('dialog', 'rb-career-dialog'), actions = el('div', 'rb-controls');
     const originKey = document.activeElement?.dataset.focusKey;
     function close() { dialog.close(); dialog.remove(); if (originKey) [...root.querySelectorAll('button')].find((n) => n.dataset.focusKey === originKey)?.focus({ preventScroll: true }); }
     const copy = el('p', '', text), cancel = btn('Annuler', close); copy.id = `rb-career-confirm-${++confirmationId}`; dialog.setAttribute('aria-label', 'Confirmer cette opération'); dialog.setAttribute('aria-describedby', copy.id);
-    dialog.append(copy); actions.append(btn('Confirmer', () => { close(); action(); }, true), cancel); dialog.append(actions);
+    dialog.append(copy); actions.append(btn(confirmLabel, () => { close(); action(); }, true), cancel); dialog.append(actions);
     dialog.addEventListener('cancel', (event) => { event.preventDefault(); close(); }); root.append(dialog); dialog.showModal(); cancel.focus();
   }
   function updateAndPlay() {

@@ -1,4 +1,4 @@
-import { el, btn, field, select, money, metric, table, stats, xpProgress, fatigue, comparison, portraitIdentity } from '../career-components.mjs';
+import { el, btn, field, select, money, metric, table, stats, statList, xpProgress, fatigue, comparison, portraitIdentity, equipmentSlots, pageHeading } from '../career-components.mjs';
 import { CATALOGUE, compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
 import { mountMatch } from '../ui.mjs';
 import { crestPicker, clubIdentity, matchBanner, equipmentArtwork } from '../broadcast-components.mjs';
@@ -16,7 +16,7 @@ export async function mountOnline(root, config, connect) {
   const notice = el('p', 'rb-error rb-online-notice'); notice.hidden = true; notice.setAttribute('role', 'alert');
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
   root.append(top, notice, content, live);
-  let teamDraft = null;
+  let teamDraft = null, shopPlayerId = null;
   let client, user, league, tab = 'Équipe', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false;
   function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; }
   async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
@@ -25,6 +25,7 @@ export async function mountOnline(root, config, connect) {
     if (result.league) {
       const next = result.league, changed = !league || league.id !== next.id || revision !== result.revision || league.locked !== next.locked || league.status !== next.status;
       const entered = !league || league.id !== next.id, justLocked = next.locked && !league?.locked;
+      if (entered) shopPlayerId = null;
       const discarded = justLocked && teamDraft?.dirty;
       if (entered || justLocked || ['configure', 'cancel'].includes(action)) {
         const context = !entered && teamDraft ? { view: teamDraft.view, selected: teamDraft.selected, detailsOpen: teamDraft.detailsOpen } : null;
@@ -125,6 +126,9 @@ export async function mountOnline(root, config, connect) {
       const b = btn(label, () => { tab = label; frameKey = null; renderLeague(); }); b.setAttribute('aria-current', tab === label ? 'page' : 'false'); nav.append(b);
     }
     content.append(nav);
+    const mobile = select(Object.fromEntries(['Équipe', 'Recrutement', 'Équipement', 'Ligue', 'Direct'].map(label => [label, label])), tab);
+    mobile.addEventListener('change', () => { tab = mobile.value; frameKey = null; renderLeague(); });
+    const mobileField = field('Menu de la ligue', mobile); mobileField.classList.add('rb-mobile-nav'); content.append(mobileField);
     const body = el('section', 'rb-online-body'); content.append(body);
     if (tab === 'Équipe') renderTeam(body, c);
     if (tab === 'Recrutement') renderMarket(body, c);
@@ -156,28 +160,46 @@ export async function mountOnline(root, config, connect) {
     }
   }
   function renderShop(body, c) {
-    const player = select(Object.fromEntries(c.players.map((p) => [p.id, p.name])), c.lineup[0]), catalog = el('div');
+    shopPlayerId = c.players.some(p => p.id === shopPlayerId) ? shopPlayerId : c.lineup[0];
+    const player = select(Object.fromEntries(c.players.map((p) => [p.id, p.name])), shopPlayerId), catalog = el('div', 'rb-online-equipment');
     player.setAttribute('data-readonly-control', 'true');
-    body.append(field('Joueur à équiper', player), catalog);
+    body.append(pageHeading('Équipement sportif', 'Le matériel porté, les protections du club, puis les achats pour ce joueur.'), field('Joueur à équiper', player), catalog);
     function draw() {
-      catalog.replaceChildren(); const p = c.players.find((p) => p.id === player.value);
-      catalog.append(portraitIdentity(compilePlayer(p, c.inventory), c.kitColor, el('h4', '', p.name), el('small', 'rb-muted', stats(compilePlayer(p, c.inventory)))));
-      catalog.append(el('p', '', `Protection : ${CATALOGUE[c.inventory.find((g) => g.playerId === p.id)?.itemId]?.name ?? 'Aucune'} · Implant : ${CATALOGUE[p.implant]?.name ?? 'Aucun'}`));
-      for (const gear of c.inventory) catalog.append(action(`${CATALOGUE[gear.itemId].name} : attribuer`, 'equip', { itemId: gear.id, playerId: p.id }), action('Retirer', 'equip', { itemId: gear.id, playerId: null }), action(`Revendre · ${money(CATALOGUE[gear.itemId].price / 2)}`, 'sellProtection', { itemId: gear.id }));
-      for (const [id, item] of Object.entries(CATALOGUE)) {
-        const row = el('div', 'rb-online-player'), copy = el('div'), replace = input('checkbox', `Détruire l’ancien implant pour ${item.name}`); replace.required = false;
-        const after = { ...p, implant: item.slot === 'implant' ? id : p.implant }, inventory = item.slot === 'protection' ? [...c.inventory.filter((g) => g.playerId !== p.id), { itemId: id, playerId: p.id }] : c.inventory;
-        copy.append(el('strong', '', item.name), el('p', 'rb-muted', item.effect), comparison(compilePlayer(p, c.inventory), compilePlayer(after, inventory), p.implant, after.implant)); row.append(equipmentArtwork(id, item.name), copy);
-        if (item.slot === 'implant' && p.implant) row.append(field('Remplacer détruit l’ancien implant', replace));
-        const buy = btn(`Acheter · ${money(item.price)}`, () => attempt(async () => {
-          if (item.slot === 'implant' && p.implant && !replace.checked) throw new Error('Confirmez la destruction de l’ancien implant avant le remplacement.');
-          await send('buy', { itemId: id, playerId: p.id, replaceConfirmed: replace.checked });
-        }));
-        const blocked = c.balance < 0 ? 'Salaires impayés : achats bloqués.' : c.balance < item.price ? `Il manque ${item.price - c.balance} chromas.` : '';
-        buy.disabled = league.locked || Boolean(blocked); if (blocked) copy.append(el('small', 'rb-muted', blocked)); row.append(buy); catalog.append(row);
+      catalog.replaceChildren(); const p = c.players.find((p) => p.id === player.value), compiled = compilePlayer(p, c.inventory);
+      const identity = el('section', 'rb-equipment-player');
+      identity.append(portraitIdentity(compiled, c.kitColor, el('h4', '', p.name), xpProgress(p)), equipmentSlots(p, c.inventory), statList(compiled)); catalog.append(identity);
+      catalog.append(el('h4', '', 'Protections du club'), el('p', 'rb-muted', 'Les transferts sont gratuits. Une protection retirée reste disponible en réserve.'));
+      const reserve = el('div', 'rb-club-inventory');
+      if (!c.inventory.length) reserve.append(el('p', 'rb-empty-state', 'Votre réserve est vide. Les protections achetées pourront être réattribuées entre deux soirées.'));
+      for (const gear of c.inventory) {
+        const row = el('div', 'rb-inventory-row'), copy = el('div'), assignment = select({ '': 'Réserve', ...Object.fromEntries(c.players.map(p => [p.id, p.name])) }, gear.playerId ?? '');
+        assignment.disabled = league.locked;
+        assignment.addEventListener('change', () => attempt(() => send('equip', { itemId: gear.id, playerId: assignment.value || null })));
+        copy.append(el('strong', '', CATALOGUE[gear.itemId].name), field('Attribuer à · transfert gratuit', assignment));
+        row.append(equipmentArtwork(gear.itemId, CATALOGUE[gear.itemId].name), copy, action(`Revendre · ${money(CATALOGUE[gear.itemId].price / 2)}`, 'sellProtection', { itemId: gear.id })); reserve.append(row);
+      }
+      catalog.append(reserve, el('h4', '', 'Magasin'), el('p', 'rb-muted', `Les achats sont équipés sur ${p.name}. Le remplacement d’un implant détruit l’ancien.`));
+      for (const slot of ['protection', 'implant']) {
+        catalog.append(el('p', 'rb-eyebrow', slot === 'protection' ? 'Protections · transférables' : 'Implants · personnels'));
+        const list = el('div', 'rb-shop');
+        for (const [id, item] of Object.entries(CATALOGUE).filter(([, item]) => item.slot === slot)) {
+          const row = el('section', 'rb-career-player'), replace = input('checkbox', `Détruire l’ancien implant pour ${item.name}`); replace.required = false;
+          const after = { ...p, implant: item.slot === 'implant' ? id : p.implant }, inventory = item.slot === 'protection' ? [...c.inventory.filter((g) => g.playerId !== p.id), { itemId: id, playerId: p.id }] : c.inventory;
+          const heading = el('div', 'rb-equipment-heading'); heading.append(equipmentArtwork(id, ''), el('h4', '', item.name));
+          row.append(heading, el('p', 'rb-muted', item.effect), comparison(compiled, compilePlayer(after, inventory), p.implant, after.implant));
+          if (item.slot === 'implant' && p.implant && p.implant !== id) row.append(field(`Détruire ${CATALOGUE[p.implant].name} pour remplacer l’implant`, replace));
+          const buy = btn(`Acheter · ${money(item.price)}`, () => attempt(async () => {
+            if (item.slot === 'implant' && p.implant && !replace.checked) throw new Error('Confirmez la destruction de l’ancien implant avant le remplacement.');
+            await send('buy', { itemId: id, playerId: p.id, replaceConfirmed: replace.checked });
+          }));
+          const blocked = p.implant === id ? 'Cet implant est déjà équipé.' : c.balance < 0 ? 'Salaires impayés : achats bloqués.' : c.balance < item.price ? `Il manque ${item.price - c.balance} chromas.` : '';
+          row.append(el('p', 'rb-purchase-projection', `Après achat : ${money(c.balance - item.price)}`));
+          buy.disabled = league.locked || Boolean(blocked); row.append(buy); if (blocked) row.append(el('small', 'rb-muted', blocked)); list.append(row);
+        }
+        catalog.append(list);
       }
     }
-    player.addEventListener('change', draw); draw();
+    player.addEventListener('change', () => { shopPlayerId = player.value; draw(); }); draw();
   }
   function renderLive(body) {
     body.append(el('h3', '', 'La soirée en direct'));

@@ -45,6 +45,10 @@ Une protection transférable et revendable à moitié prix, un implant attaché 
 
 La clé navigateur `the-hub.rumbleball.career.v1` contient une seule carrière. Sauvegarde après chaque transition de gestion et chaque tour complet, reprise en pause. Les identifiants des rencontres empêchent le double prélèvement et le double règlement. Marché, calendrier et matchs utilisent des domaines de graines séparés. Export/import JSON avec validation avant remplacement ; un échec d’écriture conserve la sauvegarde précédente et propose de réessayer ou exporter l’état en mémoire. Les sauvegardes locales dépendent de l’origine du site : localhost, 127.0.0.1, les différents ports et GitHub Pages ont chacun leur stockage. Utiliser l’export/import pour transférer une carrière.
 
+Dans **Sauvegarde → Redémarrer la campagne**, une confirmation permet d’effacer la carrière locale et de revenir à la création du club, y compris pendant une rencontre. Exporter une copie avant de confirmer pour conserver l’ancienne progression. Si le navigateur refuse la suppression, la campagne reste disponible.
+
+La [passe de finition graphique du 18 octobre](playtests/ui-finitions-2026-10-18.md) complète les menus mobiles, les emplacements illustrés, la réserve et le magasin communs, ainsi que les portraits du bilan et des adversaires.
+
 Limites : une carrière, huit joueurs, cinq niveaux, aucun intérêt bancaire, blessure permanente, entraînement payant, bâtiment, sponsor négociable, multijoueur ou transfert entre clubs.
 
 ## Essayer en local

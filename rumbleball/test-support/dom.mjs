@@ -47,7 +47,7 @@ export function serializeSVG(node) {
 }
 export function environment(saved = null) {
   const map = new Map(saved ? [[CAREER_KEY, saved]] : []);
-  const storage = { failing: false, getItem: (key) => map.get(key) ?? null, setItem(key, value) { if (this.failing) throw new Error('QuotaExceededError'); map.set(key, value); } };
+  const storage = { failing: false, getItem: (key) => map.get(key) ?? null, setItem(key, value) { if (this.failing) throw new Error('QuotaExceededError'); map.set(key, value); }, removeItem(key) { if (this.failing) throw new Error('SecurityError'); map.delete(key); } };
   installTestDOM();
   globalThis.window = { localStorage: storage }; globalThis.matchMedia = () => ({ matches: true });
   const section = new TestNode('section'); section.setAttribute('data-section', ''); section.classList.add('is-active'); const root = new TestNode('div'); section.append(root);

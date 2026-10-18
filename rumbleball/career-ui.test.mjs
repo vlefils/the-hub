@@ -69,6 +69,67 @@ test('UI : échec de sauvegarde visible, reprise en pause et remplacement JSON e
   fileInput.files = [{ size: 2, text: async () => '{}' }]; await fileInput.emit('change'); assert.match(classNode(restored.root, 'rb-career-notice').textContent, /Import refusé/);
 });
 
+test('redémarrage : confirmation annulable, rencontre abandonnée et nouvelle campagne persistante', async () => {
+  const e = environment(); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  assert.equal(button(e.root, 'Redémarrer la campagne').disabled, true);
+  await foundClub(e.root);
+  await button(e.root, 'Préparer le match').click(); await button(e.root, 'Lancer la rencontre').click();
+  const before = e.storage.getItem(CAREER_KEY); e.storage.setItem('other-save', 'conservée');
+  const restart = button(e.root, 'Redémarrer la campagne'); restart.focus(); await restart.click();
+  const dialog = classNode(e.root, 'rb-career-dialog');
+  assert.match(dialog.textContent, /progression seront supprimés/); assert.match(dialog.textContent, /Exportez/);
+  assert.match(classNode(e.root, 'rb-playback-status').textContent, /Pause/);
+  assert.equal(document.activeElement, button(dialog, 'Annuler'));
+  await button(dialog, 'Annuler').click();
+  assert.equal(e.storage.getItem(CAREER_KEY), before); assert.equal(document.activeElement, restart);
+  await restart.click(); await classNode(e.root, 'rb-career-dialog').emit('cancel');
+  assert.equal(e.storage.getItem(CAREER_KEY), before); assert.equal(classNode(e.root, 'rb-career-dialog'), null);
+  await restart.click(); await button(classNode(e.root, 'rb-career-dialog'), 'Redémarrer').click();
+  assert.equal(e.storage.getItem(CAREER_KEY), null); assert.equal(e.storage.getItem('other-save'), 'conservée');
+  assert.equal(classNode(e.root, 'rb-match-area').hidden, true); assert.equal(classNode(e.root, 'rb-career').hidden, false);
+  const form = classNode(e.root, 'rb-career-create');
+  assert.ok(form); assert.equal(document.activeElement, form.querySelector('input'));
+  assert.equal(descendants(form).some((n) => n.type === 'checkbox'), false);
+  assert.equal(button(e.root, 'Exporter').disabled, true); assert.equal(button(e.root, 'Importer').disabled, false);
+  const fresh = environment(); mountCareer(fresh.root, mountMatch); assert.ok(classNode(fresh.root, 'rb-career-create'));
+  await foundClub(fresh.root);
+  const c = fresh.saved(); assert.equal(c.day, 0); assert.equal(c.season, 1); assert.equal(c.current, null); assert.equal(c.balance, 900);
+  assert.notEqual(c.seed, importCareer(before).seed);
+  const restored = environment(fresh.storage.getItem(CAREER_KEY)); mountCareer(restored.root, mountMatch);
+  assert.equal(classNode(restored.root, 'rb-career-create'), null); assert.ok(classNode(restored.root, 'rb-fixture-hero'));
+});
+
+test('redémarrage : refus du stockage conserve la carrière et permet de réessayer', async () => {
+  const c = createCareer('Les Persistants', 'restart-storage'), before = exportCareer(c);
+  const e = environment(before); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  e.storage.failing = true;
+  await button(e.root, 'Redémarrer la campagne').click(); await button(classNode(e.root, 'rb-career-dialog'), 'Redémarrer').click();
+  assert.equal(e.storage.getItem(CAREER_KEY), before); assert.equal(classNode(e.root, 'rb-career-create'), null);
+  assert.match(classNode(e.root, 'rb-career-notice').textContent, /Redémarrage impossible.*campagne est conservée/);
+  assert.equal(classNode(e.root, 'rb-career-notice').hidden, false); assert.equal(button(e.root, 'Exporter').disabled, false);
+  e.storage.failing = false;
+  await button(e.root, 'Redémarrer la campagne').click(); await button(classNode(e.root, 'rb-career-dialog'), 'Redémarrer').click();
+  assert.equal(e.storage.getItem(CAREER_KEY), null); assert.ok(classNode(e.root, 'rb-career-create'));
+  assert.equal(classNode(e.root, 'rb-career-notice').hidden, true);
+});
+
+test('redémarrage : brouillon, import en attente et mode exhibition reviennent à une création vierge', async () => {
+  const c = createCareer('Les Brouillons', 'restart-draft'), before = exportCareer(c);
+  const e = environment(before); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  const check = descendants(classNode(e.root, 'rb-candidate-list')).find((n) => n.type === 'checkbox'); check.checked = true; await check.emit('change');
+  const file = descendants(e.root).find((n) => n.type === 'file'); file.files = [{ size: before.length, text: async () => before }]; await file.emit('change');
+  assert.equal(classNode(e.root, 'rb-career-import').hidden, false);
+  let finishReading; file.files = [{ size: before.length, text: () => new Promise((resolve) => { finishReading = resolve; }) }]; const reading = file.emit('change');
+  await button(e.root, 'Exhibition').click(); await button(e.root, 'Redémarrer la campagne').click();
+  await button(classNode(e.root, 'rb-career-dialog'), 'Redémarrer').click();
+  finishReading(before); await reading;
+  assert.equal(button(e.root, 'Carrière').getAttribute('aria-pressed'), 'true');
+  assert.equal(classNode(e.root, 'rb-career-import').hidden, true); assert.equal(classNode(e.root, 'rb-career-import').textContent, '');
+  const form = classNode(e.root, 'rb-career-create'); form.querySelector('input').value = 'Les Nouveaux'; await form.emit('submit');
+  assert.equal(descendants(classNode(e.root, 'rb-candidate-list')).some((n) => n.type === 'checkbox' && n.checked), false);
+  assert.equal(button(e.root, 'Valider les contrats').disabled, true); assert.equal(e.saved().balance, 2400);
+});
+
 test('UI : couleur du club de la création au terrain, sauvegarde et lecture seule pendant la rencontre', async () => {
   const e = environment(); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
   const creation = classNode(e.root, 'rb-career-create'), color = creation.querySelector('.rb-kit-color');

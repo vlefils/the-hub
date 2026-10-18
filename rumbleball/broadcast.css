@@ -1,6 +1,6 @@
 /* Shared sports broadcast identity. Layout first; artwork stays secondary. */
 body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line: #33415a; --rb-ball: #f4d783; --rb-surface: #172236; --rb-surface-raised: #1e2c43; --rb-good: #8be0be; --rb-warning: #f0c363; --rb-bad: #fa9580; background: #101729; color: var(--text); font-size: 1rem; }
-.rb-app .rb-career { --rb-surface: #172236; --rb-surface-soft: #131e32; max-width: none; gap: .85rem; }
+.rb-app .rb-career { --rb-surface: #172236; --rb-surface-soft: #131e32; --rb-good: #8be0be; --rb-warning: #f0c363; --rb-bad: #fa9580; max-width: none; gap: .85rem; }
 .rb-app-header { background: #101729; border-color: var(--rb-line); padding-block: .85rem; }
 .rb-app-brand h1 { font-style: italic; letter-spacing: -.015em; }
 .rb-app-brand h1 span { color: var(--rb-accent); font-size: .875rem; letter-spacing: .16em; }
@@ -14,6 +14,7 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
 .rb-app .rb-button:hover:not(:disabled) { background: #293c58; border-color: #a8b7cf; }
 .rb-app .rb-button-primary { color: #151c2d; background: #ff793d; border-color: #ff793d; }
 .rb-app .rb-button-primary:hover:not(:disabled) { background: #ff9869; border-color: #ff9869; }
+.rb-app a.rb-button { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .rb-app :is(button, input, select):disabled { cursor: not-allowed; opacity: .6; }
 .rb-app :focus-visible { outline: 3px solid #8bacff; outline-offset: 3px; }
 .rb-app :is(small, .rb-eyebrow, .rb-muted, .rb-field, .rb-fatigue, .rb-player-xp, .rb-resource, .rb-class-resource) { font-size: .875rem; }
@@ -24,6 +25,9 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
 .rb-app .rb-archetype { color: #b8c8ed; }
 .rb-app .rb-class-resource { color: var(--muted); }
 .rb-app .rb-field { display: grid; align-content: start; gap: .4rem; }
+.rb-app input[type='checkbox'] { width: 1.25rem; height: 1.25rem; min-height: 1.25rem; padding: 0; accent-color: var(--rb-accent); }
+.rb-app .rb-field:has(> input[type='checkbox']) { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: flex-start; gap: .65rem; }
+.rb-app .rb-field > input[type='checkbox'] { flex: 0 0 1.25rem; margin: .15rem 0 0; }
 .rb-app .rb-error { color: #ffb6ac; }
 .rb-app .rb-gain { color: #8be0be; }
 .rb-app .rb-loss { color: #ffb6ac; }
@@ -58,7 +62,9 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
 .rb-broadcast-deadline { grid-column: 1 / -1; color: var(--muted); font-size: .875rem; text-align: center; }
 .rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) { display: flex; flex-wrap: nowrap; gap: .5rem; overflow-x: auto; padding-block: .4rem; border-bottom: 1px solid var(--rb-line); }
 .rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) > .rb-button { flex: 0 0 auto; white-space: nowrap; background: transparent; border-color: transparent; border-radius: 0; }
+.rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) > .rb-button:hover:not(:disabled) { background: transparent; border-color: transparent; border-bottom-color: var(--muted); }
 .rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) [aria-current='page'] { color: var(--text); border-bottom: 3px solid var(--rb-accent); }
+.rb-app :is(.rb-career-tabs, .rb-online-nav, .rb-team-tabs) > .rb-button[aria-current='page']:hover { border-bottom-color: var(--rb-accent); }
 .rb-app .rb-mobile-nav { display: none; }
 .rb-app .rb-career-top { border-color: var(--rb-line); }
 .rb-app .rb-career-top { margin-bottom: .75rem; padding-bottom: .65rem; }
@@ -70,6 +76,8 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
 .rb-app :is(.rb-career-create, .rb-career-import, .rb-career-summary, .rb-career-dialog) { background: var(--rb-surface); border-color: var(--rb-line); }
 .rb-app .rb-career-introduction::before { background-image: linear-gradient(0deg, #101729, transparent 60%), url('assets/broadcast/banner/arena.webp'); }
 .rb-app .rb-career-finances dd { font-variant-numeric: tabular-nums; }
+.rb-app .rb-save-actions { gap: .5rem; align-items: stretch; }
+.rb-app .rb-save-actions .rb-destructive-action { flex-basis: 100%; color: var(--rb-bad); border-color: transparent; text-align: left; }
 .rb-app .rb-online-top { padding-bottom: .85rem; margin-bottom: 1rem; border-bottom: 1px solid var(--rb-line); }
 .rb-online-account { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; margin-left: auto; min-width: 0; }
 .rb-online-account > span { display: flex; align-items: center; gap: .75rem; min-width: 0; }
@@ -160,6 +168,7 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
 .rb-app .rb-sport-preparation .rb-lineup-slot { grid-template-columns: minmax(0, 1fr); gap: .4rem; }
 .rb-app .rb-sport-preparation .rb-lineup-slot > .rb-slot-copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .rb-app .rb-sport-preparation .rb-slot-select { justify-self: start; font-size: .875rem; }
+.rb-app .rb-sport-preparation .rb-slot-select { background: transparent; border-color: transparent; }
 .rb-sport-preparation .rb-slot-copy .rb-person-identity > div { font-size: .875rem; }
 .rb-app .rb-lineup-slot { background: transparent; border-color: var(--rb-line); }
 .rb-app .rb-lineup-slot.is-selected { background: #1c2c44; border-color: #ff793d; }
@@ -180,7 +189,40 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
 .rb-app .rb-order-token { min-width: 2.75rem; min-height: 2.75rem; }
 .rb-app .rb-stats-table { background: transparent; }
 .rb-app .rb-stats-table th { color: var(--text); }
+.rb-app .rb-stats-table thead th { font-size: .875rem; }
 .rb-app .rb-own-club { background: #21304a; }
+
+/* Finish the same system across the club, equipment and debrief screens. */
+.rb-app .rb-team-preview .rb-button { background: transparent; border-color: transparent; }
+.rb-app .rb-team-preview .rb-button:hover { background: var(--rb-surface-raised); }
+.rb-app .rb-team-preview .rb-athlete-portrait { width: clamp(2.75rem, 5vw, 4rem); }
+.rb-app .rb-quiet-action { background: transparent; border-color: transparent; color: var(--muted); }
+.rb-app .rb-draft-total { background: #101729f5; border-color: var(--rb-line); }
+.rb-app .rb-launch-bar { position: static; gap: .75rem 1.5rem; padding: 1rem; background: var(--rb-surface-soft); }
+.rb-app .rb-launch-bar p { font-size: .875rem; }
+.rb-app .rb-equipment-slots { align-self: stretch; align-content: start; }
+.rb-app .rb-equipment-slots > div { min-width: 0; }
+.rb-app .rb-equipment-slots :is(dt, dd) { font-size: .875rem; }
+.rb-app .rb-equipment-slots dd { display: flex; align-items: center; gap: .65rem; min-height: 3rem; margin: .5rem 0 0; overflow-wrap: anywhere; }
+.rb-app .rb-equipment-slots .rb-equipment-art { width: 3rem; height: 3rem; flex-basis: 3rem; }
+.rb-app .rb-player-xp progress { width: 100%; height: .4rem; border: 0; border-radius: 0; accent-color: var(--rb-home); background: var(--rb-line); }
+.rb-app .rb-player-xp progress::-webkit-progress-bar { background: var(--rb-line); }
+.rb-app .rb-player-xp progress::-webkit-progress-value { background: var(--rb-home); }
+.rb-app .rb-player-xp progress::-moz-progress-bar { background: var(--rb-home); }
+.rb-equipment-heading { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+.rb-equipment-heading h4 { margin: 0; overflow-wrap: anywhere; }
+.rb-app .rb-online-equipment { display: grid; gap: 1.25rem; }
+.rb-app .rb-online-body { display: grid; gap: 1.25rem; min-width: 0; }
+.rb-online-equipment > :is(h4, p) { margin: 0; }
+.rb-app .rb-online-equipment .rb-shop { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.5rem 2rem; }
+.rb-online-equipment .rb-career-player { gap: .85rem; padding-block: 1rem 1.5rem; }
+.rb-online-equipment .rb-career-player > .rb-button:last-of-type { margin-top: auto; }
+.rb-online-equipment .rb-inventory-row { align-items: start; gap: 1rem; padding-block: .75rem; }
+.rb-online-equipment .rb-inventory-row > div { min-width: 0; }
+.rb-online-equipment .rb-inventory-row .rb-field { margin-top: .65rem; }
+.rb-app .rb-career-summary .rb-person-identity { text-align: left; }
+.rb-career-summary .rb-athlete-portrait { width: 2.75rem; flex-basis: 2.75rem; }
+.rb-level-gain .rb-athlete-portrait { width: 3.5rem; flex-basis: 3.5rem; }
 @media (min-width: 1024px) {
   .rb-app .rb-broadcast-preparation { grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr); grid-template-rows: min-content 1fr; }
   .rb-broadcast-context { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -204,7 +246,7 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
   .rb-online-identity .rb-online-finances { padding-block: .25rem; }
   .rb-composition-tabs { display: flex; gap: .5rem; grid-column: 1 / -1; }
   .rb-composition-tabs .rb-button { flex: 1; }
-  .rb-composition-tabs [aria-pressed='true'] { border-color: #ff793d; color: #ffb18c; }
+  .rb-app .rb-composition-tabs .rb-button[aria-pressed='true'] { border-color: #ff793d; color: #ffb18c; background: var(--rb-surface-raised); }
   [data-team-view='Composition'] > .rb-broadcast-tactics { display: none; }
   [data-team-view='Tactique'] > .rb-broadcast-squad { display: none; }
   .rb-app .rb-preparation.rb-sport-preparation { grid-template-columns: minmax(0, 1fr); }
@@ -222,14 +264,33 @@ body.rb-app { --text: #f5f4ee; --muted: #b8c2d3; --rb-accent: #ff793d; --rb-line
   .rb-app-brand img { width: 1.5rem; }
   .rb-hub-link { padding-inline: .5rem; font-size: .875rem; }
   .rb-hub-link { max-width: 6rem; margin-left: 0; text-align: center; }
-  .rb-broadcast-banner { gap: .85rem .5rem; padding: 1rem .5rem; }
-  .rb-broadcast-banner > .rb-club-identity { flex-direction: column; text-align: center; gap: .5rem; font-size: 1.2rem; }
-  .rb-broadcast-banner > .rb-club-identity:nth-child(3) { flex-direction: column; text-align: center; }
-  .rb-broadcast-banner .rb-crest { width: 2.75rem; flex-basis: 2.75rem; }
-  .rb-broadcast-versus .rb-eyebrow { display: none; }
-  .rb-broadcast-banner .rb-club-identity strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .rb-app .rb-broadcast-banner { grid-template-columns: minmax(0, 1fr); gap: .85rem; padding: 1rem .75rem; }
+  .rb-broadcast-banner > .rb-club-identity, .rb-broadcast-banner > .rb-club-identity:nth-child(3) { flex-direction: row; text-align: left; gap: .75rem; font-size: 1.2rem; }
+  .rb-broadcast-banner .rb-crest { width: 2.25rem; flex-basis: 2.25rem; }
+  .rb-broadcast-banner > .rb-broadcast-versus { grid-row: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; text-align: left; }
+  .rb-broadcast-versus .rb-eyebrow { display: block; }
+  .rb-broadcast-deadline { text-align: left; }
+  .rb-broadcast-banner .rb-club-identity strong { overflow-wrap: anywhere; }
   .rb-broadcast-versus strong { font-size: 1.35rem; }
   .rb-broadcast-selectors { grid-template-columns: minmax(0, 1fr); }
+  .rb-app .rb-career-top { gap: .5rem; padding-bottom: .5rem; margin-bottom: .5rem; }
+  .rb-app .rb-career-top > .rb-controls:first-child { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .25rem; width: 100%; }
+  .rb-app .rb-career-top > .rb-controls:first-child .rb-button { padding-inline: .25rem; font-size: .875rem; text-align: center; }
+  .rb-app .rb-career-top > .rb-controls:last-child { width: 100%; justify-content: space-between; gap: .25rem .75rem; }
+  .rb-app .rb-career-tabs, .rb-app .rb-online-nav { display: none; }
+  .rb-app .rb-mobile-nav, .rb-app .rb-career .rb-mobile-nav { display: grid; margin-block: .5rem; }
+  .rb-app .rb-club-header { gap: .75rem; padding-block: .75rem; }
+  .rb-app .rb-club-header .rb-eyebrow { font-size: .875rem; letter-spacing: .06em; }
+  .rb-app .rb-club-header h3 { font-size: 1.75rem; }
+  .rb-app .rb-header-actions { gap: .75rem; }
+  .rb-app .rb-club-header .rb-career-finances { gap: .75rem 1.5rem; }
+  .rb-app .rb-save-status { font-size: .875rem; }
+  .rb-app .rb-roster-table td::before { font-size: .875rem; }
+  .rb-app .rb-fixture-hero { padding: 1rem; }
+  .rb-app .rb-launch-bar > div { flex-basis: 100%; }
+  .rb-app .rb-launch-bar > .rb-button { width: 100%; }
+  .rb-app .rb-equipment-player { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .rb-app .rb-club-inventory { grid-template-columns: minmax(0, 1fr); }
   .rb-online-top { align-items: start; }
   .rb-online-top > span { overflow-wrap: anywhere; min-width: 0; }
   .rb-online-finances { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }

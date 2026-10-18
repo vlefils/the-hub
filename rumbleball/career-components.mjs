@@ -1,5 +1,6 @@
 import { CATALOGUE, XP_THRESHOLDS, levelOf } from './progression.mjs';
 import { athletePortrait } from './visuals.mjs';
+import { gearImage } from './identity.mjs';
 
 export const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 export const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}` , text); b.type = 'button'; b.addEventListener('click', action); return b; };
@@ -70,8 +71,16 @@ export function comparison(before, after, beforeImplant = null, afterImplant = n
 export function equipmentSlots(p, inventory) {
   const slots = el('dl', 'rb-equipment-slots'), protection = inventory.find((i) => i.playerId === p.id);
   for (const [label, id] of [['Protection', protection?.itemId], ['Implant', p.implant]]) {
-    const row = el('div'); row.append(el('dt', 'rb-muted', label), el('dd', '', CATALOGUE[id]?.name ?? 'Emplacement libre')); slots.append(row);
+    const row = el('div'), value = el('dd'), item = CATALOGUE[id];
+    row.dataset.slot = label === 'Protection' ? 'protection' : 'implant';
+    if (item) { const art = equipmentArtwork(id, ''); value.append(art, el('span', '', item.name)); }
+    else { row.classList.add('is-empty'); value.append(el('span', 'rb-muted', 'Emplacement libre')); }
+    row.append(el('dt', 'rb-muted', label), value); slots.append(row);
   } return slots;
+}
+export function equipmentArtwork(id, name) {
+  const image = el('img', 'rb-equipment-art'); image.src = gearImage(id); image.alt = name; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async';
+  image.addEventListener('error', () => { image.hidden = true; }); return image;
 }
 export function disclosure(label, key, ...children) {
   const details = el('details', 'rb-career-disclosure'); details.dataset.sectionKey = key; details.append(el('summary', '', label), ...children); return details;

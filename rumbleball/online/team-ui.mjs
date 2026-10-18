@@ -26,7 +26,7 @@ export function leagueContext(league) {
       row.append(el('small', '', league.status === 'lobby' ? 'Après le lancement de la saison' : i ? 'À suivre · pause de 2 min' : '20 h · heure de Paris'), clubIdentity(member(f.homeId), { compact: true }), clubIdentity(member(f.awayId), { compact: true })); schedule.append(row);
     }
   }
-  ranking.append(el('h4', '', 'Classement'), table(['Club', 'J', 'Pts'], league.table.map((r, i) => {
+  ranking.append(el('h4', '', 'Classement'), table(['Club', 'Joués', 'Points'], league.table.map((r, i) => {
     const label = el('span'); label.append(el('span', 'rb-muted', `${i + 1}. `), clubIdentity(member(r.id), { compact: true })); return [label, r.played, r.points];
   }), { highlight: league.table.findIndex(r => r.id === league.club.id), caption: 'Classement de la ligue' }));
   root.append(schedule, ranking); return root;

@@ -47,3 +47,23 @@ test('broadcast : enregistrer libère le rafraîchissement du lobby sans réacti
   const savedForm = e.root.querySelector('form'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true);
   e.remoteChange(); await e.poll(); assert.equal(e.root.contains(savedForm), false); assert.equal(e.strategy().value, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
 });
+
+test('équipement : joueur conservé après achat et transfert, réserve lisible et verrouillage respecté', async t => {
+  const e = await online(t), target = e.state().members[0].club.players[1].id;
+  await button(e.root, 'Équipement').click();
+  const picker = () => e.root.querySelector('.rb-online-body').querySelector('select');
+  picker().value = target; await picker().emit('change');
+  await button(e.root, 'Acheter · 100 chromas').click();
+  assert.equal(picker().value, target);
+  const slots = e.root.querySelector('.rb-equipment-slots');
+  assert.match(slots.textContent, /Plastron léger/); assert.ok(slots.querySelector('img'));
+  const assignment = e.root.querySelector('.rb-inventory-row').querySelector('select');
+  assert.equal(assignment.value, target); assignment.value = ''; await assignment.emit('change');
+  assert.equal(picker().value, target); assert.equal(e.state().members[0].draft.inventory[0].playerId, null);
+  assert.match(e.root.querySelector('.rb-equipment-slots').textContent, /Emplacement libre/);
+  await e.lock();
+  assert.equal(picker().disabled, undefined);
+  assert.equal(e.root.querySelector('.rb-inventory-row').querySelector('select').disabled, true);
+  assert.ok(descendants(e.root).filter(n => n.tagName === 'button' && n.textContent.startsWith('Acheter ·')).every(n => n.disabled));
+  e.mounted.stop();
+});

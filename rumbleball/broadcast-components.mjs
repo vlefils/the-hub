@@ -1,7 +1,8 @@
 import { el, field, select, table } from './career-components.mjs';
-import { CRESTS, crestById, gearImage } from './identity.mjs';
+import { CRESTS, crestById } from './identity.mjs';
 import { teamCrest } from './visuals.mjs';
 export { archetypeIcon } from './visuals.mjs';
+export { equipmentArtwork } from './career-components.mjs';
 
 export function crestPicker(value, color, disabled = false) {
   const root = el('div', 'rb-crest-picker'), choice = select(Object.fromEntries(CRESTS.map(c => [c.id, c.name])), crestById(value).id), preview = el('span', 'rb-crest-preview');
@@ -23,10 +24,6 @@ export function matchBanner(home, away, title, status = '') {
   if (status) { const note = el('p', 'rb-broadcast-deadline', status); banner.append(note); }
   return banner;
 }
-export function equipmentArtwork(id, name) {
-  const image = el('img', 'rb-equipment-art'); image.src = gearImage(id); image.alt = name; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async';
-  image.addEventListener('error', () => { image.hidden = true; }); return image;
-}
 export function compositionTabs(root, onChange = () => {}, initial = 'Composition') {
   const nav = el('nav', 'rb-composition-tabs'); nav.setAttribute('aria-label', 'Vues de la préparation');
   const buttons = [];
@@ -41,7 +38,7 @@ export function careerContext(career) {
     const row = el('div', `rb-broadcast-fixture${[f.homeId, f.awayId].includes('club') ? ' is-own' : ''}`);
     row.append(clubIdentity(career.clubs.find(c => c.id === f.homeId), { compact: true }), clubIdentity(career.clubs.find(c => c.id === f.awayId), { compact: true }), el('small', 'rb-muted', f.result ? f.result.winnerId ? 'Rencontre terminée' : 'Match nul' : 'À jouer')); schedule.append(row);
   }
-  ranking.append(el('h4', '', 'Classement'), table(['Club', 'J', 'Pts'], career.table.map((r, i) => {
+  ranking.append(el('h4', '', 'Classement'), table(['Club', 'Joués', 'Points'], career.table.map((r, i) => {
     const label = el('span'); label.append(el('span', 'rb-muted', `${i + 1}. `), clubIdentity(career.clubs.find(c => c.id === r.clubId), { compact: true })); return [label, r.played, r.points];
   }), { highlight: career.table.findIndex(r => r.clubId === 'club'), caption: 'Classement de la saison' })); root.append(schedule, ranking); return root;
 }
