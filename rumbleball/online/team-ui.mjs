@@ -6,6 +6,7 @@ import { OPENINGS, openingDeployment } from '../openings.mjs';
 import { deploymentEditor, draggablePlayer, PLAYER_DRAG_TYPE } from '../deployment-ui.mjs';
 import { moveDeployment } from '../deployment.mjs';
 import { playerEquipment } from '../player-equipment.mjs';
+import { inspectorPanels } from '../player-inspector.mjs';
 import { abilitySummary, abilityPendingBadge, playerAdvancement } from '../player-development-ui.mjs';
 import { playoffPlaces } from '../playoffs.mjs';
 import { qualificationLegend } from '../playoffs-ui.mjs';
@@ -85,12 +86,14 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
     playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
     const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
-    detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, abilitySummary(compiled), statList(compiled), playerAdvancement(club, p, { locked, onAdvance }), playerEquipment(club, p, { locked, onBuy, selectedSlot: draft.equipmentSlot, onSlot: slot => { draft.equipmentSlot = slot; draft.shopItem = undefined; }, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; }, onAssign, onSell: onSellGear }));
-    if (!draft.lineup.includes(selected)) detail.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
-    detail.append(el('small', 'rb-muted', `${money(salary(p))} / journée`));
+    detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress);
+    const overview = [playerTactics, abilitySummary(compiled), statList(compiled)], progression = [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement(club, p, { locked, onAdvance }), el('p', 'rb-muted', `Niveau ${compiled.level} · ${p.xp} XP cumulée · ${money(salary(p))} / journée`)];
+    if (!draft.lineup.includes(selected)) overview.push(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
+    if (club.players.length > 5) { const sell = btn(`Céder ${p.name} · ${money(recruitmentPrice(p) / 2)}`, () => onSell(p.id)); sell.disabled = locked; progression.push(sell); }
+    inspectorPanels(detail, { overview, equipment: [playerEquipment(club, p, { locked, onBuy, selectedSlot: draft.equipmentSlot, onSlot: slot => { draft.equipmentSlot = slot; draft.shopItem = undefined; }, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; }, onAssign, onSell: onSellGear })], progression,
+      points: compiled.pendingAbilityIncreases * 2, selected: draft.inspectorTab, onSelect: key => { draft.inspectorTab = key; } });
     inspector.replaceChildren(detail);
     highlight();
-    if (club.players.length > 5) { const sell = btn(`Céder ${p.name} · ${money(recruitmentPrice(p) / 2)}`, () => onSell(p.id)); sell.disabled = locked; detail.append(sell); }
     for (const control of [role, instruction]) control.addEventListener('change', () => { draft.assignments[p.id] = { role: role.value, instruction: instruction.value }; changed(); });
   }
   function replaceAt(index, id) {

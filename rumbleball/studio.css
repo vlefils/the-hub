@@ -227,6 +227,9 @@ body.rb-app {
 .rb-player-inspector :is(.rb-player-tactics, .rb-tactical-player) .rb-field { font-size: .8rem; }
 .rb-player-inspector > .rb-career-disclosure { margin: 0; }
 .rb-player-inspector .rb-career-disclosure p { font-size: .8rem; }
+.rb-inspector-tabs { display: none; }
+.rb-inspector-panel { display: grid; gap: .75rem; min-width: 0; }
+.rb-inspector-panel > :first-child { margin-top: 0; }
 .rb-player-shop { display: grid; gap: .65rem; padding-top: 1rem; border-top: 1px solid #2c4b60; }
 .rb-player-shop h4 { margin-bottom: 0; }
 .rb-player-shop-preview { display: grid; gap: .65rem; }
@@ -304,6 +307,43 @@ body.rb-app {
 .rb-modal-body .rb-career-player { display: grid; gap: .8rem; padding: 1rem; background: #102c40; border: 1px solid #2b4a61; border-radius: 4px; }
 .rb-modal-body .rb-player-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .rb-modal-notice { margin: 1rem 1.5rem; color: #ffb0a0; }
+
+/* A desktop equipment browser. The compact inline shop remains the mobile flow. */
+.rb-equipment-dialog { width: min(76rem, calc(100% - 3rem)); }
+.rb-gear-budget { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 0 0 1.25rem; }
+.rb-gear-browser { display: grid; grid-template-columns: minmax(0, 1fr) minmax(19rem, .52fr); gap: 1.75rem; align-items: start; }
+.rb-gear-collection { display: grid; gap: 1.25rem; min-width: 0; }
+.rb-gear-collection > p { margin: 0; font-size: .875rem; line-height: 1.5; }
+.rb-gear-group h3 { margin: 0 0 .7rem; font: 700 1.4rem/1.2 'Rajdhani', sans-serif; }
+.rb-gear-group > p { margin: 0; font-size: .875rem; }
+.rb-gear-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: .65rem; }
+.rb-app .rb-gear-card { display: grid; align-content: start; justify-items: center; gap: .4rem; padding: .75rem .6rem; min-width: 0; text-align: center; color: #e9f1f6; background: #112d40; border: 1px solid #345168; box-shadow: none; }
+.rb-gear-card .rb-equipment-art { width: 5rem; height: 5rem; object-fit: contain; }
+.rb-gear-card strong { font-size: .95rem; line-height: 1.3; overflow-wrap: anywhere; }
+.rb-gear-card small { font-size: .75rem; line-height: 1.4; }
+.rb-app .rb-gear-card:hover, .rb-app .rb-gear-card:focus-visible { background: #193b50; border-color: #87c6dc; }
+.rb-app .rb-gear-card[aria-pressed='true'] { border-color: #ff8d55; background: #263b48; }
+.rb-gear-preview { position: sticky; top: 6rem; display: grid; gap: 1rem; padding-left: 1.5rem; border-left: 1px solid #345168; min-width: 0; }
+.rb-gear-preview :is(p, h3) { margin: 0; }
+.rb-gear-preview p { font-size: .9rem; line-height: 1.5; }
+.rb-gear-preview > .rb-player-shop { padding: 0; border: 0; }
+.rb-gear-preview .rb-equipment-heading { display: grid; justify-items: center; text-align: center; gap: .8rem; }
+.rb-gear-preview .rb-equipment-heading > div { display: grid; gap: .4rem; }
+.rb-gear-preview .rb-equipment-heading :is(strong, h3) { display: block; font: 700 1.7rem/1.15 'Rajdhani', sans-serif; }
+.rb-gear-preview .rb-equipment-art { width: min(100%, 12rem); height: 10rem; object-fit: contain; }
+.rb-gear-preview .rb-stat-comparison { margin: 0; }
+.rb-gear-preview .rb-button { width: 100%; }
+
+@media (min-width: 1440px) {
+  .rb-inspector-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .2rem; border-bottom: 1px solid #426279; }
+  .rb-app .rb-inspector-tabs .rb-button { padding: .65rem .25rem; min-width: 0; font-size: .85rem; color: #a8bfd1; background: none; border: 0; border-bottom: 3px solid transparent; border-radius: 0; box-shadow: none; }
+  .rb-app .rb-inspector-tabs [aria-selected='true'] { color: #fff; border-bottom-color: #ff793d; }
+  .rb-inspector-panel[data-active='false'] { display: none; }
+  .rb-player-inspector .rb-equipment-inline { display: none; }
+  .rb-player-inspector .rb-equipment-workbench { display: block; }
+  .rb-player-inspector .rb-player-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rb-player-inspector .rb-equipment-help { font-size: .8rem; }
+}
 @media (max-width: 1439px) {
   .rb-app-header { grid-template-columns: 12rem minmax(0, 1fr) auto; gap: .2rem 1rem; }
   .rb-app-brand h1 { font-size: 2.3rem; }
@@ -369,6 +409,9 @@ body.rb-app {
   .rb-modal-header, .rb-modal-body { padding: 1rem; }
 }
 @media print {
+  .rb-inspector-tabs { display: none; }
+  .rb-inspector-panel[data-active='false'] { display: grid; }
+  .rb-player-inspector .rb-equipment-inline { display: block; }
   .rb-app { background: white; }
   .rb-workspace-sidebar { max-height: none; overflow: visible; }
   .rb-broadcast-banner::before { display: none; }

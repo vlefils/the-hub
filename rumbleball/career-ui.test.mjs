@@ -224,7 +224,7 @@ test('préparation : sélection liée au terrain, rotation, retour sur une ouver
   assert.equal(classNode(e.root, 'rb-deployment-player').value, '2'); assert.deepEqual(e.saved().lineup, c.lineup); assert.deepEqual(e.saved().clubs[0].deployment, formation);
   assert.match(classNode(e.root, 'rb-tactical-player').textContent, new RegExp(c.clubs[0].players[2].name));
   const role = descendants(e.root).find((n) => n.dataset.focusKey === 'active-role'); role.focus(); role.value = 'defender'; await role.emit('change');
-  assert.equal(classNode(e.root, 'rb-tactical-player').parentNode, classNode(e.root, 'rb-player-inspector'));
+  assert.ok(classNode(e.root, 'rb-player-inspector').contains(classNode(e.root, 'rb-tactical-player')));
   assert.equal(classNode(e.root, 'rb-lineup-slots').querySelector('.rb-tactical-player'), null);
   assert.equal(e.saved().clubs[0].players[2].role, 'defender'); assert.equal(document.activeElement, role);
   const substitute = c.clubs[0].players[5], balance = e.saved().balance;

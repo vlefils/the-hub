@@ -14,6 +14,7 @@ import { abilitySummary, abilityPendingBadge, playerAdvancement } from './player
 import { playoffPlaces, currentPlayoffRound } from './playoffs.mjs';
 import { qualificationLegend, playoffBracket } from './playoffs-ui.mjs';
 import { managementDialog } from './management-dialog.mjs';
+import { inspectorPanels } from './player-inspector.mjs';
 import { clubOpening, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
 import { el, btn, field, select, money, signed, keyed, kitPicker, portraitIdentity, pageHeading, metric, table, stats, statList, xpProgress, fatigue, comparison, disclosure } from './career-components.mjs';
@@ -29,6 +30,7 @@ export function mountCareer(root, mountMatch) {
   let career = loaded.career, tab = 'Club', mode = 'career', unsaved = false, selectedPlayer = null, draftIds = new Set(), pendingImport = null;
   let marketFilter = '', comparePlayer = null, calendarDay = null, formationUndo = null;
   let preparationShopItem, preparationSlotPlayer, preparationEquipmentSlot;
+  let preparationInspectorTab = 'player';
   const sectionScroll = new Map(); let confirmationId = 0, importRequestId = 0;
   const top = el('div', 'rb-career-top'), modes = el('div', 'rb-controls'), tools = el('div', 'rb-controls');
   const careerMode = btn('Carrière', () => showMode('career')), exhibitionMode = btn('Exhibition', () => showMode('exhibition'));
@@ -78,6 +80,7 @@ export function mountCareer(root, mountMatch) {
       importRequestId++; pendingImport = null; importPreview.replaceChildren(); importPreview.hidden = true; draftIds.clear();
       selectedPlayer = comparePlayer = calendarDay = formationUndo = null;
       preparationShopItem = preparationSlotPlayer = preparationEquipmentSlot = undefined;
+      preparationInspectorTab = 'player';
       tab = 'Club'; marketFilter = ''; sectionScroll.clear();
       saveStatus.textContent = 'Sauvegarde locale automatique'; saveTools.open = false;
       showMode('career'); manager.querySelector('input')?.focus();
@@ -265,15 +268,19 @@ export function mountCareer(root, mountMatch) {
       role.title = ROLE_DESCRIPTIONS[role.value];
       const compiled = compilePlayer(p, career.inventory);
       const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
-      inspector.replaceChildren(portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', archetypeLabel(compiled))), progress, active, abilitySummary(compiled), statList(compiled), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), playerEquipment({ ...own, balance: career.balance, inventory: career.inventory }, p, {
+      const equipment = playerEquipment({ ...own, balance: career.balance, inventory: career.inventory }, p, {
         locked, selectedSlot: preparationEquipmentSlot, selectedItem: preparationShopItem, onSlot: slot => { preparationEquipmentSlot = slot; preparationShopItem = undefined; }, onItem: id => { preparationShopItem = id; }, onBuy: (id, playerId, confirmed, location) => update(() => buyItem(career, id, playerId, confirmed, location)),
         onAssign: (id, playerId, location) => update(() => assignProtection(career, id, playerId, location)), onSell: id => update(() => sellProtection(career, id))
-      }));
-      if (!career.lineup.includes(p.id)) inspector.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
+      });
       const techniques = disclosure('Techniques et progression', 'player-techniques', el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`));
-      for (const [label, description] of classAbilities(compiled)) techniques.append(el('h4', '', label), el('p', 'rb-muted', description)); inspector.append(techniques);
+      for (const [label, description] of classAbilities(compiled)) techniques.append(el('h4', '', label), el('p', 'rb-muted', description));
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length <= 5 ? 'Cinq joueurs minimum.' : '';
-      inspector.append(blocked(btn(`Céder · ${money(recruitmentPrice(p) / 2)}`, () => showConfirmation(`Céder ${p.name} pour ${money(recruitmentPrice(p) / 2)} ? Son implant quitte le club ; son équipement retourne en réserve.`, () => update(() => sellPlayer(career, p.id)))), reason));
+      const sell = blocked(btn(`Céder · ${money(recruitmentPrice(p) / 2)}`, () => showConfirmation(`Céder ${p.name} pour ${money(recruitmentPrice(p) / 2)} ? Son implant quitte le club ; son équipement retourne en réserve.`, () => update(() => sellPlayer(career, p.id)))), reason);
+      inspector.replaceChildren(portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', archetypeLabel(compiled))), progress);
+      const overview = [active, abilitySummary(compiled), statList(compiled)];
+      if (!career.lineup.includes(p.id)) overview.push(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
+      inspectorPanels(inspector, { overview, equipment: [equipment], progression: [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), techniques, sell],
+        points: compiled.pendingAbilityIncreases * 2, selected: preparationInspectorTab, onSelect: key => { preparationInspectorTab = key; } });
       for (const control of [role, instruction]) control.addEventListener('change', () => attempt(() => { assignments[p.id] = { role: role.value, instruction: instruction.value }; commitLineup(); role.title = ROLE_DESCRIPTIONS[role.value]; }));
       refreshSlots();
     }

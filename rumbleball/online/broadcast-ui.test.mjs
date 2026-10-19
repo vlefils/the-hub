@@ -154,6 +154,27 @@ test('body en ligne : armer les deux mains du remplaçant préserve les tactique
   assert.equal(e.root.querySelector('.rb-player-shop').querySelector('select').disabled, true); e.mounted.stop();
 });
 
+test('bureau en ligne : modale d’achat, onglet et tactiques conservés, annulation et verrouillage', async t => {
+  const e = await online(t), club = e.state().members[0].club, reserve = club.players.find(p => !club.lineup.includes(p.id));
+  window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+  const slot = id => e.root.querySelectorAll('.rb-body-slot').find(node => node.dataset.slot === id);
+  const active = () => e.root.querySelector('.rb-inspector-tabs').querySelectorAll('button').find(node => node.getAttribute('aria-selected') === 'true').textContent;
+  e.strategy().value = 'possession'; await e.strategy().emit('change'); await button(e.root, reserve.name).click();
+  await button(e.root.querySelector('.rb-inspector-tabs'), 'Équipement').click(); await slot('leftHand').click();
+  let dialog = e.root.querySelector('.rb-equipment-dialog');
+  await dialog.querySelectorAll('.rb-gear-card').find(node => node.dataset.itemId === 'arc_tonfa').click();
+  await button(dialog, 'Acheter et équiper · 400 chromas').click();
+  assert.equal(e.root.querySelector('.rb-equipment-dialog'), null); assert.equal(active(), 'Équipement');
+  assert.equal(e.strategy().value, 'possession'); assert.match(e.root.querySelector('.rb-player-inspector').textContent, new RegExp(reserve.name));
+  const prepared = e.state().members[0].draft; assert.equal(prepared.balance, club.balance - 400);
+  assert.deepEqual(prepared.inventory.map(item => [item.itemId, item.location, item.playerId]), [['arc_tonfa', 'leftHand', reserve.id]]);
+  await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(active(), 'Équipement');
+  await e.lock(); await slot('leftHand').click(); dialog = e.root.querySelector('.rb-equipment-dialog');
+  await dialog.querySelectorAll('.rb-gear-card').find(node => node.dataset.itemId === 'tonfa').click();
+  assert.equal(button(dialog, 'Équiper gratuitement').disabled, true); await dialog.emit('cancel');
+  await button(e.root.querySelector('.rb-inspector-tabs'), 'Progression').click(); assert.equal(active(), 'Progression'); e.mounted.stop();
+});
+
 test('recrutement en ligne : modale, banc, saisie préservée et annulation de la préparation', async t => {
   const e = await online(t), base = e.state().members[0].club, offer = base.market[0];
   e.strategy().value = 'possession'; await e.strategy().emit('change');

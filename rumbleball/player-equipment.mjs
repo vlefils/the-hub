@@ -2,6 +2,8 @@ import { el, btn, equipmentArtwork } from './career-components.mjs';
 import { CATALOGUE, EQUIPMENT_SLOTS, equipmentAt } from './equipment.mjs';
 import { playerInventory } from './player-inventory.mjs';
 import { playerShop } from './player-shop.mjs';
+import { equipmentDialog } from './equipment-dialog.mjs';
+import { wideInspector, WIDE_INSPECTOR } from './player-inspector.mjs';
 
 const mannequin = new URL('./assets/equipment/mannequin.svg', import.meta.url).href;
 export function playerEquipment(club, player, options = {}) {
@@ -11,7 +13,17 @@ export function playerEquipment(club, player, options = {}) {
     const diagram = el('div', 'rb-body-slots'), body = el('img', 'rb-equipment-body'); body.src = mannequin; body.alt = ''; body.setAttribute('aria-hidden', 'true'); diagram.append(body);
     for (const [slot, label] of Object.entries(EQUIPMENT_SLOTS)) {
       const equipped = equipmentAt(player, club.inventory, slot), id = slot === 'implant' ? player.implant : equipped?.itemId, item = CATALOGUE[id];
-      const choice = btn('', () => { location = slot; selectedItem = undefined; options.onSlot?.(slot); draw(true); });
+      const choice = btn('', () => {
+        location = slot; selectedItem = undefined; options.onSlot?.(slot);
+        if (wideInspector()) {
+          const host = root.closest('.rb') ?? root.closest('.rb-online') ?? root;
+          const media = window.matchMedia(WIDE_INSPECTOR);
+          const resize = () => { if (!wideInspector()) { dialog.close(); draw(true); } };
+          const dialog = equipmentDialog(host, club, player, slot, { ...options, selectedItem, onItem: id => { selectedItem = id; options.onItem?.(id); }, onClose: () => media.removeEventListener?.('change', resize) }, choice);
+          media.addEventListener?.('change', resize);
+          for (const button of root.querySelectorAll('.rb-body-slot')) button.setAttribute('aria-pressed', String(button.dataset.slot === slot));
+        } else draw(true);
+      });
       choice.classList.add('rb-body-slot'); choice.dataset.slot = slot; choice.dataset.focusKey = `equipment-slot-${slot}`;
       choice.setAttribute('aria-pressed', String(slot === location)); choice.setAttribute('aria-label', `${label} · ${item?.name ?? 'emplacement libre'}${item?.hands === 2 ? ' · deux mains' : ''}`);
       choice.setAttribute('data-readonly-control', 'true');
@@ -24,6 +36,7 @@ export function playerEquipment(club, player, options = {}) {
       diagram.append(choice);
     }
     const context = el('div', 'rb-equipment-context'), equipped = equipmentAt(player, club.inventory, location), id = location === 'implant' ? player.implant : equipped?.itemId;
+    context.classList.add('rb-equipment-inline');
     context.append(el('h5', '', EQUIPMENT_SLOTS[location]), el('p', 'rb-muted', id ? `${CATALOGUE[id].name} · ${CATALOGUE[id].effect}` : 'Sélectionnez une pièce du club ou achetez un équipement pour cet emplacement.'));
     context.append(playerInventory(club, player, { ...options, location, inline: true }), playerShop(club, player, { ...options, location, selectedItem, onItem: id => { selectedItem = id; options.onItem?.(id); } }));
     const workbench = el('div', 'rb-equipment-workbench'); workbench.append(diagram, context);

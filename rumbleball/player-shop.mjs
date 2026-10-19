@@ -3,14 +3,15 @@ import { CATALOGUE, compilePlayer } from './progression.mjs';
 import { compatibleLocation, equipmentAt, previewEquipment, HAND_SLOTS, equipmentTier, EQUIPMENT_TIERS, ARENA_WEAPON_RULE } from './equipment.mjs';
 
 // One compact, real purchase flow, shared by the solo and online inspectors.
-export function playerShop(club, player, { locked = false, onBuy, selectedItem, onItem, location } = {}) {
+export function playerShop(club, player, { locked = false, onBuy, selectedItem, onItem, location, showPicker = true, previewOnly = false } = {}) {
   const available = Object.entries(CATALOGUE).filter(([id]) => !location || compatibleLocation(id, location)).sort(([, a], [, b]) => equipmentTier(a) - equipmentTier(b) || a.price - b.price);
   const root = el('section', 'rb-player-shop'), choice = select(Object.fromEntries(available.map(([id, item]) => [id, `${item.name} · ${item.price === 0 ? 'Gratuit' : `${EQUIPMENT_TIERS[equipmentTier(item)]} · ${money(item.price)}`}`])), available.some(([id]) => id === selectedItem) ? selectedItem : available[0][0]);
   choice.setAttribute('aria-label', `Équipement pour ${player.name}`);
   choice.disabled = locked;
   const hand = select({ rightHand: 'Main droite', leftHand: 'Main gauche' }, HAND_SLOTS.includes(location) ? location : 'rightHand'); hand.disabled = locked;
   const preview = el('div', 'rb-player-shop-preview');
-  root.append(el('h4', '', location ? 'Magasin' : 'Équiper ce joueur'), field('Choisir un équipement', choice), preview);
+  if (showPicker) root.append(el('h4', '', location ? 'Magasin' : 'Équiper ce joueur'), field('Choisir un équipement', choice));
+  root.append(preview);
   function draw() {
     const id = choice.value, item = CATALOGUE[id], target = item.slot === 'weapon' ? hand.value : item.location;
     const before = compilePlayer(player, club.inventory), after = previewEquipment(player, club.inventory, id, target);
@@ -33,6 +34,7 @@ export function playerShop(club, player, { locked = false, onBuy, selectedItem, 
     preview.append(heading, comparison(before, compilePlayer(after.player, after.inventory), player.implant, after.player.implant));
     if (item.description) preview.append(el('p', 'rb-muted', item.description));
     if (item.slot === 'weapon') preview.append(el('p', 'rb-muted', ARENA_WEAPON_RULE));
+    if (previewOnly) { preview.append(el('p', 'rb-muted', 'Cliquez sur cet objet pour le sélectionner.')); return; }
     if (replacing) preview.append(field(`Détruire ${CATALOGUE[player.implant].name} pour le remplacer`, replace));
     preview.append(el('p', reason ? 'rb-loss' : 'rb-muted', reason || (item.price === 0 ? 'Dotation du club · aucun chroma débité. Le matériel remplacé reste en réserve.' : `Après achat : ${money(club.balance - item.price)}`)), buy);
   }

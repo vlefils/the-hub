@@ -36,7 +36,7 @@ export async function mountOnline(root, config, connect) {
       if (entered) { modal.close(); tab = 'Club'; }
       const discarded = justLocked && teamDraft?.dirty;
       if (entered || justLocked || ['configure', 'cancel'].includes(action)) {
-        const context = !entered && teamDraft ? { selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, shopItem: teamDraft.shopItem, equipmentSlot: teamDraft.equipmentSlot } : null;
+        const context = !entered && teamDraft ? { selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, shopItem: teamDraft.shopItem, equipmentSlot: teamDraft.equipmentSlot, inspectorTab: teamDraft.inspectorTab } : null;
         teamDraft = context ? { ...preparationDraft(next.club), ...context } : null; formDirty = false;
       }
       league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
