@@ -3,6 +3,7 @@ import {
   legalAction, openPassReceiver, opponents, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill,
 } from './rules.mjs';
 import { canUseTechnique } from './classes.mjs';
+import { averageDamage, damageChance } from './attack-damage.mjs';
 
 const delay = (state, id) => {
   const gap = state.initiative.indexOf(id) - state.turnIndex;
@@ -29,7 +30,7 @@ export function defensiveForecast(state, actor) {
       for (const attack of [enemy.attack, ...(enemy.offhandAttack ? [enemy.offhandAttack] : [])]) {
         const chance = Math.max(.05, Math.min(.95, (21 + attack.bonus - armorAgainst(player, enemy)) / 20));
         const hit = dodging && !player.grappledBy ? chance * chance : chance;
-        hits += hit * contest; damage += hit * contest * ((attack.die + 1) / 2 + attack.flat);
+        hits += hit * contest; damage += hit * contest * averageDamage(attack);
       }
     }
     return { damage, hits };
@@ -115,8 +116,8 @@ export function evasiveDecision(state, actor, plan, passChance) {
     for (const enemy of foes.filter((p) => distance(p.position, entry.position) <= 1)) {
       const chance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
       const hit = enemy.dodging && !enemy.grappledBy ? chance * chance : enemy.prone ? 1 - (1 - chance) ** 2 : chance;
-      const damage = Math.min(enemy.hp, (actor.attack.die + 1) / 2 + actor.attack.flat);
-      const kill = enemy.hp <= actor.attack.die + actor.attack.flat ? Math.min(1, (actor.attack.die + actor.attack.flat - enemy.hp + 1) / actor.attack.die) * hit : 0;
+      const damage = Math.min(enemy.hp, averageDamage(actor.attack));
+      const kill = damageChance(actor.attack, enemy.hp) * hit;
       add(entry, { type: 'attack', targetId: enemy.id }, positional + damage * hit * 9 + kill * 55 + Number(focus?.id === enemy.id) * 18);
       if (plan.mode === 'own' && (actor.archetype === 'belier' || actor.role === 'blocker') && !enemy.grappledBy) {
         const threat = distance(enemy.position, holder.position) <= enemy.speed / 1.5 + 1;

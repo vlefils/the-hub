@@ -2,13 +2,14 @@ import { CATALOGUE, XP_THRESHOLDS, levelOf, MAX_LEVEL } from './progression.mjs'
 import { ABILITY_LABELS } from './player-development.mjs';
 import { athletePortrait } from './visuals.mjs';
 import { gearImage, gearFallback } from './identity.mjs';
+import { signed, damageText } from './formatters.mjs';
+export { signed, damageText };
 
 export const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 export const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}` , text); b.type = 'button'; b.addEventListener('click', action); return b; };
 export const field = (label, control) => { const node = el('label', 'rb-field', label); node.append(control); return node; };
 export const select = (values, value) => { const node = el('select'); for (const [key, text] of Object.entries(values)) { const option = el('option', '', text); option.value = key; option.selected = key === String(value); node.append(option); } node.value = String(value); return node; };
 export const money = (n) => `${n.toLocaleString('fr-FR')} chromas`;
-export const signed = (n) => `${n >= 0 ? '+' : '−'}${Math.abs(n).toLocaleString('fr-FR')}`;
 export const keyed = (node, key) => { node.dataset.focusKey = key; return node; };
 
 export function kitPicker(value, disabled = false) {
@@ -42,8 +43,8 @@ export function table(headers, rows, { highlight = -1, caption = '', qualifying 
 export function stats(p) { return `${p.maxHp} PV · CA ${p.armor} · ${p.speed.toLocaleString('fr-FR')} m · Lutte ${signed(p.skills.wrestling)} · Acrobaties ${signed(p.skills.acrobatics)}`; }
 export function statList(p) {
   const list = el('dl', 'rb-player-stats');
-  const entries = [['PV max.', p.maxHp], ['CA', p.armor], ['Vitesse', `${p.speed.toLocaleString('fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)], ['Attaque', signed(p.attack.bonus)], ['Dégâts', damageText(p.attack)]];
-  if (p.offhandAttack) entries.push(['Seconde arme', `${damageText(p.offhandAttack)} · action bonus`]);
+  const entries = [['PV max.', p.maxHp], ['CA', p.armor], ['Vitesse', `${p.speed.toLocaleString('fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)], ['Bonus d’attaque', signed(p.attack.bonus)], ['Dégâts', damageText(p.attack)]];
+  if (p.offhandAttack) entries.push(['Seconde arme', `${signed(p.offhandAttack.bonus)} au toucher · ${damageText(p.offhandAttack)} · action bonus`]);
   for (const [key, label] of [['adrenaline', 'Adrénaline'], ['focus', 'Concentration'], ['calls', 'Appels']]) if (p.caps?.[key]) entries.push([label, p.caps[key]]);
   if (p.archetype === 'belier' && p.chargeDC !== undefined) entries.push(['DD percussion', p.chargeDC]);
   for (const [label, value] of entries) {
@@ -65,10 +66,10 @@ export function fatigue(p) {
 }
 export function comparison(before, after, beforeImplant = null, afterImplant = null) {
   const root = el('dl', 'rb-stat-comparison');
-  const entries = [...Object.entries(ABILITY_LABELS).map(([key, label]) => [label, before.abilities[key], after.abilities[key]]), ['PV max.', before.maxHp, after.maxHp], ['CA', before.armor, after.armor], ['Vitesse', before.speed, after.speed], ['Attaque', before.attack.bonus, after.attack.bonus], ['Lutte', before.skills.wrestling, after.skills.wrestling], ['Athlétisme', before.skills.athletics, after.skills.athletics], ['Acrobaties', before.skills.acrobatics, after.skills.acrobatics], ['Récupération', before.recovery, after.recovery], ['Appels', before.caps?.calls, after.caps?.calls], ['Concentration', before.caps?.focus, after.caps?.focus], ['Adrénaline', before.caps?.adrenaline, after.caps?.adrenaline]];
+  const entries = [...Object.entries(ABILITY_LABELS).map(([key, label]) => [label, before.abilities[key], after.abilities[key]]), ['PV max.', before.maxHp, after.maxHp], ['CA', before.armor, after.armor], ['Vitesse', before.speed, after.speed], ['Bonus d’attaque', before.attack.bonus, after.attack.bonus, signed], ['Lutte', before.skills.wrestling, after.skills.wrestling, signed], ['Athlétisme', before.skills.athletics, after.skills.athletics, signed], ['Acrobaties', before.skills.acrobatics, after.skills.acrobatics, signed], ['Récupération', before.recovery, after.recovery], ['Appels', before.caps?.calls, after.caps?.calls], ['Concentration', before.caps?.focus, after.caps?.focus], ['Adrénaline', before.caps?.adrenaline, after.caps?.adrenaline]];
   if (before.archetype === 'belier') entries.push(['DD percussion', before.chargeDC, after.chargeDC]);
-  for (const [label, a, b] of entries) if (a !== b) {
-    const row = el('div'); row.append(el('dt', '', label), el('dd', b > a ? 'rb-gain' : 'rb-loss', `${a.toLocaleString('fr-FR')} → ${b.toLocaleString('fr-FR')}${label === 'Vitesse' ? ' m' : ''}`)); root.append(row);
+  for (const [label, a, b, format = value => value.toLocaleString('fr-FR')] of entries) if (a !== b) {
+    const row = el('div'); row.append(el('dt', '', label), el('dd', b > a ? 'rb-gain' : 'rb-loss', `${format(a)} → ${format(b)}${label === 'Vitesse' ? ' m' : ''}`)); root.append(row);
   }
   for (const [label, a, b] of [['Dégâts', damageText(before.attack), damageText(after.attack)], ['Seconde arme', before.offhandAttack ? damageText(before.offhandAttack) : 'Aucune', after.offhandAttack ? damageText(after.offhandAttack) : 'Aucune']]) if (a !== b) {
     const row = el('div'); row.append(el('dt', '', label), el('dd', '', `${a} → ${b}`)); root.append(row);
@@ -79,7 +80,6 @@ export function comparison(before, after, beforeImplant = null, afterImplant = n
   if (!root.children.length) root.append(el('p', 'rb-muted', 'Aucune variation des caractéristiques.'));
   return root;
 }
-export const damageText = attack => `1d${attack.die}${attack.flat ? ` ${signed(attack.flat)}` : ''}`;
 export function equipmentArtwork(id, name) {
   const image = el('img', 'rb-equipment-art'); image.src = gearImage(id); image.alt = name; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async';
   image.addEventListener('error', () => { const fallback = gearFallback(id); if (fallback && image.src !== fallback) image.src = fallback; else image.hidden = true; }); return image;

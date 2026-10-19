@@ -6,6 +6,7 @@ import { isRunner, canUseTechnique } from './classes.mjs';
 import { OPENINGS, openingPlan } from './openings.mjs';
 import { isCenterBall } from './deployment.mjs';
 import { evasiveDecision, evasiveMovement } from './evasion.mjs';
+import { averageDamage } from './attack-damage.mjs';
 
 const nearestDistance = (players, cell) => Math.min(12, ...players.map((p) => distance(p.position, cell)));
 const order = (a, b) => a.id.localeCompare(b.id);
@@ -457,7 +458,7 @@ export function decideTurn(state, actor) {
       if (enemy.id === holder?.id) add(cell, { type: 'strip', targetId: enemy.id }, state.version >= 5 ? stripValue(here, actorHere, enemy, task, aggression)
         : 106 + skill(actor, 'wrestling') * 3 + Number(actor.role === 'retriever') * 16 + aggression * .3 + Number(plan.opening?.id === 'press') * 15);
       const hitChance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
-      const ko = enemy.hp <= actor.attack.die / 2 + .5 + actor.attack.flat;
+      const ko = enemy.hp <= averageDamage(actor.attack);
       const distraction = (supporting && (!danger || passingGame(state, actor)) || task === 'cover' && enemy.id !== holder?.id)
         ? actor.instruction === 'aggressive' ? 10 : passingGame(state, actor) && supporting ? 45 : 30 : 0;
       add(cell, { type: 'attack', targetId: enemy.id }, 18 + hitChance * 18 + Number(enemy.id === holder?.id) * 28 + Number(danger) * 18 + Number(ko) * 20 + aggression - distraction);

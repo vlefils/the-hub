@@ -40,7 +40,7 @@ export function compilePlayer(player, inventory = []) {
   if (main) {
     const weapon = CATALOGUE[main.itemId], attackMod = modifier(weapon.finesse ? Math.max(abilities.strength, abilities.dexterity) : abilities.strength);
     const other = worn.find(item => CATALOGUE[item.itemId]?.slot === 'weapon' && item !== main);
-    result.attack = { bonus: attackMod + mastery + (weapon.enhancement ?? 0), die: weapon.versatile && !other ? weapon.versatile : weapon.die, flat: attackMod + (weapon.enhancement ?? 0) };
+    result.attack = { bonus: attackMod + mastery + (weapon.enhancement ?? 0), die: weapon.versatile && !other ? weapon.versatile : weapon.die, ...(weapon.count ? { count: weapon.count } : {}), flat: attackMod + (weapon.enhancement ?? 0) };
     result.weapon = { id: main.itemId, name: weapon.name, location: itemLocation(main) };
     if (secondary && weapon.light && CATALOGUE[secondary.itemId].light) {
       const off = CATALOGUE[secondary.itemId], mod = modifier(off.finesse ? Math.max(abilities.strength, abilities.dexterity) : abilities.strength);

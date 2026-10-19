@@ -12,13 +12,15 @@ Poings chromés, tonfa d’arène, batte renforcée, marteau d’arène et boucl
 
 ## Nouveaux modèles
 
+Le marteau de dotation inflige 2d6 et le bouclier de contact apporte +2 CA. Le Marteau Gravité conserve ces 2d6 et ajoute +1 au toucher et aux dégâts ; l’Égide apporte +3 CA. Les critiques doublent le nombre de dés, soit 4d6 pour les marteaux, sans doubler le bonus fixe.
+
 | Emplacement | Objet | Prix | Effet |
 | --- | --- | ---: | --- |
 | Main | Poings Pulse | 250 | 1d4, +1 toucher/dégâts, légère, finesse |
 | Main | Tonfa Arc | 400 | 1d6, +1 toucher/dégâts, légère, finesse |
 | Main | Batte Aftershock | 450 | 1d8 ou 1d10 main libre, +1 toucher/dégâts, Force |
-| Deux mains | Marteau Gravité | 600 | 1d12, +1 toucher/dégâts, Force |
-| Main | Bouclier Égide | 450 | +2 CA, un seul bouclier |
+| Deux mains | Marteau Gravité | 600 | 2d6, +1 toucher/dégâts, Force |
+| Main | Bouclier Égide | 450 | +3 CA, un seul bouclier |
 | Main | Matraque Nulltrace | 850 | 1d6, +2 toucher/dégâts, légère, finesse |
 | Tête | Visière Spectre | 350 | +1 CA, +1 Acrobaties |
 | Tête | Casque Bastion | 350 | +2 CA |

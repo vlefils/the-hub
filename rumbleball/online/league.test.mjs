@@ -64,6 +64,8 @@ test('équipement serveur : emplacement falsifié refusé sans débit et deux ma
   s = editPreparation(s, 'u0', 'buy', { itemId: 'maul', playerId: p.id, location: 'rightHand' }, day);
   const draft = s.members[0].draft; assert.equal(draft.inventory.filter(item => item.playerId === p.id).length, 1);
   assert.ok(draft.inventory.slice(0, 2).every(item => item.playerId === null)); assert.equal(draft.balance, 600);
+  const frozen = advanceLeague(s, lock).night.games[0].config.rosters.home[0];
+  assert.equal(frozen.attack.die, 6); assert.equal(frozen.attack.count, 2); assert.equal(frozen.offhandAttack, null);
 });
 
 test('catalogue serveur : dotation gratuite, tarifs autoritaires, arme avancée figée et annulation', () => {

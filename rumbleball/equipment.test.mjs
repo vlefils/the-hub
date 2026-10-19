@@ -6,7 +6,9 @@ import { compilePlayer } from './progression.mjs';
 import { createCareer, confirmDraft, buyItem, assignProtection, sellProtection, sellPlayer, launchCareerMatch, saveCareerTurn } from './career.mjs';
 import { exportCareer, importCareer, validateCareer } from './career-storage.mjs';
 import { createMatch, stepMatch, simulateMatch } from './engine.mjs';
-import { performAttack, beginTurn } from './rules.mjs';
+import { performAttack, beginTurn, randomInt } from './rules.mjs';
+import { averageDamage, damageChance } from './attack-damage.mjs';
+import { statList, comparison, damageText } from './career-components.mjs';
 import { defensiveForecast } from './evasion.mjs';
 import { playerEquipment } from './player-equipment.mjs';
 import { mountCareer } from './career-ui.mjs';
@@ -38,10 +40,10 @@ test('armes : main gauche ou droite, finesse et Force, dés propres et polyvalen
   const p = player(), base = compilePlayer(p), tonfa = compilePlayer(p, [gear('tonfa', 'leftHand')]);
   assert.deepEqual(tonfa.attack, { bonus: 4, die: 6, flat: 2 }); assert.equal(tonfa.weapon.location, 'leftHand'); assert.equal(tonfa.weapon.name, 'Tonfa d’arène');
   const bat = compilePlayer(p, [gear('bat', 'rightHand')]); assert.equal(bat.attack.die, 10);
-  const guarded = compilePlayer(p, [gear('bat', 'rightHand'), gear('shield', 'leftHand')]); assert.equal(guarded.attack.die, 8); assert.equal(guarded.armor, base.armor + 1);
+  const guarded = compilePlayer(p, [gear('bat', 'rightHand'), gear('shield', 'leftHand')]); assert.equal(guarded.attack.die, 8); assert.equal(guarded.armor, base.armor + 2);
   const runner = { ...player(2), abilities: { strength: 8, dexterity: 15, constitution: 13, mind: 14, charisma: 9 } };
   assert.deepEqual(compilePlayer(runner, [gear('tonfa')]).attack, { bonus: 4, die: 6, flat: 2 });
-  assert.deepEqual(compilePlayer(runner, [gear('maul')]).attack, { bonus: 1, die: 10, flat: -1 });
+  assert.deepEqual(compilePlayer(runner, [gear('maul')]).attack, { bonus: 1, die: 6, count: 2, flat: -1 });
   assert.deepEqual(compilePlayer(p), base);
 });
 
@@ -69,11 +71,57 @@ test('armes avancées : bonus propres à chaque main, polyvalence et marteau à 
   const weak = { ...p, abilities: { strength: 8, dexterity: 8, constitution: 15, mind: 15, charisma: 13 } };
   assert.deepEqual(compilePlayer(weak, [gear('arc_tonfa', 'rightHand'), gear('ghost_baton', 'leftHand')]).offhandAttack, { bonus: 3, die: 6, flat: 1 });
   const bat = compilePlayer(p, [gear('shock_bat')]), shielded = compilePlayer(p, [gear('shock_bat'), gear('aegis_shield', 'leftHand')]);
-  assert.equal(bat.attack.die, 10); assert.equal(shielded.attack.die, 8); assert.equal(shielded.armor, base.armor + 2);
+  assert.equal(bat.attack.die, 10); assert.equal(shielded.attack.die, 8); assert.equal(shielded.armor, base.armor + 3);
   let c = club(); const id = c.lineup[0]; c = buyItem(c, 'aegis_shield', id, false, 'leftHand'); c = buyItem(c, 'gravity_maul', id);
-  const heavy = compilePlayer(c.clubs[0].players[0], c.inventory); assert.equal(heavy.attack.die, 12); assert.equal(heavy.offhandAttack, null);
+  const heavy = compilePlayer(c.clubs[0].players[0], c.inventory); assert.equal(heavy.attack.die, 6); assert.equal(heavy.attack.count, 2); assert.equal(heavy.offhandAttack, null);
   assert.equal(equipmentAt({ id }, c.inventory, 'leftHand').itemId, 'gravity_maul'); assert.equal(heavy.armor, compilePlayer(c.clubs[0].players[0]).armor);
   validateCareer(c); assert.deepEqual(importCareer(exportCareer(c)), c);
+});
+
+test('marteaux : 2d6 réels, 4d6 en critique et anciennes armes figées conservées', () => {
+  for (const [itemId, oldDie] of [['maul', 10], ['gravity_maul', 12]]) {
+    const compiled = compilePlayer(player(), [gear(itemId)]), original = structuredClone(compiled);
+    for (const [critical, count, legacy] of [[false, 2, false], [true, 4, false], [false, 1, true], [true, 2, true]]) {
+      const p = structuredClone(compiled);
+      if (legacy) { delete p.attack.count; p.attack.die = oldDie; }
+      const state = createMatch({ classes: false, rosters: { home: Array(5).fill(p) } }), [actor, target] = [state.players[0], state.players[5]];
+      actor.position = { x: 3, y: 3 }; target.position = { x: 4, y: 3 }; target.hp = target.maxHp = 100; target.armor = 0;
+      for (let rng = 0; ; rng++) {
+        const probe = { rng }, roll = randomInt(probe, 20) + 1;
+        if (critical ? roll === 20 : roll > 1 && roll < 20) { state.rng = rng; break; }
+      }
+      const before = target.hp, events = []; assert.equal(performAttack(state, actor, target, events), true);
+      const damage = events.find(event => event.type === 'roll' && Object.hasOwn(event, 'critical'));
+      assert.equal(damage.critical, critical); assert.equal(damage.dice.length, count);
+      assert.ok(damage.dice.every(die => die >= 1 && die <= (legacy ? oldDie : 6)));
+      assert.equal(before - target.hp, damage.dice.reduce((total, die) => total + die, actor.attack.flat));
+    }
+    assert.deepEqual(compiled, original);
+  }
+});
+
+test('prévisions : moyenne et probabilité de KO utilisent la distribution de 2d6', () => {
+  const attack = { die: 6, count: 2, flat: 2 };
+  assert.equal(averageDamage(attack), 9);
+  for (const [hp, chance] of [[4, 1], [9, 21 / 36], [14, 1 / 36], [15, 0]]) assert.ok(Math.abs(damageChance(attack, hp) - chance) < 1e-12);
+  assert.equal(averageDamage({ die: 10, flat: 2 }), 7.5); assert.equal(damageChance({ die: 10, flat: 2 }, 12), .1);
+});
+
+test('affichage : bonus signés, CA absolue et bons dés dans les fiches et comparaisons', async () => {
+  const e = environment(), p = player(), base = compilePlayer(p), heavy = compilePlayer(p, [gear('maul')]);
+  const values = list => Object.fromEntries(list.children.map(row => row.children.map(node => node.textContent)));
+  assert.equal(damageText(heavy.attack), '2d6 +2'); assert.equal(damageText({ die: 6, count: 2, flat: -1 }), '2d6 −1');
+  assert.equal(damageText({ die: 10, flat: 0 }), '1d10');
+  assert.equal(values(statList(heavy))['Bonus d’attaque'], '+4'); assert.equal(values(statList(heavy)).Lutte, '+4');
+  assert.equal(values(statList(heavy)).Acrobaties, '+1'); assert.equal(values(statList(heavy)).CA, '11');
+  const advanced = compilePlayer(p, [gear('gravity_maul'), gear('grapple_gloves')]), changes = values(comparison(heavy, advanced));
+  assert.equal(changes['Bonus d’attaque'], '+4 → +5'); assert.equal(changes.Lutte, '+4 → +6'); assert.equal(changes.Dégâts, '2d6 +2 → 2d6 +3');
+  assert.equal(values(comparison(heavy, compilePlayer(p, [gear('shield')]))).CA, '11 → 13');
+  const { mountMatch } = await import('./ui.mjs'), view = mountMatch(e.root);
+  view.load({ config: {}, state: createMatch({ rosters: { home: Array(5).fill(heavy) } }), turns: [] }, false);
+  await e.root.querySelector('.rb-player-name').click();
+  assert.match(e.root.querySelector('.rb-selected').textContent, /bonus d’attaque \+4 · 2d6 \+2/);
+  view.pause(); assert.deepEqual(compilePlayer(p), base);
 });
 
 test('protections avancées : CA sans PV, compromis de mobilité et implant remplaçable', () => {
@@ -98,7 +146,7 @@ test('magasin : dotation accessible sans budget, aperçu du modèle avancé et a
   await button(root, 'Équiper gratuitement').click(); assert.deepEqual(calls, [['tonfa', p.id, false, 'leftHand']]);
   choice.value = 'arc_tonfa'; await choice.emit('change');
   assert.equal(button(root, 'Acheter et équiper · 400 chromas').disabled, true); assert.match(root.textContent, /salaires impayés/);
-  assert.match(root.textContent, /Tonfa Arc/); assert.match(root.querySelector('.rb-stat-comparison').textContent, /Attaque/);
+  assert.match(root.textContent, /Tonfa Arc/); assert.match(root.querySelector('.rb-stat-comparison').textContent, /Bonus d’attaque\+4 → \+5/);
 });
 
 test('deux armes : attaque secondaire uniquement avec deux armes légères, sans modificateur positif aux dégâts', () => {
@@ -115,7 +163,7 @@ test('deux mains : remplacement et retrait libèrent les deux mains sans détrui
   const first = structuredClone(c); c = buyItem(c, 'maul', p.id, false, 'leftHand');
   assert.equal(c.inventory[0].playerId, null); assert.equal(c.inventory[1].playerId, null);
   assert.equal(equipmentAt(p, c.inventory, 'rightHand').itemId, 'maul'); assert.equal(equipmentAt(p, c.inventory, 'leftHand').itemId, 'maul');
-  assert.equal(compilePlayer(p, c.inventory).attack.die, 10); assert.equal(c.inventory.filter(item => item.playerId === p.id).length, 1);
+  assert.equal(damageText(compilePlayer(p, c.inventory).attack).split(' ')[0], '2d6'); assert.equal(c.inventory.filter(item => item.playerId === p.id).length, 1);
   c = assignProtection(c, c.inventory[0].id, p.id, 'rightHand'); assert.equal(c.inventory[2].playerId, null);
   assert.equal(equipmentAt(p, c.inventory, 'leftHand'), null); assert.equal(equipmentAt(p, c.inventory, 'rightHand').itemId, 'tonfa');
   assert.equal(first.inventory[0].playerId, p.id); assert.equal(first.inventory[1].playerId, p.id); validateCareer(c);

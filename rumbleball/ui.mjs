@@ -1,5 +1,6 @@
 import { PROFILES as IDENTITY_PROFILES } from './data.mjs';
 import { PORTRAITS } from './identity.mjs';
+import { signed, damageText } from './formatters.mjs';
 import { crestPicker } from './broadcast-components.mjs';
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, CURRENT_RULES, DEFAULT_SEED, seedHash, stepMatch } from './engine.mjs';
@@ -59,7 +60,7 @@ export function mountMatch(root, callbacks = {}) {
     const row = element('div', 'rb-setup-row');
     const identity = element('div', 'rb-identity');
     const portrait = element('div', 'rb-portrait-wrap'); portrait.append(athletePortrait(p, colorInput.value)); identity.append(portrait);
-    const copy = element('div'); copy.append(element('strong', '', p.name), element('span', 'rb-archetype', archetypeLabel(p)), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString('fr-FR')} m · attaque +${p.attack.bonus}, 1d${p.attack.die}+${p.attack.flat}`));
+    const copy = element('div'); copy.append(element('strong', '', p.name), element('span', 'rb-archetype', archetypeLabel(p)), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString('fr-FR')} m · bonus d’attaque ${signed(p.attack.bonus)}, ${damageText(p.attack)}`));
     identity.append(copy);
     const roleLabel = element('label', 'rb-field', 'Rôle'); const role = element('select'); role.name = `rb-role-${index}`;
     role.setAttribute('aria-label', `Rôle de ${p.name}`); role.append(...options(ROLES, p.role)); roleLabel.append(role);
@@ -378,8 +379,8 @@ export function mountMatch(root, callbacks = {}) {
     }
     heading.prepend(athletePortrait(p, state.teams.find(t => t.id === p.teamId)?.kitColor, { large: true }));
     selected.append(heading, element('p', 'rb-archetype', archetypeLabel(p)), stats,
-      element('p', 'rb-muted', `${sportingWeapon(p).name} · attaque ${signed(p.attack.bonus)} · 1d${p.attack.die} ${signed(p.attack.flat)} contondants.`));
-    if (p.offhandAttack) selected.append(element('p', 'rb-muted', `Seconde arme · 1d${p.offhandAttack.die} ${signed(p.offhandAttack.flat)} · utilise l’action bonus après une attaque.`));
+      element('p', 'rb-muted', `${sportingWeapon(p).name} · bonus d’attaque ${signed(p.attack.bonus)} · ${damageText(p.attack)} contondants.`));
+    if (p.offhandAttack) selected.append(element('p', 'rb-muted', `Seconde arme · bonus d’attaque ${signed(p.offhandAttack.bonus)} · ${damageText(p.offhandAttack)} · utilise l’action bonus après une attaque.`));
     const gear = visibleGear(p);
     if (gear.protection || gear.implant) selected.append(element('p', 'rb-muted', `Protection : ${CATALOGUE[gear.protection]?.name ?? 'aucune'} · Implant : ${CATALOGUE[gear.implant]?.name ?? 'aucun'}.`));
     const classCopy = element('div', 'rb-class-details');
@@ -392,7 +393,6 @@ export function mountMatch(root, callbacks = {}) {
     if (p.readiedPass) classCopy.append(element('p', 'rb-ball-text', 'Passe prête : attend un partenaire démarqué pour passer en réaction.'));
     selected.append(classCopy);
   }
-  function signed(value) { return value >= 0 ? `+${value}` : String(value); }
   function renderRosters() {
     const focusedId = rosters.contains(document.activeElement) ? document.activeElement.dataset.rbPlayer : null;
     rosters.replaceChildren();

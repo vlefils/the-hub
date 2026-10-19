@@ -2,6 +2,7 @@ import { COURT, WET_CELLS, modifier } from './data.mjs';
 import { ARCHETYPES, classCaps, isRunner, canUseTechnique } from './classes.mjs';
 import { isCenterBall } from './deployment.mjs';
 import { openingPlan } from './openings.mjs';
+import { damageDice } from './attack-damage.mjs';
 
 export const distance = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 export const sameCell = (a, b) => a.x === b.x && a.y === b.y;
@@ -370,7 +371,7 @@ export function performAttack(state, actor, target, events, opportunity = null, 
     emit(state, events, 'miss', `${actor.name} manque ${target.name}.`);
     return true;
   }
-  const dice = Array.from({ length: roll.natural === 20 ? 2 : 1 }, () => randomInt(state, attack.die) + 1);
+  const dice = Array.from({ length: damageDice(attack) * (roll.natural === 20 ? 2 : 1) }, () => randomInt(state, attack.die) + 1);
   emit(state, events, 'roll', `${roll.natural === 20 ? 'Critique ! ' : ''}Dégâts : ${dice.join(' + ')} + ${attack.flat}`, { dice, critical: roll.natural === 20 });
   dealDamage(state, actor, target, dice.reduce((a, b) => a + b, attack.flat), events);
   if (technique && target.hp > 0) {
