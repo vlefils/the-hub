@@ -388,11 +388,15 @@ body.rb-app {
   .rb-app .rb-squad-slot > .rb-fatigue, .rb-sport-preparation .rb-slot-copy > .rb-fatigue { grid-column: 3; grid-row: 2; }
   .rb-squad-slot > .rb-fatigue > :is(small, .rb-fatigue-meter), .rb-slot-copy > .rb-fatigue > :is(small, .rb-fatigue-meter) { display: none; }
   .rb-app .rb-squad-slot > .rb-squad-name, .rb-sport-preparation .rb-slot-copy > .rb-squad-name { font-size: 1.05rem; min-height: 1.3rem; }
+  .rb-app .rb-squad-slot > .rb-squad-name, .rb-app .rb-sport-preparation .rb-slot-copy > .rb-squad-name { display: block; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rb-app .rb-squad-slot > .rb-archetype, .rb-sport-preparation .rb-slot-copy > .rb-archetype { font-size: .75rem; }
   .rb-app .rb-recruit-tile { min-height: 2.75rem; padding: .4rem .6rem; gap: .6rem; font-size: 1.05rem; }
   .rb-recruit-tile::before { flex-basis: 1.75rem; height: 1.75rem; font-size: 1.5rem; }
-  .rb-broadcast-squad > .rb-career-disclosure { margin-top: .5rem; }
-  .rb-app .rb-court-workspace { --rb-court-width: clamp(18rem, calc((100svh - 28rem) * 1.5), 52rem); --rb-bench-width: 6.5rem; gap: .5rem; }
+  .rb-broadcast-squad > .rb-career-disclosure { margin-top: .5rem; padding-block: .25rem; }
+  .rb-app .rb-broadcast-squad > .rb-career-disclosure > summary { min-height: 1.8rem; padding: .25rem 0; }
+  .rb-app .rb-broadcast-squad > .rb-quiet-action { min-height: 1.8rem; padding: .25rem 0; line-height: 1.3; }
+  .rb-app .rb-broadcast-tactics { gap: .3rem; }
+  .rb-app .rb-court-workspace { --rb-court-width: clamp(18rem, calc((100svh - 30rem) * 1.5), 52rem); --rb-bench-width: 6.5rem; gap: .5rem; }
   .rb-court-workspace:has(.is-expanded) { --rb-bench-width: 12rem; }
   .rb-app .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) { gap: .3rem; padding: .4rem; }
   .rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) { gap: .2rem; padding: .3rem 0; }

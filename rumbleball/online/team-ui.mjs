@@ -105,7 +105,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     slots.replaceChildren(); bench.replaceChildren(el('h4', '', 'Banc'));
     for (const [i, id] of draft.lineup.entries()) {
       const p = club.players.find(p => p.id === id), compiled = compilePlayer(p, club.inventory), row = el('div', 'rb-squad-slot'); row.dataset.playerId = id;
-      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = draft.slotSelected = id; drawDetail(); highlight(); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
+      const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = draft.slotSelected = id; drawDetail(); highlight(); }); pick.classList.add('rb-squad-name'); pick.title = p.name; pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
       const portrait = athletePortrait(compiled, draft.color); draggablePlayer(portrait, id, locked); draggablePlayer(pick, id, locked);
       row.addEventListener('click', event => { if (!event.target.closest('button')) pick.click(); });
       row.append(portrait, pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p), abilityPendingBadge(p)); slots.append(row);

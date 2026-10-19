@@ -243,7 +243,7 @@ export function mountCareer(root, mountMatch) {
     function refreshSlots() {
       for (const [index, { row, copy, pick }] of slotCopies.entries()) {
         const p = ownedPlayers(career).find((p) => p.id === slotControls[index].value);
-        const compiled = compilePlayer(p, career.inventory); pick.textContent = `${index + 1} · ${p.name}`;
+        const compiled = compilePlayer(p, career.inventory); pick.textContent = `${index + 1} · ${p.name}`; pick.title = p.name;
         row.classList.toggle('is-selected', p.id === selectedPlayer); copy.replaceChildren(athletePortrait(compiled, clubKit(career.clubs[0])), pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p), abilityPendingBadge(p));
         draggablePlayer(copy.children[0], p.id, locked);
       }

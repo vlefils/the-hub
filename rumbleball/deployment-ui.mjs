@@ -32,7 +32,7 @@ export function draggablePlayer(node, id, disabled = false) {
 export function deploymentEditor({ players, positions = defaultDeployment(), color = KIT_COLORS[0], disabled = false, selectedPlayerId = null, onSelect = () => {}, onChange = () => {}, interactivePlayers = false, onDropPlayer = () => {} }) {
   let cells = positions.map((p) => ({ ...p })), selected = Math.max(0, players.findIndex((p) => (p.playerId ?? p.id) === selectedPlayerId)), focusIndex = 0;
   const root = el('section', 'rb-deployment'), title = el('h4', '', 'Déploiement dans votre moitié'), help = el('p', 'rb-muted', 'Choisissez un titulaire puis sa case. Une case occupée échange les deux positions. Flèches pour parcourir le terrain, Entrée pour placer.');
-  if (interactivePlayers) { title.textContent = 'Terrain · 12 × 8'; help.textContent = 'Glissez un joueur, ou sélectionnez-le puis sa case. Flèches et Entrée au clavier.'; }
+  if (interactivePlayers) { title.textContent = 'Terrain · 12 × 8'; help.textContent = 'Glissez un joueur sur sa case · Flèches et Entrée au clavier.'; }
   help.id = `rb-deployment-help-${++instance}`;
   const layout = el('div', 'rb-deployment-layout'), controls = el('div', 'rb-deployment-controls'), field = el('label', 'rb-field', 'Joueur à placer'), select = el('select', 'rb-deployment-player');
   select.setAttribute('aria-label', 'Joueur à placer'); field.append(select);
@@ -93,7 +93,7 @@ export function deploymentEditor({ players, positions = defaultDeployment(), col
   body.append(grid, markings); board.append(direction, columns, body, legend); scroll.append(board); layout.append(scroll, controls);
   if (interactivePlayers) {
     const heading = el('div', 'rb-deployment-titlebar'); heading.append(title, field);
-    info.textContent = 'Votre camp : colonnes A à F. En F4 et F5, vos joueurs peuvent intercepter l’engagement.';
+    info.textContent = 'Votre camp : A–F · Engagement : F4 et F5.';
     root.append(heading, help, layout);
   } else root.append(title, help, layout);
   function render() {
