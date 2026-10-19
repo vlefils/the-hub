@@ -1,0 +1,27 @@
+.rb-session-notice { padding: .75rem 1rem; margin-block: .75rem; background: var(--rb-surface-soft); border-left: 3px solid var(--rb-accent); overflow-wrap: anywhere; }
+.rb-account-tools { grid-column: 4; grid-row: 1 / span 2; display: grid; align-content: center; gap: .25rem; min-width: 0; }
+.rb-account-tools > .rb-button { min-height: 2rem; font-size: .8rem; padding: .3rem .5rem; }
+.rb-account-tools .rb-account-menu > summary { justify-content: center; }
+.rb-account-tools .rb-account-panel { overflow-wrap: anywhere; }
+.rb-app-header:has(.rb-account-tools:not([hidden])) > .rb-hub-link { display: none; }
+.rb-account-inline { display: flex; flex-wrap: wrap; justify-content: flex-end; margin-block: .75rem; }
+.rb-games-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem 2rem; padding-block: clamp(1.5rem, 4vh, 3rem); }
+.rb-games-heading > div:first-child { flex: 1 1 24rem; max-width: 48rem; }
+.rb-games-heading h2 { font-size: clamp(2rem, 3vw, 3rem); margin: .25rem 0; }
+.rb-games-heading p { line-height: 1.6; }
+.rb-solo-list { display: grid; gap: 0; padding-bottom: 2rem; }
+.rb-app .rb-solo-entry { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; padding: 1.25rem .75rem; text-align: left; color: var(--text); border: 0; border-bottom: 1px solid var(--rb-line); border-radius: 0; background: transparent; box-shadow: none; }
+.rb-app .rb-solo-entry:hover { background: var(--rb-surface); border-color: #7797af; }
+.rb-solo-entry > div { flex: 1 1 18rem; min-width: 0; overflow-wrap: anywhere; }
+.rb-solo-entry h3 { font: 700 1.6rem/1.2 'Rajdhani', sans-serif; margin: 0; }
+.rb-solo-entry p { margin: .3rem 0 0; }
+.rb-solo-entry small { display: block; font-size: .875rem; line-height: 1.5; }
+.rb-solo-resume { color: #8cc3eb; font-weight: 600; }
+@media (max-width: 1199px) {
+  .rb-account-tools { grid-column: 1 / -1; grid-row: auto; display: flex; justify-content: flex-end; align-items: center; gap: .5rem; padding-block: .3rem; }
+}
+@media (max-width: 650px) {
+  .rb-games-heading .rb-online-actions { width: 100%; }
+  .rb-games-heading .rb-online-actions > .rb-button { flex: 1 1 12rem; }
+  .rb-solo-entry > div { flex-basis: 100%; }
+}

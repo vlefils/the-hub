@@ -41,7 +41,8 @@ export function mountReplay(root, replay, mountMatch) {
   }
   speed.addEventListener('change', pause);
   cursor.addEventListener('input', () => { clearTimeout(timer); timer = null; running = false; index = Number(cursor.value); show(false); });
-  document.addEventListener('visibilitychange', () => { if (document.hidden && !stopped) pause(); });
+  const onVisibility = () => { if (document.hidden && !stopped) pause(); };
+  document.addEventListener('visibilitychange', onVisibility);
   show(false);
-  return { stop() { stopped = true; running = false; clearTimeout(timer); timer = null; view.pause(); } };
+  return { stop() { stopped = true; running = false; clearTimeout(timer); timer = null; if (view.stop) view.stop(); else view.pause(); document.removeEventListener?.('visibilitychange', onVisibility); } };
 }

@@ -538,10 +538,12 @@ export function mountMatch(root, callbacks = {}) {
     while (!state.finished && errorBox.hidden) advance({ animate: false });
     if (state.finished) resultPanel.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) setRunning(false); });
-  window.addEventListener?.('pagehide', () => setRunning(false));
+  const onVisibility = () => { if (document.hidden) setRunning(false); }, onPageHide = () => setRunning(false);
+  document.addEventListener('visibilitychange', onVisibility);
+  window.addEventListener?.('pagehide', onPageHide);
   updatePreview(); setRunning(false);
   return {
+    stop() { setRunning(false); resetKickoff(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', onPageHide); },
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
     broadcast(frame, elapsed = 0, { speed = 1, animate = true } = {}) {

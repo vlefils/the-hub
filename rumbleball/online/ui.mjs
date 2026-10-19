@@ -14,11 +14,12 @@ import { waitingRoom } from './lobby-ui.mjs';
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
 
-export async function mountOnline(root, config, connect) {
+export async function mountOnline(root, config, connect, options = {}) {
   root.replaceChildren();
   const top = el('div', 'rb-online-top'), back = el('a', 'rb-button', 'Carrière solo et exhibition'); back.href = './index.html';
   const identity = el('span', 'rb-muted'); top.append(back, identity);
-  const accountSlot = document.querySelector('[data-online-account]');
+  top.hidden = Boolean(options.managedSession);
+  const accountSlot = options.managedSession ? null : document.querySelector('[data-online-account]');
   if (accountSlot) { const menu = el('details', 'rb-account-menu'), panel = el('div', 'rb-account-panel'); panel.append(identity); menu.append(el('summary', '', 'Compte'), panel); accountSlot.append(back, menu); top.hidden = true; }
   const notice = el('p', 'rb-error rb-online-notice'); notice.hidden = true; notice.setAttribute('role', 'alert');
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
@@ -26,11 +27,13 @@ export async function mountOnline(root, config, connect) {
   root.append(top, notice, content, live, replayArea);
   let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30, waitingSlot;
   const modal = managementDialog(root, () => { marketOpen = false; });
-  let client, user, league, tab = 'Club', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false;
+  let client, user, league, tab = 'Club', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false, authSubscription;
+  const inactive = () => stopped || options.isActive?.() === false;
   function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; if (error && modal.visible) modal.message(text); }
   async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; if (modal.visible) modal.message(''); try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
   async function send(action, payload = {}, id = league?.id) {
     const result = await client.request(action, id, payload);
+    if (inactive()) return result;
     if (result.league) {
       const next = result.league, changed = !league || league.id !== next.id || revision !== result.revision || league.locked !== next.locked || league.status !== next.status;
       const entered = !league || league.id !== next.id, justLocked = next.locked && !league?.locked;
@@ -95,12 +98,15 @@ export async function mountOnline(root, config, connect) {
     panel.append(actions, el('p', 'rb-muted', 'Votre compte Riftbound Tracker fonctionne aussi ici. Votre club et votre session Rumbleball restent séparés.'));
   }
   async function renderLobby() {
+    if (inactive()) return;
     modal.close();
     workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
     content.className = 'rb-online-lobby';
-    league = null; teamDraft = null; revision = null; frameKey = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'), btn('Déconnexion', () => attempt(async () => { await client.auth.signOut(); user = null; renderAuth(); })));
+    league = null; teamDraft = null; revision = null; frameKey = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'));
+    if (!options.managedSession) identity.append(btn('Déconnexion', () => attempt(async () => { await client.auth.signOut(); user = null; renderAuth(); })));
     const { leagues } = await client.request('list');
+    if (inactive()) return;
     content.append(el('h2', '', 'Vos ligues'));
     const list = el('div', 'rb-online-actions');
     for (const item of leagues) list.append(btn(`${item.name} · ${item.members} club${item.members > 1 ? 's' : ''}${item.status === 'lobby' ? ' · Salle d’attente' : ''}`, () => attempt(() => send('get', {}, item.id))));
@@ -130,7 +136,7 @@ export async function mountOnline(root, config, connect) {
     if (restore) (Array.from(waitingSlot.querySelectorAll('button')).find(button => key ? button.dataset.focusKey === key : button.textContent === label) ?? waitingSlot.querySelector('.rb-online-actions button'))?.focus({ preventScroll: true });
   }
   function renderLeague() {
-    if (replayOpen) return;
+    if (replayOpen || inactive()) return;
     content.className = 'rb-online-content';
     content.dataset.workspaceScreen = tab;
     content.replaceChildren(); live.hidden = true;
@@ -246,7 +252,7 @@ export async function mountOnline(root, config, connect) {
     if (!frame.turns.length) body.append(el('p', 'rb-online-lock', 'Coup d’envoi imminent…'));
   }
   async function poll() {
-    if (stopped || polling) return;
+    if (inactive() || polling) return;
     polling = true;
     try {
       if (!document.hidden && user && league && !busy && (league.status === 'lobby' || tab === 'Ligue' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
@@ -259,16 +265,19 @@ export async function mountOnline(root, config, connect) {
     client = await connect(config);
     const { data, error } = await client.auth.getSession(); if (error) throw error;
     user = data.session?.user;
-    client.auth.onAuthStateChange((event) => {
+    if (!options.managedSession) authSubscription = client.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') renderAuth(true);
       if (event === 'SIGNED_OUT') { user = null; league = null; view?.pause(); renderAuth(); }
-    });
+    })?.data?.subscription;
+    if (inactive()) return { stop() {} };
+    if (options.managedSession && !user) throw new Error('Session expirée. Reconnectez-vous au jeu.');
     if (new URLSearchParams(location.search).has('recovery') && user) renderAuth(true);
     else if (user) await renderLobby(); else renderAuth();
     timer = setTimeout(poll, 4000);
   } catch (error) { message(error.message); content.append(el('p', 'rb-muted', 'La carrière solo reste disponible.')); }
-  const stop = () => { stopped = true; clearTimeout(timer); view?.pause(); replayView?.stop(); };
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && !stopped) { frameKey = null; clearTimeout(timer); poll(); } });
+  const stop = () => { stopped = true; clearTimeout(timer); if (view?.stop) view.stop(); else view?.pause(); replayView?.stop(); modal.close(); authSubscription?.unsubscribe?.(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', stop); };
+  const onVisibility = () => { if (!document.hidden && !inactive()) { frameKey = null; clearTimeout(timer); poll(); } };
+  document.addEventListener('visibilitychange', onVisibility);
   window.addEventListener?.('pagehide', stop);
   return { stop };
 }

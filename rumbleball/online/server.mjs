@@ -13,6 +13,7 @@ export function createLeagueService(store, { now = () => new Date().toISOString(
   async function command(userId, request) {
     need(userId, 'Authentification requise.');
     const { action, leagueId, payload = {} } = request;
+    need(payload.accountId === undefined || payload.accountId === userId, 'Le compte connecté a changé. Reconnectez-vous au compte de cette ligue.');
     if (action === 'create') {
       const id = uuid(), state = createLeague({ ...payload, id, userId, inviteCode: uuid().replaceAll('-', ''), seed: uuid() }, now());
       const revision = await store.commit(id, 0, state, false); return { league: leagueProjection(state, userId, now()), revision };

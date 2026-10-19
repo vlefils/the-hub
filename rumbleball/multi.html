@@ -15,14 +15,19 @@
   <link rel="stylesheet" href="online/online.css?v=20261019-open-lobby" />
     <link rel="stylesheet" href="broadcast.css" />
   <link rel="stylesheet" href="studio.css?v=20261019-bench-review" />
+  <link rel="stylesheet" href="session.css?v=20261019-account-saves" />
   <script type="importmap">
     { "imports": {
+      "./career-ui.mjs": "./career-ui.mjs?v=20261019-account-saves",
+      "./ui.mjs": "./ui.mjs?v=20261019-account-saves",
+      "./replay-ui.mjs": "./replay-ui.mjs?v=20261019-account-saves",
+      "./online/client.mjs": "./online/client.mjs?v=20261019-account-saves",
       "./career.mjs": "./career.mjs?v=20261019-open-lobby",
       "./equipment-dialog.mjs": "./equipment-dialog.mjs?v=20261019-open-lobby",
-      "./online/ui.mjs": "./online/ui.mjs?v=20261019-open-lobby"
+      "./online/ui.mjs": "./online/ui.mjs?v=20261019-account-saves"
     } }
   </script>
-  <script type="module" src="online/app.mjs"></script>
+  <script type="module" src="online/app.mjs?v=20261019-account-saves"></script>
 </head>
 <body class="rb-app">
   <a class="rb-skip" href="#jeu">Aller au jeu</a>
@@ -30,7 +35,8 @@
     <div class="rb-app-brand"><img src="icon.svg" alt="" width="44" height="44" /><h1>Rumbleball <span>Manager</span></h1></div>
     <div class="rb-shell-context" data-shell-context hidden></div>
     <div class="rb-shell-navigation" data-shell-nav hidden></div>
-    <div class="rb-online-account" data-online-account></div>
+    <div class="rb-shell-tools" data-shell-tools hidden></div>
+    <div class="rb-account-tools" data-account-tools hidden></div>
     <a class="rb-hub-link" href="../#outils-rumbleball">Retour à The Hub</a>
   </header>
   <main id="jeu" class="rb-app-main" tabindex="-1"><div data-online class="rb"><p role="status">Connexion au vestiaire…</p></div></main>

@@ -7,9 +7,9 @@ export async function connectOnline(config, load = () => import('https://esm.sh/
     async request(action, leagueId, payload = {}) {
       const { data, error } = await supabase.functions.invoke('rumbleball-api', { body: { action, leagueId, payload } });
       if (error) {
-        let message = error.message;
-        try { message = (await error.context.json()).error ?? message; } catch {}
-        throw new Error(message);
+        let message = error.message, code;
+        try { const details = await error.context.json(); message = details.error ?? message; code = details.code; } catch {}
+        throw Object.assign(new Error(message), { code });
       }
       if (data.error) throw new Error(data.error);
       return data;

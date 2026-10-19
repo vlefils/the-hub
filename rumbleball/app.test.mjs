@@ -4,7 +4,8 @@ import { readFile, access } from 'node:fs/promises';
 import { createCareer, confirmDraft } from './career.mjs';
 import { exportCareer } from './career-storage.mjs';
 import { environment, TestNode, descendants, classNode, button } from './test-support/dom.mjs';
-import { mountApp } from './app.mjs';
+import { mountCareer } from './career-ui.mjs';
+import { mountMatch } from './ui.mjs';
 import { stepMatch } from './engine.mjs';
 
 const source = (path) => readFile(new URL(path, import.meta.url), 'utf8');
@@ -61,7 +62,7 @@ test('page autonome : toutes les ressources locales HTML, CSS et les imports Jav
 test('page autonome : carrière existante, lecture automatique sans section du livre, pause au départ et reprise', async (t) => {
   const c = club(), e = standalone(exportCareer(c)), clock = timers(t), pageEvents = new Map();
   window.addEventListener = (type, callback) => pageEvents.set(type, callback);
-  mountApp(e.root);
+  mountCareer(e.root, mountMatch);
   assert.equal(e.root.closest('[data-section]'), null);
   assert.match(classNode(e.root, 'rb-club-header').textContent, /Rebuts de l’intersection/);
   assert.deepEqual(e.saved(), c, 'Ouvrir la nouvelle page ne modifie pas la sauvegarde.');
@@ -77,7 +78,7 @@ test('page autonome : carrière existante, lecture automatique sans section du l
   assert.equal(classNode(e.root, 'rb-rosters').tabIndex, 0);
   pageEvents.get('pagehide')(); assert.equal(clock.pending.size, 0);
   assert.match(classNode(e.root, 'rb-playback-status').textContent, /Pause/);
-  const loaded = standalone(exportCareer(e.saved())); mountApp(loaded.root);
+  const loaded = standalone(exportCareer(e.saved())); mountCareer(loaded.root, mountMatch);
   await button(loaded.root, 'Reprendre la rencontre').click();
   assert.equal(clock.pending.size, 0, 'Une reprise reste en pause.');
   assert.equal(loaded.saved().current.state.turns, savedTurns);
@@ -92,7 +93,7 @@ test('page autonome : carrière existante, lecture automatique sans section du l
 });
 
 test('page autonome : lancement d’Exhibition en haut du vestiaire et après les réglages, sans carrière', async (t) => {
-  const e = standalone(), clock = timers(t); mountApp(e.root);
+  const e = standalone(), clock = timers(t); mountCareer(e.root, mountMatch);
   assert.ok(classNode(e.root, 'rb-career-welcome')); assert.ok(classNode(e.root, 'rb-career-create'));
   await button(e.root, 'Exhibition').click();
   const setup = classNode(e.root, 'rb-setup'), quickStart = button(setup, 'Lancer le match'), order = descendants(setup);

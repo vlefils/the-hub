@@ -22,10 +22,11 @@ function download(text, filename) {
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })), a = el('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function mountCareer(root, mountMatch) {
+export function mountCareer(root, mountMatch, options = {}) {
   root.replaceChildren(); root.classList.add('rb');
   // Access localStorage lazily, including browsers that reject the property getter.
-  const storage = { getItem: (key) => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value), removeItem: (key) => window.localStorage.removeItem(key) };
+  const storage = options.sync?.storage ?? options.storage ?? { getItem: (key) => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value), removeItem: (key) => window.localStorage.removeItem(key) };
+  let active = true;
   const loaded = loadCareer(storage);
   let career = loaded.career, tab = 'Club', mode = 'career', unsaved = false, selectedPlayer = null, draftIds = new Set(), pendingImport = null;
   let marketFilter = '', comparePlayer = null, calendarDay = null, formationUndo = null;
@@ -35,7 +36,7 @@ export function mountCareer(root, mountMatch) {
   const top = el('div', 'rb-career-top'), modes = el('div', 'rb-controls'), tools = el('div', 'rb-controls');
   const careerMode = btn('Carrière', () => showMode('career')), exhibitionMode = btn('Exhibition', () => showMode('exhibition'));
   modes.setAttribute('aria-label', 'Mode de jeu'); modes.append(careerMode, exhibitionMode);
-  const onlineLink = el('a', 'rb-button', 'Multijoueur'); onlineLink.href = './multi.html'; modes.append(onlineLink);
+  const onlineLink = options.onOnline ? btn('Multijoueur', options.onOnline) : el('a', 'rb-button', 'Multijoueur'); onlineLink.href = './multi.html'; modes.append(onlineLink);
   const exportButton = btn('Exporter', () => attempt(() => download(exportCareer(career), `rumbleball-saison-${career.season}.json`)));
   const importInput = el('input'); importInput.type = 'file'; importInput.accept = '.json,application/json'; importInput.hidden = true;
   const importButton = btn('Importer', () => importInput.click());
@@ -45,10 +46,13 @@ export function mountCareer(root, mountMatch) {
   }), 'restart-career');
   restartButton.classList.add('rb-destructive-action');
   const retry = btn('Réessayer la sauvegarde', () => { save(); renderManagement(); }); retry.hidden = true;
-  const saveStatus = el('span', 'rb-save-status', 'Sauvegarde locale automatique'); saveStatus.setAttribute('role', 'status'); saveStatus.setAttribute('aria-live', 'polite');
+  const saveStatus = el('span', 'rb-save-status', options.sync ? options.sync.status().message : 'Sauvegarde locale automatique'); saveStatus.setAttribute('role', 'status'); saveStatus.setAttribute('aria-live', 'polite');
   const saveActions = el('div', 'rb-controls rb-save-actions'); saveActions.append(exportButton, importButton, restartButton);
-  const saveTools = disclosure('Sauvegarde', 'save-tools', el('p', 'rb-muted', 'Cette carrière est conservée dans ce navigateur. Exportez une copie pour la garder sur un autre appareil.'), saveActions, importInput);
+  const saveTools = disclosure('Sauvegarde', 'save-tools', el('p', 'rb-muted', options.sync ? 'Cette partie est sauvegardée automatiquement sur votre compte. Une copie locale conserve les modifications en attente de synchronisation.' : 'Cette carrière est conservée dans ce navigateur. Exportez une copie pour la garder sur un autre appareil.'), saveActions, importInput);
   tools.append(saveStatus, saveTools, retry); top.append(modes, tools);
+  const cloudRetry = btn('Réessayer la synchronisation', () => options.sync?.flush()); cloudRetry.hidden = true;
+  if (options.sync) tools.append(cloudRetry);
+  const unsubscribeSync = options.sync?.subscribe(status => { saveStatus.textContent = status.message; cloudRetry.hidden = status.kind !== 'error'; });
   const notice = el('p', 'rb-career-notice'); notice.setAttribute('role', 'alert'); notice.hidden = !loaded.error; notice.textContent = loaded.error ?? '';
   const importPreview = el('section', 'rb-career-import'); importPreview.hidden = true;
   const manager = el('div', 'rb-career'), matchArea = el('div', 'rb-match-area'), matchActions = el('div', 'rb-controls rb-match-back'), matchRoot = el('div');
@@ -60,15 +64,16 @@ export function mountCareer(root, mountMatch) {
   workspaceHeader({ tools: top });
   const view = mountMatch(matchRoot, {
     onTurn(state, events) {
+      if (!active) return false;
       career = saveCareerTurn(career, state, events);
       if (career.current?.settled) { calendarDay = null; formationUndo = null; }
       return save();
     },
     onReturn() { matchArea.hidden = true; manager.hidden = false; if (career.current?.settled) tab = 'Bilan'; renderManagement(); manager.scrollIntoView({ block: 'start', behavior: 'instant' }); },
   });
-  function attempt(action) { if (modal.visible) modal.message(''); try { action(); } catch (error) { notice.hidden = false; notice.textContent = error.message; if (modal.visible) modal.message(error.message); } }
+  function attempt(action) { if (!active) return; if (modal.visible) modal.message(''); try { action(); } catch (error) { notice.hidden = false; notice.textContent = error.message; if (modal.visible) modal.message(error.message); } }
   function save() {
-    try { persistCareer(storage, career); unsaved = false; retry.hidden = true; notice.hidden = true; if (saveStatus.textContent !== 'Enregistré dans ce navigateur') saveStatus.textContent = 'Enregistré dans ce navigateur'; return true; }
+    try { persistCareer(storage, career); unsaved = false; retry.hidden = true; notice.hidden = true; saveStatus.textContent = options.sync ? options.sync.status().message : 'Enregistré dans ce navigateur'; return true; }
     catch (error) { unsaved = true; retry.hidden = false; if (saveStatus.textContent !== 'Progression non enregistrée') saveStatus.textContent = 'Progression non enregistrée'; notice.hidden = false; notice.textContent = `Progression non enregistrée : ${error.message} La dernière sauvegarde valide est conservée. Réessayez ou exportez votre progression avant de fermer cette page.`; return false; }
   }
   function update(action) { attempt(() => { career = action(); save(); renderManagement(); }); }
@@ -82,7 +87,7 @@ export function mountCareer(root, mountMatch) {
       preparationShopItem = preparationSlotPlayer = preparationEquipmentSlot = undefined;
       preparationInspectorTab = 'player';
       tab = 'Club'; marketFilter = ''; sectionScroll.clear();
-      saveStatus.textContent = 'Sauvegarde locale automatique'; saveTools.open = false;
+      saveStatus.textContent = options.sync ? options.sync.status().message : 'Sauvegarde locale automatique'; saveTools.open = false;
       showMode('career'); manager.querySelector('input')?.focus();
     });
   }
@@ -112,7 +117,7 @@ export function mountCareer(root, mountMatch) {
       if (requestId !== importRequestId) return;
       pendingImport = imported;
       if (managementLocked(career ?? {})) throw new Error('Terminez la rencontre avant de remplacer la carrière.');
-      importPreview.replaceChildren(el('h3', '', 'Importer cette carrière'), el('p', '', `${pendingImport.clubs[0].name} · saison ${pendingImport.season} · ${money(pendingImport.balance)}. La carrière locale actuelle sera remplacée.`),
+      importPreview.replaceChildren(el('h3', '', 'Importer cette carrière'), el('p', '', `${pendingImport.clubs[0].name} · saison ${pendingImport.season} · ${money(pendingImport.balance)}. ${options.sync ? 'La partie actuellement ouverte sera remplacée. Les autres parties du compte sont conservées.' : 'La carrière locale actuelle sera remplacée.'}`),
         btn('Confirmer le remplacement', () => attempt(() => { if (managementLocked(career ?? {})) throw new Error('Terminez la rencontre avant de remplacer la carrière.'); view.pause(); career = pendingImport; pendingImport = null; draftIds.clear(); selectedPlayer = comparePlayer = calendarDay = formationUndo = null; tab = 'Club'; sectionScroll.clear(); importPreview.hidden = true; save(); showMode('career'); }), true),
         btn('Annuler', () => { pendingImport = null; importPreview.hidden = true; }));
       importPreview.hidden = false;
@@ -173,7 +178,7 @@ export function mountCareer(root, mountMatch) {
     for (const [title, copy] of [['Recrutez', 'Quatre archétypes, des équipements et des implants.'], ['Préparez', 'Vos rôles, vos consignes, votre placement.'], ['Entrez dans l’arène', 'Les joueurs agissent seuls. Le club progresse avec vous.']]) { const step = el('li'); step.append(el('strong', '', title), el('span', '', copy)); steps.append(step); }
     introduction.append(steps);
     const form = el('form', 'rb-career-create'), input = el('input'); input.required = true; input.maxLength = 80; input.placeholder = 'Les Rebuts du Chrome';
-    form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', '2 400 chromas pour vos premiers contrats. Cinq titulaires par match et jusqu’à dix joueurs dans le club. Six clubs, dix journées de groupe, puis les quatre premiers en playoffs. Votre carrière est sauvegardée dans ce navigateur.'), field('Nom du club', input));
+    form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', `2 400 chromas pour vos premiers contrats. Cinq titulaires par match et jusqu’à dix joueurs dans le club. Six clubs, dix journées de groupe, puis les quatre premiers en playoffs. ${options.sync ? 'Cette partie est sauvegardée sur votre compte.' : 'Votre carrière est sauvegardée dans ce navigateur.'}`), field('Nom du club', input));
     const color = kitPicker(KIT_COLORS[0]), preview = el('div', 'rb-kit-preview');
     const showKit = () => preview.replaceChildren(...[0, 1, 2, 4].map((profile) => playerPortrait(compilePlayer({ id: `preview-${profile}`, name: 'Aperçu', profile, xp: 0, fatigue: 0 }), color.value)));
     color.addEventListener('input', showKit); showKit(); form.append(field('Couleur des maillots', color), preview);
@@ -418,4 +423,5 @@ export function mountCareer(root, mountMatch) {
     matchArea.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   showMode('career');
+  return { stop() { active = false; unsubscribeSync?.(); modal.close(); if (view.stop) view.stop(); else view.pause(); top.remove(); } };
 }
