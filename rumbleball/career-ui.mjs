@@ -250,7 +250,7 @@ export function mountCareer(root, mountMatch) {
       const target = ownedPlayers(career).find((p) => p.id === (career.lineup.includes(selectedPlayer) ? selectedPlayer : deployment.selectedPlayerId));
       bench.replaceChildren(el('h4', '', 'Banc'));
       const reserves = ownedPlayers(career).filter((p) => !career.lineup.includes(p.id));
-      bench.classList.toggle('is-expanded', reserves.length > 3);
+      bench.classList.toggle('is-expanded', reserves.length > 2);
       if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant.'));
       else bench.append(el('p', 'rb-muted', 'Disponibles'));
       for (const p of reserves) {

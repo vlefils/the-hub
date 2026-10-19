@@ -111,7 +111,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
       row.append(portrait, pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p), abilityPendingBadge(p)); slots.append(row);
     }
     const reserves = club.players.filter(p => !draft.lineup.includes(p.id));
-    bench.classList.toggle('is-expanded', reserves.length > 3);
+    bench.classList.toggle('is-expanded', reserves.length > 2);
     if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant.'));
     else bench.append(el('p', 'rb-muted', 'Disponibles'));
     for (const p of reserves) {

@@ -423,6 +423,15 @@ body.rb-app {
   .rb-court-workspace .rb-bench-name > span:last-child { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .rb-court-workspace .rb-bench-name .rb-athlete-portrait { width: 2.25rem; }
   .rb-app .rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) .rb-button:not(.rb-bench-name) { min-height: 1.65rem; padding: .2rem; font-size: .75rem; }
+  .rb-app .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench).is-expanded { grid-template-columns: minmax(0, 1fr); align-content: start; gap: .25rem; }
+  .rb-court-workspace .is-expanded > p { display: none; }
+  .rb-court-workspace .is-expanded :is(.rb-bench-entry, .rb-bench-player) { grid-template-columns: minmax(0, 1fr) max-content; gap: .15rem .3rem; padding-block: .15rem; align-items: center; }
+  .rb-app .rb-court-workspace .is-expanded .rb-bench-name { grid-column: 1; grid-row: 1 / 3; display: flex; align-items: center; justify-content: start; gap: .25rem; min-width: 0; text-align: left; }
+  .rb-court-workspace .is-expanded .rb-bench-name > span:last-child { flex: 1; min-width: 0; }
+  .rb-court-workspace .is-expanded .rb-bench-name .rb-athlete-portrait { flex: 0 0 2rem; width: 2rem; }
+  .rb-court-workspace .is-expanded :is(.rb-bench-entry, .rb-bench-player) > .rb-fatigue { grid-column: 2; grid-row: 1; }
+  .rb-court-workspace .is-expanded :is(.rb-bench-entry, .rb-bench-player) > :is(.rb-controls, .rb-button:not(.rb-bench-name)) { grid-column: 2; grid-row: 2; }
+  .rb-court-workspace .is-expanded :is(.rb-bench-entry, .rb-bench-player) > .rb-development-count { grid-column: 1 / -1; }
   .rb-app .rb-deployment-titlebar h4 { font-size: 1.15rem; }
   .rb-app .rb-deployment-titlebar select { min-height: 1.8rem !important; padding: .2rem .35rem; line-height: 1.25; }
   .rb-deployment-titlebar, .rb-app .rb-deployment-layout { margin-top: 0; margin-bottom: .2rem; gap: .25rem; }
