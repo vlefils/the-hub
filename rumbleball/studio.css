@@ -50,7 +50,7 @@ body.rb-app {
 .rb-app .rb-shell-tools .rb-career-top { display: grid; gap: .3rem; padding: 0 0 0 1rem; margin: 0; border: 0; border-left: 1px solid var(--rb-line); }
 .rb-app .rb-shell-tools .rb-career-top > .rb-controls:first-child .rb-button { min-height: 2rem; font-size: .8rem; padding: .3rem .5rem; border: 0; box-shadow: none; }
 .rb-shell-tools .rb-save-status { font-size: .75rem; }
-.rb-shell-tools .rb-save-tools { font-size: .8rem; }
+.rb-shell-tools [data-section-key='save-tools'] { font-size: .8rem; }
 .rb-shell-tools .rb-controls { gap: .35rem; }
 .rb-shell-context .rb-online-identity { display: grid; grid-template-columns: minmax(12rem, 1fr) auto auto; gap: 1.5rem; align-items: center; margin: 0; }
 .rb-shell-context .rb-online-identity > div:first-child > .rb-club-identity { font-size: 1.15rem; margin: .15rem 0 0; }
@@ -373,8 +373,8 @@ body.rb-app {
   .rb-hub-link { min-height: 0; }
   .rb-app .rb-workspace-navigation { padding-block: .15rem; }
   .rb-app .rb-shell-tools .rb-career-top > .rb-controls:last-child { flex-wrap: nowrap; }
-  .rb-shell-tools .rb-save-tools { padding-block: 0; }
-  .rb-shell-tools .rb-save-tools > summary { min-height: 1.6rem; padding-block: .2rem; }
+  .rb-shell-tools [data-section-key='save-tools'] { padding-block: 0; }
+  .rb-shell-tools [data-section-key='save-tools'] > summary { min-height: 1.6rem; padding-block: .2rem; font-size: .8rem; line-height: 1.25; }
   .rb-app-brand { padding-block: .35rem; }
   .rb-app-brand h1 { font-size: 2.35rem; }
   .rb-app-brand h1 span { font-size: 1.35rem; margin-top: .35rem; }
