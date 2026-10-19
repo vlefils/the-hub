@@ -1,8 +1,9 @@
+import { startReadyLeague as startLeague } from '../test-support/online.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { environment, descendants, button } from '../test-support/dom.mjs';
-import { createLeague, joinLeague, startLeague, addBot, advanceLeague, editPreparation } from './league.mjs';
+import { createLeague, joinLeague, addBot, advanceLeague, editPreparation } from './league.mjs';
 import { createLeagueService } from './server.mjs';
 import { connectOnline } from './client.mjs';
 import { mountOnline } from './ui.mjs';
@@ -82,16 +83,13 @@ test('lobby : les arrivées se mettent à jour sans reconstruire un formulaire i
   const api = { auth: { async getSession() { return { data: { session: { user: { id: 'u0' } } } }; }, onAuthStateChange() {} }, request: (action, leagueId, payload) => service.command('u0', { action, leagueId, payload }) };
   const mounted = await mountOnline(e.root, { enabled: true }, async () => api);
   await button(e.root, 'Ligue des amis · 1 club').click();
-  const first = descendants(e.root).find((n) => n.tagName === 'form');
-  await e.pending.shift()(); assert.ok(e.root.contains(first), 'Un sondage inchangé préserve le formulaire et son focus.');
+  const first = e.root.querySelector('input'); first.value = '2026-10-20T21:15'; await first.emit('input');
+  await e.pending.shift()(); assert.ok(e.root.contains(first), 'Un sondage inchangé préserve la date et son focus.');
   state = joinLeague(state, 'u1', { clubName: 'Ami' }, clock); revision++;
   await e.pending.shift()(); assert.match(e.root.textContent, /2 clubs inscrits/); assert.equal(button(e.root, 'Lancer la saison').disabled, false);
-  const editing = descendants(e.root).find((n) => n.tagName === 'form');
-  const strategy = descendants(editing).find(n => n.tagName === 'select' && n.children.some(o => o.value === 'possession')); strategy.value = 'possession'; await strategy.emit('input');
-  state = editPreparation(state, 'u1', 'color', { color: '#aabbcc' }, clock); revision++;
   state = addBot(state, 'u0'); revision++;
-  await e.pending.shift()(); assert.ok(e.root.contains(editing), 'Une arrivée ou modification distante ne doit pas effacer la saisie locale.');
-  assert.equal(strategy.value, 'possession'); assert.match(e.root.querySelector('.rb-waiting-room').textContent, /3 clubs inscrits/);
+  await e.pending.shift()(); assert.equal(e.root.querySelector('input').value, '2026-10-20T21:15');
+  assert.equal(e.root.querySelector('.rb-player-inspector'), null); assert.match(e.root.querySelector('.rb-waiting-room').textContent, /3 clubs inscrits/);
   assert.match(e.root.querySelector('.rb-waiting-room').textContent, /Bot · gestion automatique/);
   mounted.stop();
 });
@@ -107,18 +105,23 @@ test('salle d’attente : création sans capacité, ajout et retrait de bots san
   assert.doesNotMatch(create.textContent, /Nombre de clubs/);
   const names = create.querySelectorAll('input').filter(input => input.type === 'text'); names[0].value = 'Ligue ouverte'; names[1].value = 'Club';
   await create.emit('submit'); assert.equal(state.capacity, null); assert.equal(button(e.root, 'Lancer la saison').disabled, true);
-  const editor = e.root.querySelector('form'), strategy = editor.querySelectorAll('select').find(select => select.children.some(option => option.value === 'possession'));
-  strategy.value = 'possession'; await strategy.emit('input'); strategy.focus();
+  assert.equal(e.root.querySelector('form'), null); assert.equal(state.members[0].club.players.length, 0);
+  const schedule = e.root.querySelector('input'); schedule.value = '2026-10-20T21:15'; await schedule.emit('input'); schedule.focus();
   await button(e.root, 'Ajouter un bot').click();
-  assert.ok(e.root.contains(editor)); assert.equal(document.activeElement, strategy); assert.equal(strategy.value, 'possession');
+  assert.equal(e.root.querySelector('input').value, '2026-10-20T21:15');
   assert.equal(button(e.root, 'Lancer la saison').disabled, false); assert.equal(state.bots.length, 1);
-  await button(e.root, 'Retirer').click(); assert.equal(state.bots.length, 0); assert.ok(e.root.contains(editor));
+  await button(e.root, 'Retirer').click(); assert.equal(state.bots.length, 0);
   assert.equal(button(e.root, 'Lancer la saison').disabled, true);
   await button(e.root, 'Ajouter un bot').click(); await button(e.root, 'Ajouter un bot').click();
-  await button(e.root, 'Lancer la saison').click(); assert.equal(state.capacity, 3); assert.equal(state.status, 'preparation');
+  await button(e.root, 'Lancer la saison').click(); assert.equal(state.capacity, 3); assert.equal(state.status, 'recruitment');
+  assert.equal(state.nextLockAt, '2026-10-20T19:15:00.000Z');
   assert.equal(e.root.querySelector('.rb-waiting-room'), null);
-  const prepared = e.root.querySelectorAll('select').find(select => select.children.some(option => option.value === 'possession'));
-  assert.equal(prepared.value, 'possession'); mounted.stop();
+  assert.ok(e.root.querySelector('.rb-initial-roster')); assert.equal(button(e.root, 'Valider mon effectif').disabled, true);
+  const choices = e.root.querySelectorAll('input').filter(n => n.type === 'checkbox');
+  for (const checkbox of choices.slice(0, 6)) { checkbox.checked = true; await checkbox.emit('change'); }
+  await button(e.root, 'Valider mon effectif').click();
+  assert.equal(state.status, 'preparation'); assert.equal(state.members[0].club.players.length, 6); assert.equal(state.members[0].club.balance, 600);
+  assert.ok(e.root.querySelector('.rb-player-inspector')); mounted.stop();
 });
 
 test('salle d’attente invitée : clubs et bots visibles, gestion réservée au créateur', async t => {

@@ -5,9 +5,16 @@ import { deploymentEditor, PLAYER_DRAG_TYPE } from './deployment-ui.mjs';
 import { environment, button } from './test-support/dom.mjs';
 import { playerShop } from './player-shop.mjs';
 import { portraitById } from './identity.mjs';
+import { managementDialog } from './management-dialog.mjs';
 
 const transfer = id => ({ types: [PLAYER_DRAG_TYPE], getData: type => type === PLAYER_DRAG_TYPE ? id : '', setData() {} });
 const cell = (root, x, y) => root.querySelectorAll('.rb-deployment-cell').find(n => n.dataset.cell === `${x},${y}`);
+
+test('fenêtre : la fermeture rend le focus au bouton déplacé dans le bandeau', () => {
+  const e = environment(), trigger = document.createElement('button'); trigger.isConnected = true;
+  const dialog = managementDialog(e.root); dialog.show('Sauvegarde', trigger); dialog.close();
+  assert.ok(document.activeElement === trigger);
+});
 
 test('préparation : portraits en bulles, sélection sans déplacement et cinq positions uniques après dépôt', async () => {
   environment(); const players = createMatch().players.slice(0, 5), selected = [], drops = [], changes = [];

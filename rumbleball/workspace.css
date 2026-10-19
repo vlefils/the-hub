@@ -1,0 +1,131 @@
+/* Layout only: the shell owns the available space; the pitch never sizes the page. */
+.rb-save-dialog { max-width: 36rem; }
+.rb-save-dialog .rb-save-actions { display: grid; gap: .75rem; }
+.rb-save-dialog .rb-save-actions > .rb-button { justify-content: start; text-align: left; }
+.rb-preparation-rail { display: contents; }
+.rb-court-workspace > .rb-deployment { grid-column: 1; grid-row: 1; }
+.rb-preparation-rail > :is(.rb-bench, .rb-broadcast-bench) { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; }
+.rb-preparation-rail > :is(.rb-team-plans, .rb-broadcast-selectors, .rb-launch-bar, .rb-broadcast-save) { grid-column: 1 / -1; }
+.rb-deployment-titlebar > .rb-quiet-action { margin-left: auto; font-size: .8rem; }
+
+@media (min-width: 1200px) {
+  /* Identity, finances, navigation and account each have a stable place. */
+  .rb-app-header { grid-template-columns: 10.5rem minmax(14rem, 26rem) auto minmax(18rem, 1fr) auto; gap: 1.25rem; padding-block: .65rem; min-height: 5.5rem; }
+  .rb-app-brand { grid-row: 1; padding: .25rem 0; }
+  .rb-app-brand h1 { font-size: 2.1rem; }
+  .rb-app-brand h1 span { font-size: 1.25rem; }
+  .rb-shell-context { grid-column: 2; grid-row: 1; }
+  .rb-shell-navigation { grid-column: 3; grid-row: 1; }
+  .rb-shell-tools { grid-column: 4; grid-row: 1; justify-self: end; }
+  .rb-account-tools, .rb-app-header > .rb-hub-link { grid-column: 5; grid-row: 1; }
+  .rb-shell-context .rb-club-header { display: grid; justify-content: start; gap: .35rem; }
+  .rb-shell-context .rb-club-header > .rb-club-identity { gap: .6rem; }
+  .rb-shell-context .rb-club-header h3 { font-size: 1.25rem; overflow-wrap: anywhere; }
+  .rb-shell-context .rb-career-finances { display: flex; gap: .4rem 1rem; flex-wrap: wrap; }
+  .rb-shell-context .rb-career-finances > div { display: flex; align-items: baseline; gap: .35rem; }
+  .rb-shell-context .rb-career-finances :is(dt, dd) { margin: 0; font-size: .75rem; }
+  .rb-shell-context .rb-club-header .rb-crest { width: 2rem; flex-basis: 2rem; }
+  .rb-app .rb-workspace-navigation { gap: .5rem; padding: 0; }
+  .rb-app .rb-workspace-navigation > .rb-button { min-width: 6rem; min-height: 2.75rem; padding: .5rem 1rem; font-size: 1.25rem; }
+  .rb-app .rb-shell-tools .rb-career-top { gap: .35rem; padding-left: 1rem; }
+  .rb-shell-tools .rb-career-top > .rb-controls { justify-content: flex-end; }
+  .rb-app .rb-shell-tools .rb-career-top > .rb-controls:last-child { flex-wrap: wrap; max-width: 20rem; gap: .25rem .75rem; }
+  .rb-shell-tools .rb-save-status { flex: 1 1 12rem; max-width: 20rem; text-align: right; font-size: .75rem; line-height: 1.35; }
+  .rb-app .rb-shell-tools [data-focus-key='save-tools'] { min-height: 1.75rem; padding: .2rem .5rem; font-size: .8rem; }
+  .rb-account-tools { justify-items: stretch; align-self: center; }
+  .rb-shell-context .rb-online-identity { display: grid; grid-template-columns: minmax(0, 1fr); gap: .3rem; }
+  .rb-shell-context .rb-online-finances { display: flex; flex-wrap: wrap; gap: .35rem .75rem; }
+  .rb-shell-context .rb-online-finances .rb-metric { display: flex; align-items: baseline; gap: .3rem; }
+  .rb-shell-context .rb-online-finances .rb-metric > :is(strong, span) { font-size: .75rem; }
+  .rb-shell-context .rb-online-actions { display: flex; }
+  .rb-app-header:has(.rb-online-identity) { grid-template-columns: 10.5rem minmax(18rem, 1fr) auto auto; }
+  .rb-app-header:has(.rb-online-identity) .rb-account-tools { grid-column: 4; }
+  .rb-shell-context .rb-online-identity { grid-template-columns: minmax(12rem, 1fr) auto; align-items: center; gap: .35rem 1rem; }
+  .rb-shell-context .rb-online-identity > div:first-child { grid-column: 1; grid-row: 1 / 3; min-width: 0; }
+  .rb-shell-context .rb-online-finances { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+  .rb-shell-context .rb-online-actions { grid-column: 2; grid-row: 2; justify-content: flex-end; }
+
+  /* Flex rows absorb banners and notices before giving the workspace its height. */
+  body.rb-app:has([data-workspace-screen='Club']) { height: 100svh; display: flex; flex-direction: column; }
+  .rb-app-header { flex: none; }
+  .rb-app-main:has([data-workspace-screen='Club']) { flex: 1; display: flex; flex-direction: column; min-height: 0; max-width: none; padding-block: .5rem .75rem; }
+  .rb-app-main:has([data-workspace-screen='Club']) > [data-rumbleball],
+  .rb-session-pane:has([data-workspace-screen='Club']),
+  .rb-career[data-workspace-screen='Club'],
+  .rb-online-content[data-workspace-screen='Club'],
+  .rb-online-body:has(> .rb-broadcast-preparation) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  [data-rumbleball]:has([data-workspace-screen='Club']) > .rb-session-pane { flex: 1; min-height: 0; }
+  .rb-career[data-workspace-screen='Club'] > .rb-lineup-form,
+  .rb-online-body > .rb-broadcast-preparation { flex: 1; min-height: 0; }
+  .rb-career[data-workspace-screen='Club'] > :not(.rb-lineup-form) { flex: none; }
+  .rb-app .rb-career[data-workspace-screen] { width: 100%; margin-inline: 0; }
+  .rb-app :is(.rb-broadcast-preparation, .rb-preparation.rb-sport-preparation) { grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr) minmax(18rem, 22rem); grid-template-rows: minmax(0, 1fr); height: 100%; min-height: 0; gap: 1rem; }
+  .rb-app :is(.rb-broadcast-squad, .rb-team-controls, .rb-workspace-sidebar) { grid-row: 1; min-height: 0; }
+  .rb-app :is(.rb-broadcast-squad, .rb-team-controls) { height: 100%; align-self: stretch; align-content: start; overflow-y: auto; overscroll-behavior: contain; }
+  .rb-app .rb-broadcast-tactics { min-height: 0; height: 100%; align-self: stretch; display: flex; }
+  .rb-app .rb-court-workspace { width: 100%; height: 100%; grid-template-columns: minmax(0, 1fr) clamp(11.5rem, 13vw, 15rem); gap: 1rem; align-items: stretch; }
+  .rb-preparation-rail { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto auto; gap: 1rem; min-width: 0; min-height: 0; padding-inline: .1rem; }
+  .rb-preparation-rail > :is(.rb-bench, .rb-broadcast-bench) { grid-column: 1; grid-row: 1; display: grid; align-content: start; gap: .25rem; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0; border: 0; background: none; }
+  .rb-preparation-rail :is(.rb-bench-entry, .rb-bench-player) { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .15rem .5rem; align-items: center; padding: .3rem 0; border: 0; border-bottom: 1px solid #29485c; background: none; }
+  .rb-app .rb-preparation-rail .rb-bench-name { grid-column: 1; grid-row: 1 / 3; display: flex; align-items: center; gap: .5rem; min-width: 0; padding: 0; font-size: .95rem; text-align: left; }
+  .rb-preparation-rail .rb-bench-name > span:last-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .rb-preparation-rail .rb-bench-name .rb-athlete-portrait { flex: 0 0 2.5rem; width: 2.5rem; border-radius: 50%; border: 2px solid var(--rb-portrait-kit); }
+  .rb-preparation-rail :is(.rb-bench-entry, .rb-bench-player) > .rb-fatigue { grid-column: 2; grid-row: 1; font-size: .75rem; }
+  .rb-preparation-rail .rb-fatigue-meter, .rb-preparation-rail .rb-fatigue > small { display: none; }
+  .rb-preparation-rail :is(.rb-bench-entry, .rb-bench-player) > :is(.rb-controls, .rb-button:not(.rb-bench-name)) { grid-column: 2; grid-row: 2; }
+  .rb-preparation-rail :is(.rb-bench-entry, .rb-bench-player) > .rb-development-count { grid-column: 1 / -1; }
+  .rb-preparation-rail :is(.rb-bench, .rb-broadcast-bench) > p { display: none; }
+  .rb-app .rb-court-workspace .rb-preparation-rail :is(.rb-team-plans, .rb-broadcast-selectors) { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: minmax(0, 1fr); gap: .65rem; padding: .75rem 0 0; margin: 0; border-top: 1px solid #29485c; }
+  .rb-app .rb-preparation-rail .rb-team-plans > .rb-opening-picker { grid-column: auto; grid-row: auto; }
+  .rb-app .rb-preparation-rail .rb-field { font-size: .8rem; gap: .3rem; }
+  .rb-preparation-rail select { width: 100%; }
+  .rb-app .rb-preparation-rail :is(.rb-launch-bar, .rb-broadcast-save) { grid-column: 1; grid-row: 3; display: flex; flex-direction: column; align-items: stretch; gap: .6rem; margin: 0; padding: .75rem 0 0; border-top: 1px solid #29485c; }
+  .rb-preparation-rail .rb-launch-bar > div, .rb-preparation-rail .rb-broadcast-save > .rb-button { flex: none; }
+  .rb-app .rb-preparation-rail .rb-broadcast-save > * { flex: none; }
+  .rb-preparation-rail .rb-preparation-cancel { margin: 0; padding: 0; }
+  .rb-preparation-rail .rb-launch-bar > div { font-size: .8rem; }
+  .rb-preparation-rail .rb-launch-bar p { font-size: .75rem; }
+  .rb-preparation-rail .rb-button-primary { width: 100%; min-height: 2.75rem; font-size: 1.1rem; }
+  .rb-preparation-rail .rb-quiet-action { text-align: center; }
+
+  /* The local court container measures only its own labels, never page chrome. */
+  .rb-court-workspace > .rb-deployment { min-height: 0; margin: 0; display: flex; flex-direction: column; }
+  .rb-app .rb-deployment-titlebar { flex: none; gap: .5rem; flex-wrap: wrap; margin: 0 0 .5rem; }
+  .rb-deployment-titlebar > .rb-field { display: none; }
+  .rb-court-workspace > .rb-deployment > p { display: none; }
+  .rb-court-workspace .rb-deployment-layout { flex: 1; min-height: 0; margin: 0; display: flex; flex-direction: column; }
+  .rb-court-workspace .rb-deployment-controls { display: none; }
+  .rb-app .rb-court-workspace .rb-deployment-scroll { flex: 1; min-height: 0; width: 100%; container-type: size; display: grid; place-items: center; }
+  .rb-app .rb-court-workspace .rb-deployment-board { width: min(100cqw, calc((100cqh - 3rem) * 1.5)); max-width: 100%; margin: 0; }
+  .rb-workspace-sidebar { contain: size; align-self: stretch; }
+  .rb-workspace-sidebar .rb-player-inspector { height: 100%; min-height: 0; box-sizing: border-box; }
+  .rb-player-inspector.rb-inspector-content, .rb-player-inspector .rb-inspector-content { min-height: 0; height: 100%; grid-template-rows: auto auto auto minmax(0, 1fr); }
+  .rb-player-inspector:has(> .rb-squad-detail) { grid-template-rows: minmax(0, 1fr); }
+  .rb-player-inspector .rb-inspector-panel { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; align-content: start; scrollbar-gutter: stable; }
+}
+@media (min-width: 1200px) and (max-width: 1450px) {
+  .rb-app-header { grid-template-columns: 8.5rem minmax(13rem, 1fr) auto minmax(16rem, 20rem) auto; gap: .75rem; }
+  .rb-app-brand h1 { font-size: 1.7rem; }
+  .rb-app-brand h1 span { font-size: 1.1rem; }
+  .rb-app .rb-workspace-navigation > .rb-button { min-width: 5rem; padding-inline: .65rem; }
+  .rb-app .rb-shell-tools .rb-career-top { padding-left: .5rem; }
+  .rb-app :is(.rb-broadcast-preparation, .rb-preparation.rb-sport-preparation) { grid-template-columns: 12rem minmax(0, 1fr) 18rem; gap: .75rem; }
+}
+.rb-waiting-guide { max-width: 48rem; }
+.rb-waiting-guide p { margin-block: .65rem; }
+.rb-initial-roster { max-width: 90rem; margin-inline: auto; padding-block: 1rem; }
+.rb-initial-candidates { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr)); gap: 1rem; padding-block: 1.25rem; }
+.rb-initial-candidate { display: grid; gap: .65rem; padding: 1rem; background: #0c2232; border: 1px solid #29485c; cursor: pointer; }
+.rb-initial-candidate.is-selected { border-color: #ff8952; background: #123044; }
+.rb-initial-candidate > input { width: 1.2rem; height: 1.2rem; }
+.rb-initial-candidate h3, .rb-initial-candidate p { margin: 0; }
+.rb-initial-total { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding: .75rem 1rem; background: #071925; border-top: 1px solid #426279; }
+.rb-initial-total p { margin: 0; }
+@media (max-width: 650px) {
+  .rb-court-workspace > .rb-deployment, .rb-preparation-rail > :is(.rb-bench, .rb-broadcast-bench) { grid-column: 1; grid-row: auto; }
+  .rb-preparation-rail > :is(.rb-bench, .rb-broadcast-bench) { display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: .65rem; padding: .75rem .5rem; background: #071b29; border: 1px dashed #4a728b; }
+  .rb-preparation-rail > :is(.rb-bench, .rb-broadcast-bench) > :is(h4, p) { grid-column: 1 / -1; }
+  .rb-app .rb-sport-preparation .rb-preparation-rail .rb-team-plans { grid-template-columns: minmax(0, 1fr); }
+  .rb-app .rb-sport-preparation .rb-preparation-rail .rb-opening-picker { grid-column: 1; grid-row: auto; }
+  .rb-deployment-titlebar > .rb-quiet-action { flex-basis: 100%; }
+}

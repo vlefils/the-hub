@@ -1,6 +1,7 @@
+import { startReadyLeague as startLeague } from '../test-support/online.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLeague, joinLeague, startLeague, advanceLeague, fixturesFor, leagueTable, leagueProjection, editPreparation, replayProjection } from './league.mjs';
+import { createLeague, joinLeague, advanceLeague, fixturesFor, leagueTable, leagueProjection, editPreparation, replayProjection } from './league.mjs';
 import { validPlayoffs, currentPlayoffRound } from '../playoffs.mjs';
 
 const day = '2026-10-18T10:00:00Z';

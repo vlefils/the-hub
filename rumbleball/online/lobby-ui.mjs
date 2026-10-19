@@ -1,7 +1,8 @@
-import { el, btn } from '../career-components.mjs';
+import { el, btn, field } from '../career-components.mjs';
 import { clubIdentity } from '../broadcast-components.mjs';
+import { parisDateTime } from './schedule.mjs';
 
-export function waitingRoom(league, userId, { onAdd, onRemove, onStart, onCopy }) {
+export function waitingRoom(league, userId, { onAdd, onRemove, onStart, onCopy, scheduleValue, onSchedule = () => {} }) {
   const root = el('section', 'rb-waiting-room'), invitation = el('div'), roster = el('div'), owner = league.ownerId === userId;
   root.setAttribute('aria-label', 'Salle d’attente');
   invitation.append(el('p', 'rb-eyebrow', 'Salle d’attente'), el('h2', '', `${league.members.length} club${league.members.length > 1 ? 's' : ''} inscrit${league.members.length > 1 ? 's' : ''}`),
@@ -20,11 +21,18 @@ export function waitingRoom(league, userId, { onAdd, onRemove, onStart, onCopy }
     list.append(row);
   }
   roster.append(list);
+  const guide = el('div', 'rb-waiting-guide');
+  guide.append(el('h3', '', 'Comment se déroule la saison ?'), el('p', '', '1. Le créateur rassemble les managers et les bots, puis lance la saison.'),
+    el('p', '', '2. Journée 1 : chacun dispose de 2 400 chromas pour choisir ses premières recrues et préparer cinq titulaires.'),
+    el('p', '', '3. Les matchs démarrent à l’horaire choisi, lorsque tous les managers ont validé leur effectif. Les journées suivantes ont lieu à 20 h, heure de Paris.'));
+  roster.append(guide);
   if (owner) {
-    const actions = el('div', 'rb-online-actions'), add = btn('Ajouter un bot', onAdd), start = btn('Lancer la saison', onStart, true);
+    const date = el('input'); date.type = 'datetime-local'; date.required = true; date.value = scheduleValue || parisDateTime(league.suggestedFirstMatchAt); date.setAttribute('aria-label', 'Premier match · heure de Paris'); date.dataset.focusKey = 'first-match-at';
+    date.addEventListener('input', () => onSchedule(date.value));
+    const actions = el('div', 'rb-online-actions'), add = btn('Ajouter un bot', onAdd), start = btn('Lancer la saison', () => onStart(date.value), true);
     add.disabled = league.members.length >= league.maxClubs;
     start.disabled = league.members.length < 2;
-    actions.append(add, start); roster.append(actions);
+    actions.append(add, start); roster.append(field('Premier match · heure de Paris', date), el('p', 'rb-muted', 'Lancer la saison ouvre immédiatement le recrutement et ferme les inscriptions. Aucun joueur ne vous sera attribué automatiquement.'), actions);
   }
   root.append(invitation, roster); return root;
 }

@@ -35,9 +35,9 @@ export function nextLock(now, includeToday = true) {
   throw new Error('Prochain verrouillage introuvable.');
 }
 
-export function makeClub(userId, name, seed, color = '#35bdb3', crestId, cosmeticNamespace = userId) {
+export function makeClub(userId, name, seed, color = '#35bdb3', crestId, cosmeticNamespace = userId, initialRecruitment = false) {
   let career = createCareer(text(name, 'Nom du club'), seed, color);
-  career = confirmDraft(career, career.market.slice(0, 6).map((p) => p.id));
+  if (!initialRecruitment) career = confirmDraft(career, career.market.slice(0, 6).map((p) => p.id));
   // Public cosmetic choices must not encode any part of the secret match seed.
   delete career.clubs[0].crestId;
   for (const p of [...career.clubs[0].players, ...career.market]) { delete p.portraitId; p.name = ''; }
@@ -64,22 +64,37 @@ const edits = {
 };
 export function createLeague({ id, userId, name, clubName, color, crestId, inviteCode, seed }, now) {
   need(typeof inviteCode === 'string' && inviteCode.length >= 16, 'Code d’invitation invalide.');
-  return { version: 1, id, name: text(name, 'Nom de ligue'), ownerId: userId, inviteCode, seed, capacity: null, status: 'lobby', bots: [], botSequence: 0,
+  return { version: 2, id, name: text(name, 'Nom de ligue'), ownerId: userId, inviteCode, seed, capacity: null, status: 'lobby', bots: [], botSequence: 0,
     season: 1, day: 0, completedDays: 0, phase: 'groups', playoffs: null, playoffHistory: [], nextLockAt: null, night: null, history: [],
-    members: [{ userId, club: makeClub(userId, clubName, `${seed}:${userId}`, color, crestId, `${id}:${userId}`), draft: null }], createdAt: iso(instant(now)) };
+    members: [{ userId, initialRecruitment: true, club: makeClub(userId, clubName, `${seed}:${userId}`, color, crestId, `${id}:${userId}`, true), draft: null }], createdAt: iso(instant(now)) };
 }
 export function joinLeague(input, userId, { clubName, color, crestId }, now) {
   const s = copy(input); need(s.status === 'lobby', 'Cette saison a déjà commencé.');
   need(!s.members.some((m) => m.userId === userId), 'Vous participez déjà à cette ligue.');
   need(leagueParticipants(s).length < MAX_LEAGUE_CLUBS, 'La ligue accueille au maximum 128 clubs.');
   s.capacity = null;
-  s.members.push({ userId, club: makeClub(userId, clubName, `${s.seed}:${userId}`, color, crestId, `${s.id}:${userId}`), draft: null }); return s;
+  const initialRecruitment = s.version >= 2;
+  s.members.push({ userId, initialRecruitment, club: makeClub(userId, clubName, `${s.seed}:${userId}`, color, crestId, `${s.id}:${userId}`, initialRecruitment), draft: null }); return s;
 }
-export function startLeague(input, userId, now) {
+export function startLeague(input, userId, now, { firstMatchAt } = {}) {
   const s = copy(input); need(s.ownerId === userId, 'Seul le créateur peut lancer la saison.');
   need(s.status === 'lobby', 'Cette saison a déjà commencé.');
   need(leagueParticipants(s).length >= 2, 'Il faut au moins deux clubs pour commencer.');
-  s.capacity = leagueParticipants(s).length; s.status = 'preparation'; s.nextLockAt = nextLock(now); return s;
+  need(typeof firstMatchAt === 'string' && /Z$|[+-]\d{2}:\d{2}$/.test(firstMatchAt), 'Choisissez la date et l’heure du premier match.');
+  need(instant(firstMatchAt) > instant(now), 'Le premier match doit être programmé dans le futur.');
+  // Old waiting rooms had automatically paid six contracts. Reopen the initial
+  // market only when launching those rooms; active seasons are never reset.
+  if (s.version < 2) {
+    for (const member of s.members) {
+      const previous = member.draft ?? member.club;
+      member.club = makeClub(member.userId, previous.name, `${s.seed}:${member.userId}`, previous.kitColor, previous.crestId, `${s.id}:${member.userId}`, true);
+      member.initialRecruitment = true; member.draft = null;
+    }
+    s.version = 2;
+  }
+  s.capacity = leagueParticipants(s).length;
+  s.status = s.members.some(m => m.initialRecruitment) ? 'recruitment' : 'preparation';
+  s.firstMatchAt = s.nextLockAt = iso(instant(firstMatchAt)); return s;
 }
 const BOT_NAMES = ['Néon Dogs', 'Circuit Fantôme', 'Chrome Union', 'Les Déphaseurs', 'Secteur Zéro', 'Les Ferrailleurs', 'Signal Noir', 'Les Spectres'];
 export function addBot(input, userId) {
@@ -105,7 +120,17 @@ export function isLocked(s, now) { return s.status === 'broadcast' || s.status =
 export function editPreparation(input, userId, command, payload, now) {
   const s = copy(input), member = s.members.find((m) => m.userId === userId);
   need(member, 'Vous ne participez pas à cette ligue.'); need(!isLocked(s, now), 'Équipes verrouillées pour la soirée.');
-  need(['lobby', 'preparation'].includes(s.status), 'Préparation indisponible.');
+  need(['recruitment', 'preparation'].includes(s.status), s.status === 'lobby' ? 'Le recrutement ouvre au lancement de la saison.' : 'Préparation indisponible.');
+  if (command === 'initialRecruit') {
+    need(member.initialRecruitment === true && s.status === 'recruitment', 'Votre effectif initial est déjà recruté.');
+    need(Array.isArray(payload.playerIds) && payload.playerIds.length <= MAX_SQUAD_SIZE, 'Sélectionnez de cinq à dix joueurs différents.');
+    const c = confirmDraft({ ...careerView(member.club, 0), status: 'draft' }, payload.playerIds);
+    member.club = { ...c.clubs[0], lineup: c.lineup, inventory: c.inventory, market: c.market, balance: c.balance, transactions: c.transactions };
+    member.initialRecruitment = false; member.draft = null;
+    if (s.members.every(m => !m.initialRecruitment)) s.status = 'preparation';
+    return s;
+  }
+  need(!member.initialRecruitment, 'Choisissez et validez votre effectif initial avant de préparer votre équipe.');
   if (command === 'cancel') { member.draft = null; return s; }
   need(Object.hasOwn(edits, command), 'Commande inconnue.');
   const source = copy(member.draft ?? member.club);
@@ -285,8 +310,8 @@ export function leagueProjection(s, userId, now) {
   }
   return { id: s.id, name: s.name, ownerId: s.ownerId, capacity: s.status === 'lobby' ? null : s.capacity, maxClubs: MAX_LEAGUE_CLUBS, status: s.status, season: s.season, day: s.day,
     phase: s.phase ?? 'groups', playoffs: copy(s.playoffs ?? null), playoffHistory: copy(s.playoffHistory ?? []),
-    members: leagueParticipants(s).map((m) => ({ userId: m.userId, name: m.club.name, isBot: (s.bots ?? []).some(bot => bot.userId === m.userId), kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
-    serverTime: iso(t), nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
-    club: ownClub, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
+    members: leagueParticipants(s).map((m) => ({ userId: m.userId, name: m.club.name, ready: !m.initialRecruitment, isBot: (s.bots ?? []).some(bot => bot.userId === m.userId), kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
+    serverTime: iso(t), suggestedFirstMatchAt: s.status === 'lobby' ? nextLock(now) : null, nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
+    club: ownClub, needsRecruitment: Boolean(member.initialRecruitment), firstMatchAt: s.firstMatchAt ?? null, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
     history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: s.status === 'lobby' ? [] : s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

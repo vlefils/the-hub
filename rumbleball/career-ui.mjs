@@ -39,8 +39,9 @@ export function mountCareer(root, mountMatch, options = {}) {
   const onlineLink = options.onOnline ? btn('Multijoueur', options.onOnline) : el('a', 'rb-button', 'Multijoueur'); onlineLink.href = './multi.html'; modes.append(onlineLink);
   const exportButton = btn('Exporter', () => attempt(() => download(exportCareer(career), `rumbleball-saison-${career.season}.json`)));
   const importInput = el('input'); importInput.type = 'file'; importInput.accept = '.json,application/json'; importInput.hidden = true;
-  const importButton = btn('Importer', () => importInput.click());
+  const importButton = btn('Importer', () => { saveDialog.close(); importInput.click(); });
   const restartButton = keyed(btn('Redémarrer la campagne', () => {
+    saveDialog.close();
     view.pause();
     showConfirmation('Redémarrer la campagne ? Le club, les joueurs et toute la progression seront supprimés, y compris la rencontre en cours. Vous repartirez de la création d’un club. Exportez votre carrière avant de continuer si vous souhaitez en garder une copie.', restartCareer, 'Redémarrer');
   }), 'restart-career');
@@ -48,7 +49,7 @@ export function mountCareer(root, mountMatch, options = {}) {
   const retry = btn('Réessayer la sauvegarde', () => { save(); renderManagement(); }); retry.hidden = true;
   const saveStatus = el('span', 'rb-save-status', options.sync ? options.sync.status().message : 'Sauvegarde locale automatique'); saveStatus.setAttribute('role', 'status'); saveStatus.setAttribute('aria-live', 'polite');
   const saveActions = el('div', 'rb-controls rb-save-actions'); saveActions.append(exportButton, importButton, restartButton);
-  const saveTools = disclosure('Sauvegarde', 'save-tools', el('p', 'rb-muted', options.sync ? 'Cette partie est sauvegardée automatiquement sur votre compte. Une copie locale conserve les modifications en attente de synchronisation.' : 'Cette carrière est conservée dans ce navigateur. Exportez une copie pour la garder sur un autre appareil.'), saveActions, importInput);
+  const saveTools = keyed(btn('Sauvegarde', () => saveDialog.show('Sauvegarde de la partie', saveTools)), 'save-tools'); saveTools.setAttribute('aria-haspopup', 'dialog');
   tools.append(saveStatus, saveTools, retry); top.append(modes, tools);
   const cloudRetry = btn('Réessayer la synchronisation', () => options.sync?.flush()); cloudRetry.hidden = true;
   if (options.sync) tools.append(cloudRetry);
@@ -61,6 +62,8 @@ export function mountCareer(root, mountMatch, options = {}) {
   root.append(top, notice, importPreview, manager, matchArea);
   let modalKind = null, modalClubId = null;
   const modal = managementDialog(root, () => { modalKind = null; });
+  const saveDialog = managementDialog(root); saveDialog.root.classList.add('rb-save-dialog');
+  saveDialog.body.append(el('p', 'rb-muted', options.sync ? 'Cette partie est sauvegardée automatiquement sur votre compte. Une copie locale conserve les modifications en attente de synchronisation.' : 'Cette carrière est conservée dans ce navigateur. Exportez une copie pour la garder sur un autre appareil.'), saveActions, importInput);
   workspaceHeader({ tools: top });
   const view = mountMatch(matchRoot, {
     onTurn(state, events) {
@@ -87,7 +90,7 @@ export function mountCareer(root, mountMatch, options = {}) {
       preparationShopItem = preparationSlotPlayer = preparationEquipmentSlot = undefined;
       preparationInspectorTab = 'player';
       tab = 'Club'; marketFilter = ''; sectionScroll.clear();
-      saveStatus.textContent = options.sync ? options.sync.status().message : 'Sauvegarde locale automatique'; saveTools.open = false;
+      saveStatus.textContent = options.sync ? options.sync.status().message : 'Sauvegarde locale automatique'; saveDialog.close();
       showMode('career'); manager.querySelector('input')?.focus();
     });
   }
@@ -300,20 +303,21 @@ export function mountCareer(root, mountMatch, options = {}) {
     const crest = crestPicker(own.crestId, clubKit(own), locked); crest.choice.addEventListener('change', () => attempt(commitLineup));
     const color = kitPicker(clubKit(own), locked); color.addEventListener('change', () => update(() => setClubColor(career, color.value)));
     teamControls.append(disclosure('Identité du club', 'club-identity', field('Couleur des maillots', color), crest.root));
-    const court = el('div', 'rb-court-workspace'); court.append(deployment.root, bench);
-    const tactics = el('section', 'rb-broadcast-tactics'); tactics.append(court, teamPlans);
+    const court = el('div', 'rb-court-workspace'), rail = el('aside', 'rb-preparation-rail'); rail.setAttribute('aria-label', 'Banc et préparation'); rail.append(bench, teamPlans); court.append(deployment.root, rail);
+    const tactics = el('section', 'rb-broadcast-tactics'); tactics.append(court);
     preparation.append(teamControls, tactics, sidebar); form.append(preparation);
     const launch = el('div', 'rb-launch-bar'), copy = el('div');
     const finished = careerSeasonFinished(career), spectating = !fixture && !finished && career.playoffs;
-    copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : finished ? 'La saison est terminée' : spectating ? `${currentPlayoffRound(career.playoffs).name} · autres clubs` : `${money(payroll(career))} de salaires au coup d’envoi`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : finished ? 'Vous pouvez commencer la saison suivante.' : spectating ? 'Consultez le tableau dans Ligue. Votre club ne joue pas ce tour ; aucun salaire de match ne vous est prélevé.' : `Solde après prélèvement : ${money(career.balance - payroll(career))}. Les primes seront versées après le match.`));
-    launch.append(copy, finished ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : spectating ? btn(`Simuler · ${currentPlayoffRound(career.playoffs).name}`, () => update(() => advanceCareerPlayoffs(career)), true) : blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); tactics.append(formNotice, launch);
-    if (career.current?.settled) tactics.append(btn('Voir le bilan', () => go('Bilan')));
+    copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : finished ? 'La saison est terminée' : spectating ? `${currentPlayoffRound(career.playoffs).name} · autres clubs` : `Après salaires : ${money(career.balance - payroll(career))}`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : finished ? 'Vous pouvez commencer la saison suivante.' : spectating ? 'Votre club ne joue pas ce tour. Aucun salaire prélevé.' : 'Primes versées après le match.'));
+    launch.append(copy, finished ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : spectating ? btn(`Simuler · ${currentPlayoffRound(career.playoffs).name}`, () => update(() => advanceCareerPlayoffs(career)), true) : blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); rail.append(launch);
+    formNotice.classList.add('rb-sr-only'); rail.append(formNotice);
+    if (career.current?.settled) { const summary = btn('Voir le bilan', () => go('Bilan')); summary.classList.add('rb-quiet-action'); launch.append(summary); }
     form.addEventListener('submit', (event) => event.preventDefault()); manager.append(form); renderActive();
     const helpBody = el('div'); helpBody.append(el('p', 'rb-muted', 'L’archétype définit les techniques. Le rôle donne une mission ; la consigne règle le comportement. Le plan collectif guide l’équipe, tandis que l’ouverture fixe le placement et le premier tour. Choisir un titulaire déjà présent échange leurs positions. Aucun remplacement pendant le match.'), strategyHelp, ...opening.root.querySelectorAll('p'));
     const help = btn('Comprendre la préparation', () => {
       modalKind = 'help'; modal.body.replaceChildren(helpBody);
       modal.show('Comprendre la préparation', help);
-    }); help.classList.add('rb-quiet-action'); teamControls.append(help);
+    }); help.classList.add('rb-quiet-action'); deployment.root.querySelector('.rb-deployment-titlebar').append(help);
   }
   function renderMarket(locked, target) {
     target.replaceChildren();
@@ -423,5 +427,5 @@ export function mountCareer(root, mountMatch, options = {}) {
     matchArea.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   showMode('career');
-  return { stop() { active = false; unsubscribeSync?.(); modal.close(); if (view.stop) view.stop(); else view.pause(); top.remove(); } };
+  return { stop() { active = false; unsubscribeSync?.(); modal.close(); saveDialog.close(); if (view.stop) view.stop(); else view.pause(); top.remove(); } };
 }

@@ -61,11 +61,11 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   const selectors = el('div', 'rb-broadcast-selectors'); selectors.append(field('Plan collectif', strategy), field('Ouverture', opening));
   const kit = disclosure('Identité du club', 'club-identity', field('Couleur des maillots', color), crest.root);
   const saveBar = el('div', 'rb-broadcast-save'), save = el('button', 'rb-button rb-button-primary', 'Enregistrer la préparation'), status = el('p', 'rb-form-status'); save.type = 'submit'; status.setAttribute('role', 'status');
-  const court = el('div', 'rb-court-workspace'); court.append(editor.root, bench);
-  saveBar.append(save, status); tactics.append(court, selectors);
+  const court = el('div', 'rb-court-workspace'), rail = el('aside', 'rb-preparation-rail'); rail.setAttribute('aria-label', 'Banc et préparation'); rail.append(bench, selectors, saveBar); court.append(editor.root, rail);
+  saveBar.append(save, status); tactics.append(court);
   const recruit = btn('Recruter un joueur', onRecruit); recruit.classList.add('rb-recruit-tile'); recruit.setAttribute('aria-haspopup', 'dialog'); recruit.setAttribute('data-readonly-control', 'true');
   squad.append(squadHeading(), slots, recruit, kit);
-  sidebar.append(inspector); root.append(squad, tactics, saveBar, sidebar);
+  sidebar.append(inspector); root.append(squad, tactics, sidebar);
   const baseline = JSON.stringify(preparationDraft(club));
   function read() {
     draft.strategy = strategy.value; draft.opening = opening.value; draft.color = color.value; draft.crestId = crest.value; draft.deployment = editor.value;

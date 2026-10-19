@@ -9,7 +9,8 @@ export function managementDialog(host, onClose = () => {}) {
     if (!visible) return;
     visible = false; root.hidden = true; onClose();
     const replacement = opener?.dataset.focusKey && [...host.querySelectorAll('button')].find(button => button.dataset.focusKey === opener.dataset.focusKey);
-    (host.contains(opener) && !opener.closest('[hidden]') ? opener : replacement ?? host.querySelector('.rb-recruit-tile'))?.focus({ preventScroll: true });
+    const connected = opener?.isConnected ?? host.contains(opener);
+    (connected && !opener.closest('[hidden]') ? opener : replacement ?? host.querySelector('.rb-recruit-tile'))?.focus({ preventScroll: true });
   }
   function close() { if (root.open) root.close(); finish(); }
   const dismiss = btn('Fermer', close); dismiss.classList.add('rb-modal-close');

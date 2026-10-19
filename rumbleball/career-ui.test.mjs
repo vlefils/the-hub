@@ -278,6 +278,17 @@ test('Ligue : club cliquable, effectif et rotation en modale, fermeture sans mut
   await dialog.emit('cancel'); assert.equal(dialog.hidden, true); assert.equal(document.activeElement, trigger); assert.equal(e.storage.getItem(CAREER_KEY), before);
 });
 
+test('sauvegarde : fenêtre séparée des commandes du bandeau, fermeture et focus restaurés', async () => {
+  const c = confirmDraft(createCareer('Club sauvegardé', 'save-dialog-ui'), createCareer('Club sauvegardé', 'save-dialog-ui').market.slice(0, 6).map(p => p.id));
+  const e = environment(exportCareer(c)); mountCareer(e.root, (await import('./ui.mjs')).mountMatch);
+  const trigger = button(e.root, 'Sauvegarde'); trigger.focus(); await trigger.click();
+  const dialog = classNode(e.root, 'rb-save-dialog'); assert.equal(dialog.open, true);
+  assert.ok(dialog.contains(button(e.root, 'Exporter')));
+  assert.equal(classNode(e.root, 'rb-career-top').contains(button(e.root, 'Exporter')), false);
+  await button(dialog, 'Fermer').click(); assert.equal(dialog.hidden, true);
+  assert.ok(document.activeElement === trigger); assert.deepEqual(e.saved(), c);
+});
+
 test('recrutement solo : modale depuis la liste, arrivée sur le banc et fermeture sans quitter Club', async () => {
   let c = createCareer('Les Recruteurs', 'ui-recruit-dialog'); c = confirmDraft(c, c.market.slice(0, 5).map(p => p.id));
   const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
@@ -286,7 +297,7 @@ test('recrutement solo : modale depuis la liste, arrivée sur le banc et fermetu
   const dialog = classNode(e.root, 'rb-management-dialog'); assert.equal(dialog.hidden, false); assert.equal(dialog.open, true);
   await descendants(dialog).find(n => n.dataset.focusKey === `recruit-${offer.id}`).click();
   assert.equal(e.saved().clubs[0].players.length, 6); assert.equal(e.saved().balance, balance - 300); assert.deepEqual(e.saved().lineup, lineup);
-  const bench = classNode(e.root, 'rb-bench'); assert.equal(bench.parentNode, classNode(e.root, 'rb-court-workspace')); assert.match(bench.textContent, new RegExp(offer.name));
+  const bench = classNode(e.root, 'rb-bench'); assert.ok(classNode(e.root, 'rb-preparation-rail').contains(bench)); assert.match(bench.textContent, new RegExp(offer.name));
   assert.equal(dialog.hidden, false); await dialog.emit('cancel'); assert.equal(dialog.hidden, true);
   assert.equal(document.activeElement, button(e.root, 'Recruter un joueur'));
   assert.deepEqual(classNode(e.root, 'rb-workspace-navigation').children.map(n => n.textContent), ['Club', 'Ligue']);

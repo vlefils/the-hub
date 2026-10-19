@@ -2,6 +2,7 @@ import { CAREER_KEY, importCareer } from '../career-storage.mjs';
 
 // Small in-memory DOM for event/transition tests. No browser, server or layout engine.
 export class TestNode {
+  [Symbol.for('nodejs.util.inspect.custom')]() { return `<${this.tagName}${this.className ? ` class="${this.className.trim()}"` : ''}>`; }
   constructor(tag = '#text', text = '') { this.tagName = tag; this._text = text; this.children = []; this.dataset = {}; this.attributes = {}; this.listeners = {}; this.className = ''; this.hidden = false; this.style = { values: {}, setProperty(key, value) { this.values[key] = value; }, getPropertyValue(key) { return this.values[key] ?? ''; } }; }
   get textContent() { return this._text + this.children.map((c) => c.textContent).join(''); }
   set textContent(text) { this._text = String(text); this.children = []; }

@@ -1,8 +1,9 @@
+import { startReadyLeague as startLeague } from '../test-support/online.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { environment, descendants, button } from '../test-support/dom.mjs';
 import { mountOnline } from './ui.mjs';
-import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague } from './league.mjs';
+import { createLeague, joinLeague, editPreparation, advanceLeague } from './league.mjs';
 import { createLeagueService } from './server.mjs';
 import { PLAYER_DRAG_TYPE } from '../deployment-ui.mjs';
 
@@ -59,10 +60,10 @@ test('broadcast : 20 h écarte la saisie non enregistrée, avertit et laisse les
   assert.match(e.root.querySelector('.rb-squad-detail').textContent, new RegExp(player.name)); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
 });
 
-test('broadcast : après sauvegarde, le rafraîchissement de la salle préserve le formulaire et les tactiques', async t => {
-  const e = await online(t, true); e.strategy().value = 'possession'; await e.strategy().emit('change'); await e.root.querySelector('form').emit('submit');
-  const savedForm = e.root.querySelector('form'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true);
-  e.remoteChange(); await e.poll(); assert.equal(e.root.contains(savedForm), true); assert.equal(e.strategy().value, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
+test('broadcast : après sauvegarde, une actualisation conserve les tactiques', async t => {
+  const e = await online(t); e.strategy().value = 'possession'; await e.strategy().emit('change'); await e.root.querySelector('form').emit('submit');
+  assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true);
+  e.remoteChange(); await button(e.root, 'Actualiser').click(); assert.equal(e.strategy().value, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
 });
 
 test('équipement : joueur conservé après achat et transfert, réserve lisible et verrouillage respecté', async t => {
@@ -188,14 +189,14 @@ test('recrutement en ligne : modale, banc, saisie préservée et annulation de l
   await button(dialog, 'Recruter · 300 chromas').click();
   const next = e.state().members[0].draft; assert.equal(next.players.length, base.players.length + 1); assert.equal(next.balance, base.balance - 300); assert.deepEqual(next.lineup, base.lineup);
   assert.equal(e.strategy().value, 'possession'); assert.match(e.root.querySelector('.rb-broadcast-bench').textContent, new RegExp(offer.name));
-  assert.equal(e.root.querySelector('.rb-broadcast-bench').parentNode, e.root.querySelector('.rb-court-workspace'));
+  assert.ok(e.root.querySelector('.rb-preparation-rail').contains(e.root.querySelector('.rb-broadcast-bench')));
   await button(dialog, 'Fermer').click(); assert.equal(dialog.hidden, true);
   await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(e.strategy().value, base.strategy); e.mounted.stop();
 });
 
 test('amélioration en ligne : points sur le banc, choix conservés avec les tactiques non enregistrées, annulation', async t => {
-  const e = await online(t, true), club = e.state().members[0].club, reserve = club.players.find(p => !club.lineup.includes(p.id));
-  reserve.xp = 50; e.remoteChange(); await e.poll();
+  const e = await online(t), club = e.state().members[0].club, reserve = club.players.find(p => !club.lineup.includes(p.id));
+  reserve.xp = 50; e.remoteChange(); await button(e.root, 'Actualiser').click();
   e.strategy().value = 'possession'; await e.strategy().emit('change');
   await button(e.root, reserve.name).click();
   const inspector = e.root.querySelector('.rb-player-inspector'), advancement = inspector.querySelector('.rb-player-advancement'), choices = advancement.querySelectorAll('select');

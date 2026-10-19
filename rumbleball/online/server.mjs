@@ -36,7 +36,7 @@ export function createLeagueService(store, { now = () => new Date().toISOString(
       return { replay: replayProjection(row.state, userId, payload.matchId, archive, now()) };
     }
     const updated = await update(leagueId, (s, time) => {
-      if (action === 'start') return startLeague(s, userId, time);
+      if (action === 'start') return startLeague(s, userId, time, payload);
       if (action === 'addBot') return addBot(s, userId);
       if (action === 'removeBot') return removeBot(s, userId, payload.botId);
       return editPreparation(s, userId, action, payload, time);

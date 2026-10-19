@@ -10,6 +10,8 @@ import { abilitySummary } from '../player-development-ui.mjs';
 import { playoffPlaces, currentPlayoffRound } from '../playoffs.mjs';
 import { qualificationLegend, playoffBracket } from '../playoffs-ui.mjs';
 import { waitingRoom } from './lobby-ui.mjs';
+import { initialRoster } from './initial-roster-ui.mjs';
+import { scheduledInstant } from './schedule.mjs';
 
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
@@ -26,6 +28,7 @@ export async function mountOnline(root, config, connect, options = {}) {
   const replayArea = el('section', 'rb-replay-area'); replayArea.hidden = true;
   root.append(top, notice, content, live, replayArea);
   let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30, waitingSlot;
+  let firstMatchChoice = '', initialIds = new Set();
   const modal = managementDialog(root, () => { marketOpen = false; });
   let client, user, league, tab = 'Club', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false, authSubscription;
   const inactive = () => stopped || options.isActive?.() === false;
@@ -39,16 +42,16 @@ export async function mountOnline(root, config, connect, options = {}) {
       const entered = !league || league.id !== next.id, justLocked = next.locked && !league?.locked;
       const roomOnly = !entered && tab === 'Club' && league.status === 'lobby' && next.status === 'lobby' &&
         (['addBot', 'removeBot'].includes(action) || action === 'get' && (formDirty || JSON.stringify(league.club) === JSON.stringify(next.club)));
-      if (entered) { modal.close(); tab = 'Club'; }
+      if (entered) { modal.close(); tab = 'Club'; firstMatchChoice = ''; initialIds.clear(); }
       const discarded = justLocked && teamDraft?.dirty;
-      if (entered || justLocked || ['configure', 'cancel'].includes(action)) {
+      if (entered || justLocked || ['configure', 'cancel', 'initialRecruit'].includes(action)) {
         const context = !entered && teamDraft ? { selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, shopItem: teamDraft.shopItem, equipmentSlot: teamDraft.equipmentSlot, inspectorTab: teamDraft.inspectorTab } : null;
         teamDraft = context ? { ...preparationDraft(next.club), ...context } : null; formDirty = false;
       }
       league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
       if (roomOnly) { if (changed) renderWaitingRoom(); }
       else if (action !== 'get' || changed || tab === 'Ligue') renderLeague();
-      if (discarded) message('Verrouillage de 20 h : les modifications non enregistrées n’ont pas été retenues. La dernière préparation enregistrée est utilisée.', false);
+      if (discarded) message('Coup d’envoi : les modifications non enregistrées n’ont pas été retenues. La dernière préparation enregistrée est utilisée.', false);
     }
     return result;
   }
@@ -112,13 +115,11 @@ export async function mountOnline(root, config, connect, options = {}) {
     for (const item of leagues) list.append(btn(`${item.name} · ${item.members} club${item.members > 1 ? 's' : ''}${item.status === 'lobby' ? ' · Salle d’attente' : ''}`, () => attempt(() => send('get', {}, item.id))));
     if (!leagues.length) list.append(el('p', 'rb-muted', 'Créez une ligue ou rejoignez celle de vos amis.'));
     content.append(list);
-    const leagueName = input('text', 'Nom de la ligue'), clubName = input('text', 'Nom de votre club'), color = input('color', 'Couleur du club', '#35bdb3');
-    const code = input('text', 'Code d’invitation'), joinName = input('text', 'Nom du club à inscrire'), joinColor = input('color', 'Couleur du club à inscrire', '#35bdb3');
-    const createCrest = crestPicker('hound', color.value), joinCrest = crestPicker('helmet', joinColor.value);
-    color.addEventListener('input', () => createCrest.updateColor(color.value)); joinColor.addEventListener('input', () => joinCrest.updateColor(joinColor.value));
+    const leagueName = input('text', 'Nom de la ligue'), clubName = input('text', 'Nom de votre club');
+    const code = input('text', 'Code d’invitation'), joinName = input('text', 'Nom du club à inscrire');
     const columns = el('div', 'rb-online-columns');
-    columns.append(form('Créer une ligue privée', [field('Nom de la ligue', leagueName), field('Votre club', clubName), field('Maillots', color), createCrest.root, el('p', 'rb-muted', 'La salle d’attente reste ouverte jusqu’au lancement, sans nombre de clubs à fixer. Le créateur peut ajouter des bots.'), el('p', 'rb-muted', 'Votre club commence avec six recrues de niveau 1 et 600 chromas après leurs contrats.')], 'Créer la ligue', () => send('create', { name: leagueName.value, clubName: clubName.value, color: color.value, crestId: createCrest.value })),
-      form('Rejoindre sur invitation', [field('Code d’invitation', code), field('Votre club', joinName), field('Maillots', joinColor), joinCrest.root], 'Rejoindre', () => send('join', { code: code.value.trim(), clubName: joinName.value, color: joinColor.value, crestId: joinCrest.value })));
+    columns.append(form('Créer une ligue privée', [field('Nom de la ligue', leagueName), field('Votre club', clubName), el('p', 'rb-muted', 'Invitez vos amis, ajoutez des bots et choisissez le premier rendez-vous. Vous recruterez votre équipe au lancement de la saison.')], 'Créer la ligue', () => send('create', { name: leagueName.value, clubName: clubName.value })),
+      form('Rejoindre sur invitation', [field('Code d’invitation', code), field('Votre club', joinName)], 'Rejoindre', () => send('join', { code: code.value.trim(), clubName: joinName.value })));
     content.append(columns);
   }
   function action(label, command, payload, primary = false) { const b = btn(label, () => attempt(() => send(command, payload)), primary); b.disabled = league.locked; return b; }
@@ -126,21 +127,33 @@ export async function mountOnline(root, config, connect, options = {}) {
     if (!waitingSlot || league.status !== 'lobby') return;
     const key = document.activeElement?.dataset?.focusKey, label = document.activeElement?.textContent;
     const restore = waitingSlot.contains(document.activeElement);
-    waitingSlot.replaceChildren(waitingRoom(league, user.id, {
+    waitingSlot.replaceChildren(waitingRoom(league, user.id, { scheduleValue: firstMatchChoice, onSchedule: value => { firstMatchChoice = value; },
       onAdd: () => attempt(() => send('addBot')), onRemove: botId => attempt(() => send('removeBot', { botId })),
-      onStart: () => attempt(() => send('start')), onCopy: () => attempt(async () => {
+      onStart: value => attempt(() => send('start', { firstMatchAt: scheduledInstant(value) })), onCopy: () => attempt(async () => {
         if (!globalThis.navigator?.clipboard?.writeText) { message('Sélectionnez le code affiché pour le copier.', false); return; }
         await navigator.clipboard.writeText(league.inviteCode); message('Code d’invitation copié.', false);
       }),
     }));
-    if (restore) (Array.from(waitingSlot.querySelectorAll('button')).find(button => key ? button.dataset.focusKey === key : button.textContent === label) ?? waitingSlot.querySelector('.rb-online-actions button'))?.focus({ preventScroll: true });
+    if (restore) ([...waitingSlot.querySelectorAll('button'), ...waitingSlot.querySelectorAll('input')].find(button => key ? button.dataset.focusKey === key : button.textContent === label) ?? waitingSlot.querySelector('.rb-online-actions button'))?.focus({ preventScroll: true });
   }
   function renderLeague() {
     if (replayOpen || inactive()) return;
     content.className = 'rb-online-content';
-    content.dataset.workspaceScreen = tab;
+    delete content.dataset.workspaceScreen;
     content.replaceChildren(); live.hidden = true;
     const c = league.club, heading = el('div', 'rb-online-identity'), copy = el('div');
+    if (league.status === 'lobby') {
+      workspaceHeader({ context: null, navigation: null });
+      content.append(pageHeading(league.name, 'Invitez les managers avant de lancer la saison.'), btn('Changer de ligue', () => attempt(renderLobby)));
+      waitingSlot = el('div'); content.append(waitingSlot); renderWaitingRoom(); return;
+    }
+    if (league.needsRecruitment) {
+      workspaceHeader({ context: null, navigation: null });
+      content.append(pageHeading(league.name, `Premier rendez-vous : ${date(league.firstMatchAt)} · heure de Paris`), initialRoster(c, initialIds, {
+        onSelect() { formDirty = true; }, onConfirm: playerIds => attempt(() => send('initialRecruit', { playerIds })),
+      })); return;
+    }
+    content.dataset.workspaceScreen = tab;
     const stage = league.status === 'lobby' ? 'Salle d’attente' : league.phase === 'playoffs' ? currentPlayoffRound(league.playoffs)?.name ?? 'Playoffs' : `Phase de groupe · journée ${league.day + 1}`;
     copy.append(el('p', 'rb-eyebrow', `${league.name} · saison ${league.season} · ${stage}`), clubIdentity(c));
     const actions = el('div', 'rb-online-actions'); actions.append(btn('Actualiser', () => attempt(() => send('get'))), btn('Changer de ligue', () => attempt(renderLobby)));
@@ -148,7 +161,8 @@ export async function mountOnline(root, config, connect, options = {}) {
     const summary = el('div', 'rb-online-finances'); summary.append(metric('Solde prévu', money(c.balance)), metric('Prochains salaires', money(c.players.reduce((n, p) => n + salary(p), 0))), metric('Revenu / victoire', '210 / +100', 'chromas par journée'));
     heading.replaceChildren(copy, summary, actions);
     workspaceHeader({ context: heading });
-    const lockMessage = league.locked ? 'Équipes verrouillées pour la soirée.' : league.nextLockAt ? `Modifiable jusqu’au ${date(league.nextLockAt)} · heure de Paris.` : 'Préparation libre jusqu’au lancement de la saison.';
+    const pending = league.members.filter(m => !m.ready);
+    const lockMessage = league.status === 'recruitment' ? `Recrutement en cours : ${pending.map(m => m.name).join(', ')}. Le premier match attend la validation de tous les effectifs.` : league.locked ? 'Équipes verrouillées pour la soirée.' : league.nextLockAt ? `Modifiable jusqu’au ${date(league.nextLockAt)} · heure de Paris.` : 'Préparation libre jusqu’au lancement de la saison.';
     summary.setAttribute('aria-label', 'Finances en chromas');
     if (league.status === 'lobby') {
       waitingSlot = el('div'); content.append(waitingSlot); renderWaitingRoom();
@@ -156,7 +170,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     const fixture = league.upcoming.find(f => [f.homeId, f.awayId].includes(c.id));
     const otherId = fixture && (fixture.homeId === c.id ? fixture.awayId : fixture.homeId), opponent = league.members.find(m => m.userId === otherId);
     if (tab === 'Club') {
-      if (opponent) content.append(matchBanner(c, opponent, league.locked ? 'Soirée en cours' : league.nextLockAt ? '20 h · Paris' : 'Saison à préparer', lockMessage));
+      if (opponent) content.append(matchBanner(c, opponent, league.locked ? 'Soirée en cours' : league.nextLockAt ? date(league.nextLockAt) : 'Saison à préparer', lockMessage));
       else content.append(el('p', league.locked ? 'rb-online-lock' : 'rb-muted', `${league.status === 'preparation' && league.phase !== 'playoffs' ? 'Journée de repos pour votre club. ' : ''}${lockMessage}`));
     }
     if (league.phase === 'playoffs') content.append(el('p', 'rb-competition-status', fixture ? `${stage} · élimination directe` : 'Votre club ne dispute plus les playoffs. Suivez les rencontres et le tableau dans Ligue.'));
@@ -186,7 +200,9 @@ export async function mountOnline(root, config, connect, options = {}) {
     if (marketOpen) { modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); }
     if (league.hasDraft) {
       const cancel = el('div', 'rb-preparation-cancel');
-      cancel.append(action('Annuler la préparation', 'cancel', {}), el('p', 'rb-muted', 'Rétablit la composition, les recrutements, les achats et le blason précédents, avant le verrouillage.'));
+      const undo = action('Annuler la préparation', 'cancel', {}), description = el('p', 'rb-sr-only', 'Rétablit la composition, les recrutements, les achats et le blason précédents, avant le verrouillage.');
+      description.id = 'rb-cancel-preparation-note'; undo.setAttribute('aria-describedby', description.id); undo.title = description.textContent;
+      cancel.append(undo, description);
       (body.querySelector('.rb-broadcast-save') ?? body).append(cancel);
     }
     // Read-only applies to forms as well as mutation buttons.
@@ -231,7 +247,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     body.append(editor.root);
   }
   function renderMarket(body, c) {
-    body.append(el('p', 'rb-muted', `${c.players.length}/${MAX_SQUAD_SIZE} places occupées · Contrats annulables avant 20 h. Les offres changent après chaque rencontre.`));
+    body.append(el('p', 'rb-muted', `${c.players.length}/${MAX_SQUAD_SIZE} places occupées · Contrats annulables avant le coup d’envoi. Les offres changent après chaque rencontre.`));
     const list = el('div', 'rb-market-list'); body.append(list);
     for (const p of c.market) {
       const row = el('section', 'rb-career-player'), price = recruitmentPrice(p), compiled = compilePlayer(p);
@@ -255,7 +271,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     if (inactive() || polling) return;
     polling = true;
     try {
-      if (!document.hidden && user && league && !busy && (league.status === 'lobby' || tab === 'Ligue' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
+      if (!document.hidden && user && league && !busy && (['lobby', 'recruitment'].includes(league.status) || tab === 'Ligue' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
         await send('get');
       }
     } catch (error) { message(`Connexion interrompue. Nouvelle tentative automatique : ${error.message}`); }

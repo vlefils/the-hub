@@ -1,6 +1,7 @@
+import { startReadyLeague as startLeague } from '../test-support/online.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLeague, joinLeague, startLeague, advanceLeague, leagueProjection } from './league.mjs';
+import { createLeague, joinLeague, advanceLeague, leagueProjection } from './league.mjs';
 import { createLeagueService } from './server.mjs';
 import { mountReplay } from '../replay-ui.mjs';
 import { createMatch, stepMatch } from '../engine.mjs';

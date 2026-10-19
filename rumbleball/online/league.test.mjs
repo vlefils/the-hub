@@ -1,6 +1,7 @@
+import { startReadyLeague as startLeague } from '../test-support/online.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLeague, joinLeague, startLeague, addBot, removeBot, editPreparation, advanceLeague, nextLock, isLocked, fixturesFor, leagueProjection, leagueParticipants, groupDays, ONLINE_RULES } from './league.mjs';
+import { createLeague, joinLeague, addBot, removeBot, editPreparation, advanceLeague, nextLock, isLocked, fixturesFor, leagueProjection, leagueParticipants, groupDays, ONLINE_RULES } from './league.mjs';
 import { salary, compilePlayer } from '../progression.mjs';
 import { createLeagueService } from './server.mjs';
 
@@ -310,5 +311,6 @@ test('service lobby : ajouts concurrents sans perte, payload financier ignoré e
   assert.equal(new Set(state.bots.map(bot => bot.userId)).size, 2);
   await assert.rejects(() => service.command(state.bots[0].userId, { action: 'get', leagueId: 'l' }), /réservé/);
   await service.command('owner', { action: 'removeBot', leagueId: 'l', payload: { botId: state.bots[0].userId } });
-  const started = await service.command('owner', { action: 'start', leagueId: 'l' }); assert.equal(started.league.capacity, 2);
+  const started = await service.command('owner', { action: 'start', leagueId: 'l', payload: { firstMatchAt: lock } }); assert.equal(started.league.capacity, 2);
+  assert.equal(started.league.needsRecruitment, true);
 });
