@@ -36,15 +36,15 @@ test('préparation : portraits en bulles, sélection sans déplacement et cinq p
 test('fiche joueur : aperçu du matériel, achat au bon joueur, remplacement explicite et verrouillage', async () => {
   const e = environment(), player = { id: 'p', name: 'Nora', profile: 0, xp: 0, fatigue: 0, implant: 'legs' }, purchases = [];
   const club = { balance: 1000, inventory: [] };
-  const shop = playerShop(club, player, { onBuy: (...args) => purchases.push(args) }); e.root.append(shop);
+  const shop = playerShop(club, player, { selectedItem: 'vest', onBuy: (...args) => purchases.push(args) }); e.root.append(shop);
   await button(shop, 'Acheter et équiper · 100 chromas').click(); assert.deepEqual(purchases[0], ['vest', player.id, false]);
   const choice = shop.querySelector('select'); choice.value = 'fibers'; await choice.emit('change');
   const buy = button(shop, 'Acheter et équiper · 300 chromas'); assert.equal(buy.disabled, true);
   const checkbox = shop.querySelector('input'); checkbox.checked = true; await checkbox.emit('change'); await buy.click();
   assert.deepEqual(purchases[1], ['fibers', player.id, true]);
-  const locked = playerShop(club, player, { locked: true, onBuy: () => assert.fail('Achat verrouillé') });
+  const locked = playerShop(club, player, { selectedItem: 'vest', locked: true, onBuy: () => assert.fail('Achat verrouillé') });
   assert.equal(button(locked, 'Acheter et équiper · 100 chromas').disabled, true);
-  const equipped = playerShop({ ...club, inventory: [{ itemId: 'vest', playerId: player.id }] }, player, { onBuy: () => assert.fail('Équipement déjà porté') });
+  const equipped = playerShop({ ...club, inventory: [{ itemId: 'vest', playerId: player.id }] }, player, { selectedItem: 'vest', onBuy: () => assert.fail('Équipement déjà porté') });
   assert.equal(button(equipped, 'Acheter et équiper · 100 chromas').disabled, true);
   assert.match(equipped.textContent, /Cet équipement est déjà porté/);
 });

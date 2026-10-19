@@ -81,20 +81,12 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   function drawDetail() {
     const p = club.players.find(p => p.id === selected), compiled = compilePlayer(p, club.inventory), role = select(ROLES, draft.assignments[p.id].role), instruction = select(INSTRUCTIONS, draft.assignments[p.id].instruction);
-    const replacement = select(Object.fromEntries(club.players.map(p => [p.id, p.name])), selected); replacement.disabled = locked;
-    replacement.addEventListener('change', () => replaceAt(draft.lineup.indexOf(selected), replacement.value));
-    const order = el('div', 'rb-controls'), index = draft.lineup.indexOf(selected);
-    for (const [text, offset] of [['Monter', -1], ['Descendre', 1]]) {
-      const move = btn(text, () => { const next = index + offset; [draft.lineup[index], draft.lineup[next]] = [draft.lineup[next], draft.lineup[index]]; editor.update({ players: deployed(), selectedPlayerId: selected }); drawSquad(); drawDetail(); changed(); });
-      move.disabled = locked || index + offset < 0 || index + offset >= 5; order.append(move);
-    }
     role.disabled = instruction.disabled = locked;
     const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
     playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
     const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
     detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, abilitySummary(compiled), statList(compiled), playerAdvancement(club, p, { locked, onAdvance }), playerEquipment(club, p, { locked, onBuy, selectedSlot: draft.equipmentSlot, onSlot: slot => { draft.equipmentSlot = slot; draft.shopItem = undefined; }, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; }, onAssign, onSell: onSellGear }));
-    if (index >= 0) detail.append(field('Remplacer ce titulaire', replacement), order);
-    else detail.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
+    if (!draft.lineup.includes(selected)) detail.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
     detail.append(el('small', 'rb-muted', `${money(salary(p))} / journée`));
     inspector.replaceChildren(detail);
     highlight();

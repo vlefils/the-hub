@@ -1,5 +1,6 @@
 import { KIT_COLORS, playerLook, sportingWeapon, visibleGear } from './appearance.mjs';
 import { portraitById, crestById, validCrest } from './identity.mjs';
+import { CATALOGUE } from './equipment.mjs';
 // Presentation only. Match rules and player positions stay in the simulation modules.
 export function svg(tag, attributes = {}, text) {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -110,7 +111,8 @@ export function turnMarkerArtwork() {
 
 export function pawnArtwork(player, color = KIT_COLORS[player.teamId === 'away' ? 1 : 0], { portrait = false } = {}) {
   const look = playerLook(player), gear = visibleGear(player), weapon = sportingWeapon(player);
-  const torso = gear.torso ?? gear.protection, gloves = gear.gloves ?? gear.protection, feet = gear.feet ?? gear.protection;
+  const appearance = id => CATALOGUE[id]?.appearance ?? id;
+  const torso = appearance(gear.torso ?? gear.protection), gloves = appearance(gear.gloves ?? gear.protection), feet = appearance(gear.feet ?? gear.protection), implant = appearance(gear.implant);
   const outline = { stroke: '#142022', 'stroke-width': 1.4, 'stroke-linejoin': 'round' };
   const jerseyStroke = [1, 3, 5].reduce((sum, i) => sum + parseInt(color.slice(i, i + 2), 16), 0) < 240 ? '#8c9c9b' : outline.stroke;
   const group = svg('g', { 'aria-hidden': 'true' });
@@ -121,7 +123,7 @@ export function pawnArtwork(player, color = KIT_COLORS[player.teamId === 'away' 
     const leg = svg('g', { class: `rb-person-${side < 0 ? 'left' : 'right'}-leg`, transform: `translate(${side * 6} 10)` });
     leg.append(svg('rect', { x: -4, y: 0, width: 8, height: 9, rx: 2, fill: '#26343c', ...outline }),
       svg('rect', { x: -4.5, y: 5, width: 9, height: 7, rx: 2, fill: '#111c22', ...outline }));
-    if (gear.implant === 'legs') leg.append(svg('path', { d: 'M-3 1H3V9H-3Z', fill: '#a3b7ba', ...outline }), svg('path', { d: 'M0 2V8', stroke: '#71dfcf', 'stroke-width': 2 }));
+    if (implant === 'legs') leg.append(svg('path', { d: 'M-3 1H3V9H-3Z', fill: '#a3b7ba', ...outline }), svg('path', { d: 'M0 2V8', stroke: '#71dfcf', 'stroke-width': 2 }));
     if (feet === 'soles') leg.append(svg('path', { d: 'M-4 11H4', stroke: '#81d6d2', 'stroke-width': 2.5 }));
     facing.append(leg);
   }
@@ -133,25 +135,26 @@ export function pawnArtwork(player, color = KIT_COLORS[player.teamId === 'away' 
       svg('path', { d: 'M-5 3H5M-5 7H5', stroke: color, 'stroke-width': 2 }));
     if (torso === 'armor') for (const x of [-18, 10]) facing.append(svg('rect', { x, y: -2, width: 8, height: 9, rx: 2, fill: '#89969a', ...outline }));
   }
-  if (gear.implant === 'regulator') facing.append(svg('rect', { x: -5, y: 6, width: 10, height: 9, rx: 2, fill: '#a8b8b3', ...outline }), svg('rect', { x: -2, y: 8, width: 4, height: 3, fill: '#65e2c6' }));
+  if (implant === 'regulator') facing.append(svg('rect', { x: -5, y: 6, width: 10, height: 9, rx: 2, fill: '#a8b8b3', ...outline }), svg('rect', { x: -2, y: 8, width: 4, height: 3, fill: '#65e2c6' }));
   for (const side of [-1, 1]) {
     const arm = svg('g', { class: `rb-person-${side < 0 ? 'left' : 'right'}-arm`, transform: `translate(${side * (broad ? 16 : 13)} 0)` });
     arm.append(svg('rect', { x: -3.5, y: 0, width: 7, height: 9, rx: 3, fill: look.skin, ...outline }),
       svg('circle', { cx: 0, cy: 8, r: gloves === 'gloves' ? 4.5 : 3.5, fill: gloves === 'gloves' ? '#7c8585' : look.skin, ...outline }));
     if (gloves === 'gloves') arm.append(svg('path', { d: 'M-2 7H2', stroke: '#e8ca80', 'stroke-width': 2 }));
     if (side < 0 && player.archetype === 'capitaine') arm.append(svg('rect', { x: -4, y: 0, width: 8, height: 3, rx: 1, fill: '#f0d679', ...outline }));
-    if (side < 0 && gear.implant === 'fibers') arm.append(svg('path', { d: 'M-4 1H4M-4 4H4M-4 7H4', stroke: '#d58962', 'stroke-width': 2 }));
+    if (side < 0 && implant === 'fibers') arm.append(svg('path', { d: 'M-4 1H4M-4 4H4M-4 7H4', stroke: '#d58962', 'stroke-width': 2 }));
     const heldId = side > 0 ? gear.rightHand : gear.leftHand;
-    const training = side > 0 ? !gear.rightHand && (!gear.leftHand || gear.leftHand === 'shield') : !gear.leftHand && gear.rightHand === 'shield';
+    const training = side > 0 ? !gear.rightHand && (!gear.leftHand || CATALOGUE[gear.leftHand]?.shield) : !gear.leftHand && CATALOGUE[gear.rightHand]?.shield;
     const heldWeapon = heldId ?? (training ? weapon.id : null);
-    if (heldWeapon && !(side < 0 && heldWeapon === 'maul' && gear.rightHand === 'maul')) {
+    const shape = appearance(heldWeapon);
+    if (heldWeapon && !(side < 0 && CATALOGUE[heldWeapon]?.hands === 2 && gear.rightHand === heldWeapon)) {
       const stick = svg('g', { class: 'rb-person-weapon', 'data-weapon': heldWeapon ?? 'none' });
-      if (heldWeapon === 'shield') stick.append(svg('path', { d: 'M-6-8H8V6L1 12L-6 6Z', fill: '#6d8593', ...outline }), svg('path', { d: 'M-3-4H5V4H-3Z', fill: color }));
-      else if (heldWeapon === 'knuckles') stick.append(svg('rect', { x: -4, y: 5, width: 8, height: 5, rx: 2, fill: '#afbac3', ...outline }));
+      if (shape === 'shield') stick.append(svg('path', { d: 'M-6-8H8V6L1 12L-6 6Z', fill: '#6d8593', ...outline }), svg('path', { d: 'M-3-4H5V4H-3Z', fill: color }));
+      else if (shape === 'knuckles') stick.append(svg('rect', { x: -4, y: 5, width: 8, height: 5, rx: 2, fill: '#afbac3', ...outline }));
       else if (heldWeapon) {
       stick.append(svg('rect', { x: 0, y: -17, width: 4, height: 27, rx: 1.5, fill: '#9da8a6', ...outline }), svg('path', { d: 'M0 4H4M0 7H4', stroke: '#273a40', 'stroke-width': 2 }));
-      if (heldWeapon === 'maul') stick.append(svg('rect', { x: -4, y: -23, width: 13, height: 9, rx: 2, fill: '#66767c', ...outline }), svg('path', { d: 'M0-21V-16M5-21V-16', stroke: '#c2d0ca', 'stroke-width': 1.5 }));
-      if (heldWeapon === 'tonfa') stick.append(svg('rect', { x: -5, y: -1, width: 10, height: 4, rx: 1, fill: '#667c83', ...outline }));
+      if (shape === 'maul') stick.append(svg('rect', { x: -4, y: -23, width: 13, height: 9, rx: 2, fill: '#66767c', ...outline }), svg('path', { d: 'M0-21V-16M5-21V-16', stroke: '#c2d0ca', 'stroke-width': 1.5 }));
+      if (shape === 'tonfa') stick.append(svg('rect', { x: -5, y: -1, width: 10, height: 4, rx: 1, fill: '#667c83', ...outline }));
       }
       arm.append(stick);
     }
@@ -177,8 +180,8 @@ export function pawnArtwork(player, color = KIT_COLORS[player.teamId === 'away' 
   if (look.faceDetail === 'paint') face.append(svg('path', { d: 'M-7-15L-4-10M5-15L7-10', stroke: '#f28abb', 'stroke-width': 2.5 }));
   if (look.faceDetail === 'patch') face.append(svg('path', { d: 'M-8-15H-1V-10H-8Z', fill: '#ffb94f' }));
   facing.append(face);
-  if (gear.head === 'helmet') facing.append(svg('path', { d: 'M-10-11Q-11 5 0 6Q11 5 10-11L6-8H-6Z', fill: '#607888', ...outline }));
-  if (gear.implant === 'interface') facing.append(svg('path', { d: 'M-8-13H8V-9H-8Z', fill: '#273d46', ...outline }), svg('path', { d: 'M-6-11H6', stroke: '#83efe1', 'stroke-width': 1.5 }));
+  if (appearance(gear.head) === 'helmet') facing.append(svg('path', { d: 'M-10-11Q-11 5 0 6Q11 5 10-11L6-8H-6Z', fill: '#607888', ...outline }));
+  if (implant === 'interface') facing.append(svg('path', { d: 'M-8-13H8V-9H-8Z', fill: '#273d46', ...outline }), svg('path', { d: 'M-6-11H6', stroke: '#83efe1', 'stroke-width': 1.5 }));
   body.append(facing); group.append(body);
   if (Number.isInteger(player.number)) {
     const badge = player.teamId === 'away' ? svg('path', { d: 'M19 7L30 18L19 29L8 18Z', fill: color, stroke: '#eaf0e4', 'stroke-width': 1 })

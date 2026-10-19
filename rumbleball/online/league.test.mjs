@@ -43,7 +43,7 @@ test('équipement serveur : deux mains indépendantes, protections localisées, 
   const initial = fixture(), before = structuredClone(initial), player = initial.members[0].club.players[0];
   let s = initial;
   for (const [itemId, location] of [['tonfa', 'rightHand'], ['tonfa', 'leftHand'], ['gloves', 'gloves'], ['soles', 'feet']]) s = editPreparation(s, 'u0', 'buy', { itemId, playerId: player.id, location }, day);
-  const draft = s.members[0].draft; assert.equal(draft.inventory.length, 4); assert.equal(draft.balance, 0);
+  const draft = s.members[0].draft; assert.equal(draft.inventory.length, 4); assert.equal(draft.balance, 300);
   assert.equal(draft.inventory.filter(item => item.itemId === 'tonfa').length, 2);
   assert.deepEqual(draft.inventory.filter(item => item.itemId === 'tonfa').map(item => item.location), ['rightHand', 'leftHand']);
   assert.equal(leagueProjection(s, 'u1', day).club.inventory.length, 0);
@@ -63,7 +63,21 @@ test('équipement serveur : emplacement falsifié refusé sans débit et deux ma
   s = editPreparation(s, 'u0', 'buy', { itemId: 'shield', playerId: p.id, location: 'leftHand' }, day);
   s = editPreparation(s, 'u0', 'buy', { itemId: 'maul', playerId: p.id, location: 'rightHand' }, day);
   const draft = s.members[0].draft; assert.equal(draft.inventory.filter(item => item.playerId === p.id).length, 1);
-  assert.ok(draft.inventory.slice(0, 2).every(item => item.playerId === null)); assert.equal(draft.balance, 0);
+  assert.ok(draft.inventory.slice(0, 2).every(item => item.playerId === null)); assert.equal(draft.balance, 600);
+});
+
+test('catalogue serveur : dotation gratuite, tarifs autoritaires, arme avancée figée et annulation', () => {
+  const initial = fixture(), p = initial.members[0].club.players[0], before = structuredClone(initial);
+  let s = editPreparation(initial, 'u0', 'buy', { itemId: 'tonfa', playerId: p.id, location: 'leftHand' }, day);
+  s = editPreparation(s, 'u0', 'buy', { itemId: 'tonfa', playerId: p.id, location: 'leftHand' }, day);
+  assert.equal(s.members[0].draft.inventory.length, 1); assert.equal(s.members[0].draft.balance, 600);
+  s = editPreparation(s, 'u0', 'buy', { itemId: 'arc_tonfa', playerId: p.id, location: 'rightHand', price: 0, enhancement: 99 }, day);
+  assert.equal(s.members[0].draft.balance, 200); assert.equal(initial.members[0].club.balance, 600);
+  assert.throws(() => editPreparation(s, 'u0', 'buy', { itemId: 'ghost_baton', playerId: p.id, price: 0 }, day), /manque/);
+  for (const itemId of ['ghost_blade', 'sword', 'spear']) assert.throws(() => editPreparation(s, 'u0', 'buy', { itemId, playerId: p.id }, day), /inconnu/);
+  const frozen = advanceLeague(s, lock).night.games[0].config.rosters.home[0], base = compilePlayer(p);
+  assert.equal(frozen.attack.bonus, base.attack.bonus + 1); assert.equal(frozen.attack.flat, base.attack.flat + 1); assert.equal(frozen.offhandAttack.flat, 0);
+  assert.deepEqual(editPreparation(s, 'u0', 'cancel', {}, day), before);
 });
 
 test('améliorations serveur : choix contrôlés, brouillon annulable, propriétaire et verrouillage', async () => {

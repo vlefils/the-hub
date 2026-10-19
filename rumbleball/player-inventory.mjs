@@ -16,6 +16,6 @@ export function playerInventory(club, player, { locked = false, onAssign, onSell
     try { await onAssign?.(id, owner, location); } finally { choice.value = equipped?.id ?? ''; choice.disabled = locked; }
   });
   root.append(field('Matériel du club · transfert gratuit', choice), el('p', 'rb-muted', 'La pièce remplacée retourne en réserve. Une arme à deux mains libère les deux emplacements quand elle est retirée.'));
-  if (equipped) { const sell = btn(`Revendre · ${money(CATALOGUE[equipped.itemId].price / 2)}`, () => onSell?.(equipped.id)); sell.disabled = locked; root.append(sell); }
+  if (equipped) { const sell = btn(CATALOGUE[equipped.itemId].price === 0 ? 'Restituer la dotation gratuite' : `Revendre · ${money(CATALOGUE[equipped.itemId].price / 2)}`, () => onSell?.(equipped.id)); sell.disabled = locked; root.append(sell); }
   return root;
 }

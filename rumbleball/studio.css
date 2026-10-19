@@ -233,6 +233,8 @@ body.rb-app {
 .rb-player-shop-preview p { margin: 0; font-size: .8rem; }
 .rb-player-shop-preview .rb-button { width: 100%; }
 .rb-player-shop .rb-equipment-heading { gap: .7rem; font-size: .85rem; }
+.rb-player-shop .rb-equipment-heading > div { display: grid; gap: .3rem; min-width: 0; }
+.rb-player-inspector .rb-player-shop .rb-equipment-art { width: 5rem; height: 5rem; flex-basis: 5rem; object-fit: contain; }
 .rb-player-equipment { min-width: 0; }
 .rb-player-equipment > h4 { margin-block: .5rem; }
 .rb-equipment-workbench { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; align-items: start; }

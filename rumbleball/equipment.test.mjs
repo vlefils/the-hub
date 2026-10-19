@@ -45,6 +45,62 @@ test('armes : main gauche ou droite, finesse et Force, dés propres et polyvalen
   assert.deepEqual(compilePlayer(p), base);
 });
 
+test('dotation : cinq armes gratuites, réutilisation des réserves et aucune création de chromas', () => {
+  let c = club(); const p = c.clubs[0].players[0], before = structuredClone(c), balance = c.balance;
+  for (const id of ['knuckles', 'tonfa', 'bat', 'maul', 'shield']) { c = buyItem(c, id, p.id); assert.equal(c.balance, balance); }
+  for (let i = 0; i < 8; i++) for (const id of ['tonfa', 'maul', 'shield']) c = buyItem(c, id, p.id);
+  assert.equal(c.inventory.length, 5); assert.deepEqual(before.inventory, []);
+  c = buyItem(c, 'tonfa', p.id, false, 'leftHand');
+  const count = c.inventory.length; c = buyItem(c, 'tonfa', p.id, false, 'leftHand'); assert.equal(c.inventory.length, count);
+  c = buyItem(c, 'tonfa', p.id, false, 'rightHand');
+  assert.equal(c.inventory.filter(item => item.playerId === p.id && item.itemId === 'tonfa').length, 2);
+  for (const item of [...c.inventory]) c = sellProtection(c, item.id);
+  assert.equal(c.balance, balance); assert.deepEqual(importCareer(exportCareer(c)), c);
+  const debt = { ...c, balance: -25 }, free = buyItem(debt, 'tonfa', p.id);
+  assert.equal(free.balance, -25); assert.throws(() => buyItem(debt, 'arc_tonfa', p.id), /impayés/);
+  assert.throws(() => buyItem(c, 'tonfa'), /joueur/); assert.deepEqual(c.lineup, before.lineup);
+});
+
+test('armes avancées : bonus propres à chaque main, polyvalence et marteau à deux mains', () => {
+  const p = player(), base = compilePlayer(p, [gear('tonfa')]);
+  const dual = compilePlayer(p, [gear('arc_tonfa', 'rightHand'), gear('ghost_baton', 'leftHand')]);
+  assert.deepEqual(dual.attack, { bonus: base.attack.bonus + 1, die: 6, flat: base.attack.flat + 1 });
+  assert.deepEqual(dual.offhandAttack, { bonus: base.attack.bonus + 2, die: 6, flat: 2 });
+  const weak = { ...p, abilities: { strength: 8, dexterity: 8, constitution: 15, mind: 15, charisma: 13 } };
+  assert.deepEqual(compilePlayer(weak, [gear('arc_tonfa', 'rightHand'), gear('ghost_baton', 'leftHand')]).offhandAttack, { bonus: 3, die: 6, flat: 1 });
+  const bat = compilePlayer(p, [gear('shock_bat')]), shielded = compilePlayer(p, [gear('shock_bat'), gear('aegis_shield', 'leftHand')]);
+  assert.equal(bat.attack.die, 10); assert.equal(shielded.attack.die, 8); assert.equal(shielded.armor, base.armor + 2);
+  let c = club(); const id = c.lineup[0]; c = buyItem(c, 'aegis_shield', id, false, 'leftHand'); c = buyItem(c, 'gravity_maul', id);
+  const heavy = compilePlayer(c.clubs[0].players[0], c.inventory); assert.equal(heavy.attack.die, 12); assert.equal(heavy.offhandAttack, null);
+  assert.equal(equipmentAt({ id }, c.inventory, 'leftHand').itemId, 'gravity_maul'); assert.equal(heavy.armor, compilePlayer(c.clubs[0].players[0]).armor);
+  validateCareer(c); assert.deepEqual(importCareer(exportCareer(c)), c);
+});
+
+test('protections avancées : CA sans PV, compromis de mobilité et implant remplaçable', () => {
+  let c = club(); const p = c.clubs[0].players[0], base = compilePlayer(p);
+  for (const id of ['optic_visor', 'bulwark_armor', 'grapple_gloves', 'sprint_boots', 'kinetic_implant']) c = buyItem(c, id, p.id);
+  const geared = compilePlayer(c.clubs[0].players[0], c.inventory);
+  assert.equal(geared.maxHp, base.maxHp); assert.equal(geared.armor, base.armor + 4); assert.equal(geared.speed, base.speed + 1.5);
+  assert.equal(geared.skills.wrestling, base.skills.wrestling + 3); assert.equal(geared.skills.acrobatics, base.skills.acrobatics + 1);
+  assert.throws(() => buyItem(c, 'reflex_implant', p.id), /détruit/);
+  c = buyItem(c, 'reflex_implant', p.id, true); const reflex = compilePlayer(c.clubs[0].players[0], c.inventory);
+  assert.equal(reflex.armor, geared.armor + 1); assert.equal(reflex.speed, base.speed); assert.equal(reflex.skills.wrestling, geared.skills.wrestling - 1);
+  const boots = c.inventory.find(item => item.itemId === 'sprint_boots'), balance = c.balance;
+  c = sellProtection(c, boots.id); assert.equal(c.balance, balance + 200); assert.deepEqual(importCareer(exportCareer(c)), c);
+  validateCareer(c);
+});
+
+test('magasin : dotation accessible sans budget, aperçu du modèle avancé et achat à la bonne main', async () => {
+  const e = environment(), p = player(), calls = [], root = playerEquipment({ players: [p], inventory: [], balance: -20 }, p, { onBuy: (...args) => calls.push(args) }); e.root.append(root);
+  await slotButton(root, 'leftHand').click();
+  const choice = root.querySelector('.rb-player-shop').querySelector('select'); choice.value = 'tonfa'; await choice.emit('change');
+  assert.equal(button(root, 'Équiper gratuitement').disabled, false); assert.match(root.textContent, /Contondant · non létal/);
+  await button(root, 'Équiper gratuitement').click(); assert.deepEqual(calls, [['tonfa', p.id, false, 'leftHand']]);
+  choice.value = 'arc_tonfa'; await choice.emit('change');
+  assert.equal(button(root, 'Acheter et équiper · 400 chromas').disabled, true); assert.match(root.textContent, /salaires impayés/);
+  assert.match(root.textContent, /Tonfa Arc/); assert.match(root.querySelector('.rb-stat-comparison').textContent, /Attaque/);
+});
+
 test('deux armes : attaque secondaire uniquement avec deux armes légères, sans modificateur positif aux dégâts', () => {
   const p = player();
   const dual = compilePlayer(p, [gear('tonfa', 'rightHand'), gear('knuckles', 'leftHand')]);
@@ -129,7 +185,7 @@ test('écran : même corps pour tous, sept slots accessibles et magasin filtré 
   assert.match(await readFile(new URL(panel.querySelector('.rb-equipment-body').src), 'utf8'), /viewBox="0 0 240 520"/);
   await slotButton(panel, 'leftHand').click(); assert.equal(document.activeElement, slotButton(panel, 'leftHand'));
   const choice = panel.querySelector('.rb-player-shop').querySelector('select'); assert.ok(choice.children.every(option => CATALOGUE[option.value].slot === 'weapon'));
-  choice.value = 'tonfa'; await choice.emit('change'); await button(panel, 'Acheter et équiper · 150 chromas').click(); assert.deepEqual(calls, [['tonfa', p.id, false, 'leftHand']]);
+  choice.value = 'tonfa'; await choice.emit('change'); await button(panel, 'Équiper gratuitement').click(); assert.deepEqual(calls, [['tonfa', p.id, false, 'leftHand']]);
   await slotButton(panel, 'feet').click(); assert.ok(panel.querySelector('.rb-player-shop').querySelector('select').children.every(option => CATALOGUE[option.value].location === 'feet'));
   const context = panel.querySelector('.rb-equipment-context'); assert.ok(context.children.indexOf(context.querySelector('.rb-player-inventory')) < context.children.indexOf(context.querySelector('.rb-player-shop')));
 });
@@ -137,7 +193,7 @@ test('écran : même corps pour tous, sept slots accessibles et magasin filtré 
 test('UI solo : armer un remplaçant à gauche conserve la sélection, les titulaires et la sauvegarde', async () => {
   const c = club(), reserve = c.clubs[0].players[5], e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
   await button(e.root, reserve.name).click(); await slotButton(e.root, 'leftHand').click();
-  const choice = e.root.querySelector('.rb-player-shop').querySelector('select'); choice.value = 'tonfa'; await choice.emit('change'); await button(e.root, 'Acheter et équiper · 150 chromas').click();
+  const choice = e.root.querySelector('.rb-player-shop').querySelector('select'); choice.value = 'tonfa'; await choice.emit('change'); await button(e.root, 'Équiper gratuitement').click();
   assert.equal(slotButton(e.root, 'leftHand').getAttribute('aria-pressed'), 'true'); assert.equal(e.saved().inventory[0].location, 'leftHand'); assert.equal(e.saved().inventory[0].playerId, reserve.id);
   assert.deepEqual(e.saved().lineup, c.lineup); assert.match(e.root.querySelector('.rb-player-inspector').textContent, new RegExp(reserve.name));
   const restored = environment(e.storage.getItem('the-hub.rumbleball.career.v1')); mountCareer(restored.root, mountMatch); await button(restored.root, reserve.name).click(); assert.match(slotButton(restored.root, 'leftHand').textContent, /Tonfa/);

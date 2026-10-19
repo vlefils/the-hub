@@ -269,8 +269,7 @@ export function mountCareer(root, mountMatch) {
         locked, selectedSlot: preparationEquipmentSlot, selectedItem: preparationShopItem, onSlot: slot => { preparationEquipmentSlot = slot; preparationShopItem = undefined; }, onItem: id => { preparationShopItem = id; }, onBuy: (id, playerId, confirmed, location) => update(() => buyItem(career, id, playerId, confirmed, location)),
         onAssign: (id, playerId, location) => update(() => assignProtection(career, id, playerId, location)), onSell: id => update(() => sellProtection(career, id))
       }));
-      const slot = career.lineup.indexOf(p.id); if (slot >= 0) inspector.append(field('Remplacer ce titulaire', slotControls[slot]));
-      else inspector.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
+      if (!career.lineup.includes(p.id)) inspector.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
       const techniques = disclosure('Techniques et progression', 'player-techniques', el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`));
       for (const [label, description] of classAbilities(compiled)) techniques.append(el('h4', '', label), el('p', 'rb-muted', description)); inspector.append(techniques);
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length <= 5 ? 'Cinq joueurs minimum.' : '';

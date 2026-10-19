@@ -40,11 +40,11 @@ export function compilePlayer(player, inventory = []) {
   if (main) {
     const weapon = CATALOGUE[main.itemId], attackMod = modifier(weapon.finesse ? Math.max(abilities.strength, abilities.dexterity) : abilities.strength);
     const other = worn.find(item => CATALOGUE[item.itemId]?.slot === 'weapon' && item !== main);
-    result.attack = { bonus: attackMod + mastery, die: weapon.versatile && !other ? weapon.versatile : weapon.die, flat: attackMod };
+    result.attack = { bonus: attackMod + mastery + (weapon.enhancement ?? 0), die: weapon.versatile && !other ? weapon.versatile : weapon.die, flat: attackMod + (weapon.enhancement ?? 0) };
     result.weapon = { id: main.itemId, name: weapon.name, location: itemLocation(main) };
     if (secondary && weapon.light && CATALOGUE[secondary.itemId].light) {
       const off = CATALOGUE[secondary.itemId], mod = modifier(off.finesse ? Math.max(abilities.strength, abilities.dexterity) : abilities.strength);
-      result.offhandAttack = { bonus: mod + mastery, die: off.die, flat: Math.min(0, mod) };
+      result.offhandAttack = { bonus: mod + mastery + (off.enhancement ?? 0), die: off.die, flat: Math.min(0, mod) + (off.enhancement ?? 0) };
     }
   }
   if (player.fatigue >= 3) result.speed -= 1.5;

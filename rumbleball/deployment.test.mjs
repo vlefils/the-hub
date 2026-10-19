@@ -8,7 +8,7 @@ import { exportCareer, importCareer } from './career-storage.mjs';
 import { narrateTurn } from './narration.mjs';
 import { buildRoundPlayback, courtPoint, sampleRoundPlayback } from './playback.mjs';
 import { mountCareer } from './career-ui.mjs';
-import { deploymentEditor } from './deployment-ui.mjs';
+import { deploymentEditor, PLAYER_DRAG_TYPE } from './deployment-ui.mjs';
 import { environment, descendants, button, classNode } from './test-support/dom.mjs';
 
 const p = (state, id) => state.players.find((p) => p.id === id);
@@ -145,15 +145,15 @@ test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le t
   const form = classNode(e.root, 'rb-lineup-form'), editor = classNode(form, 'rb-deployment');
   await cell(editor, 0, 0).click(); assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 });
   await classNode(form, 'rb-lineup-slots').children[0].querySelector('button').click();
-  const replacement = descendants(classNode(form, 'rb-player-inspector')).find(n => n.dataset.focusKey === 'lineup-0'); replacement.value = e.saved().lineup[1]; await replacement.emit('change');
-  assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 }); assert.ok(editor.querySelector('select').children[0].textContent.includes(e.saved().clubs[0].players.find(p => p.id === e.saved().lineup[0]).name));
+  await cell(editor, 0, 0).emit('drop', { dataTransfer: { types: [PLAYER_DRAG_TYPE], getData: () => e.saved().lineup[1] } });
+  assert.deepEqual(e.saved().clubs[0].deployment[1], { x: 0, y: 0 }); assert.ok(editor.querySelector('select').children[1].textContent.includes(e.saved().clubs[0].players.find(p => p.id === e.saved().lineup[1]).name));
   await button(e.root, 'Lancer la rencontre').click();
-  assert.deepEqual(e.saved().current.state.players[0].position, { x: 0, y: 0 }); assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'hidden');
+  assert.deepEqual(e.saved().current.state.players[1].position, { x: 0, y: 0 }); assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'hidden');
   assert.match(classNode(e.root, 'rb-possession').textContent, /Ballon attendu au centre/);
   await button(e.root, 'Retour au club · mettre en pause').click();
   assert.ok(classNode(e.root, 'rb-deployment').querySelectorAll('.rb-deployment-cell').every((b) => b.disabled));
   const restored = environment(exportCareer(e.saved())); mountCareer(restored.root, mountMatch); await button(restored.root, 'Reprendre la rencontre').click();
-  assert.deepEqual(restored.saved().current.state.players[0].position, { x: 0, y: 0 }); assert.match(classNode(restored.root, 'rb-playback-status').textContent, /Pause/);
+  assert.deepEqual(restored.saved().current.state.players[1].position, { x: 0, y: 0 }); assert.match(classNode(restored.root, 'rb-playback-status').textContent, /Pause/);
 });
 
 test('exhibition : déploiement libre dans le vestiaire ; ballon masqué avant le coup d’envoi', async () => {

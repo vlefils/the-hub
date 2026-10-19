@@ -45,6 +45,8 @@ L’équipement utilise le même mannequin à sept slots que le solo : tête, to
 
 Les achats et ventes sont comptabilisés dans le solde prévisionnel. **Annuler la préparation** restaure intégralement le club précédent, y compris les contrats, opérations d’équipement et choix de caractéristiques de cette préparation ; les points redeviennent disponibles. Ce n’est pas une annulation de salaire, d’XP ou de résultat déjà acquis.
 
+Le catalogue partagé propose 29 objets, dont cinq armes de dotation gratuites et 15 nouveaux modèles illustrés. Seules les armes contondantes non létales sont autorisées. L’action `buy` conserve son nom pour équiper une dotation à prix zéro : le serveur impose le prix du catalogue, réutilise la réserve libre et ne crée aucun revenu lors de sa restitution. La dotation reste accessible à découvert, mais le verrouillage de la rencontre s’applique toujours. Les modèles payants ajoutent des bonus propres à l’arme, également calculés pour la main secondaire ; les armures ajoutent de la CA et aucun PV. Aucun SQL supplémentaire : redéployer les deux fonctions suffit.
+
 À 20 h, la préparation entière est adoptée, ou le club précédent est reconduit. Le verrouillage est contrôlé par l’horloge PostgreSQL lors de l’écriture, même si le worker n’a pas encore lancé sa première exécution. Un formulaire ouvert avant 20 h ne donne aucun droit d’enregistrer après cette limite.
 
 ## Architecture

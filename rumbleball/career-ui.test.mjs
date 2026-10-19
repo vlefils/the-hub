@@ -24,9 +24,11 @@ test('parcours UI : création, échange de titulaires, consignes, équipement et
   await button(e.root, 'Club').click();
   const form = classNode(e.root, 'rb-lineup-form');
   await classNode(e.root, 'rb-lineup-slots').children[0].querySelector('button').click();
-  const replacement = descendants(classNode(e.root, 'rb-player-inspector')).find(n => n.dataset.focusKey === 'lineup-0');
-  const [first, second] = c.lineup; replacement.value = second; await replacement.emit('change');
-  c = e.saved(); assert.deepEqual(c.lineup.slice(0, 2), [second, first]);
+  assert.doesNotMatch(classNode(e.root, 'rb-player-inspector').textContent, /Remplacer ce titulaire/);
+  const [first, second] = c.lineup, position = c.clubs[0].deployment[0];
+  await descendants(classNode(e.root, 'rb-deployment')).find(n => n.dataset.cell === `${position.x},${position.y}`).emit('drop', { dataTransfer: { types: [PLAYER_DRAG_TYPE], getData: () => second } });
+  const previousPositions = c.clubs[0].deployment.slice(0, 2); c = e.saved(); assert.deepEqual(c.lineup.slice(0, 2), [first, second]);
+  assert.deepEqual(c.clubs[0].deployment.slice(0, 2), previousPositions.toReversed());
   const strategy = descendants(form).find(n => n.dataset.focusKey === 'strategy'); strategy.value = 'pressing'; await strategy.emit('change'); assert.equal(e.saved().clubs[0].strategy, 'pressing');
   const buyVest = descendants(e.root).find((n) => n.tagName === 'button' && n.textContent.startsWith('Acheter et équiper') && n.textContent.endsWith('100 chromas'));
   await buyVest.click(); assert.equal(e.saved().inventory.length, 1); assert.equal(e.saved().balance, 800);

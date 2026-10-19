@@ -1,0 +1,102 @@
+{
+  "generator": "image_gen built-in",
+  "date": "2026-10-19",
+  "direction": "Cyberpunk sportif, contact contondant non létal",
+  "images": [
+    {
+      "id": "pulse_knuckles",
+      "file": "pulse_knuckles.webp",
+      "source": "exec-dd0e3060-b966-4178-844a-9a91dbf53030.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single heavy cyberpunk brass knuckle weapon, four reinforced finger rings under a segmented gunmetal impact plate, orange pulse coils, black grip, compact brutal silhouette. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "arc_tonfa",
+      "file": "arc_tonfa.webp",
+      "source": "exec-972e02fe-d2f6-4927-a4b5-543e532e9d6f.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single futuristic arena tonfa, short thick cobalt steel baton with one perpendicular grip, cyan induction strips, robust angular industrial casing, compact recognizable T-shaped silhouette. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "shock_bat",
+      "file": "shock_bat.webp",
+      "source": "exec-a1db9604-2f01-46bf-b003-c3fc1fec6d22.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single futuristic reinforced arena baseball bat, long tapered gunmetal striking barrel with orange kinetic dampers, black wrapped handle, clean recognizable baseball bat silhouette. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "gravity_maul",
+      "file": "gravity_maul.webp",
+      "source": "exec-dec178a1-cab3-4342-aa12-18fb33ad34b9.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single massive cyberpunk arena sledgehammer, blocky industrial steel hammer head with two luminous orange gravity-core rings and thick black reinforced long shaft, unmistakable heavy two-handed silhouette. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "aegis_shield",
+      "file": "aegis_shield.webp",
+      "source": "exec-1984b395-00d7-49d4-8fd3-b03331cab3d7.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single cyberpunk riot shield, tall angular compact navy titanium shield with reinforced silver edges, central cyan hexagonal energy core, orange hazard accent, front three-quarter view. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "ghost_baton",
+      "file": "ghost_baton.webp",
+      "source": "exec-417c6635-cfe7-4dc9-8147-bbcd5329bbe8.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single premium non-lethal cyberpunk arena stun baton, thick fully rounded cylindrical contact head with soft impact-damping graphite sleeves, short ergonomic black handle and small violet and cyan sensor lights. Clearly a blunt training baton with rounded end caps and no edges, no blade, no spikes, no sharp point, no cutting wire. Compact elegant advanced sports equipment. undefined",
+      "editPrompt": "Background extraction. Remove the entire arena background from this inventory illustration and produce real alpha transparency. Preserve exactly the same blunt non-lethal padded cyberpunk stun baton, every part of the object, its rounded end caps, colors, textures, mechanical detail, orientation and lighting. Keep the whole baton visible with safe transparent padding around it. No scenery, no floor, no shadow plane, no text, no sharp edges, no spikes, no blades. This must be a clean isolated game inventory cutout matching other transparent item icons."
+    },
+    {
+      "id": "optic_visor",
+      "file": "optic_visor.webp",
+      "source": "exec-3d84d504-f44b-406d-a6ff-5567fa32967f.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single cyberpunk sports protective visor, wraparound transparent cyan lens and dark gunmetal frame, two small optical sensor modules at temples, visibly wearable headgear, no head or person. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "bastion_helmet",
+      "file": "bastion_helmet.webp",
+      "source": "exec-63275a8f-6d3b-4a49-a4ae-d8d93f8cceaf.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single closed cyberpunk heavy arena helmet, angular navy steel plating and reinforced jaw guard, narrow orange visor slit, silver impact-resistant edges, no head or person. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "mesh_armor",
+      "file": "mesh_armor.webp",
+      "source": "exec-9a2d9b4f-8e9d-4382-b474-c888a2e46ff7.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single cyberpunk flexible ballistic sleeveless sports vest, dark navy woven carbon fabric, compact silver chest inserts and cyan seams, lightweight athletic cut, no body or person. Style: detailed hand-painted videogame loot icon with believable metal, worn edges, precise mechanical parts and controlled highlights. Entire object isolated centered, diagonally posed, filling 78% of image with generous safe padding. Real transparent background, no pedestal, no scenery, no lettering, no labels, no logo, no UI, no border, no other objects. Three-quarter view, soft cool studio light with warm edge highlights. Navy gunmetal, silver, restrained cyan and orange accents. Readable at 128px."
+    },
+    {
+      "id": "bulwark_armor",
+      "file": "bulwark_armor.webp",
+      "source": "exec-c784e9e1-05e1-4022-9b16-d49af655389a.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single heavy cyberpunk arena breastplate with broad angular shoulder guards, overlapping graphite steel armor plates, thick orange reinforced chest spine, protective silver edges, no body or personundefined"
+    },
+    {
+      "id": "grapple_gloves",
+      "file": "grapple_gloves.webp",
+      "source": "exec-998229a3-0858-4cad-933a-aa5d6aa3e5ba.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a pair of cyberpunk powered grappling gauntlets, articulated steel finger guards and reinforced knuckle plates, mechanical grip tendons and amber lights, empty wearable gloves, no hands or personundefined",
+      "editPrompt": "Background extraction only. Remove ALL background scenery, floor, environment, reflections, text, labels and UI around the inventory item in the provided image. Preserve the same complete item or pair of items, same design, colors, materials, details, angle and lighting. Deliver a clean cutout on genuinely fully transparent alpha background, including transparent space between the pair and between parts. Do not replace scenery with any color or texture. No ground plane, no pedestal, no city, no backdrop, no labels, no shadows beyond the object. Keep generous transparent padding on every side. This is a cyberpunk sports game inventory icon."
+    },
+    {
+      "id": "sprint_boots",
+      "file": "sprint_boots.webp",
+      "source": "exec-f5a886f7-e94b-42bf-bcf4-fb408cde6fe9.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a pair of cyberpunk sprint boots, streamlined navy carbon armored running footwear, compact orange spring propulsion units in heels, reinforced split soles, empty boots, no personundefined",
+      "editPrompt": "Background extraction only. Remove ALL background scenery, floor, environment, reflections, text, labels and UI around the inventory item in the provided image. Preserve the same complete item or pair of items, same design, colors, materials, details, angle and lighting. Deliver a clean cutout on genuinely fully transparent alpha background, including transparent space between the pair and between parts. Do not replace scenery with any color or texture. No ground plane, no pedestal, no city, no backdrop, no labels, no shadows beyond the object. Keep generous transparent padding on every side. This is a cyberpunk sports game inventory icon."
+    },
+    {
+      "id": "ghost_boots",
+      "file": "ghost_boots.webp",
+      "source": "exec-d518fe5a-60e7-417e-b4df-9a2ddebc1a4e.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a pair of sleek cyberpunk acrobatic boots, dark flexible graphite footwear with cyan articulated ankle pivots and finely segmented silver anti-slip soles, empty boots, no personundefined",
+      "editPrompt": "Background extraction only. Remove ALL background scenery, floor, environment, reflections, text, labels and UI around the inventory item in the provided image. Preserve the same complete item or pair of items, same design, colors, materials, details, angle and lighting. Deliver a clean cutout on genuinely fully transparent alpha background, including transparent space between the pair and between parts. Do not replace scenery with any color or texture. No ground plane, no pedestal, no city, no backdrop, no labels, no shadows beyond the object. Keep generous transparent padding on every side. This is a cyberpunk sports game inventory icon."
+    },
+    {
+      "id": "kinetic_implant",
+      "file": "kinetic_implant.webp",
+      "source": "exec-7f71f431-ad23-40e1-992c-1d987de657ed.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single compact cyberpunk neuromuscular implant module, oval graphite power core connected to silver woven artificial muscle fiber bundles, amber energy channels, recognizable installable sci-fi medical hardwareundefined",
+      "editPrompt": "Background extraction only. Remove ALL background scenery, floor, environment, reflections, text, labels and UI around the inventory item in the provided image. Preserve the same complete item or pair of items, same design, colors, materials, details, angle and lighting. Deliver a clean cutout on genuinely fully transparent alpha background, including transparent space between the pair and between parts. Do not replace scenery with any color or texture. No ground plane, no pedestal, no city, no backdrop, no labels, no shadows beyond the object. Keep generous transparent padding on every side. This is a cyberpunk sports game inventory icon."
+    },
+    {
+      "id": "reflex_implant",
+      "file": "reflex_implant.webp",
+      "source": "exec-10e8d84e-d1e4-4819-926a-f02fd33a0c45.png",
+      "prompt": "Use case: stylized-concept. Asset type: premium cyberpunk sports management RPG inventory item illustration, square 1024 image. Primary request: a single compact cyberpunk neural reflex implant, dark circular processor core with luminous cyan center, delicate branching silver neural connectors, a violet microchip interface, recognizable installable sci-fi medical hardwareundefined"
+    }
+  ]
+}

@@ -8,7 +8,7 @@ import { identifyCareer, identifyClub, playerGender, validCrest } from './identi
 import { clubDeployment, validDeployment } from './deployment.mjs';
 import { DEFAULT_OPENING, clubOpening, openingDeployment, validOpening } from './openings.mjs';
 import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture } from './playoffs.mjs';
-import { equipMutable, compatibleLocation, equipmentDefinition } from './equipment.mjs';
+import { equipMutable, compatibleLocation, equipmentDefinition, itemLocation } from './equipment.mjs';
 
 export const SEASON_PRIZES = [600, 400, 200, 100, 100, 100];
 const CLUBS = [
@@ -43,9 +43,9 @@ export function ensureCareerPlayoffs(career) {
 }
 const editable = (career) => need(career.status === 'active' && !managementLocked(career), 'La gestion est verrouillée pendant la rencontre.');
 export function purchaseBlock(career, price) {
-  return managementLocked(career) ? 'Rencontre en cours : gestion en lecture seule.' : career.balance < 0 ? 'Salaires impayés : remboursez le solde avant tout achat.' : career.balance < price ? `Il manque ${price - career.balance} chromas.` : '';
+  return managementLocked(career) ? 'Rencontre en cours : gestion en lecture seule.' : price > 0 && career.balance < 0 ? 'Salaires impayés : remboursez le solde avant tout achat.' : price > 0 && career.balance < price ? `Il manque ${price - career.balance} chromas.` : '';
 }
-function spend(career, amount, label) { need(!purchaseBlock(career, amount), purchaseBlock(career, amount)); transact(career, -amount, label); }
+function spend(career, amount, label) { need(!purchaseBlock(career, amount), purchaseBlock(career, amount)); transact(career, amount === 0 ? 0 : -amount, label); }
 function transact(career, amount, label, fixtureId = null) {
   career.balance += amount;
   career.transactions.push({ id: `t${career.transactions.length + 1}`, season: career.season, day: Math.min(10, career.day + 1), amount, label, fixtureId, balance: career.balance });
@@ -145,6 +145,13 @@ export function buyItem(input, itemId, playerId = null, replaceConfirmed = false
   need(location === undefined || compatibleLocation(itemId, location), 'Emplacement incompatible.');
   const p = ownedPlayers(c).find((q) => q.id === playerId);
   need(playerId === null || p, 'Joueur inconnu.');
+  if (item.price === 0) {
+    need(p, 'Sélectionnez un joueur pour cette dotation gratuite.');
+    const current = c.inventory.find(q => q.itemId === itemId && q.playerId === p.id && (item.hands === 2 || itemLocation(q) === (location ?? 'rightHand')));
+    if (current) return c;
+    const reserve = c.inventory.find(q => q.itemId === itemId && q.playerId === null);
+    if (reserve) { assignProtectionMutable(c, reserve.id, p.id, location); return c; }
+  }
   if (item.slot === 'implant') { need(p, 'Sélectionnez un joueur.'); need(!p.implant || replaceConfirmed, 'Le remplacement détruit l’ancien implant. Confirmez ce remplacement.'); }
   spend(c, item.price, `${item.name}${p ? ` : ${p.name}` : ''}`);
   if (item.slot === 'implant') p.implant = itemId;
@@ -192,12 +199,16 @@ function manageAiClub(c, club, fixture, wages, winnerId) {
   order.push(...club.players.filter(p => !order.includes(p)));
   const unprotected = order.find(p => !club.inventory.some(item => item.playerId === p.id && CATALOGUE[item.itemId]?.slot === 'protection'));
   const implant = order.find(p => !p.implant && club.inventory.some(item => item.playerId === p.id && CATALOGUE[item.itemId]?.slot === 'protection'));
-  const unarmed = order.find(p => !club.inventory.some(item => item.playerId === p.id && CATALOGUE[item.itemId]?.slot === 'weapon'));
-  if (unarmed && club.players.some(p => p.implant) && (c.completedDays + 1) % 2 === 0) {
-    const itemId = PROFILES[unarmed.profile].archetype === 'belier' ? 'maul' : 'tonfa';
-    if (budget() >= CATALOGUE[itemId].price) {
-      transaction(-CATALOGUE[itemId].price, `${CATALOGUE[itemId].name} : ${unarmed.name}`);
-      const id = `${club.id}-gear-${club.transactions.length}`; club.inventory.push({ id, itemId, playerId: null }); equipMutable(club.inventory, id, unarmed.id, 'rightHand'); return;
+  const armable = order.find(p => !club.inventory.some(item => item.playerId === p.id && (CATALOGUE[item.itemId]?.enhancement ?? 0) > 0));
+  if (armable && club.players.some(p => p.implant) && (c.completedDays + 1) % 2 === 0) {
+    const heavy = PROFILES[armable.profile].archetype === 'belier', upgrade = heavy ? 'gravity_maul' : 'arc_tonfa';
+    const armed = club.inventory.some(item => item.playerId === armable.id && CATALOGUE[item.itemId]?.die);
+    const itemId = budget() >= CATALOGUE[upgrade].price ? upgrade : !armed ? heavy ? 'maul' : 'tonfa' : null;
+    if (itemId) {
+      transaction(CATALOGUE[itemId].price === 0 ? 0 : -CATALOGUE[itemId].price, `${CATALOGUE[itemId].name} : ${armable.name}`);
+      const reserve = CATALOGUE[itemId].price === 0 && club.inventory.find(item => item.itemId === itemId && item.playerId === null);
+      const id = reserve?.id ?? `${club.id}-gear-${club.transactions.length}`;
+      if (!reserve) club.inventory.push({ id, itemId, playerId: null }); equipMutable(club.inventory, id, armable.id, 'rightHand'); return;
     }
   }
   const firstImplant = implant && club.inventory.length >= 3 && !club.players.some(p => p.implant);
