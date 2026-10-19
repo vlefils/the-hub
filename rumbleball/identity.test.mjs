@@ -38,9 +38,9 @@ test('identités : visages distincts, conservés après contrat, recrutement, é
   assert.throws(() => setClubCrest(launched, 'hound'), /verrouillée/); assert.throws(() => setClubCrest(c, 'external-url'), /inconnu/);
 });
 
-test('ancienne carrière : lecture sans mutation, attribution à la prochaine action et match commencé préservé', () => {
+test('ancienne carrière : identités complétées à la lecture sans modifier l’original ni le match commencé', () => {
   const old = club(); for (const c of old.clubs) { delete c.crestId; for (const p of c.players) delete p.portraitId; } for (const p of old.market) delete p.portraitId;
-  const loaded = importCareer(exportCareer(old)); assert.deepEqual(loaded, old);
+  const loaded = importCareer(exportCareer(old)); assert.ok(loaded.clubs.every(club => club.players.every(p => p.portraitId))); assert.ok(loaded.clubs.every(club => club.crestId));
   const changed = setClubCrest(loaded, 'hound'); assert.ok(changed.clubs[0].players.every(p => p.portraitId)); assert.equal(old.clubs[0].players[0].portraitId, undefined);
   const launched = launchCareerMatch(changed), frozen = structuredClone(launched.current);
   const copied = structuredClone(launched); delete copied.clubs[0].crestId; copied.clubs[0].players.forEach(p => delete p.portraitId);

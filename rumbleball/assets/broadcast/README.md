@@ -20,7 +20,7 @@ Les premières productions ont porté sur quatre portraits, quatre emblèmes et 
 
 ## Identités et extension
 
-`portraitId` et `crestId` sont des références stables au catalogue de `identity.mjs`. Ne pas renommer un identifiant déjà utilisé dans une sauvegarde. Ajouter un nouveau visuel avec un nouvel identifiant et ses métadonnées de peau, de cheveux et de coiffure.
+`portraitId` et `crestId` sont des références stables au catalogue de `identity.mjs`. Ne pas renommer un identifiant déjà utilisé dans une sauvegarde. Ajouter un nouveau visuel avec un nouvel identifiant et ses métadonnées de peau, de cheveux, de coiffure et de genre (`female`, `male`, `neutral`). Le genre correspond à la description d’origine du personnage illustré ; il n’est pas déduit de sa coiffure. L’identité `Prénom "Pseudo" Nom` est générée après l’attribution du portrait pour accorder le prénom et le pseudo. Les personnages androgynes utilisent des prénoms épicènes et des pseudos neutres.
 
 Les nouvelles attributions évitent les doublons et équilibrent les peaux au sein de l’effectif et du marché. Le portrait ne dépend ni de la classe ni des achats. Les traits permanents du visage (mâchoire, optique, visière, peinture ou patch) sont cosmétiques et repris sur les pions ; ils n’accordent aucun bonus. Les équipements sportifs réellement achetés restent représentés séparément par le dessin du pion et par les emplacements de la fiche.
 

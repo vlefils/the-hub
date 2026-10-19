@@ -3,8 +3,7 @@ import { CATALOGUE, MAX_SQUAD_SIZE } from './progression.mjs';
 import { assertInvariants } from './rules.mjs';
 import { createMatch } from './engine.mjs';
 import { validKitColor } from './appearance.mjs';
-import { validCrest, validPortrait } from './identity.mjs';
-import { replaceLegacyPlayerNames } from './player-names.mjs';
+import { validCrest, validPortrait, identifyCareer } from './identity.mjs';
 import { validDeployment } from './deployment.mjs';
 import { validOpening } from './openings.mjs';
 
@@ -133,9 +132,7 @@ export function importCareer(json) {
   if (typeof json !== 'string' || json.length > 8_000_000) throw new Error('Fichier JSON trop volumineux.');
   let data; try { data = JSON.parse(json); } catch { throw new Error('Ce fichier ne contient pas un JSON lisible.'); }
   if (data?.format !== 'the-hub-rumbleball' || data.version !== 1) throw new Error('Format de carrière inconnu.');
-  const career = validateCareer(data.career);
-  replaceLegacyPlayerNames([...career.clubs.flatMap(club => club.players), ...career.market], `${career.seed}:players`);
-  return career;
+  return identifyCareer(validateCareer(data.career));
 }
 export function loadCareer(storage) {
   try { const raw = storage.getItem(CAREER_KEY); return { career: raw ? importCareer(raw) : null, error: null, hasSave: Boolean(raw) }; }

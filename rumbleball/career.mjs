@@ -3,7 +3,7 @@ import { createMatch, simulateMatch, seedHash, CURRENT_RULES } from './engine.mj
 import { compilePlayer, recruitmentPrice, salary, levelOf, progressPlayer, CATALOGUE, XP_THRESHOLDS, MAX_SQUAD_SIZE } from './progression.mjs';
 import { playerName } from './player-names.mjs';
 import { KIT_COLORS, clubKit, validKitColor } from './appearance.mjs';
-import { identifyCareer, validCrest } from './identity.mjs';
+import { identifyCareer, identifyClub, playerGender, validCrest } from './identity.mjs';
 import { clubDeployment, validDeployment } from './deployment.mjs';
 import { DEFAULT_OPENING, clubOpening, openingDeployment, validOpening } from './openings.mjs';
 
@@ -44,10 +44,12 @@ function player(id, name, profile, level = 1) {
 function generateMarket(career, initial = false) {
   const profiles = initial ? [0, 1, 2, 3, 4, 0, 0, 1, 2, 2, 4, 4] : [0, 1, 2, 4, ...shuffle([0, 1, 2, 3, 4], `${career.seed}:market:${career.completedDays}`).slice(0, 2)];
   const used = new Set(career.clubs.flatMap(club => club.players.map(p => p.name)));
-  return profiles.map((profile, index) => {
+  const market = profiles.map((profile, index) => {
     const id = `offer-${career.completedDays}-${index}`, name = initial && index < 5 ? PROFILES[profile].trainingName : playerName(`${career.seed}:name:${id}`, used); used.add(name);
     return player(id, name, profile, Math.min(5, 1 + Math.floor(career.completedDays / 5)));
   });
+  identifyClub(team(career), `${career.seed}:club`, market);
+  return market;
 }
 function seasonSchedule(career) {
   const ids = shuffle(career.clubs.map((c) => c.id), `${career.seed}:schedule:${career.season}`), first = [];
@@ -161,6 +163,8 @@ function manageAiClub(c, club, fixture, wages, winnerId) {
     const profile = [...new Set(preferred)].sort((a, b) => count(a) - count(b))[0];
     const id = `${club.id}-recruit-${c.completedDays + 1}`, used = new Set(c.clubs.flatMap(other => other.players.map(p => p.name)).concat(c.market.map(p => p.name)));
     const p = player(id, playerName(`${c.seed}:name:${id}`, used), profile, Math.min(5, 1 + Math.floor((c.completedDays + 1) / 5)));
+    identifyClub(club, `${c.seed}:${club.id}`, [p]);
+    p.name = playerName(`${c.seed}:name:${id}`, used, playerGender(p));
     if (budget() >= recruitmentPrice(p) + salary(p)) { transaction(-recruitmentPrice(p), `Recrutement : ${p.name}`); club.players.push(p); recruited = true; }
   }
   // Keep savings for the next contract instead of spending them on gear daily.

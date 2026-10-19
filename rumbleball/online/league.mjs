@@ -6,7 +6,6 @@ import { createMatch, stepMatch, CURRENT_RULES } from '../engine.mjs';
 import { compilePlayer, salary, progressPlayer } from '../progression.mjs';
 import { clubDeployment } from '../deployment.mjs';
 import { clubOpening } from '../openings.mjs';
-import { playerName } from '../player-names.mjs';
 
 export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: 3500 });
 const need = (ok, message) => { if (!ok) throw new Error(message); };
@@ -34,8 +33,7 @@ export function makeClub(userId, name, seed, color = '#35bdb3', crestId, cosmeti
   career = confirmDraft(career, career.market.slice(0, 6).map((p) => p.id));
   // Public cosmetic choices must not encode any part of the secret match seed.
   delete career.clubs[0].crestId;
-  const used = new Set();
-  for (const p of [...career.clubs[0].players, ...career.market]) { delete p.portraitId; p.name = playerName(`${cosmeticNamespace}:name:${p.id}`, used); used.add(p.name); }
+  for (const p of [...career.clubs[0].players, ...career.market]) { delete p.portraitId; p.name = ''; }
   identifyClub(career.clubs[0], cosmeticNamespace, career.market);
   if (crestId !== undefined) { need(validCrest(crestId), 'Blason inconnu.'); career = setClubCrest(career, crestId); }
   return { ...career.clubs[0], id: userId, lineup: career.lineup, inventory: career.inventory, market: career.market,
@@ -141,8 +139,7 @@ function settle(s, game) {
     const offers = createCareer(c.name, `${s.seed}:${id}:market:${s.completedDays + 1}`, c.kitColor).market;
     const indices = [0, 1, 2, 4, 8, 10];
     c.market = indices.map((i, n) => ({ ...offers[i], id: `offer-${s.completedDays + 1}-${n}`, xp: [0, 20, 50, 90, 140][Math.min(4, Math.floor((s.completedDays + 1) / 5))] }));
-    const used = new Set(c.players.map(p => p.name));
-    for (const p of c.market) { delete p.portraitId; p.name = playerName(`${s.id}:${id}:name:${p.id}`, used); used.add(p.name); }
+    for (const p of c.market) { delete p.portraitId; p.name = ''; }
     identifyClub(c, `${s.id}:${id}`, c.market);
   }
   game.settled = true;
@@ -194,7 +191,7 @@ export function replayProjection(s, userId, matchId, archive, now) {
 }
 export function leagueProjection(s, userId, now) {
   const member = s.members.find((m) => m.userId === userId); need(member, 'Accès réservé aux participants.');
-  const ownClub = identifyClub(copy(member.draft ?? member.club), `${s.id}:${userId}`, []);
+  const ownClub = copy(member.draft ?? member.club);
   identifyClub(ownClub, `${s.id}:${userId}`, ownClub.market);
   const t = instant(now), night = s.night;
   const games = night?.games.map((g) => {

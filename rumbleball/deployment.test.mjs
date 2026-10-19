@@ -146,7 +146,7 @@ test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le t
   await cell(editor, 0, 0).click(); assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 });
   await classNode(form, 'rb-lineup-slots').children[0].querySelector('button').click();
   const replacement = descendants(classNode(form, 'rb-player-inspector')).find(n => n.dataset.focusKey === 'lineup-0'); replacement.value = e.saved().lineup[1]; await replacement.emit('change');
-  assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 }); assert.match(editor.querySelector('select').children[0].textContent, /Brique/);
+  assert.deepEqual(e.saved().clubs[0].deployment[0], { x: 0, y: 0 }); assert.ok(editor.querySelector('select').children[0].textContent.includes(e.saved().clubs[0].players.find(p => p.id === e.saved().lineup[0]).name));
   await button(e.root, 'Lancer la rencontre').click();
   assert.deepEqual(e.saved().current.state.players[0].position, { x: 0, y: 0 }); assert.equal(classNode(e.root, 'rb-center-zone').getAttribute('visibility'), 'hidden');
   assert.match(classNode(e.root, 'rb-possession').textContent, /Ballon attendu au centre/);

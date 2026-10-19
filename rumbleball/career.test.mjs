@@ -21,7 +21,7 @@ test('création : douze profils fixes, trois par archétype, cinq Recrues, contr
   const c = createCareer('  Les Rebuts  ', 'draft'); const original = structuredClone(c);
   assert.equal(c.balance, 2400); assert.equal(c.market.length, 12); assert.equal(c.clubs[0].name, 'Les Rebuts');
   for (const type of ['belier', 'escamoteur', 'capitaine', 'passeur']) assert.equal(c.market.filter((p) => PROFILES[p.profile].archetype === type).length, 3);
-  assert.deepEqual(c.market.slice(0, 5).map((p) => p.name), PROFILES.map((p) => p.trainingName));
+  assert.ok(c.market.every(p => /^[^"\n]+ "[^"\n]+" [^"\n]+$/.test(p.name)));
   assert.throws(() => confirmDraft(c, c.market.slice(0, 4).map((p) => p.id)), /cinq/);
   assert.throws(() => confirmDraft(c, c.market.slice(0, 11).map((p) => p.id)), /dix/);
   assert.throws(() => confirmDraft(c, c.market.slice(0, 9).map((p) => p.id)), /manque/);

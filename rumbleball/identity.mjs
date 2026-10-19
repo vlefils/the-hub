@@ -1,33 +1,38 @@
 // Stable cosmetic catalogue. Never import the simulation RNG here.
-import { replaceLegacyPlayerNames } from './player-names.mjs';
+import { normalisePlayerNames } from './player-names.mjs';
 const asset = (path) => new URL(`./assets/broadcast/${path}`, import.meta.url).href;
 export const PORTRAITS = Object.freeze([
   {
     "id": "p01",
+    "gender": "female",
     "skin": "#f2c7a5",
     "hair": "#242525",
     "hairStyle": "crop"
   },
   {
     "id": "p02",
+    "gender": "male",
     "skin": "#dca27c",
     "hair": "#513628",
     "hairStyle": "sweep"
   },
   {
     "id": "p03",
+    "gender": "neutral",
     "skin": "#bb805b",
     "hair": "#815032",
     "hairStyle": "mohawk"
   },
   {
     "id": "p04",
+    "gender": "female",
     "skin": "#975e40",
     "hair": "#cc9b4c",
     "hairStyle": "bald"
   },
   {
     "id": "p05",
+    "gender": "male",
     "skin": "#704630",
     "hair": "#b5b2a6",
     "hairStyle": "bun",
@@ -37,6 +42,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p06",
+    "gender": "neutral",
     "skin": "#493025",
     "hair": "#b95f42",
     "hairStyle": "braids",
@@ -46,6 +52,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p07",
+    "gender": "female",
     "skin": "#f2c7a5",
     "hair": "#597b82",
     "hairStyle": "crop",
@@ -55,6 +62,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p08",
+    "gender": "male",
     "skin": "#dca27c",
     "hair": "#9d577e",
     "hairStyle": "sweep",
@@ -64,6 +72,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p09",
+    "gender": "neutral",
     "skin": "#bb805b",
     "hair": "#242525",
     "hairStyle": "mohawk",
@@ -73,6 +82,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p10",
+    "gender": "female",
     "skin": "#975e40",
     "hair": "#513628",
     "hairStyle": "bald",
@@ -82,6 +92,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p11",
+    "gender": "male",
     "skin": "#704630",
     "hair": "#815032",
     "hairStyle": "bun",
@@ -91,6 +102,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p12",
+    "gender": "neutral",
     "skin": "#493025",
     "hair": "#cc9b4c",
     "hairStyle": "braids",
@@ -100,6 +112,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p13",
+    "gender": "female",
     "skin": "#f2c7a5",
     "hair": "#b5b2a6",
     "hairStyle": "crop",
@@ -109,6 +122,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p14",
+    "gender": "male",
     "skin": "#dca27c",
     "hair": "#b95f42",
     "hairStyle": "sweep",
@@ -118,6 +132,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p15",
+    "gender": "neutral",
     "skin": "#bb805b",
     "hair": "#597b82",
     "hairStyle": "mohawk",
@@ -127,6 +142,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p16",
+    "gender": "female",
     "skin": "#975e40",
     "hair": "#9d577e",
     "hairStyle": "bald",
@@ -136,6 +152,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p17",
+    "gender": "male",
     "skin": "#704630",
     "hair": "#242525",
     "hairStyle": "bun",
@@ -145,6 +162,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p18",
+    "gender": "neutral",
     "skin": "#493025",
     "hair": "#513628",
     "hairStyle": "braids",
@@ -154,6 +172,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p19",
+    "gender": "female",
     "skin": "#f2c7a5",
     "hair": "#815032",
     "hairStyle": "crop",
@@ -163,6 +182,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p20",
+    "gender": "male",
     "skin": "#dca27c",
     "hair": "#cc9b4c",
     "hairStyle": "sweep",
@@ -172,6 +192,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p21",
+    "gender": "neutral",
     "skin": "#bb805b",
     "hair": "#b5b2a6",
     "hairStyle": "mohawk",
@@ -181,6 +202,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p22",
+    "gender": "female",
     "skin": "#975e40",
     "hair": "#b95f42",
     "hairStyle": "bald",
@@ -190,6 +212,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p23",
+    "gender": "male",
     "skin": "#704630",
     "hair": "#597b82",
     "hairStyle": "bun",
@@ -199,6 +222,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p24",
+    "gender": "neutral",
     "skin": "#493025",
     "hair": "#9d577e",
     "hairStyle": "braids",
@@ -208,6 +232,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p25",
+    "gender": "female",
     "skin": "#f2c7a5",
     "hair": "#242525",
     "hairStyle": "crop",
@@ -217,6 +242,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p26",
+    "gender": "male",
     "skin": "#dca27c",
     "hair": "#513628",
     "hairStyle": "sweep",
@@ -226,6 +252,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p27",
+    "gender": "neutral",
     "skin": "#bb805b",
     "hair": "#815032",
     "hairStyle": "mohawk",
@@ -235,6 +262,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p28",
+    "gender": "female",
     "skin": "#975e40",
     "hair": "#cc9b4c",
     "hairStyle": "bald",
@@ -244,6 +272,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p29",
+    "gender": "male",
     "skin": "#704630",
     "hair": "#b5b2a6",
     "hairStyle": "bun",
@@ -253,6 +282,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p30",
+    "gender": "neutral",
     "skin": "#493025",
     "hair": "#b95f42",
     "hairStyle": "braids",
@@ -262,6 +292,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p31",
+    "gender": "female",
     "skin": "#f2c7a5",
     "hair": "#597b82",
     "hairStyle": "crop",
@@ -271,6 +302,7 @@ export const PORTRAITS = Object.freeze([
   },
   {
     "id": "p32",
+    "gender": "male",
     "skin": "#dca27c",
     "hair": "#9d577e",
     "hairStyle": "sweep",
@@ -356,10 +388,9 @@ export function cosmeticHash(value) {
   return hash;
 }
 // Mutates only a caller-owned copy. Existing identities always take precedence.
-export function identifyClub(club, namespace, market = []) {
+function identifyPortraits(club, namespace, market = []) {
   if (!validCrest(club.crestId)) club.crestId = CRESTS[cosmeticHash(`${namespace}:crest`) % CRESTS.length].id;
   const players = [...club.players, ...market], used = new Set(players.filter(p => validPortrait(p.portraitId)).map(p => p.portraitId));
-  replaceLegacyPlayerNames(players, namespace);
   for (const p of players) {
     if (validPortrait(p.portraitId)) continue;
     let index = cosmeticHash(`${namespace}:portrait:${p.id}`) % PORTRAITS.length;
@@ -371,8 +402,14 @@ export function identifyClub(club, namespace, market = []) {
   }
   return club;
 }
+export const playerGender = player => portraitById(player.portraitId)?.gender ?? 'neutral';
+export function identifyClub(club, namespace, market = []) {
+  identifyPortraits(club, namespace, market);
+  normalisePlayerNames([...club.players, ...market], namespace, playerGender);
+  return club;
+}
 export function identifyCareer(career) {
-  replaceLegacyPlayerNames([...career.clubs.flatMap(club => club.players), ...career.market], `${career.seed}:players`);
-  for (const c of career.clubs) identifyClub(c, `${career.seed}:${c.id}`, c.id === 'club' ? career.market : []);
+  for (const c of career.clubs) identifyPortraits(c, `${career.seed}:${c.id}`, c.id === 'club' ? career.market : []);
+  normalisePlayerNames([...career.clubs.flatMap(club => club.players), ...career.market], `${career.seed}:players`, playerGender);
   return career;
 }
