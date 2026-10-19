@@ -100,7 +100,11 @@ test('Club : rôle et consigne dans la fiche à droite avec l’équipement', as
 test('replays UI : consultation en période verrouillée, parcours et retour sans mutation de ligue', async t => {
   const e = await online(t); await e.finishNight(); await e.lock();
   const before = structuredClone(e.state());
-  await button(e.root, 'Ligue').click(); assert.equal(button(e.root, 'Voir le replay').disabled, undefined);
+  await button(e.root, 'Ligue').click();
+  await descendants(e.root).find(n => n.tagName === 'button' && n.textContent.startsWith('Replays des rencontres ·')).click();
+  assert.equal(e.root.querySelector('.rb-management-dialog').open, true); assert.equal(button(e.root, 'Voir le replay').disabled, undefined);
+  await e.poll(); await e.root.querySelector('.rb-management-dialog').emit('cancel');
+  assert.equal(document.activeElement.dataset.focusKey, 'league-replays'); await document.activeElement.click();
   await button(e.root, 'Voir le replay').click();
   assert.equal(e.root.querySelector('.rb-replay-area').hidden, false); assert.equal(e.root.querySelector('.rb-online-content').hidden, true);
   await button(e.root.querySelector('.rb-replay-area'), 'Round suivant').click();

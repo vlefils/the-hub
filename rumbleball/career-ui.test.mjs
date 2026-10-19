@@ -266,6 +266,17 @@ test('banc de cinq : sélectionner et gérer le dernier remplaçant sans modifie
   assert.ok(descendants(classNode(e.root, 'rb-management-dialog')).filter(n => n.dataset.focusKey?.startsWith('recruit-')).every(n => n.disabled));
 });
 
+test('Ligue : club cliquable, effectif et rotation en modale, fermeture sans mutation', async () => {
+  const base = createCareer('Les Compacts', 'compact-clubs'), c = confirmDraft(base, base.market.slice(0, 5).map(p => p.id)), opponent = c.clubs[1];
+  const e = environment(exportCareer(c)); mountCareer(e.root, (await import('./ui.mjs')).mountMatch); await button(e.root, 'Ligue').click();
+  assert.equal(descendants(e.root).some(n => n.dataset.sectionKey === 'league-opponents'), false);
+  const trigger = button(e.root, `Voir le club ${opponent.name}`), before = e.storage.getItem(CAREER_KEY); trigger.focus(); await trigger.click();
+  const dialog = classNode(e.root, 'rb-management-dialog'); assert.equal(dialog.open, true); assert.match(dialog.textContent, /Clubs adverses et rotation/);
+  assert.match(dialog.textContent, /Titulaire/); assert.match(dialog.textContent, /Banc/); assert.match(dialog.textContent, /Équipement/);
+  for (const player of opponent.players) assert.ok(dialog.textContent.includes(player.name));
+  await dialog.emit('cancel'); assert.equal(dialog.hidden, true); assert.equal(document.activeElement, trigger); assert.equal(e.storage.getItem(CAREER_KEY), before);
+});
+
 test('recrutement solo : modale depuis la liste, arrivée sur le banc et fermeture sans quitter Club', async () => {
   let c = createCareer('Les Recruteurs', 'ui-recruit-dialog'); c = confirmDraft(c, c.market.slice(0, 5).map(p => p.id));
   const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);

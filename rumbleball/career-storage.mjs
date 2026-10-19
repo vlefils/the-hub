@@ -107,7 +107,7 @@ export function validateCareer(c) {
     if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, m.state.version >= 6 ? 1 : 10));
     else check(m.state.result === null);
     check(['home', 'away'].every((side) => m.state.stats?.[side] && ['passesAttempted', 'passesCompleted', 'recoveries', 'knockouts'].every((key) => integer(m.state.stats[side][key]))));
-    check([2, 3, 4, 5, 6].includes(m.state.version));
+    check([2, 3, 4, 5, 6, 7].includes(m.state.version));
     check(m.config.rulesVersion === undefined || m.config.rulesVersion === m.state.version);
     const initial = createMatch({ ...m.config, rulesVersion: m.state.version });
     if (m.state.version >= 4) check(m.state.teams.every((team, i) => validOpening(team.opening) && team.opening === initial.teams[i].opening));

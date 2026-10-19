@@ -23,8 +23,8 @@ export async function mountOnline(root, config, connect) {
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
   const replayArea = el('section', 'rb-replay-area'); replayArea.hidden = true;
   root.append(top, notice, content, live, replayArea);
-  let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30;
-  const modal = managementDialog(root, () => { marketOpen = false; });
+  let teamDraft = null, marketOpen = false, replaysOpen = false, replayView = null, replayOpen = false, replayLimit = 30;
+  const modal = managementDialog(root, () => { marketOpen = replaysOpen = false; });
   let client, user, league, tab = 'Club', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false;
   function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; if (error && modal.visible) modal.message(text); }
   async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; if (modal.visible) modal.message(''); try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
@@ -115,6 +115,7 @@ export async function mountOnline(root, config, connect) {
   function renderLeague() {
     if (replayOpen) return;
     content.className = 'rb-online-content';
+    content.dataset.workspaceScreen = tab;
     content.replaceChildren(); live.hidden = true;
     const c = league.club, heading = el('div', 'rb-online-identity'), copy = el('div');
     const stage = league.phase === 'playoffs' ? currentPlayoffRound(league.playoffs)?.name ?? 'Playoffs' : `Phase de groupe · journée ${league.day + 1}`;
@@ -135,8 +136,10 @@ export async function mountOnline(root, config, connect) {
     }
     const fixture = league.upcoming.find(f => [f.homeId, f.awayId].includes(c.id));
     const otherId = fixture && (fixture.homeId === c.id ? fixture.awayId : fixture.homeId), opponent = league.members.find(m => m.userId === otherId);
-    if (opponent) content.append(matchBanner(c, opponent, league.locked ? 'Soirée en cours' : league.nextLockAt ? '20 h · Paris' : 'Saison à préparer', lockMessage));
-    else content.append(el('p', league.locked ? 'rb-online-lock' : 'rb-muted', lockMessage));
+    if (tab === 'Club') {
+      if (opponent) content.append(matchBanner(c, opponent, league.locked ? 'Soirée en cours' : league.nextLockAt ? '20 h · Paris' : 'Saison à préparer', lockMessage));
+      else content.append(el('p', league.locked ? 'rb-online-lock' : 'rb-muted', lockMessage));
+    }
     if (league.phase === 'playoffs') content.append(el('p', 'rb-competition-status', fixture ? `${stage} · élimination directe` : 'Votre club ne dispute plus les playoffs. Suivez les rencontres et le tableau dans Ligue.'));
     const lastChampion = league.playoffHistory?.at(-1);
     if (lastChampion) content.append(el('p', 'rb-competition-status', `Champion de la saison ${lastChampion.season} : ${league.members.find(member => member.userId === lastChampion.bracket.championId)?.name}`));
@@ -146,7 +149,9 @@ export async function mountOnline(root, config, connect) {
     if (tab === 'Club') renderTeam(body, c);
     if (tab === 'Ligue') {
       const overview = el('div', 'rb-league-layout'), ranking = el('section'), programme = el('section');
-      body.append(pageHeading('La ligue', `Saison ${league.season} · ${stage}`));
+      const title = pageHeading('La ligue', `Saison ${league.season} · ${stage}`);
+      const replays = btn(`Replays des rencontres · ${league.history.length}`, () => { replaysOpen = true; modal.body.replaceChildren(); renderReplays(modal.body); modal.show('Replays des rencontres', replays); });
+      replays.classList.add('rb-quiet-action'); replays.dataset.focusKey = 'league-replays'; replays.setAttribute('aria-haspopup', 'dialog'); replays.setAttribute('data-readonly-control', 'true'); title.append(replays); body.append(title);
       ranking.append(el('h3', '', 'Classement · phase de groupe'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id), qualifying: playoffPlaces(league.capacity) }), qualificationLegend(playoffPlaces(league.capacity)));
       programme.append(el('h3', '', 'Programme de la soirée'));
       for (const f of league.upcoming) {
@@ -154,10 +159,9 @@ export async function mountOnline(root, config, connect) {
       }
       overview.append(ranking, programme); body.append(overview);
       const clubs = league.members.map(member => ({ id: member.userId, name: member.name }));
-      if (league.playoffs) body.append(playoffBracket(league.playoffs, clubs, c.id));
-      else if (lastChampion) body.append(playoffBracket(lastChampion.bracket, clubs, c.id));
+      if (league.playoffs || lastChampion) { overview.classList.add('has-playoffs'); overview.append(playoffBracket(league.playoffs ?? lastChampion.bracket, clubs, c.id)); }
     }
-    if (tab === 'Ligue') { renderLive(body); renderReplays(body); }
+    if (tab === 'Ligue') renderLive(body);
     if (marketOpen) { modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); }
     if (league.hasDraft) {
       const cancel = el('div', 'rb-preparation-cancel');
@@ -168,7 +172,7 @@ export async function mountOnline(root, config, connect) {
     if (league.locked) for (const tag of ['input', 'select', 'button']) for (const control of body.querySelectorAll(tag)) if (control.getAttribute('data-readonly-control') !== 'true') control.disabled = true;
   }
   function renderReplays(body) {
-    body.append(pageHeading('Replays des rencontres', 'Revoir les matchs terminés de la ligue, sans modifier les résultats ni la progression.'));
+    body.append(el('p', 'rb-muted', 'Revoir les matchs terminés de la ligue, sans modifier les résultats ni la progression.'));
     if (!league.history.length) { body.append(el('p', 'rb-empty-state', 'Les replays apparaîtront après la première rencontre terminée.')); return; }
     for (const game of league.history.slice(-replayLimit).reverse()) {
       const row = el('section', 'rb-replay-entry'), home = league.members.find(m => m.userId === game.homeId), away = league.members.find(m => m.userId === game.awayId);
@@ -178,7 +182,7 @@ export async function mountOnline(root, config, connect) {
       } else row.append(el('p', 'rb-muted', 'Images non conservées pour cette ancienne rencontre.'));
       body.append(row);
     }
-    if (league.history.length > replayLimit) { const more = btn('Afficher les rencontres précédentes', () => { replayLimit += 30; renderLeague(); }); more.setAttribute('data-readonly-control', 'true'); body.append(more); }
+    if (league.history.length > replayLimit) { const more = btn('Afficher les rencontres précédentes', () => { replayLimit += 30; body.replaceChildren(); renderReplays(body); }); more.setAttribute('data-readonly-control', 'true'); body.append(more); }
   }
   async function openReplay(matchId, control) {
     if (busy) return;
@@ -187,7 +191,7 @@ export async function mountOnline(root, config, connect) {
     try { return await attempt(async () => {
       const { replay } = await client.request('replay', leagueId, { matchId });
       if (league?.id !== leagueId || tab !== 'Ligue' || stopped) return;
-      replayView?.stop(); view?.pause(); replayOpen = true; content.hidden = true; live.hidden = true; replayArea.hidden = false;
+      modal.close(); replayView?.stop(); view?.pause(); replayOpen = true; content.hidden = true; live.hidden = true; replayArea.hidden = false;
       const back = btn('Retour aux replays', () => { replayView?.stop(); replayView = null; replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = 'Ligue'; renderLeague(); });
       const player = el('div'); replayArea.replaceChildren(back, pageHeading(`Replay · saison ${replay.season}, journée ${replay.day + 1}`), player);
       replayView = mountReplay(player, replay, mountMatch); replayArea.scrollIntoView({ block: 'start' }); back.focus();

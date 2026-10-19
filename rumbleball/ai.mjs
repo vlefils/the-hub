@@ -2,7 +2,7 @@ import {
   active, allies, armorAgainst, canReceivePass, carrier, chargeRun, collectiveOpening, distance, hasCheckHelp, hasPassCall, interceptionCandidates, legalAction, legalClassAction,
   inside, movementView, openPassReceiver, opponents, playerById, provokesOpportunity, reachableCells, readiedPasser, shouldTakeOpportunity, skill, trajectory,
 } from './rules.mjs';
-import { isRunner } from './classes.mjs';
+import { isRunner, canUseTechnique } from './classes.mjs';
 import { OPENINGS, openingPlan } from './openings.mjs';
 import { isCenterBall } from './deployment.mjs';
 import { evasiveDecision, evasiveMovement } from './evasion.mjs';
@@ -122,7 +122,7 @@ export function passCompletionChance(state, actor, receiver, precision = false) 
   const dc = actor.grappledBy || opponents(state, actor).some((p) => distance(actor.position, p.position) <= 1) ? 15 : 10;
   const advantage = precision || hasCheckHelp(state, actor) || hasPassCall(state, actor);
   const interceptor = interceptionCandidates(state, actor, receiver.position)[0];
-  const interceptAdvantage = interceptor && (hasCheckHelp(state, interceptor) || interceptor.archetype === 'passeur' && interceptor.classState.focus > 0);
+  const interceptAdvantage = interceptor && (hasCheckHelp(state, interceptor) || canUseTechnique(interceptor, 'trajectory', state.version) && interceptor.classState.focus > 0);
   let chance = 0;
   for (let die = 1; die <= 20; die++) {
     const total = die + skill(actor, 'acrobatics');
@@ -310,7 +310,7 @@ function exposure(state, actor, path, disengaged = false) {
   const provoked = new Set();
   for (const next of path) {
     opponents(state, actor).forEach((p) => {
-      if (actor.archetype === 'escamoteur' && actor.classState.flaw === 1 && actor.classState.targetId === p.id) return;
+      if (canUseTechnique(actor, 'exploitation', state.version) && actor.classState.flaw === 1 && actor.classState.targetId === p.id) return;
       if (provokesOpportunity(p, actor, last, next) && shouldTakeOpportunity(state, p, actor)) provoked.add(p.id);
     });
     last = next;
@@ -402,7 +402,7 @@ export function decideTurn(state, actor) {
       const spent = new Set(); let from = actor.position;
       for (const to of entry.path) {
         for (const enemy of opponents(state, actor)) {
-          const feinted = actor.archetype === 'escamoteur' && actor.classState.flaw && actor.classState.targetId === enemy.id;
+          const feinted = canUseTechnique(actor, 'exploitation', state.version) && actor.classState.flaw && actor.classState.targetId === enemy.id;
           if (!feinted && provokesOpportunity(enemy, actor, from, to) && shouldTakeOpportunity(state, enemy, actor)) spent.add(enemy.id);
         }
         from = to;

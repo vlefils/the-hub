@@ -60,6 +60,7 @@ export function fatigue(p) {
   const root = el('div', `rb-fatigue${p.fatigue >= 5 ? ' is-exhausted' : p.fatigue >= 3 ? ' is-tired' : ''}`), meter = el('span', 'rb-fatigue-meter'); meter.setAttribute('aria-hidden', 'true');
   for (let i = 0; i < 6; i++) meter.append(el('i', i < p.fatigue ? 'is-filled' : ''));
   const effect = p.fatigue >= 5 ? '−1,5 m · −1 aux compétences physiques' : p.fatigue >= 3 ? 'Vitesse −1,5 m' : 'Aucun malus';
+  root.title = `Fatigue ${p.fatigue}/6 · ${effect}`;
   root.append(el('span', '', `${p.fatigue}/6`), meter, el('small', 'rb-muted', effect)); return root;
 }
 export function comparison(before, after, beforeImplant = null, afterImplant = null) {

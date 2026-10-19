@@ -1,4 +1,4 @@
-import { el, field, select, table } from './career-components.mjs';
+import { el, btn, field, select, table } from './career-components.mjs';
 import { CRESTS, crestById } from './identity.mjs';
 import { teamCrest } from './visuals.mjs';
 export { archetypeIcon } from './visuals.mjs';
@@ -12,8 +12,10 @@ export function crestPicker(value, color, disabled = false) {
   choice.addEventListener('change', draw); draw(); root.append(preview, field('Blason du club', choice));
   return { root, choice, get value() { return choice.value; }, updateColor(next) { currentColor = next; draw(); } };
 }
-export function clubIdentity(club, { compact = false } = {}) {
-  const node = el('span', `rb-club-identity${compact ? ' is-compact' : ''}`);
+export function clubIdentity(club, { compact = false, onClick } = {}) {
+  const node = onClick ? btn('', () => onClick(club, node)) : el('span');
+  node.className = `rb-club-identity${compact ? ' is-compact' : ''}${onClick ? ' rb-club-link' : ''}`;
+  if (onClick) { node.dataset.focusKey = `club-${club.id}`; node.setAttribute('aria-label', `Voir le club ${club.name}`); node.setAttribute('aria-haspopup', 'dialog'); node.setAttribute('data-readonly-control', 'true'); }
   node.title = club.name;
   node.append(teamCrest(club), el('strong', '', club.name)); return node;
 }

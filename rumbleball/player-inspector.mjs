@@ -1,6 +1,6 @@
 import { el, btn } from './career-components.mjs';
 
-export const WIDE_INSPECTOR = '(min-width: 1440px)';
+export const WIDE_INSPECTOR = '(min-width: 1200px)';
 export const wideInspector = () => Boolean(globalThis.window?.matchMedia?.(WIDE_INSPECTOR).matches);
 let sequence = 0;
 

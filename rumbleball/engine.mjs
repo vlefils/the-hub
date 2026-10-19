@@ -8,7 +8,7 @@ import { defaultOpening, openingDeployment, validOpening } from './openings.mjs'
 import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat, performAttack, distance } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
-export const CURRENT_RULES = 6;
+export const CURRENT_RULES = 7;
 export function seedHash(seed) {
   let n = 2166136261;
   for (const char of String(seed)) n = Math.imul(n ^ char.charCodeAt(0), 16777619);
@@ -24,7 +24,7 @@ function centerBall(state) {
 export function createMatch(config = {}) {
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
-  const version = [2, 3, 4, 5].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
+  const version = [2, 3, 4, 5, 6].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
   const deployments = {}, openings = {};
   if (version >= 3) for (const side of ['home', 'away']) {
     openings[side] = config.openings?.[side] ?? defaultOpening(side === 'home' ? config.strategy : config.awayStrategy);

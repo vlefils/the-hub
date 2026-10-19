@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ARCHETYPES, initialClassState } from './classes.mjs';
+import { ARCHETYPES, initialClassState, classAbilities, canUseTechnique } from './classes.mjs';
 import { createMatch, simulateMatch, stepMatch } from './engine.mjs';
 import { decideClassAction, decideTurn } from './ai.mjs';
 import { armorAgainst, assertInvariants, beginTurn, collectiveOpening, dealDamage, distance, endTurn, giveBall,
-  legalAction, legalClassAction, moveAlong, randomInt, resolveAction, resolveClassAction } from './rules.mjs';
+  legalAction, legalClassAction, moveAlong, randomInt, resolveAction, resolveClassAction, resolveCenterEngagement } from './rules.mjs';
 import { narrateTurn } from './narration.mjs';
 import { buildCourtPlayback, sampleCourtPlayback } from './playback.mjs';
 
@@ -25,6 +25,42 @@ function forceD20(state, wanted) {
   throw new Error('Jet de test introuvable');
 }
 const uses = (events, ability) => events.filter((e) => e.type === 'class' && e.ability === ability);
+
+test('progression : une technique initiale et une spécialisation au niveau 3 pour chaque classe', () => {
+  for (const archetype of Object.keys(ARCHETYPES)) {
+    const low = classAbilities({ archetype, level: 2 }), high = classAbilities({ archetype, level: 3 });
+    assert.equal(low[0][2].unlocked, true); assert.equal(low[1][2].unlocked, false); assert.equal(low[1][2].level, 3);
+    assert.equal(high[1][2].unlocked, true);
+    assert.equal(canUseTechnique({ archetype, level: 1 }, low[1][2].id, 6), true);
+    assert.equal(canUseTechnique({ archetype }, low[1][2].id), true, 'Exhibition sans niveaux');
+  }
+});
+
+test('niveau 3 : percussion, exploitation, feinte et appel refusés sans jet ni dépense avant le déblocage', () => {
+  for (const [archetype, type, technique] of [['belier', 'attack', 'percussion'], ['escamoteur', 'strip', 'exploitation'], ['escamoteur', 'feint'], ['capitaine', 'call']]) {
+    const { state, a, b, events } = fixture(['home-1']), ally = state.players[1]; ally.position = { x: 1, y: 3 };
+    assign(a, archetype); a.level = 2; a.chargeRun = { steps: 2 }; a.classState.targetId = b.id; a.classState.flaw = archetype === 'escamoteur' ? 1 : 0;
+    giveBall(state, b, events); events.length = 0;
+    const action = { type, targetId: type === 'call' ? ally.id : b.id, ...(technique ? { technique } : {}) }, before = structuredClone(state);
+    assert.equal(type === 'call' || type === 'feint' ? legalClassAction(state, a, action) : legalAction(state, a, action), false);
+    assert.equal(type === 'call' || type === 'feint' ? resolveClassAction(state, a, action, events) : resolveAction(state, a, action, events), false);
+    assert.deepEqual(state, before); assert.deepEqual(events, []);
+    a.level = 3;
+    assert.equal(type === 'call' || type === 'feint' ? legalClassAction(state, a, action) : legalAction(state, a, action), true);
+    a.level = 2; state.version = 6;
+    assert.equal(type === 'call' || type === 'feint' ? legalClassAction(state, a, action) : legalAction(state, a, action), true, 'Ancien match conservé');
+  }
+});
+
+test('Lecture de trajectoire : l’engagement automatique attend le niveau 3, anciens matchs préservés', () => {
+  for (const [level, version, expected] of [[2, 7, 0], [3, 7, 1], [2, 6, 1]]) {
+    const { state, a, b, events } = fixture(); assign(a, 'passeur'); assign(b, null); a.level = level; state.version = version;
+    a.position = { x: 5, y: 3 }; b.position = { x: 6, y: 3 }; forceD20(state, [10, 10, 10]);
+    const focus = a.classState.focus; resolveCenterEngagement(state, events);
+    assert.equal(uses(events, 'observe').filter(e => e.playerId === a.id).length, expected);
+    assert.equal(a.classState.focus, focus - expected);
+  }
+});
 
 test('quatre archétypes préfaits, ressources indépendantes, configuration bornée', () => {
   const config = { players: [{ archetype: 'inconnu' }, { archetype: 'escamoteur' }], awayPlayers: [{ archetype: 'passeur' }] };

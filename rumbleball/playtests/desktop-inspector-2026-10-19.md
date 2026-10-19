@@ -2,13 +2,13 @@
 
 ## Structure
 
-La fiche longue réunissait les réglages, toutes les statistiques, la progression, le mannequin, la réserve et le magasin dans la colonne droite. À partir de 1 440 px, trois onglets affichent un seul ensemble à la fois. Identité, XP et fatigue restent communs :
+La fiche longue réunissait les réglages, toutes les statistiques, la progression, le mannequin, la réserve et le magasin dans la colonne droite. À partir de 1 200 px, trois onglets affichent un seul ensemble à la fois. Identité, XP et fatigue restent communs :
 
 - Joueur : rôle, consigne, caractéristiques et statistiques dérivées.
 - Équipement : mannequin et sept emplacements ; la réserve et le magasin sortent de la colonne.
 - Progression : points de caractéristiques, informations de progression et cession. L’onglet signale les points disponibles.
 
-Les techniques de classe sont affichées directement dans Progression, avec leurs effets et leurs réserves actuelles, en solo comme en ligne. Elles sont toutes disponibles dès le niveau 1 dans les règles sportives actuelles. Une liste séparée présente les vrais paliers à venir : caractéristiques aux niveaux 3, 6, 9 et 12 ; maîtrise et réserves aux niveaux 4, 7 et 10 ; vitesse de l’Escamoteur aux niveaux 3 et 5. Les paliers futurs sont gris et portent la mention « À débloquer » ; ceux déjà atteints indiquent « Débloqué ». Cette présentation n’ajoute aucun verrouillage de technique aux matchs.
+Les techniques de classe sont affichées directement dans Progression, avec leurs effets et leurs réserves actuelles, en solo comme en ligne. Une technique est acquise au départ ; Percussion, Exploitation sportive, Appel de jeu et Lecture de trajectoire se débloquent au niveau 3. Les techniques verrouillées sont grises et indiquent leur niveau requis. Une liste séparée présente les autres paliers : caractéristiques aux niveaux 3, 6, 9 et 12 ; maîtrise et réserves aux niveaux 4, 7 et 10 ; vitesse de l’Escamoteur aux niveaux 3 et 5. Les nouveaux matchs utilisent les règles v7 ; les rencontres et replays v2 à v6 restent inchangés. L’Exhibition sans niveaux conserve toutes les techniques.
 
 Les boutons natifs utilisent les rôles de tabulation, les relations de panneaux et la navigation par flèches, Début et Fin. Le choix est conservé au changement de joueur, aux achats et aux rafraîchissements en ligne. Les onglets restent consultables pendant le verrouillage.
 
@@ -28,7 +28,13 @@ Escape et Fermer rendent le focus au déclencheur. Les écouteurs de largeur son
 
 ## Mobile
 
-Sous 1 440 px, aucune barre d’onglets ni modale d’équipement : les panneaux sont visibles dans la fiche et l’emplacement conserve les listes de matériel du club et du magasin. Le filtrage par emplacement, les confirmations et les actions restent les mêmes. Aucun défilement interne n’est ajouté à la colonne joueur.
+Sous 1 200 px, aucune barre d’onglets ni modale d’équipement : les panneaux sont visibles dans la fiche et l’emplacement conserve les listes de matériel du club et du magasin. Le filtrage par emplacement, les confirmations et les actions restent les mêmes. Aucun défilement interne n’est ajouté à la colonne joueur.
+
+## Densité et détails de Ligue
+
+Sur ordinateur, l’en-tête, le bandeau, les cartes, le banc et les champs réservent moins de hauteur ; la taille du terrain dépend également de la hauteur disponible. La fiche conserve son contenu, ses cibles de clic et ses onglets dès 1 200 px. Aucun masquage du débordement de la page n’empêche de lire un contenu long ou une erreur.
+
+Dans la carrière, le classement et le calendrier ouvrent l’effectif du club cliqué en modale : titulaires calculés par la vraie rotation IA, banc, niveaux, XP, fatigue et équipement. Les archives de saisons et l’aide à la préparation s’ouvrent aussi en modale. En ligne, les replays passent dans une liste en modale, accessible pendant le verrouillage et stable pendant les rafraîchissements. Les données privées des adversaires en ligne ne sont pas exposées.
 
 ## Validation
 
@@ -36,6 +42,8 @@ Sous 1 440 px, aucune barre d’onglets ni modale d’équipement : les panneaux
 
 Commandes : `node --test rumbleball/player-inspector.test.mjs rumbleball/career-ui.test.mjs rumbleball/online/broadcast-ui.test.mjs rumbleball/equipment.test.mjs rumbleball/preparation-workspace.test.mjs rumbleball/deployment.test.mjs rumbleball/online/ui.test.mjs`, puis `node --test rumbleball/identity.test.mjs`.
 
-La validation est fondée sur les tests DOM et la revue du responsive CSS ; aucune nouvelle capture de navigateur n’est revendiquée. Les règles, le catalogue et le serveur ne changent pas ; aucun SQL ni redéploiement Supabase n’est nécessaire.
+Les validations de structure utilisent les tests DOM et la revue du responsive CSS. Aucun SQL supplémentaire n’est nécessaire ; le déblocage de techniques nécessite le redéploiement de `rumbleball-api` et `rumbleball-worker`.
 
 Après l’affichage des techniques et des paliers, les 45 tests de `player-inspector.test.mjs`, `career-ui.test.mjs`, `online/broadcast-ui.test.mjs` et `online/ui.test.mjs` ont été relancés avec succès.
+
+Pour le compactage et les déblocages v7 : 400 tests exécutés, dont le test d’ouverture initialement figé sur v6 actualisé puis repassé avec ses tests voisins. Les 39 tests des vues modifiées et les 33 tests d’ouverture/fiche/multijoueur ont également été relancés. `deno check --no-lock` réussit pour les deux fonctions Supabase. Les cas ajoutés couvrent la modale de rotation et son focus, les techniques refusées sans jet ni dépense aux niveaux 1–2, l’interception automatique au niveau 3 et la conservation des règles v6.

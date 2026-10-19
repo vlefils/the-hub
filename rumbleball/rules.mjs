@@ -1,5 +1,5 @@
 import { COURT, WET_CELLS, modifier } from './data.mjs';
-import { ARCHETYPES, classCaps, isRunner } from './classes.mjs';
+import { ARCHETYPES, classCaps, isRunner, canUseTechnique } from './classes.mjs';
 import { isCenterBall } from './deployment.mjs';
 import { openingPlan } from './openings.mjs';
 
@@ -60,11 +60,11 @@ export const classEvent = (state, events, ability, actor, message, extra = {}) =
 export function legalClassAction(state, actor, action) {
   if (!action || actor.hp <= 0 || !actor.classState) return false;
   const target = playerById(state, action.targetId), r = actor.classState;
-  if (action.type === 'feint') return actor.archetype === 'escamoteur' && r.flaw === 1
+  if (action.type === 'feint') return canUseTechnique(actor, 'exploitation', state.version) && r.flaw === 1
     && target?.hp > 0 && target.id === r.targetId && !actor.feintTargetId;
   if (!actor.bonusAction || !target || target.hp <= 0 || distance(actor.position, target.position) > 6) return false;
   if (action.type === 'lock') return isRunner(actor) && target.teamId !== actor.teamId && r.targetId !== target.id;
-  if (action.type === 'call') return actor.archetype === 'capitaine' && r.calls > 0 && target.teamId === actor.teamId
+  if (action.type === 'call') return canUseTechnique(actor, 'call', state.version) && r.calls > 0 && target.teamId === actor.teamId
     && target.id !== actor.id && !state.calls.some((c) => c.targetId === target.id);
   return false;
 }
@@ -274,7 +274,7 @@ export function resolveCenterEngagement(state, events = []) {
   for (const p of eligible) {
     p.reaction = false; p.pickedUp = true;
     emit(state, events, 'center-reaction', `${p.name} tente d’intercepter l’engagement en réaction.`, { playerId: p.id });
-    const reading = p.archetype === 'passeur' && p.classState.focus > 0 && !hasCheckHelp(state, p);
+    const reading = canUseTechnique(p, 'trajectory', state.version) && p.classState.focus > 0 && !hasCheckHelp(state, p);
     if (reading) { p.classState.focus--; classEvent(state, events, 'observe', p, `${p.name} lit la trajectoire de l’engagement (1 concentration).`, { label: 'Lecture' }); }
     const total = skillCheck(state, p, Math.max(skill(p, 'wrestling'), skill(p, 'acrobatics')), events, `${p.name} · interception d’engagement${contested ? '' : ' DD 10'}`, reading);
     if (contested) { if (total > best) { winner = p; best = total; } }
@@ -346,7 +346,7 @@ export function performAttack(state, actor, target, events, opportunity = null, 
   if (opportunity && (!opportunity.from || !opportunity.to || !sameCell(target.position, opportunity.from)
     || !provokesOpportunity(actor, target, opportunity.from, opportunity.to)
     || !canStep(state, target, opportunity.from, opportunity.to))) return false;
-  if (technique && (opportunity || technique !== 'percussion' || actor.archetype !== 'belier' || actor.classState.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2)) return false;
+  if (technique && (opportunity || technique !== 'percussion' || !canUseTechnique(actor, 'percussion', state.version) || actor.classState.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2)) return false;
   if (opportunity) { actor.reaction = false; cancelReadiedPass(state, actor, events, 'réaction dépensée'); }
   else if (offhand) { actor.bonusAction = false; actor.offhandReady = false; }
   else { actor.action = false; actor.chargeRun = null; if (actor.offhandAttack) actor.offhandReady = true; }
@@ -458,11 +458,11 @@ export function legalAction(state, actor, action) {
   if (action.technique) {
     const r = actor.classState;
     if (action.technique === 'percussion') {
-      if (action.type !== 'attack' || actor.archetype !== 'belier' || r.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2) return false;
+      if (action.type !== 'attack' || !canUseTechnique(actor, 'percussion', state.version) || r.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2) return false;
     } else if (action.technique === 'precision') {
       if (action.type !== 'pass' || actor.archetype !== 'passeur' || r.focus <= 0) return false;
     } else if (action.technique === 'exploitation') {
-      if (action.type !== 'strip' || actor.archetype !== 'escamoteur' || r.flaw !== 1 || r.targetId !== action.targetId) return false;
+      if (action.type !== 'strip' || !canUseTechnique(actor, 'exploitation', state.version) || r.flaw !== 1 || r.targetId !== action.targetId) return false;
     } else return false;
   }
   if (action.type === 'wait') return true;
@@ -611,7 +611,7 @@ function resolveActionEvents(state, actor, action, events) {
       let intercepted = false;
       if (interceptor) {
         interceptor.reaction = false;
-        const reading = interceptor.archetype === 'passeur' && interceptor.classState.focus > 0 && !hasCheckHelp(state, interceptor) && total < 20 + skill(interceptor, 'acrobatics');
+        const reading = canUseTechnique(interceptor, 'trajectory', state.version) && interceptor.classState.focus > 0 && !hasCheckHelp(state, interceptor) && total < 20 + skill(interceptor, 'acrobatics');
         if (reading) {
           interceptor.classState.focus--;
           classEvent(state, events, 'intercept-read', interceptor, `${interceptor.name} anticipe la trajectoire de la passe.`, { label: 'Anticipation' });

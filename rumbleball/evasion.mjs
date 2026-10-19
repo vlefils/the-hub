@@ -2,6 +2,7 @@ import {
   allies, armorAgainst, carrier, distance, hasCheckHelp, hasPassCall,
   legalAction, openPassReceiver, opponents, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill,
 } from './rules.mjs';
+import { canUseTechnique } from './classes.mjs';
 
 const delay = (state, id) => {
   const gap = state.initiative.indexOf(id) - state.turnIndex;
@@ -39,7 +40,7 @@ export function defensiveForecast(state, actor) {
     const spent = new Set();
     for (const to of path) {
       for (const enemy of enemies) {
-        if (spent.has(enemy.id) || actor.archetype === 'escamoteur' && actor.classState.flaw && actor.classState.targetId === enemy.id) continue;
+        if (spent.has(enemy.id) || canUseTechnique(actor, 'exploitation', state.version) && actor.classState.flaw && actor.classState.targetId === enemy.id) continue;
         if (!provokesOpportunity(enemy, actor, from, to) || !shouldTakeOpportunity(state, enemy, actor)) continue;
         spent.add(enemy.id);
         const hit = Math.max(.05, Math.min(.95, (21 + enemy.attack.bonus - armorAgainst(actor, enemy)) / 20));

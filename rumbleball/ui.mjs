@@ -384,8 +384,8 @@ export function mountMatch(root, callbacks = {}) {
     if (gear.protection || gear.implant) selected.append(element('p', 'rb-muted', `Protection : ${CATALOGUE[gear.protection]?.name ?? 'aucune'} · Implant : ${CATALOGUE[gear.implant]?.name ?? 'aucun'}.`));
     const classCopy = element('div', 'rb-class-details');
     classCopy.append(element('p', 'rb-class-resource', classResources(p, state.players)));
-    for (const [name, description] of classAbilities(p)) {
-      const line = element('p'); line.append(element('strong', '', `${name}. `), document.createTextNode(description)); classCopy.append(line);
+    for (const [name, description, technique] of classAbilities(p, state.version)) {
+      const line = element('p', technique.unlocked ? '' : 'rb-technique-locked'); line.append(element('strong', '', `${name}${technique.unlocked ? '' : ` · niveau ${technique.level} requis`}. `), document.createTextNode(description)); classCopy.append(line);
     }
     const call = state.calls.find((c) => c.targetId === p.id);
     if (call) classCopy.append(element('p', 'rb-ball-text', `Appel de ${state.players.find((q) => q.id === call.sourceId).name} : prochaine passe avec avantage.`));
