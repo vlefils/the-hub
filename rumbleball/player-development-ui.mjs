@@ -8,7 +8,8 @@ export function abilitySummary(compiled) {
   const root = el('section', 'rb-ability-summary'), list = el('dl', 'rb-ability-scores'); root.setAttribute('aria-label', 'Caractéristiques et maîtrise');
   for (const [key, label] of Object.entries(ABILITY_LABELS)) {
     const score = compiled.abilities[key], row = el('div'), value = el('dd');
-    value.append(el('strong', '', String(score)), el('small', 'rb-muted', signed(modifier(score)))); row.append(el('dt', 'rb-muted', label), value); list.append(row);
+    const name = el('dt', 'rb-muted'), short = el('abbr', 'rb-ability-short', { strength: 'FOR', dexterity: 'DEX', constitution: 'CON', mind: 'ESP', charisma: 'CHA' }[key]); short.title = label; name.setAttribute('aria-label', label); name.append(el('span', 'rb-ability-full', label), short);
+    value.append(el('strong', '', String(score)), el('small', 'rb-muted', signed(modifier(score)))); row.append(name, value); list.append(row);
   }
   root.append(list, el('p', 'rb-muted', `Maîtrise ${signed(compiled.proficiencyBonus)} · Récupération sur le banc : ${compiled.recovery} fatigue / journée`));
   if (compiled.pendingAbilityIncreases) root.append(el('p', 'rb-development-count', `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à répartir`));

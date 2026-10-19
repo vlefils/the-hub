@@ -196,7 +196,8 @@ test('amélioration UI : remplaçant sélectionné, prévision Constitution, sau
   assert.deepEqual(e.saved().clubs[0].players[5].advancements, [{ level: 3, changes: { constitution: 2 } }]);
   assert.deepEqual(e.saved().lineup, c.lineup); assert.equal(classNode(classNode(e.root, 'rb-player-inspector'), 'rb-player-advancement').hidden, true);
   const restored = environment(e.storage.getItem(CAREER_KEY)); mountCareer(restored.root, mountMatch); await button(restored.root, p.name).click();
-  assert.match(classNode(restored.root, 'rb-player-inspector').querySelector('.rb-ability-scores').textContent, /Constitution16/);
+  const constitution = descendants(classNode(restored.root, 'rb-player-inspector')).find(node => node.tagName === 'dt' && node.getAttribute('aria-label') === 'Constitution');
+  assert.equal(constitution.parentNode.querySelector('strong').textContent, '16');
 });
 
 test('amélioration UI : plafond explicite et choix désactivés durant une rencontre', async () => {

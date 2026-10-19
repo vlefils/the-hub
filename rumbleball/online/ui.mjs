@@ -23,8 +23,8 @@ export async function mountOnline(root, config, connect) {
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
   const replayArea = el('section', 'rb-replay-area'); replayArea.hidden = true;
   root.append(top, notice, content, live, replayArea);
-  let teamDraft = null, marketOpen = false, replaysOpen = false, replayView = null, replayOpen = false, replayLimit = 30;
-  const modal = managementDialog(root, () => { marketOpen = replaysOpen = false; });
+  let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30;
+  const modal = managementDialog(root, () => { marketOpen = false; });
   let client, user, league, tab = 'Club', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false;
   function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; if (error && modal.visible) modal.message(text); }
   async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; if (modal.visible) modal.message(''); try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
@@ -150,7 +150,7 @@ export async function mountOnline(root, config, connect) {
     if (tab === 'Ligue') {
       const overview = el('div', 'rb-league-layout'), ranking = el('section'), programme = el('section');
       const title = pageHeading('La ligue', `Saison ${league.season} · ${stage}`);
-      const replays = btn(`Replays des rencontres · ${league.history.length}`, () => { replaysOpen = true; modal.body.replaceChildren(); renderReplays(modal.body); modal.show('Replays des rencontres', replays); });
+      const replays = btn(`Replays des rencontres · ${league.history.length}`, () => { modal.body.replaceChildren(); renderReplays(modal.body); modal.show('Replays des rencontres', replays); });
       replays.classList.add('rb-quiet-action'); replays.dataset.focusKey = 'league-replays'; replays.setAttribute('aria-haspopup', 'dialog'); replays.setAttribute('data-readonly-control', 'true'); title.append(replays); body.append(title);
       ranking.append(el('h3', '', 'Classement · phase de groupe'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id), qualifying: playoffPlaces(league.capacity) }), qualificationLegend(playoffPlaces(league.capacity)));
       programme.append(el('h3', '', 'Programme de la soirée'));

@@ -199,7 +199,7 @@ export function mountCareer(root, mountMatch) {
   }
   function renderPreparation(locked) {
     const own = career.clubs[0], fixture = nextFixture(career), other = fixture && career.clubs.find(c => c.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
-    if (other) manager.append(matchBanner(own, other, career.playoffs ? currentPlayoffRound(career.playoffs).name : 'Journée ' + (career.day + 1), locked ? 'Composition figée pour cette rencontre' : 'Composition enregistrée automatiquement · modifiable avant le lancement'));
+    if (other) manager.append(matchBanner(own, other, career.playoffs ? currentPlayoffRound(career.playoffs).name : 'Journée ' + (career.day + 1), locked ? 'Composition figée pour cette rencontre' : 'Enregistrée automatiquement · modifiable avant le match'));
     if (career.playoffs) {
       const champion = career.clubs.find(c => c.id === career.playoffs.championId);
       manager.append(el('p', 'rb-competition-status', champion ? `Champion de la saison : ${champion.name}` : !fixture ? 'Votre club ne dispute plus les playoffs. Vous pouvez suivre le tableau dans Ligue et simuler les tours restants.' : `${currentPlayoffRound(career.playoffs).name} · élimination directe`));
