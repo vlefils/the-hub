@@ -83,12 +83,11 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   function drawDetail() {
     const p = club.players.find(p => p.id === selected), compiled = compilePlayer(p, club.inventory), role = select(ROLES, draft.assignments[p.id].role), instruction = select(INSTRUCTIONS, draft.assignments[p.id].instruction);
     role.disabled = instruction.disabled = locked;
-    const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
+    const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}${draft.lineup.includes(selected) ? '' : ' · Banc'}`);
     playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
     const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
     detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress);
     const overview = [playerTactics, abilitySummary(compiled), statList(compiled)], progression = [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement(club, p, { locked, onAdvance }), el('p', 'rb-muted', `Niveau ${compiled.level} · ${p.xp} XP cumulée · ${money(salary(p))} / journée`), playerTechniques(compiled), playerMilestones(compiled)];
-    if (!draft.lineup.includes(selected)) overview.push(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
     if (club.players.length > 5) { const sell = btn(`Céder le joueur · ${money(recruitmentPrice(p) / 2)}`, () => onSell(p.id)); sell.disabled = locked; overview.push(sell); }
     inspectorPanels(detail, { overview, equipment: [playerEquipment(club, p, { locked, onBuy, selectedSlot: draft.equipmentSlot, onSlot: slot => { draft.equipmentSlot = slot; draft.shopItem = undefined; }, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; }, onAssign, onSell: onSellGear })], progression,
       points: compiled.pendingAbilityIncreases * 2, selected: draft.inspectorTab, onSelect: key => { draft.inspectorTab = key; } });
