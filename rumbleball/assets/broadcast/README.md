@@ -6,17 +6,19 @@ Identité commune aux ligues en ligne, à la carrière solo et à l’exhibition
 
 - 32 portraits de 512 × 512 et 32 miniatures de 128 × 128, en WebP : quatre profils classiques, seize cyberpunk et douze personnages décalés.
 - 16 emblèmes blancs sur fond transparent, 256 × 256. Le composant SVG compose l’écusson et applique la couleur du club par masque ; la couleur ne fait pas partie du fichier.
-- 23 équipements sur fond transparent, 256 × 256, dont les 15 modèles avancés ajoutés le 19 octobre.
+- 29 équipements sur fond transparent, 256 × 256, dont les 15 modèles avancés et les six équipements de base illustrés le 19 octobre.
 - 1 bandeau d’arène et de ville, 1 600 × 480.
 - 4 symboles d’archétypes dessinés dans le code SVG partagé.
 
-Le lot initial de 57 fichiers principaux occupe 1,68 Mo, ou 1,77 Mo avec les miniatures. Les 15 nouveaux équipements ajoutent environ 315 Ko. Les images hors écran sont chargées à la demande et réservent leur place. Si un portrait est indisponible, le personnage SVG conserve sa fonction de secours.
+Le lot initial de 57 fichiers principaux occupe 1,68 Mo, ou 1,77 Mo avec les miniatures. Les 15 nouveaux équipements ajoutent environ 315 Ko, et les six illustrations de base 89 Ko. Les images hors écran sont chargées à la demande et réservent leur place. Si un portrait est indisponible, le personnage SVG conserve sa fonction de secours.
 
 ## Génération et sources
 
 Outil : **image_gen intégré**, sans CLI/API de génération externe. [generation.json](generation.json) conserve les prompts exacts et les métadonnées. Les maîtres PNG originaux sont conservés localement dans `output/rumbleball-broadcast-sources/` à la racine du workspace ; ils ne sont pas nécessaires au site publié.
 
 Les prompts et les noms des sources du nouveau catalogue se trouvent dans [equipment/catalogue-generation.json](equipment/catalogue-generation.json). Les maîtres de ce lot restent dans le répertoire de génération imagegen. Les armes illustrées sont exclusivement contondantes et non létales ; les fonds d’atelier ont été retirés avec imagegen avant réduction et encodage en WebP.
+
+[equipment/base-generation.json](equipment/base-generation.json) documente les six illustrations de base : protège-poing, tonfa, batte, maillet, bouclier et casque. Leurs maîtres PNG restent dans le répertoire de génération imagegen ; les WebP conservent la transparence. Les anciens SVG servent de secours en cas de chargement impossible.
 
 Les premières productions ont porté sur quatre portraits, quatre emblèmes et deux équipements. La banque a été complétée après leur inspection, puis redimensionnée et encodée en WebP. À la demande du joueur, les 28 portraits suivants ont été remplacés par des profils plus cyberpunk et funs ; les versions PNG et leurs prompts restent conservés. Aucun contenu des captures de maquettes n’est utilisé comme interface : tous les textes et contrôles du jeu restent du HTML/SVG.
 

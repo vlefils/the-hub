@@ -309,10 +309,14 @@ body.rb-app {
 .rb-modal-notice { margin: 1rem 1.5rem; color: #ffb0a0; }
 
 /* A desktop equipment browser. The compact inline shop remains the mobile flow. */
-.rb-equipment-dialog { width: min(76rem, calc(100% - 3rem)); }
+.rb-equipment-dialog { width: min(76rem, calc(100% - 3rem)); height: min(54rem, calc(100svh - 3rem)); box-sizing: border-box; overflow: hidden; }
+.rb-equipment-dialog[open] { display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
+.rb-equipment-dialog > .rb-modal-header { grid-row: 1; }
+.rb-equipment-dialog > .rb-modal-notice { grid-row: 2; }
+.rb-equipment-dialog > .rb-modal-body { grid-row: 3; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; overflow: hidden; }
 .rb-gear-budget { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 0 0 1.25rem; }
-.rb-gear-browser { display: grid; grid-template-columns: minmax(0, 1fr) minmax(19rem, .52fr); gap: 1.75rem; align-items: start; }
-.rb-gear-collection { display: grid; gap: 1.25rem; min-width: 0; }
+.rb-gear-browser { display: grid; grid-template-columns: minmax(0, 1fr) minmax(19rem, .52fr); gap: 1.75rem; align-items: stretch; min-height: 0; }
+.rb-gear-collection { display: grid; align-content: start; gap: 1.25rem; min-width: 0; min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; padding-right: .6rem; }
 .rb-gear-collection > p { margin: 0; font-size: .875rem; line-height: 1.5; }
 .rb-gear-group h3 { margin: 0 0 .7rem; font: 700 1.4rem/1.2 'Rajdhani', sans-serif; }
 .rb-gear-group > p { margin: 0; font-size: .875rem; }
@@ -323,7 +327,7 @@ body.rb-app {
 .rb-gear-card small { font-size: .75rem; line-height: 1.4; }
 .rb-app .rb-gear-card:hover, .rb-app .rb-gear-card:focus-visible { background: #193b50; border-color: #87c6dc; }
 .rb-app .rb-gear-card[aria-pressed='true'] { border-color: #ff8d55; background: #263b48; }
-.rb-gear-preview { position: sticky; top: 6rem; display: grid; gap: 1rem; padding-left: 1.5rem; border-left: 1px solid #345168; min-width: 0; }
+.rb-gear-preview { display: grid; align-content: start; gap: 1rem; padding-inline: 1.5rem .35rem; border-left: 1px solid #345168; min-width: 0; min-height: 0; overflow: auto; scrollbar-gutter: stable; overscroll-behavior: contain; }
 .rb-gear-preview :is(p, h3) { margin: 0; }
 .rb-gear-preview p { font-size: .9rem; line-height: 1.5; }
 .rb-gear-preview > .rb-player-shop { padding: 0; border: 0; }

@@ -381,7 +381,8 @@ export const validPortrait = (id) => PORTRAITS.some(p => p.id === id);
 export const validCrest = (id) => CRESTS.some(c => c.id === id);
 export const portraitById = (id) => PORTRAITS.find(p => p.id === id) ?? null;
 export const crestById = (id) => CRESTS.find(c => c.id === id) ?? CRESTS[0];
-export const gearImage = id => ['helmet', 'knuckles', 'tonfa', 'bat', 'maul', 'shield'].includes(id) ? new URL(`./assets/equipment/${id}.svg`, import.meta.url).href : asset(`equipment/${id}.webp`);
+export const gearImage = id => asset(`equipment/${id}.webp`);
+export const gearFallback = id => ['helmet', 'knuckles', 'tonfa', 'bat', 'maul', 'shield'].includes(id) ? new URL(`./assets/equipment/${id}.svg`, import.meta.url).href : null;
 export function cosmeticHash(value) {
   let hash = 2166136261;
   for (const char of String(value)) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;

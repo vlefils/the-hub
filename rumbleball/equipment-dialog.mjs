@@ -34,6 +34,7 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
     const item = CATALOGUE[entry.itemId], onlyPreview = hover && selected !== entry;
     if (displayed === entry && previewMode === onlyPreview) return;
     displayed = entry; previewMode = onlyPreview;
+    preview.scrollTop = 0;
     if (entry.source === 'catalogue') {
       preview.replaceChildren(playerShop(club, player, { ...options, location, selectedItem: entry.itemId, showPicker: false, previewOnly: onlyPreview,
         onBuy: (...args) => act(() => options.onBuy?.(...args)) }));

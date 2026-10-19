@@ -1,7 +1,7 @@
 import { CATALOGUE, XP_THRESHOLDS, levelOf, MAX_LEVEL } from './progression.mjs';
 import { ABILITY_LABELS } from './player-development.mjs';
 import { athletePortrait } from './visuals.mjs';
-import { gearImage } from './identity.mjs';
+import { gearImage, gearFallback } from './identity.mjs';
 
 export const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
 export const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}` , text); b.type = 'button'; b.addEventListener('click', action); return b; };
@@ -81,7 +81,7 @@ export function comparison(before, after, beforeImplant = null, afterImplant = n
 export const damageText = attack => `1d${attack.die}${attack.flat ? ` ${signed(attack.flat)}` : ''}`;
 export function equipmentArtwork(id, name) {
   const image = el('img', 'rb-equipment-art'); image.src = gearImage(id); image.alt = name; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async';
-  image.addEventListener('error', () => { image.hidden = true; }); return image;
+  image.addEventListener('error', () => { const fallback = gearFallback(id); if (fallback && image.src !== fallback) image.src = fallback; else image.hidden = true; }); return image;
 }
 export function disclosure(label, key, ...children) {
   const details = el('details', 'rb-career-disclosure'); details.dataset.sectionKey = key; details.append(el('summary', '', label), ...children); return details;
