@@ -26,7 +26,11 @@ export function mountLogin(root, client, { recovery = false, onSession, message 
   }); });
   if (!recovery) actions.append(btn('Créer un compte', () => run(async () => {
     if (!email.value || password.value.length < 8) throw new Error('Renseignez votre e-mail et un mot de passe d’au moins huit caractères.');
-    const { data, error } = await client.auth.signUp({ email: email.value, password: password.value, options: { emailRedirectTo: new URL('./multi.html', location.href).href } });
+    const displayName = Array.from(email.value.trim().split('@')[0]).slice(0, 32).join('');
+    const { data, error } = await client.auth.signUp({ email: email.value, password: password.value, options: {
+      emailRedirectTo: new URL('./multi.html', location.href).href,
+      data: { display_name: Array.from(displayName).length >= 2 ? displayName : 'Manager' },
+    } });
     if (error) throw error;
     password.value = '';
     if (data.session) await onSession(data.user); else message('Consultez votre e-mail pour confirmer le compte, puis connectez-vous ici.', false);

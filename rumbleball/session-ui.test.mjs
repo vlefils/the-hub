@@ -43,6 +43,20 @@ test('connexion : ancienne carrière importée avant la liste, puis reprise de c
   await button(e.root, 'Ouvrir la partie Club à retrouver').click();
   assert.deepEqual(JSON.parse(options.sync.storage.getItem(CAREER_KEY)).career, c); assert.equal(e.root.querySelector('.rb-online-auth'), null);
 });
+
+test('inscription : le nom de profil respecte les contraintes même avec une adresse e-mail longue ou très courte', async t => {
+  const e = setup(); let submitted;
+  e.api.auth.signUp = async data => { submitted = data; return { data: { session: null } }; };
+  const app = await mountApp(e.root, e.options); t.after(app.stop);
+  const inputs = e.root.querySelector('form').querySelectorAll('input');
+  inputs[0].value = 'a'.repeat(50) + '@example.invalid'; inputs[1].value = 'temporary-password';
+  await button(e.root, 'Créer un compte').click();
+  assert.equal(submitted.options.data.display_name, 'a'.repeat(32));
+  assert.equal(submitted.options.emailRedirectTo, 'https://vlefils.github.io/the-hub/rumbleball/multi.html');
+  inputs[0].value = 'a@example.invalid'; inputs[1].value = 'temporary-password';
+  await button(e.root, 'Créer un compte').click();
+  assert.equal(submitted.options.data.display_name, 'Manager');
+});
 test('plusieurs parties : créer une seconde partie, revenir à la liste et conserver la première', async t => {
   const e = setup(account('owner')); await e.backend.command('owner', 'solo_import', { json: exportCareer(career()) }); let sync;
   const app = await mountApp(e.root, { ...e.options, careerView(root, match, opts) { sync = opts.sync; return { stop() {} }; } }); t.after(app.stop);
