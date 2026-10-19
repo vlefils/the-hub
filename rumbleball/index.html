@@ -15,7 +15,14 @@
     <link rel="stylesheet" href="career.css" />
     <link rel="stylesheet" href="broadcast.css" />
     <link rel="stylesheet" href="studio.css?v=20261019-bench-review" />
-    <script type="module" src="app.mjs"></script>
+  <script type="importmap">
+    { "imports": {
+      "./career.mjs": "./career.mjs?v=20261019-open-lobby",
+      "./equipment-dialog.mjs": "./equipment-dialog.mjs?v=20261019-open-lobby",
+      "./online/ui.mjs": "./online/ui.mjs?v=20261019-open-lobby"
+    } }
+  </script>
+  <script type="module" src="app.mjs"></script>
   </head>
   <body class="rb-app">
     <a class="rb-skip" href="#jeu">Aller au jeu</a>
