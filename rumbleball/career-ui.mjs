@@ -1,7 +1,7 @@
 import { ROLES, ROLE_DESCRIPTIONS, INSTRUCTIONS, STRATEGIES, STARTS } from './data.mjs';
 import { ARCHETYPES, archetypeLabel, classAbilities } from './classes.mjs';
 import { XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice, MAX_SQUAD_SIZE } from './progression.mjs';
-import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings, improveAbilities } from './career.mjs';
+import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings, improveAbilities, careerSeasonFinished, advanceCareerPlayoffs } from './career.mjs';
 import { CAREER_KEY, loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
 import { KIT_COLORS, clubKit } from './appearance.mjs';
 import { playerPortrait, teamCrest, athletePortrait } from './visuals.mjs';
@@ -12,6 +12,8 @@ import { workspaceHeader, workspaceNavigation } from './workspace-header.mjs';
 import { playerShop } from './player-shop.mjs';
 import { playerInventory } from './player-inventory.mjs';
 import { abilitySummary, abilityPendingBadge, playerAdvancement } from './player-development-ui.mjs';
+import { playoffPlaces, currentPlayoffRound } from './playoffs.mjs';
+import { qualificationLegend, playoffBracket } from './playoffs-ui.mjs';
 import { managementDialog } from './management-dialog.mjs';
 import { clubOpening, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
@@ -125,7 +127,7 @@ export function mountCareer(root, mountMatch) {
     if (career.status === 'draft') { renderDraft(); restoreContext(); return; }
     const locked = managementLocked(career), club = career.clubs[0];
     const header = el('header', 'rb-club-header'), identity = el('div');
-    identity.append(el('p', 'rb-eyebrow', `Saison ${career.season} · ${career.day}/10 journées terminées`), el('h3', '', club.name));
+    identity.append(el('p', 'rb-eyebrow', `Saison ${career.season} · ${career.playoffs ? currentPlayoffRound(career.playoffs)?.name ?? 'Saison terminée' : `${career.day}/10 journées terminées`}`), el('h3', '', club.name));
     const finances = el('dl', 'rb-career-finances');
     const amounts = [['Solde', money(career.balance), career.balance < 0 ? 'rb-away' : ''], ['Prochains salaires', money(payroll(career)), '']];
     if (career.balance < 0) amounts.push(['Salaires impayés', money(-career.balance), 'rb-away']);
@@ -166,7 +168,7 @@ export function mountCareer(root, mountMatch) {
     for (const [title, copy] of [['Recrutez', 'Quatre archétypes, des équipements et des implants.'], ['Préparez', 'Vos rôles, vos consignes, votre placement.'], ['Entrez dans l’arène', 'Les joueurs agissent seuls. Le club progresse avec vous.']]) { const step = el('li'); step.append(el('strong', '', title), el('span', '', copy)); steps.append(step); }
     introduction.append(steps);
     const form = el('form', 'rb-career-create'), input = el('input'); input.required = true; input.maxLength = 80; input.placeholder = 'Les Rebuts du Chrome';
-    form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', '2 400 chromas pour vos premiers contrats. Cinq titulaires par match et jusqu’à dix joueurs dans le club. Une ligue de six clubs, dix journées par saison. Votre carrière est sauvegardée dans ce navigateur.'), field('Nom du club', input));
+    form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', '2 400 chromas pour vos premiers contrats. Cinq titulaires par match et jusqu’à dix joueurs dans le club. Six clubs, dix journées de groupe, puis les quatre premiers en playoffs. Votre carrière est sauvegardée dans ce navigateur.'), field('Nom du club', input));
     const color = kitPicker(KIT_COLORS[0]), preview = el('div', 'rb-kit-preview');
     const showKit = () => preview.replaceChildren(...[0, 1, 2, 4].map((profile) => playerPortrait(compilePlayer({ id: `preview-${profile}`, name: 'Aperçu', profile, xp: 0, fatigue: 0 }), color.value)));
     color.addEventListener('input', showKit); showKit(); form.append(field('Couleur des maillots', color), preview);
@@ -192,7 +194,11 @@ export function mountCareer(root, mountMatch) {
   }
   function renderPreparation(locked) {
     const own = career.clubs[0], fixture = nextFixture(career), other = fixture && career.clubs.find(c => c.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
-    if (other) manager.append(matchBanner(own, other, 'Journée ' + (career.day + 1), locked ? 'Composition figée pour cette rencontre' : 'Composition enregistrée automatiquement · modifiable avant le lancement'));
+    if (other) manager.append(matchBanner(own, other, career.playoffs ? currentPlayoffRound(career.playoffs).name : 'Journée ' + (career.day + 1), locked ? 'Composition figée pour cette rencontre' : 'Composition enregistrée automatiquement · modifiable avant le lancement'));
+    if (career.playoffs) {
+      const champion = career.clubs.find(c => c.id === career.playoffs.championId);
+      manager.append(el('p', 'rb-competition-status', champion ? `Champion de la saison : ${champion.name}` : !fixture ? 'Votre club ne dispute plus les playoffs. Vous pouvez suivre le tableau dans Ligue et simuler les tours restants.' : `${currentPlayoffRound(career.playoffs).name} · élimination directe`));
+    }
     const form = el('form', 'rb-lineup-form'), strategy = keyed(select(STRATEGIES, career.clubs[0].strategy), 'strategy'); strategy.disabled = locked;
     const preparation = el('div', 'rb-preparation rb-sport-preparation'), teamControls = el('div', 'rb-team-controls rb-broadcast-squad'), teamPlans = el('div', 'rb-team-plans');
     const assignments = Object.fromEntries(ownedPlayers(career).map((p) => [p.id, { role: p.role, instruction: p.instruction }]));
@@ -285,8 +291,9 @@ export function mountCareer(root, mountMatch) {
     const tactics = el('section', 'rb-broadcast-tactics'); tactics.append(court, teamPlans);
     preparation.append(teamControls, tactics, sidebar); form.append(preparation);
     const launch = el('div', 'rb-launch-bar'), copy = el('div');
-    copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : !nextFixture(career) ? 'La saison est terminée' : `${money(payroll(career))} de salaires au coup d’envoi`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : !nextFixture(career) ? 'Commencez la saison suivante depuis Club.' : `Solde après prélèvement : ${money(career.balance - payroll(career))}. Les primes seront versées après le match.`));
-    launch.append(copy, !nextFixture(career) ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); tactics.append(formNotice, launch);
+    const finished = careerSeasonFinished(career), spectating = !fixture && !finished && career.playoffs;
+    copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : finished ? 'La saison est terminée' : spectating ? `${currentPlayoffRound(career.playoffs).name} · autres clubs` : `${money(payroll(career))} de salaires au coup d’envoi`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : finished ? 'Vous pouvez commencer la saison suivante.' : spectating ? 'Consultez le tableau dans Ligue. Votre club ne joue pas ce tour ; aucun salaire de match ne vous est prélevé.' : `Solde après prélèvement : ${money(career.balance - payroll(career))}. Les primes seront versées après le match.`));
+    launch.append(copy, finished ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : spectating ? btn(`Simuler · ${currentPlayoffRound(career.playoffs).name}`, () => update(() => advanceCareerPlayoffs(career)), true) : blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); tactics.append(formNotice, launch);
     if (career.current?.settled) tactics.append(btn('Voir le bilan', () => go('Bilan')));
     form.addEventListener('submit', (event) => event.preventDefault()); manager.append(form); renderActive();
     manager.append(disclosure('Comprendre la préparation', 'preparation-help', el('p', 'rb-muted', 'L’archétype définit les techniques. Le rôle donne une mission ; la consigne règle le comportement. Le plan collectif guide l’équipe, tandis que l’ouverture fixe le placement et le premier tour. Choisir un titulaire déjà présent échange leurs positions. Aucun remplacement pendant le match.'), strategyHelp, ...opening.root.querySelectorAll('p')));
@@ -314,8 +321,8 @@ export function mountCareer(root, mountMatch) {
   }
   function renderLeague() {
     const rows = standings(career), layout = el('div', 'rb-league-layout'), ranking = el('section'), calendar = el('section', 'rb-league-calendar');
-    manager.append(pageHeading('La ligue', `Saison ${career.season} · Six clubs, dix journées, une place à prendre.`));
-    ranking.append(el('h4', '', 'Classement'), table(['Club', 'Joués', 'V', 'N', 'D', 'Points'], rows.map((r) => [clubIdentity(career.clubs.find(c => c.id === r.clubId), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: rows.findIndex((r) => r.clubId === 'club'), caption: 'Classement de la saison. V : victoires, N : nuls, D : défaites.' }),
+    manager.append(pageHeading('La ligue', `Saison ${career.season} · Phase de groupe puis playoffs.`));
+    ranking.append(el('h4', '', 'Classement · phase de groupe'), table(['Club', 'Joués', 'V', 'N', 'D', 'Points'], rows.map((r) => [clubIdentity(career.clubs.find(c => c.id === r.clubId), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: rows.findIndex((r) => r.clubId === 'club'), qualifying: playoffPlaces(rows.length), caption: 'Classement de la phase de groupe. Les places qualificatives pour les playoffs sont signalées. V : victoires, N : nuls, D : défaites.' }), qualificationLegend(playoffPlaces(rows.length)),
       el('p', 'rb-muted', 'Victoire : 3 points · nul : 1. Départage par victoires, puis ordre fixé en début de saison.'), disclosure('Primes de classement', 'league-prizes', el('p', 'rb-muted', '1er : 600 · 2e : 400 · 3e : 200 · 4e à 6e : 100 chromas.')));
     calendarDay = Math.min(9, Math.max(0, calendarDay ?? career.day));
     const day = keyed(select(Object.fromEntries(career.schedule.map((_, i) => [i, `Journée ${i + 1}${i < career.day ? ' · terminée' : i === career.day ? ' · à jouer' : ''}`])), calendarDay), 'calendar-day');
@@ -325,16 +332,24 @@ export function mountCareer(root, mountMatch) {
       const row = el('div', `rb-fixture-row${own ? ' is-own' : ''}`);
       row.append(clubIdentity(home, { compact: true }), clubIdentity(away, { compact: true }), el('p', 'rb-muted', !f.result ? 'À jouer' : f.result.winnerId ? `Victoire : ${career.clubs.find((c) => c.id === f.result.winnerId).name}` : 'Match nul')); calendar.append(row);
     } layout.append(ranking, calendar); manager.append(layout);
+    if (career.playoffs) manager.append(playoffBracket(career.playoffs, career.clubs, 'club'));
     const opponents = disclosure('Clubs adverses et rotation', 'league-opponents');
     for (const club of career.clubs.slice(1)) { opponents.append(clubIdentity(club), el('p', 'rb-muted', club.style), table(['Joueur', 'Niveau', 'XP', 'Fatigue'], club.players.map((p) => [portraitIdentity(compilePlayer(p, []), clubKit(club), el('strong', '', p.name)), levelOf(p), p.xp, fatigue(p)]))); }
     manager.append(opponents);
-    for (const past of career.seasonHistory) manager.append(disclosure(`Saison ${past.season} · classement final`, `season-${past.season}`, table(['Club', 'Points'], past.table.map((r, i) => [`${i + 1}. ${r.name}`, r.points]), { highlight: past.table.findIndex((r) => r.clubId === 'club') })));
+    for (const past of career.seasonHistory) {
+      const history = disclosure(`Saison ${past.season} · classement de groupe`, `season-${past.season}`, table(['Club', 'Points'], past.table.map((r, i) => [`${i + 1}. ${r.name}`, r.points]), { highlight: past.table.findIndex((r) => r.clubId === 'club') }));
+      if (past.playoffs && past.season !== career.season) history.append(playoffBracket(past.playoffs, career.clubs, 'club')); manager.append(history);
+    }
   }
   function renderSummary(target) {
     target.replaceChildren();
     const summary = career.current.summary, panel = el('section', 'rb-career-summary');
     target.append(pageHeading('Bilan de la journée', `Face à ${career.current.config.teamNames.away}`));
-    panel.append(el('p', 'rb-eyebrow', `Journée ${career.day} terminée`), el('h4', 'rb-result-title', resultLabel()));
+    const playoffRound = career.playoffs?.rounds.find(round => round.matches.some(match => match.id === career.current.fixtureId));
+    panel.append(el('p', 'rb-eyebrow', playoffRound ? `${playoffRound.name} · rencontre terminée` : `Journée ${career.day} terminée`), el('h4', 'rb-result-title', resultLabel()));
+    if (summary.fatigueReset) panel.append(el('p', 'rb-competition-status', 'Phase de groupe terminée. Toute la fatigue est retirée avant les playoffs.'));
+    const knockout = career.playoffs?.rounds.flatMap(round => round.matches).find(match => match.id === career.current.fixtureId);
+    if (knockout) panel.append(el('p', 'rb-competition-status', `${career.clubs.find(club => club.id === knockout.winnerId).name} ${knockout.id === career.playoffs.rounds.at(-1).matches[0].id ? 'remporte les playoffs' : 'se qualifie'}${knockout.decision === 'ranking' ? ' grâce à son classement de groupe après le nul' : ''}.`));
     const metrics = el('div', 'rb-summary-metrics'); metrics.append(metric('Variation après salaires', `${signed(summary.reward + summary.seasonPrize - summary.wages)} chromas`), metric('Disponible à la fin de la journée', money(summary.available)), metric('Niveaux gagnés', String(summary.progress.reduce((sum, p) => sum + p.level - p.beforeLevel, 0)))); panel.append(metrics);
     for (const progress of summary.progress.filter((p) => p.level > p.beforeLevel)) {
       const owner = ownedPlayers(career).find((p) => p.id === progress.playerId), promotion = el('div', 'rb-level-gain');
@@ -352,7 +367,7 @@ export function mountCareer(root, mountMatch) {
       return [name, `+${p.xp}${p.ko ? ' · KO' : ''}`, p.level > p.beforeLevel ? `${p.beforeLevel} → ${p.level}` : p.level, `${p.beforeFatigue} → ${p.fatigue}/6`];
     })));
     panel.append(disclosure('Détail des primes et salaires', 'summary-finances', el('p', '', `Prime brute : ${money(summary.reward)} · Salaires prélevés au coup d’envoi : ${money(summary.wages)}${summary.seasonPrize ? ` · Prime de classement (${summary.rank}e) : ${money(summary.seasonPrize)}` : ''}`), el('p', 'rb-muted', `Dont ${money(summary.debtRepaid)} absorbés par les impayés. Ce remboursement est déjà compris dans le solde. Dette restante : ${money(summary.remainingDebt)}.`)));
-    const actions = el('div', 'rb-controls'); actions.append(btn(career.day === 10 ? 'Retour au club · saison terminée' : 'Préparer la prochaine rencontre', () => go('Club'), true), btn('Faire tourner l’effectif', () => go('Club')), btn('Revoir le terrain et le fil du match · sans récompense supplémentaire', () => openMatch())); panel.append(actions); target.append(panel);
+    const actions = el('div', 'rb-controls'); actions.append(btn(careerSeasonFinished(career) ? 'Retour au club · saison terminée' : 'Préparer la prochaine rencontre', () => go('Club'), true), btn('Faire tourner l’effectif', () => go('Club')), btn('Revoir le terrain et le fil du match · sans récompense supplémentaire', () => openMatch())); panel.append(actions); target.append(panel);
   }
   function showConfirmation(text, action, confirmLabel = 'Confirmer') {
     const dialog = el('dialog', 'rb-career-dialog'), actions = el('div', 'rb-controls');

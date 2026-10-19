@@ -8,6 +8,8 @@ import { moveDeployment } from '../deployment.mjs';
 import { playerShop } from '../player-shop.mjs';
 import { playerInventory } from '../player-inventory.mjs';
 import { abilitySummary, abilityPendingBadge, playerAdvancement } from '../player-development-ui.mjs';
+import { playoffPlaces } from '../playoffs.mjs';
+import { qualificationLegend } from '../playoffs-ui.mjs';
 import { athletePortrait } from '../visuals.mjs';
 import { crestPicker, clubIdentity, archetypeIcon } from '../broadcast-components.mjs';
 
@@ -30,9 +32,9 @@ export function leagueContext(league) {
       row.append(el('small', '', league.status === 'lobby' ? 'Après le lancement de la saison' : i ? 'À suivre · pause de 2 min' : '20 h · heure de Paris'), clubIdentity(member(f.homeId), { compact: true }), clubIdentity(member(f.awayId), { compact: true })); schedule.append(row);
     }
   }
-  ranking.append(el('h4', '', 'Classement'), table(['Club', 'Joués', 'Points'], league.table.map((r, i) => {
+  ranking.append(el('h4', '', 'Classement · phase de groupe'), table(['Club', 'Joués', 'Points'], league.table.map((r, i) => {
     const label = el('span'); label.append(el('span', 'rb-muted', `${i + 1}. `), clubIdentity(member(r.id), { compact: true })); return [label, r.played, r.points];
-  }), { highlight: league.table.findIndex(r => r.id === league.club.id), caption: 'Classement de la ligue' }));
+  }), { highlight: league.table.findIndex(r => r.id === league.club.id), qualifying: playoffPlaces(league.capacity), caption: 'Classement de la phase de groupe. Places qualificatives pour les playoffs signalées.' }), qualificationLegend(playoffPlaces(league.capacity)));
   root.append(schedule, ranking); return root;
 }
 export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onBuy, onAssign, onSellGear, onRecruit, onAdvance }) {

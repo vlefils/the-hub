@@ -128,11 +128,11 @@ test('revenu fixe : couvre six salaires niveau 5, achat sans découvert, dette r
 });
 test('deux saisons : progression conservée, fatigue remise à zéro et récupération sans avalanche de journées', () => {
   let s = fixture();
-  for (let i = 0; i < 4; i++) { s = advanceLeague(s, s.nextLockAt); s = advanceLeague(s, s.night.endsAt); }
-  assert.equal(s.season, 3); assert.equal(s.day, 0); assert.equal(s.completedDays, 4); assert.equal(s.history.length, 4);
+  for (let i = 0; i < 6; i++) { s = advanceLeague(s, s.nextLockAt); s = advanceLeague(s, s.night.endsAt); }
+  assert.equal(s.season, 3); assert.equal(s.day, 0); assert.equal(s.completedDays, 6); assert.equal(s.history.length, 6);
   assert.ok(s.members.every((m) => m.club.players.every((p) => p.fatigue === 0 && p.xp > 0)));
-  let late = advanceLeague(s, '2027-10-18T22:00:00Z'); assert.equal(late.completedDays, 4); assert.equal(late.status, 'broadcast');
-  late = advanceLeague(late, late.night.endsAt); assert.equal(late.completedDays, 5); assert.equal(late.nextLockAt, '2027-10-19T18:00:00.000Z');
+  let late = advanceLeague(s, '2027-10-18T22:00:00Z'); assert.equal(late.completedDays, 6); assert.equal(late.status, 'broadcast');
+  late = advanceLeague(late, late.night.endsAt); assert.equal(late.completedDays, 7); assert.equal(late.nextLockAt, '2027-10-19T18:00:00.000Z');
 });
 
 test('worker fractionné : un seul round par appel, même résultat que le calcul complet et attente explicite si retard', () => {

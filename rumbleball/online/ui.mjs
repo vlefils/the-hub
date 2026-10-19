@@ -7,6 +7,8 @@ import { mountReplay } from '../replay-ui.mjs';
 import { workspaceHeader, workspaceNavigation } from '../workspace-header.mjs';
 import { managementDialog } from '../management-dialog.mjs';
 import { abilitySummary } from '../player-development-ui.mjs';
+import { playoffPlaces, currentPlayoffRound } from '../playoffs.mjs';
+import { qualificationLegend, playoffBracket } from '../playoffs-ui.mjs';
 
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
@@ -115,7 +117,8 @@ export async function mountOnline(root, config, connect) {
     content.className = 'rb-online-content';
     content.replaceChildren(); live.hidden = true;
     const c = league.club, heading = el('div', 'rb-online-identity'), copy = el('div');
-    copy.append(el('p', 'rb-eyebrow', `${league.name} · saison ${league.season} · journée ${league.day + 1}`), clubIdentity(c));
+    const stage = league.phase === 'playoffs' ? currentPlayoffRound(league.playoffs)?.name ?? 'Playoffs' : `Phase de groupe · journée ${league.day + 1}`;
+    copy.append(el('p', 'rb-eyebrow', `${league.name} · saison ${league.season} · ${stage}`), clubIdentity(c));
     const actions = el('div', 'rb-online-actions'); actions.append(btn('Actualiser', () => attempt(() => send('get'))), btn('Changer de ligue', () => attempt(renderLobby)));
     heading.append(copy, actions); content.append(heading);
     const summary = el('div', 'rb-online-finances'); summary.append(metric('Solde prévu', money(c.balance)), metric('Prochains salaires', money(c.players.reduce((n, p) => n + salary(p), 0))), metric('Revenu / victoire', '210 / +100', 'chromas par journée'));
@@ -134,19 +137,25 @@ export async function mountOnline(root, config, connect) {
     const otherId = fixture && (fixture.homeId === c.id ? fixture.awayId : fixture.homeId), opponent = league.members.find(m => m.userId === otherId);
     if (opponent) content.append(matchBanner(c, opponent, league.locked ? 'Soirée en cours' : league.nextLockAt ? '20 h · Paris' : 'Saison à préparer', lockMessage));
     else content.append(el('p', league.locked ? 'rb-online-lock' : 'rb-muted', lockMessage));
+    if (league.phase === 'playoffs') content.append(el('p', 'rb-competition-status', fixture ? `${stage} · élimination directe` : 'Votre club ne dispute plus les playoffs. Suivez les rencontres et le tableau dans Ligue.'));
+    const lastChampion = league.playoffHistory?.at(-1);
+    if (lastChampion) content.append(el('p', 'rb-competition-status', `Champion de la saison ${lastChampion.season} : ${league.members.find(member => member.userId === lastChampion.bracket.championId)?.name}`));
     const nav = workspaceNavigation(tab, label => { modal.close(); replayView?.stop(); view?.pause(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; frameKey = null; renderLeague(); });
     content.append(nav); workspaceHeader({ navigation: nav });
     const body = el('section', 'rb-online-body'); content.append(body);
     if (tab === 'Club') renderTeam(body, c);
     if (tab === 'Ligue') {
       const overview = el('div', 'rb-league-layout'), ranking = el('section'), programme = el('section');
-      body.append(pageHeading('La ligue', `Saison ${league.season} · journée ${league.day + 1}`));
-      ranking.append(el('h3', '', 'Classement'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id) }));
+      body.append(pageHeading('La ligue', `Saison ${league.season} · ${stage}`));
+      ranking.append(el('h3', '', 'Classement · phase de groupe'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id), qualifying: playoffPlaces(league.capacity) }), qualificationLegend(playoffPlaces(league.capacity)));
       programme.append(el('h3', '', 'Programme de la soirée'));
       for (const f of league.upcoming) {
         const row = el('div', 'rb-fixture-row'); row.append(clubIdentity(league.members.find(m => m.userId === f.homeId), { compact: true }), clubIdentity(league.members.find(m => m.userId === f.awayId), { compact: true })); programme.append(row);
       }
       overview.append(ranking, programme); body.append(overview);
+      const clubs = league.members.map(member => ({ id: member.userId, name: member.name }));
+      if (league.playoffs) body.append(playoffBracket(league.playoffs, clubs, c.id));
+      else if (lastChampion) body.append(playoffBracket(lastChampion.bracket, clubs, c.id));
     }
     if (tab === 'Ligue') { renderLive(body); renderReplays(body); }
     if (marketOpen) { modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); }
@@ -163,7 +172,7 @@ export async function mountOnline(root, config, connect) {
     if (!league.history.length) { body.append(el('p', 'rb-empty-state', 'Les replays apparaîtront après la première rencontre terminée.')); return; }
     for (const game of league.history.slice(-replayLimit).reverse()) {
       const row = el('section', 'rb-replay-entry'), home = league.members.find(m => m.userId === game.homeId), away = league.members.find(m => m.userId === game.awayId);
-      row.append(el('p', 'rb-eyebrow', `Saison ${game.season} · journée ${game.day + 1}`), clubIdentity(home, { compact: true }), clubIdentity(away, { compact: true }), el('p', 'rb-muted', `${date(game.endsAt)} · ${game.winnerId ? 'Victoire : ' + league.members.find(m => m.userId === game.winnerId)?.name : 'Match nul'}`));
+      row.append(el('p', 'rb-eyebrow', `Saison ${game.season} · ${game.phase === 'playoffs' ? 'Playoffs' : 'journée ' + (game.day + 1)}`), clubIdentity(home, { compact: true }), clubIdentity(away, { compact: true }), el('p', 'rb-muted', `${date(game.endsAt)} · ${game.winnerId ? 'Victoire : ' + league.members.find(m => m.userId === game.winnerId)?.name : 'Match nul'}${game.decision === 'ranking' ? ' · qualifié au classement : ' + league.members.find(m => m.userId === game.qualifiedId)?.name : ''}`));
       if (game.replayAvailable) {
         const watch = btn('Voir le replay', () => openReplay(game.id, watch)); watch.setAttribute('data-readonly-control', 'true'); row.append(watch);
       } else row.append(el('p', 'rb-muted', 'Images non conservées pour cette ancienne rencontre.'));

@@ -5,7 +5,7 @@ import { classCaps, classResources, initialClassState, classAbilities } from './
 import { createMatch, simulateMatch, stepMatch } from './engine.mjs';
 import { assertInvariants } from './rules.mjs';
 import { CATALOGUE, MAX_LEVEL, XP_THRESHOLDS, compilePlayer, levelOf, progressPlayer, salary, recruitmentPrice, fatigueRecovery } from './progression.mjs';
-import { createCareer, confirmDraft, configureTeam, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, settleCareerMatch, saveCareerTurn, nextSeason, standings, aiLineup } from './career.mjs';
+import { createCareer, confirmDraft, configureTeam, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, settleCareerMatch, saveCareerTurn, nextSeason, standings, aiLineup, careerSeasonFinished, advanceCareerPlayoffs } from './career.mjs';
 import { CAREER_KEY, validateCareer, persistCareer, loadCareer, importCareer, exportCareer } from './career-storage.mjs';
 import { playerNameMatchesGender, playerNamingClass } from './player-names.mjs';
 import { playerGender } from './identity.mjs';
@@ -19,6 +19,10 @@ function complete(input, forcedResult) {
   return saveCareerTurn(c, simulation.state, simulation.events);
 }
 const fakeStorage = () => { const map = new Map(); return { getItem: (key) => map.get(key) ?? null, setItem: (key, value) => map.set(key, value), map }; };
+function finishPlayoffs(c) {
+  while (!careerSeasonFinished(c)) c = nextFixture(c) ? complete(c) : advanceCareerPlayoffs(c);
+  return c;
+}
 
 test('création : douze profils fixes, trois par archétype, cinq Recrues, contrats groupés', () => {
   const c = createCareer('  Les Rebuts  ', 'draft'); const original = structuredClone(c);
@@ -116,7 +120,7 @@ test('clubs adverses : vingt journées de rotation, progression, contrats et éq
   for (const ai of c.clubs.slice(1)) { delete ai.balance; delete ai.inventory; delete ai.transactions; }
   c = importCareer(exportCareer(c));
   for (let day = 0; day < 20; day++) {
-    if (c.day === 10) c = nextSeason(c);
+    if (c.day === 10) c = nextSeason(finishPlayoffs(c));
     const before = structuredClone(c.clubs.slice(1)), launched = launchCareerMatch(c);
     const fixture = nextFixture(c), opponent = before.find(ai => ai.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
     assert.deepEqual(launched.current.config.rosters.away, aiLineup(opponent).map(id => compilePlayer(opponent.players.find(p => p.id === id), opponent.inventory)));
@@ -127,7 +131,8 @@ test('clubs adverses : vingt journées de rotation, progression, contrats et éq
         const next = ai.players.find(q => q.id === p.id), starter = played.includes(p.id);
         assert.equal(next.xp, p.xp + (starter ? 10 : 4));
         assert.deepEqual(next.abilities, p.abilities); assert.equal(pendingAbilityLevels(next).length, 0);
-        if (starter) assert.ok(next.fatigue >= Math.min(6, p.fatigue + (p.implant === 'regulator' ? 1 : 2)));
+        if (c.day === 10) assert.equal(next.fatigue, 0);
+        else if (starter) assert.ok(next.fatigue >= Math.min(6, p.fatigue + (p.implant === 'regulator' ? 1 : 2)));
         else assert.equal(next.fatigue, Math.max(0, p.fatigue - fatigueRecovery(p)));
       }
       const today = ai.transactions.filter(t => t.fixtureId.startsWith(`s${c.season}-d${c.day}-`));
@@ -219,7 +224,7 @@ test('saison coûteuse perdue : dette persistante, aucun intérêt et jeu toujou
   }
   balance += 100;
   assert.equal(c.current.summary.seasonPrize, 100); assert.equal(c.balance, balance); assert.ok(balance < -700);
-  c = nextSeason(c); assert.equal(c.balance, balance); assert.ok(ownedPlayers(c).every((p) => p.fatigue === 0));
+  c = nextSeason(finishPlayoffs(c)); assert.equal(c.balance, balance); assert.ok(ownedPlayers(c).every((p) => p.fatigue === 0));
   const wages = payroll(c), launched = launchCareerMatch(c); assert.equal(launched.balance, balance - wages); assert.match(purchaseBlock(launched, 1), /lecture seule/);
   const state = simulateMatch(launched.current.config).state; state.result.winnerId = 'away'; c = saveCareerTurn(launched, state, []);
   balance += 200 - wages;
@@ -240,6 +245,7 @@ test('plusieurs saisons : journées complètes, cinq offres de niveau, XP/fatigu
     assert.ok(c.clubs.slice(1).every((club) => club.players.filter(p => !p.id.includes('-recruit-')).every(p => p.xp > 0)));
     assert.equal(c.transactions.filter((t) => t.fixtureId === `season-${season}`).length, 1);
     assert.ok(c.table.every((r) => r.played === 10)); assert.equal(c.seasonHistory.length, season);
+    c = finishPlayoffs(c);
     const balance = c.balance, xp = ownedPlayers(c).map((p) => p.xp); c = nextSeason(c);
     assert.equal(c.balance, balance); assert.deepEqual(ownedPlayers(c).map((p) => p.xp), xp); assert.deepEqual(ownedPlayers(c).map((p) => p.id), ids);
     assert.ok(c.clubs.every((club) => club.players.every((p) => p.fatigue === 0))); assert.equal(c.day, 0); validateCareer(c);

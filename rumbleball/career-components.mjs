@@ -28,12 +28,13 @@ export function metric(label, value, context = '') {
   const block = el('div', 'rb-metric'); block.append(el('span', 'rb-muted', label), el('strong', '', value));
   if (context) block.append(el('small', 'rb-muted', context)); return block;
 }
-export function table(headers, rows, { highlight = -1, caption = '' } = {}) {
+export function table(headers, rows, { highlight = -1, caption = '', qualifying = 0 } = {}) {
   const wrap = el('div', 'rb-table-scroll'), t = el('table', 'rb-stats-table'), head = el('thead'), body = el('tbody'), hr = el('tr');
   if (caption) t.append(el('caption', 'rb-sr-only', caption));
   for (const text of headers) { const th = el('th', '', text); th.scope = 'col'; hr.append(th); } head.append(hr);
   for (const [index, values] of rows.entries()) {
     const row = el('tr', index === highlight ? 'rb-own-club' : '');
+    if (index < qualifying) row.classList.add('rb-playoff-qualifier');
     for (const [i, value] of values.entries()) { const cell = el(i ? 'td' : 'th'); if (!i) cell.scope = 'row'; if (value instanceof Node) cell.append(value); else cell.textContent = String(value); row.append(cell); } body.append(row);
   }
   t.append(head, body); wrap.append(t); return wrap;

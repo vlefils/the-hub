@@ -14,7 +14,7 @@ Le batch replays/KO du 18 octobre est validé localement. Le propriétaire a con
 
 - Ligue privée de 2, 4, 6 ou 8 clubs, six par défaut ; un utilisateur possède un club par ligue. Le créateur partage un code et lance la saison lorsque tous les clubs sont présents.
 - Club neuf de six recrues de niveau 1 ; 2 400 chromas moins 1 800 de contrats, soit 600 disponibles. Les carrières locales ne peuvent pas être importées dans une ligue.
-- Saison aller-retour : `2 × (clubs − 1)` journées. Une journée par soirée. Classement 3/1/0, puis victoires, puis ordre d’inscription. Nouvelle saison automatique, progression et équipement conservés, fatigue remise à zéro.
+- Phase de groupe aller-retour : `2 × (clubs − 1)` journées. Une journée par soirée. Classement 3/1/0, puis victoires, puis ordre d’inscription. Elle est suivie des playoffs ; la nouvelle saison démarre automatiquement après leur finale, avec progression et équipement conservés et fatigue remise à zéro.
 - **20 h Europe/Paris**, en tenant compte des changements d’heure. Toutes les équipes sont figées à cette heure, y compris celles qui joueront plus tard.
 - Matchs successifs dans chaque ligue. Le match suivant commence deux minutes après la fin du précédent. Les autres ligues peuvent avoir leur propre soirée en parallèle.
 - Décompte réservé de 3,5 secondes, puis dix rounds de douze secondes. Les prolongations du moteur prolongent aussi le créneau de diffusion avant la pause.
@@ -22,6 +22,16 @@ Le batch replays/KO du 18 octobre est validé localement. Le propriétaire a con
 - La gestion rouvre après la dernière rencontre de la soirée. Sans nouvelle préparation, le club reconduit automatiquement son équipe.
 - **210 chromas par journée**, versés au verrouillage, puis prélèvement des salaires de tout l’effectif. **+100 en cas de victoire**, au terme de sa diffusion ; aucune prime supplémentaire pour nul/défaite ni prime de classement dans ce mode.
 - Dix joueurs maximum, dont cinq titulaires. 210 couvre six salaires au niveau 5 ; chaque remplaçant supplémentaire augmente les dépenses. Les achats ne créent pas de découvert ; seuls les salaires peuvent le faire. Le revenu et les ventes réduisent une dette existante.
+
+### Playoffs
+
+Les 50 % premiers sont arrondis au multiple de quatre supérieur, dans la limite des inscrits : **2 qualifiés sur 2**, **4 sur 4/6/8**. Les places sont signalées dans le classement de groupe avec la légende « Les X premières équipes se qualifient pour les playoffs. » Quatre qualifiés donnent les demi-finales 1er–4e et 2e–3e, puis une finale dans un tableau fixe. Le moteur de tableau gère aussi les exemptions des meilleures têtes de série pour des effectifs plus grands, sans augmenter les capacités de ligue proposées.
+
+Au règlement de la dernière soirée de groupe, le serveur fige les têtes de série et retire **toute la fatigue de tous les joueurs**, remplaçants compris. Les demi-finales se jouent à 20 h lors de la soirée suivante ; la finale lors de celle d’après. Une ligue de deux clubs passe directement à sa soirée de finale. La fatigue reste acquise entre deux tours. Sans vainqueur après les prolongations habituelles, le meilleur classement de groupe qualifie l’équipe ; le replay conserve le résultat nul.
+
+Les points du groupe ne comptent que les matchs de groupe. Les qualifiés reçoivent l’XP, la fatigue et les primes de victoire habituelles de leurs matchs ; les clubs éliminés ne reçoivent pas d’XP sans match. Le revenu de ligue et les salaires restent appliqués à tous les membres lors de chaque soirée. La préparation reste annulable et le verrouillage de 20 h reste identique.
+
+Le tableau n’expose que les qualifications réglées à l’heure de fin de diffusion, même si le worker a déjà calculé la rencontre. Les replays, le champion et les tableaux des saisons terminées sont conservés ; la saison suivante commence après la finale. Les ligues existantes rejoignent ce cycle à la fin de leur groupe courant. Les métadonnées résident dans le JSON existant : redéployer les deux fonctions, sans nouvelle migration SQL.
 
 Les noms des joueurs et des offres suivent le format `Prénom "Pseudo" Nom`, avec 393 216 combinaisons. Chaque archétype possède seize pseudos cyberpunk dédiés ; les titres genrés sont accordés au portrait, les handles techniques sont épicènes. Les portraits androgynes reçoivent des prénoms épicènes et des pseudos neutres. Les anciens alias sont remplacés en conservant le prénom et le nom conformes ; un changement de rôle tactique ne change pas le pseudo. Leur génération publique est indépendante de la graine secrète des rencontres. La limite de dix et la génération des identités sont également serveur : après cette mise à jour, redéployer `rumbleball-api` et `rumbleball-worker` avec les commandes de la section Installation. Aucune migration SQL supplémentaire n’est nécessaire.
 

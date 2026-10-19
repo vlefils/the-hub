@@ -7,6 +7,7 @@ import { compilePlayer, salary, progressPlayer } from '../progression.mjs';
 import { clubDeployment } from '../deployment.mjs';
 import { clubOpening } from '../openings.mjs';
 import { ensureClubDevelopment, XP_THRESHOLDS, MAX_LEVEL } from '../player-development.mjs';
+import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture, playoffWinner } from '../playoffs.mjs';
 
 export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: 3500 });
 const need = (ok, message) => { if (!ok) throw new Error(message); };
@@ -60,7 +61,7 @@ export function createLeague({ id, userId, name, clubName, color, crestId, invit
   need([2, 4, 6, 8].includes(capacity), 'Une ligue accueille 2, 4, 6 ou 8 clubs.');
   need(typeof inviteCode === 'string' && inviteCode.length >= 16, 'Code d’invitation invalide.');
   return { version: 1, id, name: text(name, 'Nom de ligue'), ownerId: userId, inviteCode, seed, capacity, status: 'lobby',
-    season: 1, day: 0, completedDays: 0, nextLockAt: null, night: null, history: [],
+    season: 1, day: 0, completedDays: 0, phase: 'groups', playoffs: null, playoffHistory: [], nextLockAt: null, night: null, history: [],
     members: [{ userId, club: makeClub(userId, clubName, `${seed}:${userId}`, color, crestId, `${id}:${userId}`), draft: null }], createdAt: iso(instant(now)) };
 }
 export function joinLeague(input, userId, { clubName, color, crestId }, now) {
@@ -89,6 +90,7 @@ export function editPreparation(input, userId, command, payload, now) {
   return s;
 }
 export function fixturesFor(s) {
+  if (s.phase === 'playoffs') return playoffFixtures(s.playoffs).map(match => [match.homeId, match.awayId]);
   const ids = s.members.map((m) => m.userId), n = ids.length, day = s.day % (2 * (n - 1));
   for (let i = 0; i < day % (n - 1); i++) ids.splice(1, 0, ids.pop());
   return Array.from({ length: n / 2 }, (_, i) => day < n - 1 ? [ids[i], ids[n - 1 - i]] : [ids[n - 1 - i], ids[i]]);
@@ -122,12 +124,13 @@ function freezeNight(s, now) {
     transaction(m.club, -m.club.players.reduce((n, p) => n + salary(p), 0), 'Salaires de la journée', `wages-${s.completedDays}`);
   }
   const games = fixturesFor(s).map((sides, index) => {
-    const id = `${s.id}:s${s.season}:d${s.day}:m${index}`, seed = `${s.seed}:${id}`;
+    const playoff = s.phase === 'playoffs' ? playoffFixtures(s.playoffs)[index] : null;
+    const id = playoff?.id ?? `${s.id}:s${s.season}:d${s.day}:m${index}`, seed = `${s.seed}:${id}`;
     const config = configFor(s, sides, seed), initial = createMatch(config);
-    return { id, homeId: sides[0], awayId: sides[1], config, startsAt: index ? null : iso(start), playsAt: index ? null : iso(start + ONLINE_RULES.kickoffMs),
+    return { id, phase: s.phase ?? 'groups', homeId: sides[0], awayId: sides[1], config, startsAt: index ? null : iso(start), playsAt: index ? null : iso(start + ONLINE_RULES.kickoffMs),
       endsAt: null, broadcast: { initial, rounds: [], final: initial }, settled: false };
   });
-  s.status = 'broadcast'; s.night = { day: s.day, season: s.season, startsAt: iso(start), games, endsAt: games.at(-1).endsAt };
+  s.status = 'broadcast'; s.night = { day: s.day, season: s.season, phase: s.phase ?? 'groups', name: s.phase === 'playoffs' ? currentPlayoffRound(s.playoffs).name : `Journée ${s.day + 1}`, startsAt: iso(start), games, endsAt: games.at(-1).endsAt };
 }
 function settle(s, game) {
   if (game.settled) return;
@@ -148,7 +151,9 @@ function settle(s, game) {
     identifyClub(c, `${s.id}:${id}`, c.market);
   }
   game.settled = true;
-  s.history.push({ id: game.id, season: s.season, day: s.day, homeId: game.homeId, awayId: game.awayId, winnerId, rounds: state.round, endsAt: game.endsAt, replayAvailable: true });
+  if (game.phase === 'playoffs') settlePlayoffFixture(s.playoffs, game.id, { winnerId, round: state.result.round });
+  const qualification = game.phase === 'playoffs' ? { qualifiedId: playoffWinner(s.playoffs, game.homeId, game.awayId, winnerId), decision: winnerId ? 'match' : 'ranking' } : {};
+  s.history.push({ id: game.id, phase: game.phase ?? 'groups', season: s.season, day: s.day, homeId: game.homeId, awayId: game.awayId, winnerId, ...qualification, rounds: state.round, endsAt: game.endsAt, replayAvailable: true });
 }
 export function advanceLeague(input, now, { maxRounds = Infinity } = {}) {
   const s = copy(input), t = instant(now);
@@ -166,7 +171,14 @@ export function advanceLeague(input, now, { maxRounds = Infinity } = {}) {
   s.night.endsAt = s.night.games.at(-1).endsAt;
   if (s.night.games.every((g) => g.settled)) {
     s.status = 'preparation'; s.day++; s.completedDays++;
-    if (s.day === 2 * (s.members.length - 1)) { s.season++; s.day = 0; for (const m of s.members) for (const p of m.club.players) p.fatigue = 0; }
+    if (s.phase === 'playoffs' && s.playoffs.championId) {
+      (s.playoffHistory ??= []).push({ season: s.season, bracket: copy(s.playoffs) });
+      s.season++; s.day = 0; s.phase = 'groups'; s.playoffs = null;
+      for (const m of s.members) for (const p of m.club.players) p.fatigue = 0;
+    } else if (s.phase !== 'playoffs' && s.day === 2 * (s.members.length - 1)) {
+      s.playoffs = createPlayoffs(leagueTable(s).map(row => row.id), `${s.id}:s${s.season}:playoffs`); s.phase = 'playoffs';
+      for (const m of s.members) for (const p of m.club.players) p.fatigue = 0;
+    }
     // Recover one delayed evening without retroactively playing many seasons.
     s.nextLockAt = nextLock(now);
   }
@@ -174,7 +186,7 @@ export function advanceLeague(input, now, { maxRounds = Infinity } = {}) {
 }
 export function leagueTable(s) {
   const rows = s.members.map((m, order) => ({ id: m.userId, name: m.club.name, order, played: 0, wins: 0, draws: 0, losses: 0, points: 0 }));
-  for (const g of s.history.filter((g) => g.season === s.season)) for (const id of [g.homeId, g.awayId]) {
+  for (const g of s.history.filter(g => g.season === s.season && g.phase !== 'playoffs')) for (const id of [g.homeId, g.awayId]) {
     const r = rows.find((r) => r.id === id); r.played++;
     if (!g.winnerId) { r.draws++; r.points++; } else if (g.winnerId === id) { r.wins++; r.points += 3; } else r.losses++;
   }
@@ -190,7 +202,7 @@ export function replayProjection(s, userId, matchId, archive, now) {
   const recent = s.night?.games.find(g => g.id === matchId && g.settled);
   const data = archive ?? (recent ? { initial: recent.broadcast.initial, rounds: recent.broadcast.rounds } : null);
   need(data?.initial && Array.isArray(data.rounds) && data.rounds.length, 'Les images de cette ancienne rencontre ne sont plus disponibles.');
-  return { id: matchId, season: result.season, day: result.day, endsAt: result.endsAt,
+  return { id: matchId, season: result.season, day: result.day, phase: result.phase ?? 'groups', endsAt: result.endsAt,
     initial: publicState(data.initial, matchId), rounds: data.rounds.map(round => ({ round: round.round,
       turns: round.turns.map(turn => ({ before: publicState(turn.before, matchId), after: publicState(turn.after, matchId), events: copy(turn.events) })) })) };
 }
@@ -204,7 +216,7 @@ export function leagueProjection(s, userId, now) {
     const ended = Boolean(g.endsAt && t >= instant(g.endsAt)), started = Boolean(g.startsAt && t >= instant(g.startsAt));
     return { id: g.id, homeId: g.homeId, awayId: g.awayId, homeName: g.config.teamNames.home, awayName: g.config.teamNames.away,
       startsAt: g.startsAt, playsAt: g.playsAt, endsAt: g.endsAt, status: ended ? 'finished' : started ? 'live' : 'scheduled',
-      result: ended ? { winnerId: g.broadcast.final.result.winnerId === 'home' ? g.homeId : g.broadcast.final.result.winnerId === 'away' ? g.awayId : null } : null };
+      phase: g.phase ?? 'groups', result: ended ? { winnerId: g.broadcast.final.result.winnerId === 'home' ? g.homeId : g.broadcast.final.result.winnerId === 'away' ? g.awayId : null } : null };
   }) ?? [];
   const active = night?.games.find((g) => g.startsAt && t >= instant(g.startsAt) && (!g.endsAt || t < instant(g.endsAt)));
   let broadcast = null, waitingForServer = false;
@@ -217,8 +229,9 @@ export function leagueProjection(s, userId, now) {
       turns: t < instant(active.playsAt) ? [] : round.turns.map((turn) => ({ before: publicState(turn.before, active.id), after: publicState(turn.after, active.id), events: copy(turn.events) })) };
   }
   return { id: s.id, name: s.name, ownerId: s.ownerId, capacity: s.capacity, status: s.status, season: s.season, day: s.day,
+    phase: s.phase ?? 'groups', playoffs: copy(s.playoffs ?? null), playoffHistory: copy(s.playoffHistory ?? []),
     members: s.members.map((m) => ({ userId: m.userId, name: m.club.name, kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
     serverTime: iso(t), nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
     club: ownClub, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
-    history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
+    history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

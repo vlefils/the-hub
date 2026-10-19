@@ -7,6 +7,8 @@ import { validCrest, validPortrait, identifyCareer } from './identity.mjs';
 import { validDeployment } from './deployment.mjs';
 import { validOpening } from './openings.mjs';
 import { MAX_LEVEL, validPlayerDevelopment, ensureCareerDevelopment } from './player-development.mjs';
+import { validPlayoffs, playoffFixtures } from './playoffs.mjs';
+import { ensureCareerPlayoffs } from './career.mjs';
 
 export const CAREER_KEY = 'the-hub.rumbleball.career.v1';
 const check = (condition) => { if (!condition) throw new Error('Sauvegarde de carrière invalide ou incompatible.'); };
@@ -84,16 +86,21 @@ export function validateCareer(c) {
   const validTable = (rows) => Array.isArray(rows) && rows.length === 6 && new Set(rows.map((r) => r.clubId)).size === 6 && rows.every((r) => clubIds.includes(r.clubId) && name(r.name) && ['played', 'wins', 'draws', 'losses', 'points'].every((key) => integer(r[key])) && r.played === r.wins + r.draws + r.losses && r.points === r.wins * 3 + r.draws);
   check(validTable(c.table));
   check(c.seasonHistory.every((s, index) => s.season === index + 1 && integer(s.prize) && validTable(s.table)));
-  for (const f of c.schedule.flat().filter((f) => [f.homeId, f.awayId].includes('club'))) {
+  check(c.playoffs === undefined || c.playoffs === null || c.day === 10 && validPlayoffs(c.playoffs, c.table.map(row => row.clubId), `s${c.season}-playoffs`));
+  for (const past of c.seasonHistory) if (past.playoffs) check(past.championId && past.playoffs.championId === past.championId && validPlayoffs(past.playoffs, past.table.map(row => row.clubId), `s${past.season}-playoffs`));
+  const fixtures = [...c.schedule.flat(), ...(c.playoffs?.rounds.flatMap(round => round.matches) ?? [])];
+  for (const f of fixtures.filter(f => [f.homeId, f.awayId].includes('club'))) {
     const wages = c.transactions.filter((t) => t.fixtureId === f.id && t.label === 'Salaires de la journée');
     const rewards = c.transactions.filter((t) => t.fixtureId === f.id && t.label === 'Prime de match');
     check(wages.length === Number(Boolean(f.result) || c.current?.fixtureId === f.id) && rewards.length === Number(Boolean(f.result)));
   }
   if (c.current !== null) {
     const m = c.current; check(c.status === 'active' && m && typeof m.settled === 'boolean' && integer(m.wages) && Array.isArray(m.turns));
-    const f = c.schedule.flat().find((fixture) => fixture.id === m.fixtureId); check(f && Boolean(f.result) === m.settled);
-    check(c.schedule[c.day - Number(m.settled)]?.some((fixture) => fixture.id === m.fixtureId));
-    check(m.config?.seed === f.seed && m.state?.seed === f.seed && m.state.players?.length === 10 && m.turns.length <= 131);
+    const f = fixtures.find(fixture => fixture.id === m.fixtureId); check(f && Boolean(f.result) === m.settled);
+    const groupDay = c.schedule.findIndex(day => day.some(fixture => fixture.id === m.fixtureId));
+    check(groupDay >= 0 ? (m.settled ? groupDay < c.day : groupDay === c.day) : c.day === 10 && (m.settled || playoffFixtures(c.playoffs).some(fixture => fixture.id === m.fixtureId)));
+    const matchSeed = f.seed ?? `${c.seed}:${f.id}`;
+    check(m.config?.seed === matchSeed && m.state?.seed === matchSeed && m.state.players?.length === 10 && m.turns.length <= 131);
     check(m.state.finished === m.settled && integer(m.state.turns) && m.state.turns <= 130);
     check(integer(m.state.round, 1) && m.state.round <= 13 && integer(m.state.turnIndex) && m.state.turnIndex < (m.settled ? 11 : 10));
     check(Array.isArray(m.state.initiative) && new Set(m.state.initiative).size === 10 && m.state.initiative.every((id) => m.state.players.some((p) => p.id === id)));
@@ -134,7 +141,7 @@ export function importCareer(json) {
   if (typeof json !== 'string' || json.length > 8_000_000) throw new Error('Fichier JSON trop volumineux.');
   let data; try { data = JSON.parse(json); } catch { throw new Error('Ce fichier ne contient pas un JSON lisible.'); }
   if (data?.format !== 'the-hub-rumbleball' || data.version !== 1) throw new Error('Format de carrière inconnu.');
-  return ensureCareerDevelopment(identifyCareer(validateCareer(data.career)));
+  return ensureCareerPlayoffs(ensureCareerDevelopment(identifyCareer(validateCareer(data.career))));
 }
 export function loadCareer(storage) {
   try { const raw = storage.getItem(CAREER_KEY); return { career: raw ? importCareer(raw) : null, error: null, hasSave: Boolean(raw) }; }
