@@ -47,7 +47,7 @@ export function createMatch(config = {}) {
         const assigned = (teamId === 'home' ? config.players : config.awayPlayers)?.[index] ?? (config.rosters?.[teamId] ? profile : undefined);
         const archetype = config.classes === false ? null : Object.hasOwn(ARCHETYPES, assigned?.archetype) ? assigned.archetype : profile.archetype;
         return { ...clone(profile), id: `${teamId}-${index}`, teamId, number: index + 1,
-          archetype, classState: initialClassState(archetype, profile.level), bonusAction: true, chargeRun: null, feintTargetId: null,
+          archetype, classState: initialClassState(archetype, profile.level, profile), bonusAction: true, chargeRun: null, feintTargetId: null,
           name: config.rosters?.[teamId] ? profile.name : teamId === 'home' ? profile.trainingName : profile.name,
           role: Object.hasOwn(ROLES, assigned?.role) ? assigned.role : profile.role,
           instruction: Object.hasOwn(INSTRUCTIONS, assigned?.instruction) ? assigned.instruction : 'normal',

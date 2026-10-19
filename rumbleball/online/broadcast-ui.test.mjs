@@ -126,12 +126,31 @@ test('recrutement en ligne : modale, banc, saisie préservée et annulation de l
   e.strategy().value = 'possession'; await e.strategy().emit('change');
   await button(e.root, 'Recruter un joueur').click();
   const dialog = e.root.querySelector('.rb-management-dialog'); assert.equal(dialog.hidden, false);
+  assert.equal(dialog.querySelectorAll('.rb-ability-scores').length, base.market.length);
   await button(dialog, 'Recruter · 300 chromas').click();
   const next = e.state().members[0].draft; assert.equal(next.players.length, base.players.length + 1); assert.equal(next.balance, base.balance - 300); assert.deepEqual(next.lineup, base.lineup);
   assert.equal(e.strategy().value, 'possession'); assert.match(e.root.querySelector('.rb-broadcast-bench').textContent, new RegExp(offer.name));
   assert.equal(e.root.querySelector('.rb-broadcast-bench').parentNode, e.root.querySelector('.rb-court-workspace'));
   await button(dialog, 'Fermer').click(); assert.equal(dialog.hidden, true);
   await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(e.strategy().value, base.strategy); e.mounted.stop();
+});
+
+test('amélioration en ligne : points sur le banc, choix conservés avec les tactiques non enregistrées, annulation', async t => {
+  const e = await online(t, true), club = e.state().members[0].club, reserve = club.players.find(p => !club.lineup.includes(p.id));
+  reserve.xp = 50; e.remoteChange(); await e.poll();
+  e.strategy().value = 'possession'; await e.strategy().emit('change');
+  await button(e.root, reserve.name).click();
+  const inspector = e.root.querySelector('.rb-player-inspector'), advancement = inspector.querySelector('.rb-player-advancement'), choices = advancement.querySelectorAll('select');
+  assert.equal(inspector.querySelector('.rb-ability-scores').children.length, 5);
+  choices[0].value = 'mind'; await choices[0].emit('change'); choices[1].value = 'charisma'; await choices[1].emit('change');
+  await button(advancement, 'Valider les 2 points').click();
+  const next = e.state().members[0].draft;
+  assert.deepEqual(next.players.find(p => p.id === reserve.id).advancements, [{ level: 3, changes: { mind: 1, charisma: 1 } }]);
+  assert.deepEqual(next.lineup, club.lineup); assert.equal(e.strategy().value, 'possession');
+  assert.match(e.root.querySelector('.rb-player-inspector').textContent, new RegExp(reserve.name));
+  await button(e.root, 'Annuler la préparation').click();
+  assert.equal(e.state().members[0].draft, null); assert.deepEqual(e.state().members[0].club.players.find(p => p.id === reserve.id).advancements, []);
+  e.mounted.stop();
 });
 
 test('dix joueurs en ligne : cinquième remplaçant consultable et configurable, onzième contrat bloqué', async t => {

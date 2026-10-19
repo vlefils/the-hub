@@ -38,6 +38,30 @@ test('préparation : achats et équipe persistants, annulation intégrale et ét
   assert.throws(() => editPreparation(s, 'intruder', 'buy', {}, day), /participez/);
   assert.throws(() => editPreparation(s, 'u0', 'replaceState', { balance: 999999 }, day), /inconnue/);
 });
+
+test('améliorations serveur : choix contrôlés, brouillon annulable, propriétaire et verrouillage', async () => {
+  const s = fixture(), p = s.members[0].club.players[0]; p.xp = 50;
+  const before = structuredClone(s);
+  assert.throws(() => editPreparation(s, 'u0', 'advance', { playerId: p.id, changes: { charisma: 3 } }, day), /deux/);
+  // Club-local identifiers coincide; the other member has no points to spend.
+  assert.throws(() => editPreparation(s, 'u1', 'advance', { playerId: p.id, changes: { charisma: 2 } }, day), /Aucune/);
+  let prepared = editPreparation(s, 'u0', 'advance', { playerId: p.id, changes: { charisma: 1, mind: 1 }, abilities: { charisma: 99 } }, day);
+  const improved = prepared.members[0].draft.players[0];
+  assert.equal(improved.abilities.charisma, p.abilities.charisma); assert.deepEqual(improved.advancements, [{ level: 3, changes: { charisma: 1, mind: 1 } }]);
+  assert.deepEqual(s, before); assert.deepEqual(prepared.members[1], s.members[1]);
+  assert.equal(leagueProjection(prepared, 'u0', day).club.players[0].advancements.length, 1);
+  assert.throws(() => editPreparation(prepared, 'u0', 'advance', { playerId: p.id, changes: { mind: 2 } }, day), /Aucune/);
+  assert.deepEqual(editPreparation(prepared, 'u0', 'cancel', {}, day), before);
+  assert.throws(() => editPreparation(prepared, 'u0', 'advance', { playerId: p.id, changes: { mind: 2 } }, lock), /verrouillées/);
+  const frozen = advanceLeague(prepared, lock);
+  assert.equal(frozen.members[0].club.players[0].advancements.length, 1);
+  const live = frozen.night.games[0].config.rosters.home.find(q => q.playerId === p.id);
+  assert.equal(live.abilities.charisma, p.abilities.charisma + 1); assert.equal(live.proficiencyBonus, 2);
+  let state = s, revision = 1;
+  const service = createLeagueService({ async get() { return { id: state.id, state: structuredClone(state), revision }; }, async commit(id, expected, next) { assert.equal(expected, revision); state = next; return ++revision; } }, { now: () => day });
+  const result = await service.command('u0', { action: 'advance', leagueId: s.id, payload: { playerId: p.id, changes: { constitution: 2 } } });
+  assert.equal(result.league.club.players[0].advancements.length, 1); assert.equal(result.revision, 2);
+});
 test('calendrier : aller-retour complet pour 2, 4, 6 et 8 clubs, un match par club et journée', () => {
   for (const capacity of [2, 4, 6, 8]) {
     const s = fixture(capacity), pairs = new Set();
@@ -73,6 +97,17 @@ test('soirée : tous figés à 20 h, salaires uniques, revenu fixe, deux minutes
   }
   assert.deepEqual(advanceLeague(finished, s.night.endsAt), finished);
   assert.equal(initial.members[0].club.balance, 600);
+});
+
+test('banc en ligne : la Constitution pilote la récupération au règlement du match', () => {
+  let s = fixture();
+  const low = s.members[0].club.players[5], high = s.members[1].club.players[5];
+  low.fatigue = high.fatigue = 6;
+  low.abilities = { strength: 15, dexterity: 15, constitution: 8, mind: 13, charisma: 8 };
+  high.abilities = { strength: 13, dexterity: 15, constitution: 15, mind: 8, charisma: 8 };
+  s = advanceLeague(s, lock); s = advanceLeague(s, s.night.endsAt);
+  assert.equal(s.members[0].club.players[5].fatigue, 4); assert.equal(s.members[1].club.players[5].fatigue, 1);
+  assert.equal(s.members[0].club.players[5].xp, 4); assert.equal(s.members[1].club.players[5].xp, 4);
 });
 test('diffusion : pas de préparation adverse, pas de prochain round, pas de graine privée', () => {
   let s = fixture(); s = editPreparation(s, 'u0', 'sell', { playerId: s.members[0].club.players[5].id }, day);

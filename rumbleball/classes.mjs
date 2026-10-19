@@ -1,4 +1,5 @@
 // Sporting adaptations of The Hub classes; level changes reserves, never technique costs.
+import { modifier } from './data.mjs';
 export const ARCHETYPES = {
   belier: { className: 'Brute', name: 'Bélier d’arène',
     description: 'Encaisse les chocs et ouvre un passage au contact.',
@@ -31,6 +32,12 @@ export const archetypeLabel = (p) => ARCHETYPES[p.archetype]
   ? `${ARCHETYPES[p.archetype].className} · ${ARCHETYPES[p.archetype].name}` : 'Sans classe';
 export function classCaps(p) {
   const tiers = Number((p.level ?? 1) >= 3) + Number((p.level ?? 1) >= 5);
+  if (Number.isFinite(p.proficiencyBonus) && p.abilities) return {
+    adrenaline: p.archetype === 'belier' ? Math.max(2, 2 * p.proficiencyBonus + modifier(p.abilities.constitution)) : 0,
+    focus: p.archetype === 'passeur' ? Math.max(1, p.proficiencyBonus + modifier(p.abilities.mind)) : 0,
+    calls: p.archetype === 'capitaine' ? Math.max(1, p.proficiencyBonus + modifier(p.abilities.charisma)) : 0,
+    flaw: isRunner(p) ? 1 : 0,
+  };
   return { adrenaline: p.archetype === 'belier' ? 6 + 2 * tiers : 0,
     focus: p.archetype === 'passeur' ? 2 + tiers : 0,
     calls: p.archetype === 'capitaine' ? 2 + tiers : 0, flaw: isRunner(p) ? 1 : 0 };
@@ -40,10 +47,11 @@ export function classAbilities(p) {
   return (ARCHETYPES[p.archetype]?.abilities ?? []).map(([name, description]) => [name, description
     .replace('6 Adrénaline', `${caps.adrenaline} Adrénaline`)
     .replace('2 appels par match', `${caps.calls} appels par match`)
-    .replace('2 points de concentration', `${caps.focus} points de concentration`)]);
+    .replace('2 points de concentration', `${caps.focus} points de concentration`)
+    .replace('DD 13', `DD ${p.chargeDC ?? 13}`)]);
 }
-export function initialClassState(archetype, level = 1) {
-  const { flaw, ...resources } = classCaps({ archetype, level });
+export function initialClassState(archetype, level = 1, player = {}) {
+  const { flaw, ...resources } = classCaps({ ...player, archetype, level });
   return { ...resources, targetId: null, flaw: 0, observedRound: 0 };
 }
 export function classResources(p, players = []) {

@@ -1,6 +1,7 @@
 import { PROFILES, ROLES, INSTRUCTIONS, STRATEGIES, clone } from './data.mjs';
 import { createMatch, simulateMatch, seedHash, CURRENT_RULES } from './engine.mjs';
-import { compilePlayer, recruitmentPrice, salary, levelOf, progressPlayer, CATALOGUE, XP_THRESHOLDS, MAX_SQUAD_SIZE } from './progression.mjs';
+import { compilePlayer, recruitmentPrice, salary, levelOf, progressPlayer, CATALOGUE, XP_THRESHOLDS, MAX_SQUAD_SIZE, MAX_LEVEL } from './progression.mjs';
+import { ensurePlayerDevelopment, ensureCareerDevelopment, applyAbilityIncrease, automaticAbilityIncreases } from './player-development.mjs';
 import { playerName } from './player-names.mjs';
 import { KIT_COLORS, clubKit, validKitColor } from './appearance.mjs';
 import { identifyCareer, identifyClub, playerGender, validCrest } from './identity.mjs';
@@ -24,7 +25,7 @@ function shuffle(values, seed) {
 }
 const need = (condition, message) => { if (!condition) throw new Error(message); };
 const team = (career) => career.clubs[0];
-const identifiedCopy = (career) => identifyCareer(clone(career));
+const identifiedCopy = (career) => ensureCareerDevelopment(identifyCareer(clone(career)));
 export const ownedPlayers = (career) => team(career).players;
 export const payroll = (career) => ownedPlayers(career).reduce((sum, p) => sum + salary(p), 0);
 export const managementLocked = (career) => Boolean(career.current && !career.current.settled);
@@ -38,15 +39,15 @@ function transact(career, amount, label, fixtureId = null) {
   career.balance += amount;
   career.transactions.push({ id: `t${career.transactions.length + 1}`, season: career.season, day: Math.min(10, career.day + 1), amount, label, fixtureId, balance: career.balance });
 }
-function player(id, name, profile, level = 1) {
-  return { id, name, profile, xp: XP_THRESHOLDS[level - 1], fatigue: 0, role: PROFILES[profile].role, instruction: 'normal', implant: null };
+function player(id, name, profile, level = 1, seed = id) {
+  return ensurePlayerDevelopment({ id, name, profile, xp: XP_THRESHOLDS[level - 1], fatigue: 0, role: PROFILES[profile].role, instruction: 'normal', implant: null }, `${seed}:${id}`);
 }
 function generateMarket(career, initial = false) {
   const profiles = initial ? [0, 1, 2, 3, 4, 0, 0, 1, 2, 2, 4, 4] : [0, 1, 2, 4, ...shuffle([0, 1, 2, 3, 4], `${career.seed}:market:${career.completedDays}`).slice(0, 2)];
   const used = new Set(career.clubs.flatMap(club => club.players.map(p => p.name)));
   const market = profiles.map((profile, index) => {
     const id = `offer-${career.completedDays}-${index}`, name = initial && index < 5 ? PROFILES[profile].trainingName : playerName(`${career.seed}:name:${id}`, used, 'neutral', PROFILES[profile].archetype); used.add(name);
-    return player(id, name, profile, Math.min(5, 1 + Math.floor(career.completedDays / 5)));
+    return player(id, name, profile, Math.min(MAX_LEVEL, 1 + Math.floor(career.completedDays / 5)), career.seed);
   });
   identifyClub(team(career), `${career.seed}:club`, market);
   return market;
@@ -77,7 +78,7 @@ export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0])
   const career = { version: 1, seed: String(seed).slice(0, 80), status: 'draft', balance: 2400, season: 1, day: 0, completedDays: 0,
     clubs: [{ id: 'club', name: name.trim(), kitColor, style: 'Votre club', strategy: 'balanced', opening: DEFAULT_OPENING, deployment: openingDeployment(), players: [] }, ...CLUBS.map(([clubName, style, strategy, profiles], index) => ({ id: `ai-${index}`, name: clubName, kitColor: KIT_COLORS[index + 1], style, strategy, opening: CLUB_OPENINGS[index], deployment: openingDeployment(CLUB_OPENINGS[index]),
       balance: 600, inventory: [], transactions: [],
-      players: profiles.map((profile, number) => { const p = player(`ai-${index}-${number}`, `${PROFILES[profile].name} ${number + 1}`, profile); if ([1, 4].includes(index)) p.instruction = 'aggressive'; if (index === 1) p.role = number < 3 ? 'blocker' : p.role; if (index === 3 && number < 3) p.role = 'relay'; return p; }) }))],
+      players: profiles.map((profile, number) => { const p = player(`ai-${index}-${number}`, `${PROFILES[profile].name} ${number + 1}`, profile, 1, seed); if ([1, 4].includes(index)) p.instruction = 'aggressive'; if (index === 1) p.role = number < 3 ? 'blocker' : p.role; if (index === 3 && number < 3) p.role = 'relay'; return p; }) }))],
     lineup: [], inventory: [], transactions: [], market: [], schedule: [], tieOrder: [], current: null, seasonHistory: [] };
   career.market = generateMarket(career, true);
   career.tieOrder = shuffle(career.clubs.map((c) => c.id), `${career.seed}:ties:1`);
@@ -113,6 +114,11 @@ export function recruit(input, id) {
   const p = c.market.find((q) => q.id === id); need(p, 'Offre indisponible.'); spend(c, recruitmentPrice(p), `Recrutement : ${p.name}`);
   team(c).players.push(p); c.market = c.market.filter((q) => q.id !== id); return c;
 }
+export function improveAbilities(input, playerId, changes) {
+  const c = identifiedCopy(input); editable(c);
+  const p = ownedPlayers(c).find(p => p.id === playerId); need(p, 'Joueur inconnu.');
+  applyAbilityIncrease(p, changes); return c;
+}
 export function sellPlayer(input, id) {
   const c = identifiedCopy(input); editable(c); need(ownedPlayers(c).length > 5, 'Cinq joueurs minimum dans le club.');
   const p = ownedPlayers(c).find((q) => q.id === id); need(p, 'Joueur inconnu.');
@@ -146,6 +152,7 @@ export function aiLineup(club) {
   return [...club.players].sort((a, b) => a.fatigue - b.fatigue || b.xp - a.xp || a.id.localeCompare(b.id)).slice(0, 5).map((p) => p.id);
 }
 function manageAiClub(c, club, fixture, wages, winnerId) {
+  for (const p of club.players) automaticAbilityIncreases(p);
   // Old saves acquire the same starting management budget when first settled.
   club.balance ??= 600; club.inventory ??= []; club.transactions ??= [];
   const transaction = (amount, label) => {
@@ -162,7 +169,7 @@ function manageAiClub(c, club, fixture, wages, winnerId) {
     const count = profile => club.players.filter(p => PROFILES[p.profile].archetype === PROFILES[profile].archetype).length;
     const profile = [...new Set(preferred)].sort((a, b) => count(a) - count(b))[0];
     const id = `${club.id}-recruit-${c.completedDays + 1}`, used = new Set(c.clubs.flatMap(other => other.players.map(p => p.name)).concat(c.market.map(p => p.name)));
-    const p = player(id, playerName(`${c.seed}:name:${id}`, used, 'neutral', PROFILES[profile].archetype), profile, Math.min(5, 1 + Math.floor((c.completedDays + 1) / 5)));
+    const p = automaticAbilityIncreases(player(id, playerName(`${c.seed}:name:${id}`, used, 'neutral', PROFILES[profile].archetype), profile, Math.min(MAX_LEVEL, 1 + Math.floor((c.completedDays + 1) / 5)), c.seed));
     identifyClub(club, `${c.seed}:${club.id}`, [p]);
     p.name = playerName(`${c.seed}:name:${id}`, used, playerGender(p), PROFILES[profile].archetype);
     if (budget() >= recruitmentPrice(p) + salary(p)) { transaction(-recruitmentPrice(p), `Recrutement : ${p.name}`); club.players.push(p); recruited = true; }

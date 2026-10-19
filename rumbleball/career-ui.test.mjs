@@ -158,7 +158,59 @@ test('Club : deux vues, fiche sélectionnée dans la préparation, équipement e
   await classNode(e.root, 'rb-lineup-slots').children[1].querySelector('button').click();
   const detail = classNode(e.root, 'rb-player-inspector'), xp = detail.querySelector('progress'); assert.equal(xp.value, '0'); assert.equal(xp.max, 30);
   assert.match(detail.querySelector('.rb-player-shop').querySelector('select').getAttribute('aria-label'), new RegExp(c.clubs[0].players[1].name));
-  const max = xpProgress({ name: 'Maximum', xp: 200, fatigue: 0 }); assert.equal(max.querySelector('progress').value, '1'); assert.match(max.textContent, /Maximum/);
+  const max = xpProgress({ name: 'Maximum', xp: 770, fatigue: 0 }); assert.equal(max.querySelector('progress').value, '1'); assert.match(max.textContent, /Maximum/);
+});
+
+test('caractéristiques UI : visibles avant contrat et dans la modale de recrutement', async () => {
+  const c = createCareer('Les Évaluateurs', 'ui-stats');
+  const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  const candidates = classNode(e.root, 'rb-candidate-list');
+  assert.equal(candidates.querySelectorAll('.rb-ability-scores').length, 12);
+  assert.equal(classNode(candidates, 'rb-ability-scores').children.length, 5);
+  assert.match(candidates.textContent, /Constitution/); assert.match(candidates.textContent, /Maîtrise \+2/);
+  for (const check of descendants(candidates).filter(n => n.type === 'checkbox').slice(0, 5)) { check.checked = true; await check.emit('change'); }
+  await button(e.root, 'Valider les contrats').click();
+  await button(e.root, 'Recruter un joueur').click();
+  const dialog = classNode(e.root, 'rb-management-dialog');
+  assert.equal(dialog.querySelectorAll('.rb-ability-scores').length, 7); assert.match(dialog.textContent, /Récupération sur le banc/);
+});
+
+test('amélioration UI : remplaçant sélectionné, prévision Constitution, sauvegarde refusée puis réessayée', async () => {
+  let c = createCareer('Les Évolutifs', 'ui-advancement'); c = confirmDraft(c, c.market.slice(0, 6).map(p => p.id));
+  const p = c.clubs[0].players[5]; p.xp = 50; p.abilities = { strength: 15, dexterity: 13, constitution: 14, mind: 8, charisma: 9 };
+  const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  assert.match(classNode(e.root, 'rb-bench').textContent, /2 points à attribuer/);
+  await button(e.root, p.name).click();
+  const panel = classNode(e.root, 'rb-player-inspector'), advancement = classNode(panel, 'rb-player-advancement'), choices = advancement.querySelectorAll('select');
+  assert.match(advancement.textContent, /niveau 3/); assert.equal(button(advancement, 'Valider les 2 points').disabled, true);
+  for (const choice of choices) { choice.value = 'constitution'; await choice.emit('change'); }
+  const preview = classNode(advancement, 'rb-advancement-preview'); assert.match(preview.textContent, /14 → 16/); assert.match(preview.textContent, /Récupération5 → 6/); assert.match(preview.textContent, /PV max/);
+  const before = e.storage.getItem(CAREER_KEY); e.storage.failing = true;
+  await button(advancement, 'Valider les 2 points').click();
+  assert.equal(e.storage.getItem(CAREER_KEY), before); assert.match(classNode(e.root, 'rb-career-notice').textContent, /conservée/);
+  assert.equal(classNode(classNode(e.root, 'rb-player-inspector'), 'rb-player-advancement').hidden, true);
+  assert.equal(button(e.root, 'Réessayer la sauvegarde').hidden, false);
+  e.storage.failing = false; await button(e.root, 'Réessayer la sauvegarde').click();
+  assert.deepEqual(e.saved().clubs[0].players[5].advancements, [{ level: 3, changes: { constitution: 2 } }]);
+  assert.deepEqual(e.saved().lineup, c.lineup); assert.equal(classNode(classNode(e.root, 'rb-player-inspector'), 'rb-player-advancement').hidden, true);
+  const restored = environment(e.storage.getItem(CAREER_KEY)); mountCareer(restored.root, mountMatch); await button(restored.root, p.name).click();
+  assert.match(classNode(restored.root, 'rb-player-inspector').querySelector('.rb-ability-scores').textContent, /Constitution16/);
+});
+
+test('amélioration UI : plafond explicite et choix désactivés durant une rencontre', async () => {
+  let c = createCareer('Les Limites', 'ui-limit'); c = confirmDraft(c, c.market.slice(0, 6).map(p => p.id));
+  const p = c.clubs[0].players[5]; p.xp = 440; p.abilities = { strength: 15, dexterity: 13, constitution: 14, mind: 8, charisma: 9 };
+  p.advancements = [3, 6].map(level => ({ level, changes: { strength: 2 } }));
+  const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await button(e.root, p.name).click();
+  const advancement = classNode(classNode(e.root, 'rb-player-inspector'), 'rb-player-advancement'), choices = advancement.querySelectorAll('select');
+  for (const choice of choices) { choice.value = 'strength'; await choice.emit('change'); }
+  assert.match(advancement.textContent, /dépasser 20/); assert.equal(button(advancement, 'Valider les 2 points').disabled, true);
+  choices[1].value = 'constitution'; await choices[1].emit('change'); assert.equal(button(advancement, 'Valider les 2 points').disabled, false);
+  const locked = environment(exportCareer(launchCareerMatch(c))); mountCareer(locked.root, mountMatch);
+  await button(locked.root, 'Club').click(); await button(locked.root, p.name).click();
+  const blocked = classNode(classNode(locked.root, 'rb-player-inspector'), 'rb-player-advancement');
+  assert.ok(blocked.querySelectorAll('select').every(n => n.disabled)); assert.equal(button(blocked, 'Valider les 2 points').disabled, true);
+  assert.match(blocked.textContent, /prochaine préparation/);
 });
 
 test('préparation : sélection liée au terrain, rotation, retour sur une ouverture et focus conservé', async () => {

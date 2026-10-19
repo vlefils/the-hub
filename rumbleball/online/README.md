@@ -25,11 +25,13 @@ Le batch replays/KO du 18 octobre est validé localement. Le propriétaire a con
 
 Les noms des joueurs et des offres suivent le format `Prénom "Pseudo" Nom`, avec 393 216 combinaisons. Chaque archétype possède seize pseudos cyberpunk dédiés ; les titres genrés sont accordés au portrait, les handles techniques sont épicènes. Les portraits androgynes reçoivent des prénoms épicènes et des pseudos neutres. Les anciens alias sont remplacés en conservant le prénom et le nom conformes ; un changement de rôle tactique ne change pas le pseudo. Leur génération publique est indépendante de la graine secrète des rencontres. La limite de dix et la génération des identités sont également serveur : après cette mise à jour, redéployer `rumbleball-api` et `rumbleball-worker` avec les commandes de la section Installation. Aucune migration SQL supplémentaire n’est nécessaire.
 
+Les caractéristiques suivent les [règles de progression communes](../README.md#carrière) : tirage persistant de 59 points (8–15), tri par classe, niveaux 1–12, maîtrise +2/+3/+4/+5, améliorations au choix aux niveaux 3/6/9/12 et récupération du banc liée à la Constitution. La modale de recrutement affiche les scores avant contrat. Les protections donnent de la CA, jamais de PV. Les anciens clubs reçoivent leur tirage sans recalculer les images des matchs déjà figés. Les champs sont enregistrés dans le JSON existant ; redéployer les deux fonctions suffit, sans SQL supplémentaire.
+
 ## Préparation annulable
 
-Chaque membre possède un `club` acquis et une `draft` optionnelle, enregistrée côté serveur. Composition, rôles, consignes, déploiement, couleur, recrutements, cessions et équipement modifient cette préparation.
+Chaque membre possède un `club` acquis et une `draft` optionnelle, enregistrée côté serveur. Composition, rôles, consignes, déploiement, couleur, recrutements, cessions, équipement et attribution des points de caractéristiques modifient cette préparation. L’action `advance` accepte seulement l’identifiant d’un joueur du club et deux points légaux ; elle refuse un palier déjà dépensé, un total différent de deux, une caractéristique inconnue ou un dépassement de 20.
 
-Les achats et ventes sont comptabilisés dans le solde prévisionnel. **Annuler la préparation** restaure intégralement le club précédent, y compris les contrats et opérations d’équipement de cette préparation. Ce n’est pas une annulation de salaire, d’XP ou de résultat déjà acquis.
+Les achats et ventes sont comptabilisés dans le solde prévisionnel. **Annuler la préparation** restaure intégralement le club précédent, y compris les contrats, opérations d’équipement et choix de caractéristiques de cette préparation ; les points redeviennent disponibles. Ce n’est pas une annulation de salaire, d’XP ou de résultat déjà acquis.
 
 À 20 h, la préparation entière est adoptée, ou le club précédent est reconduit. Le verrouillage est contrôlé par l’horloge PostgreSQL lors de l’écriture, même si le worker n’a pas encore lancé sa première exécution. Un formulaire ouvert avant 20 h ne donne aucun droit d’enregistrer après cette limite.
 

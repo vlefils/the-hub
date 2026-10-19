@@ -6,6 +6,7 @@ import { mountTeamEditor, preparationDraft } from './team-ui.mjs';
 import { mountReplay } from '../replay-ui.mjs';
 import { workspaceHeader, workspaceNavigation } from '../workspace-header.mjs';
 import { managementDialog } from '../management-dialog.mjs';
+import { abilitySummary } from '../player-development-ui.mjs';
 
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
@@ -190,6 +191,7 @@ export async function mountOnline(root, config, connect) {
       onBuy: (itemId, playerId, replaceConfirmed) => attempt(() => send('buy', { itemId, playerId, replaceConfirmed })),
       onAssign: (itemId, playerId) => attempt(() => send('equip', { itemId, playerId })),
       onSellGear: itemId => attempt(() => send('sellProtection', { itemId })),
+      onAdvance: (playerId, changes) => attempt(() => send('advance', { playerId, changes })),
       onRecruit() { marketOpen = true; modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); },
       onSell: playerId => attempt(() => send('sell', { playerId })) });
     body.append(editor.root);
@@ -199,7 +201,7 @@ export async function mountOnline(root, config, connect) {
     const list = el('div', 'rb-market-list'); body.append(list);
     for (const p of c.market) {
       const row = el('section', 'rb-career-player'), price = recruitmentPrice(p), compiled = compilePlayer(p);
-      row.append(portraitIdentity(compiled, c.kitColor, el('h4', '', p.name)), el('p', 'rb-muted', `Niveau ${compiled.level} · ${money(salary(p))} / journée`), statList(compiled), el('p', 'rb-purchase-projection', `Après contrat : ${money(c.balance - price)}.`));
+      row.append(portraitIdentity(compiled, c.kitColor, el('h4', '', p.name)), el('p', 'rb-muted', `Niveau ${compiled.level} · ${money(salary(p))} / journée`), abilitySummary(compiled), statList(compiled), el('p', 'rb-purchase-projection', `Après contrat : ${money(c.balance - price)}.`));
       const buy = action(`Recruter · ${money(price)}`, 'recruit', { playerId: p.id }, true);
       const blocked = c.balance < 0 ? 'Salaires impayés : achats bloqués.' : c.players.length >= MAX_SQUAD_SIZE ? 'Dix joueurs maximum.' : c.balance < price ? `Il manque ${price - c.balance} chromas.` : '';
       if (blocked) { buy.disabled = true; row.append(el('small', 'rb-muted', blocked)); } row.append(buy); list.append(row);

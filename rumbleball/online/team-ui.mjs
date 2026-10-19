@@ -7,6 +7,7 @@ import { deploymentEditor, draggablePlayer, PLAYER_DRAG_TYPE } from '../deployme
 import { moveDeployment } from '../deployment.mjs';
 import { playerShop } from '../player-shop.mjs';
 import { playerInventory } from '../player-inventory.mjs';
+import { abilitySummary, abilityPendingBadge, playerAdvancement } from '../player-development-ui.mjs';
 import { athletePortrait } from '../visuals.mjs';
 import { crestPicker, clubIdentity, archetypeIcon } from '../broadcast-components.mjs';
 
@@ -34,7 +35,7 @@ export function leagueContext(league) {
   }), { highlight: league.table.findIndex(r => r.id === league.club.id), caption: 'Classement de la ligue' }));
   root.append(schedule, ranking); return root;
 }
-export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onBuy, onAssign, onSellGear, onRecruit }) {
+export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave, onSell, onDirty, onBuy, onAssign, onSellGear, onRecruit, onAdvance }) {
   const ids = new Set(club.players.map(p => p.id));
   draft.lineup = draft.lineup.filter(id => ids.has(id));
   for (const p of club.players) {
@@ -90,7 +91,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
     playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
     const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
-    detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, statList(compiled), equipmentSlots(p, club.inventory), playerShop(club, p, { locked, onBuy, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; } }), playerInventory(club, p, { locked, onAssign, onSell: onSellGear }));
+    detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, abilitySummary(compiled), statList(compiled), playerAdvancement(club, p, { locked, onAdvance }), equipmentSlots(p, club.inventory), playerShop(club, p, { locked, onBuy, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; } }), playerInventory(club, p, { locked, onAssign, onSell: onSellGear }));
     if (index >= 0) detail.append(field('Remplacer ce titulaire', replacement), order);
     else detail.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
     detail.append(el('small', 'rb-muted', `${money(salary(p))} / journée`));
@@ -110,7 +111,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
       const p = club.players.find(p => p.id === id), compiled = compilePlayer(p, club.inventory), row = el('div', 'rb-squad-slot'); row.dataset.playerId = id;
       const pick = btn(`${i + 1} · ${p.name}`, () => { selected = draft.selected = draft.slotSelected = id; drawDetail(); highlight(); }); pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Détails de ${p.name}`); pick.setAttribute('data-readonly-control', 'true');
       const portrait = athletePortrait(compiled, draft.color); draggablePlayer(portrait, id, locked); draggablePlayer(pick, id, locked);
-      row.append(portrait, pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p)); slots.append(row);
+      row.append(portrait, pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p), abilityPendingBadge(p)); slots.append(row);
     }
     const reserves = club.players.filter(p => !draft.lineup.includes(p.id));
     bench.classList.toggle('is-expanded', reserves.length > 3);
@@ -127,7 +128,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
       row.addEventListener('click', event => { if (!event.target.closest('button')) pick.click(); });
       row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
       row.addEventListener('drop', event => { const index = draft.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); replaceAt(index, p.id); });
-      row.append(pick, fatigue(p), controls); bench.append(row);
+      row.append(pick, fatigue(p), abilityPendingBadge(p), controls); bench.append(row);
     }
     highlight();
   }

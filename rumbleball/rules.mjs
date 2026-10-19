@@ -371,8 +371,9 @@ export function performAttack(state, actor, target, events, opportunity = null, 
   emit(state, events, 'roll', `${roll.natural === 20 ? 'Critique ! ' : ''}Dégâts : ${dice.join(' + ')} + ${actor.attack.flat}`, { dice, critical: roll.natural === 20 });
   dealDamage(state, actor, target, dice.reduce((a, b) => a + b, actor.attack.flat), events);
   if (technique && target.hp > 0) {
-    const save = check(state, stat(target, 'strength'), events, `${target.name} · résister à la percussion, DD 13`).total;
-    if (save < 13) pushAway(state, actor, target, events);
+    const dc = actor.chargeDC ?? 13;
+    const save = check(state, stat(target, 'strength'), events, `${target.name} · résister à la percussion, DD ${dc}`).total;
+    if (save < dc) pushAway(state, actor, target, events);
     else emit(state, events, 'hold', `${target.name} résiste à la percussion.`);
   }
   return true;

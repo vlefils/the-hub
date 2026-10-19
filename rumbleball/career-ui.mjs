@@ -1,7 +1,7 @@
 import { ROLES, ROLE_DESCRIPTIONS, INSTRUCTIONS, STRATEGIES, STARTS } from './data.mjs';
 import { ARCHETYPES, archetypeLabel, classAbilities } from './classes.mjs';
 import { XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice, MAX_SQUAD_SIZE } from './progression.mjs';
-import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
+import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings, improveAbilities } from './career.mjs';
 import { CAREER_KEY, loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
 import { KIT_COLORS, clubKit } from './appearance.mjs';
 import { playerPortrait, teamCrest, athletePortrait } from './visuals.mjs';
@@ -11,6 +11,7 @@ import { clubDeployment, moveDeployment } from './deployment.mjs';
 import { workspaceHeader, workspaceNavigation } from './workspace-header.mjs';
 import { playerShop } from './player-shop.mjs';
 import { playerInventory } from './player-inventory.mjs';
+import { abilitySummary, abilityPendingBadge, playerAdvancement } from './player-development-ui.mjs';
 import { managementDialog } from './management-dialog.mjs';
 import { clubOpening, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
@@ -184,7 +185,7 @@ export function mountCareer(root, mountMatch) {
     for (const p of career.market) {
       const row = el('label', 'rb-candidate'), checkbox = el('input'); checkbox.type = 'checkbox'; checkbox.checked = draftIds.has(p.id);
       checkbox.addEventListener('change', () => { if (checkbox.checked) draftIds.add(p.id); else draftIds.delete(p.id); totals(); });
-      const compiled = compilePlayer(p), copy = el('div'); copy.append(el('strong', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled)), el('small', 'rb-muted', stats(compiled)));
+      const compiled = compilePlayer(p), copy = el('div'); copy.append(el('strong', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled)), abilitySummary(compiled), el('small', 'rb-muted', stats(compiled)));
       row.append(checkbox, portraitIdentity(compiled, clubKit(career.clubs[0]), copy), el('span', '', money(recruitmentPrice(p)))); list.append(row);
     }
     totals(); footer.append(total, confirm); manager.append(list, footer);
@@ -231,7 +232,7 @@ export function mountCareer(root, mountMatch) {
       for (const [index, { row, copy, pick }] of slotCopies.entries()) {
         const p = ownedPlayers(career).find((p) => p.id === slotControls[index].value);
         const compiled = compilePlayer(p, career.inventory); pick.textContent = `${index + 1} · ${p.name}`;
-        row.classList.toggle('is-selected', p.id === selectedPlayer); copy.replaceChildren(athletePortrait(compiled, clubKit(career.clubs[0])), pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p));
+        row.classList.toggle('is-selected', p.id === selectedPlayer); copy.replaceChildren(athletePortrait(compiled, clubKit(career.clubs[0])), pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p), abilityPendingBadge(p));
         draggablePlayer(copy.children[0], p.id, locked);
       }
       const target = ownedPlayers(career).find((p) => p.id === (career.lineup.includes(selectedPlayer) ? selectedPlayer : deployment.selectedPlayerId));
@@ -248,7 +249,7 @@ export function mountCareer(root, mountMatch) {
         row.addEventListener('click', event => { if (!event.target.closest('button')) pick.click(); });
         row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
         row.addEventListener('drop', event => attempt(() => { const index = career.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); slotControls[index].value = p.id; selectedPlayer = p.id; commitLineup(); renderActive(); }));
-        row.append(pick, fatigue(p), b); bench.append(row);
+        row.append(pick, fatigue(p), abilityPendingBadge(p), b); bench.append(row);
       }
     }
     function renderActive() {
@@ -258,7 +259,7 @@ export function mountCareer(root, mountMatch) {
       role.title = ROLE_DESCRIPTIONS[role.value];
       const compiled = compilePlayer(p, career.inventory);
       const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
-      inspector.replaceChildren(portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', archetypeLabel(compiled))), progress, active, statList(compiled), equipmentSlots(p, career.inventory), playerShop({ ...own, balance: career.balance, inventory: career.inventory }, p, {
+      inspector.replaceChildren(portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', archetypeLabel(compiled))), progress, active, abilitySummary(compiled), statList(compiled), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), equipmentSlots(p, career.inventory), playerShop({ ...own, balance: career.balance, inventory: career.inventory }, p, {
         locked, selectedItem: preparationShopItem, onItem: id => { preparationShopItem = id; }, onBuy: (id, playerId, confirmed) => update(() => buyItem(career, id, playerId, confirmed))
       }));
       inspector.append(playerInventory({ ...own, inventory: career.inventory }, p, { locked, onAssign: (id, playerId) => update(() => assignProtection(career, id, playerId)), onSell: id => update(() => sellProtection(career, id)) }));
@@ -302,7 +303,7 @@ export function mountCareer(root, mountMatch) {
     const offers = career.market.filter((p) => !marketFilter || compilePlayer(p).archetype === marketFilter);
     for (const p of offers) {
       const row = el('section', 'rb-career-player'), compiled = compilePlayer(p);
-      row.append(portraitIdentity(compiled, clubKit(career.clubs[0]), el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled))), el('p', 'rb-muted', `Niveau ${levelOf(p)} · ${money(salary(p))} / journée · Fatigue 0/6`), statList(compiled));
+      row.append(portraitIdentity(compiled, clubKit(career.clubs[0]), el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled))), el('p', 'rb-muted', `Niveau ${levelOf(p)} · ${money(salary(p))} / journée · Fatigue 0/6`), abilitySummary(compiled), statList(compiled));
       row.append(disclosure(`Comparer à ${existing.name}`, `offer-${p.id}`, el('p', 'rb-muted', `Votre joueur : niveau ${levelOf(existing)}, fatigue ${existing.fatigue}/6, équipement compris. Recrue : sans équipement et sans fatigue.`), comparison(reference, compiled, existing.implant, p.implant)));
       row.append(el('p', 'rb-purchase-projection', `Après contrat : ${money(career.balance - recruitmentPrice(p))} · Nouveaux salaires : ${money(payroll(career) + salary(p))} / journée.`));
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length >= MAX_SQUAD_SIZE ? 'Effectif complet : dix joueurs maximum.' : purchaseBlock(career, recruitmentPrice(p));

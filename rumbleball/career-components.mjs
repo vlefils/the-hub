@@ -1,4 +1,5 @@
-import { CATALOGUE, XP_THRESHOLDS, levelOf } from './progression.mjs';
+import { CATALOGUE, XP_THRESHOLDS, levelOf, MAX_LEVEL } from './progression.mjs';
+import { ABILITY_LABELS } from './player-development.mjs';
 import { athletePortrait } from './visuals.mjs';
 import { gearImage } from './identity.mjs';
 
@@ -40,15 +41,18 @@ export function table(headers, rows, { highlight = -1, caption = '' } = {}) {
 export function stats(p) { return `${p.maxHp} PV · CA ${p.armor} · ${p.speed.toLocaleString('fr-FR')} m · Lutte ${signed(p.skills.wrestling)} · Acrobaties ${signed(p.skills.acrobatics)}`; }
 export function statList(p) {
   const list = el('dl', 'rb-player-stats');
-  for (const [label, value] of [['PV max.', p.maxHp], ['Armure', p.armor], ['Vitesse', `${p.speed.toLocaleString('fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)]]) {
+  const entries = [['PV max.', p.maxHp], ['CA', p.armor], ['Vitesse', `${p.speed.toLocaleString('fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)], ['Attaque', signed(p.attack.bonus)]];
+  for (const [key, label] of [['adrenaline', 'Adrénaline'], ['focus', 'Concentration'], ['calls', 'Appels']]) if (p.caps?.[key]) entries.push([label, p.caps[key]]);
+  if (p.archetype === 'belier' && p.chargeDC !== undefined) entries.push(['DD percussion', p.chargeDC]);
+  for (const [label, value] of entries) {
     const group = el('div'); group.append(el('dt', 'rb-muted', label), el('dd', '', String(value))); list.append(group);
   } return list;
 }
 export function xpProgress(p) {
-  const level = levelOf(p), start = XP_THRESHOLDS[level - 1], max = level === 5 ? 1 : XP_THRESHOLDS[level] - start;
-  const root = el('div', 'rb-player-xp'), progress = el('progress'); progress.max = max; progress.value = level === 5 ? 1 : p.xp - start;
-  progress.setAttribute('aria-label', `XP de ${p.name} : ${level === 5 ? 'niveau maximum' : `${p.xp - start} sur ${max} vers le niveau ${level + 1}`}`);
-  root.append(el('span', '', `Niv. ${level}`), progress, el('small', 'rb-muted', level === 5 ? 'Maximum' : `${p.xp - start}/${max} XP`)); return root;
+  const level = levelOf(p), start = XP_THRESHOLDS[level - 1], max = level === MAX_LEVEL ? 1 : XP_THRESHOLDS[level] - start;
+  const root = el('div', 'rb-player-xp'), progress = el('progress'); progress.max = max; progress.value = level === MAX_LEVEL ? 1 : p.xp - start;
+  progress.setAttribute('aria-label', `XP de ${p.name} : ${level === MAX_LEVEL ? 'niveau maximum' : `${p.xp - start} sur ${max} vers le niveau ${level + 1}`}`);
+  root.append(el('span', '', `Niv. ${level}`), progress, el('small', 'rb-muted', level === MAX_LEVEL ? 'Maximum' : `${p.xp - start}/${max} XP`)); return root;
 }
 export function fatigue(p) {
   const root = el('div', `rb-fatigue${p.fatigue >= 5 ? ' is-exhausted' : p.fatigue >= 3 ? ' is-tired' : ''}`), meter = el('span', 'rb-fatigue-meter'); meter.setAttribute('aria-hidden', 'true');
@@ -58,7 +62,8 @@ export function fatigue(p) {
 }
 export function comparison(before, after, beforeImplant = null, afterImplant = null) {
   const root = el('dl', 'rb-stat-comparison');
-  const entries = [['PV max.', before.maxHp, after.maxHp], ['Armure', before.armor, after.armor], ['Vitesse', before.speed, after.speed], ['Lutte', before.skills.wrestling, after.skills.wrestling], ['Athlétisme', before.skills.athletics, after.skills.athletics], ['Acrobaties', before.skills.acrobatics, after.skills.acrobatics]];
+  const entries = [...Object.entries(ABILITY_LABELS).map(([key, label]) => [label, before.abilities[key], after.abilities[key]]), ['PV max.', before.maxHp, after.maxHp], ['CA', before.armor, after.armor], ['Vitesse', before.speed, after.speed], ['Attaque', before.attack.bonus, after.attack.bonus], ['Lutte', before.skills.wrestling, after.skills.wrestling], ['Athlétisme', before.skills.athletics, after.skills.athletics], ['Acrobaties', before.skills.acrobatics, after.skills.acrobatics], ['Récupération', before.recovery, after.recovery], ['Appels', before.caps?.calls, after.caps?.calls], ['Concentration', before.caps?.focus, after.caps?.focus], ['Adrénaline', before.caps?.adrenaline, after.caps?.adrenaline]];
+  if (before.archetype === 'belier') entries.push(['DD percussion', before.chargeDC, after.chargeDC]);
   for (const [label, a, b] of entries) if (a !== b) {
     const row = el('div'); row.append(el('dt', '', label), el('dd', b > a ? 'rb-gain' : 'rb-loss', `${a.toLocaleString('fr-FR')} → ${b.toLocaleString('fr-FR')}${label === 'Vitesse' ? ' m' : ''}`)); root.append(row);
   }

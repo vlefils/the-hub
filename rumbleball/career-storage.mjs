@@ -6,6 +6,7 @@ import { validKitColor } from './appearance.mjs';
 import { validCrest, validPortrait, identifyCareer } from './identity.mjs';
 import { validDeployment } from './deployment.mjs';
 import { validOpening } from './openings.mjs';
+import { MAX_LEVEL, validPlayerDevelopment, ensureCareerDevelopment } from './player-development.mjs';
 
 export const CAREER_KEY = 'the-hub.rumbleball.career.v1';
 const check = (condition) => { if (!condition) throw new Error('Sauvegarde de carrière invalide ou incompatible.'); };
@@ -22,6 +23,7 @@ export function validateCareer(c) {
     check(p.portraitId === undefined || validPortrait(p.portraitId));
     check(p && name(p.id) && name(p.name) && integer(p.profile) && p.profile < PROFILES.length && integer(p.xp) && integer(p.fatigue) && p.fatigue <= 6);
     check(Object.hasOwn(ROLES, p.role) && Object.hasOwn(INSTRUCTIONS, p.instruction));
+    check(validPlayerDevelopment(p));
     check(p.implant === null || CATALOGUE[p.implant]?.slot === 'implant');
     check(!playerIds.has(p.id)); playerIds.add(p.id);
   };
@@ -112,16 +114,16 @@ export function validateCareer(c) {
     check(initial.players.every((p, i) => {
       const saved = m.state.players[i];
       check(p.portraitId === undefined || validPortrait(p.portraitId)); check(p.portraitId === saved.portraitId);
-      check(name(p.name) && integer(p.level, 1) && p.level <= 5 && integer(p.maxHp, 1) && integer(p.armor, 1) && Number.isFinite(p.speed) && p.speed > 0);
+      check(name(p.name) && integer(p.level, 1) && p.level <= MAX_LEVEL && integer(p.maxHp, 1) && integer(p.armor, 1) && Number.isFinite(p.speed) && p.speed > 0);
       check(Object.values(p.skills).every(Number.isFinite) && Object.values(p.abilities).every(Number.isFinite) && Object.values(p.attack).every(Number.isFinite));
       check(integer(saved.hp) && Number.isFinite(saved.movement) && saved.movement >= 0 && saved.classState && Array.isArray(m.state.aids) && Array.isArray(m.state.calls));
       if (m.state.version >= 3) check(JSON.stringify(p.startPosition) === JSON.stringify(saved.startPosition));
-      return ['playerId', 'id', 'teamId', 'name', 'level', 'archetype', 'maxHp', 'armor', 'speed', 'number', 'role', 'instruction', 'initiativeDie', 'initiative', 'initiativeTie'].every((key) => p[key] === saved[key])
+      return ['playerId', 'id', 'teamId', 'name', 'level', 'archetype', 'maxHp', 'armor', 'speed', 'number', 'role', 'instruction', 'initiativeDie', 'initiative', 'initiativeTie', 'proficiencyBonus', 'chargeDC'].every((key) => p[key] === saved[key])
         && ['skills', 'abilities', 'attack'].every((key) => JSON.stringify(p[key]) === JSON.stringify(saved[key]));
     }));
     if (m.settled) {
       check(m.summary && Array.isArray(m.summary.progress) && ['reward', 'wages', 'debtRepaid', 'remainingDebt', 'available', 'seasonPrize'].every((key) => integer(m.summary[key])));
-      check(m.summary.progress.every((p) => p && name(p.name) && name(p.playerId) && integer(p.xp) && integer(p.beforeLevel, 1) && integer(p.level, 1) && p.level <= 5 && integer(p.beforeFatigue) && integer(p.fatigue) && p.beforeFatigue <= 6 && p.fatigue <= 6));
+      check(m.summary.progress.every((p) => p && name(p.name) && name(p.playerId) && integer(p.xp) && integer(p.beforeLevel, 1) && integer(p.level, 1) && p.level <= MAX_LEVEL && integer(p.beforeFatigue) && integer(p.fatigue) && p.beforeFatigue <= 6 && p.fatigue <= 6));
     }
     assertInvariants(m.state);
   }
@@ -132,7 +134,7 @@ export function importCareer(json) {
   if (typeof json !== 'string' || json.length > 8_000_000) throw new Error('Fichier JSON trop volumineux.');
   let data; try { data = JSON.parse(json); } catch { throw new Error('Ce fichier ne contient pas un JSON lisible.'); }
   if (data?.format !== 'the-hub-rumbleball' || data.version !== 1) throw new Error('Format de carrière inconnu.');
-  return identifyCareer(validateCareer(data.career));
+  return ensureCareerDevelopment(identifyCareer(validateCareer(data.career)));
 }
 export function loadCareer(storage) {
   try { const raw = storage.getItem(CAREER_KEY); return { career: raw ? importCareer(raw) : null, error: null, hasSave: Boolean(raw) }; }

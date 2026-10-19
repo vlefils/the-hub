@@ -84,6 +84,18 @@ body.rb-app {
 .rb-broadcast-preparation > .rb-broadcast-tactics, .rb-sport-preparation > .rb-broadcast-tactics { grid-column: 2; grid-row: 1; }
 .rb-broadcast-preparation > .rb-broadcast-save { grid-column: 2; grid-row: 2; }
 .rb-workspace-sidebar { grid-column: 3; grid-row: 1 / span 2; min-width: 0; border-left: 1px solid #1c3446; padding-left: 1rem; }
+.rb-ability-summary { min-width: 0; }
+.rb-app .rb-ability-scores { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; margin: .35rem 0; }
+.rb-ability-scores > div { display: grid; grid-template-rows: subgrid; grid-row: span 2; min-width: 0; }
+.rb-ability-scores dt { font-size: .78rem; overflow-wrap: anywhere; }
+.rb-ability-scores dd { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem; margin: .2rem 0 0; }
+.rb-ability-scores strong { font-size: 1.15rem; }
+.rb-ability-summary > p { margin: .45rem 0 0; font-size: .8rem; line-height: 1.45; }
+.rb-development-count { color: #ffc07a; font-weight: 600; }
+.rb-app .rb-slot-copy > .rb-development-count, .rb-squad-slot > .rb-development-count { grid-column: 2; }
+.rb-app .rb-player-advancement { display: grid; gap: .7rem; padding-block: 1rem; border-block: 1px solid #4c6275; }
+.rb-player-advancement > :is(h4, p) { margin: 0; }
+.rb-player-advancement .rb-field { margin: 0; }
 .rb-workspace-sidebar > .rb-broadcast-context { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
 .rb-app .rb-broadcast-squad > h4, .rb-app .rb-team-controls > h4, .rb-workspace-sidebar h4, .rb-app .rb-deployment > h4 { font: 700 1.35rem/1.2 'Rajdhani', sans-serif; margin: 0 0 .75rem; }
 .rb-app .rb-broadcast-squad .rb-squad-slot { grid-template-columns: 3.5rem minmax(0, 1fr); gap: .25rem .65rem; margin-bottom: .45rem; padding: .5rem; background: linear-gradient(115deg, #183348, #091d2b); border: 1px solid #213e53; border-radius: 4px; box-shadow: inset 0 1px #b1d6ff08, 0 2px 4px #0003; }
