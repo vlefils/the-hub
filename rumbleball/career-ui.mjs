@@ -17,7 +17,7 @@ import { managementDialog } from './management-dialog.mjs';
 import { inspectorPanels } from './player-inspector.mjs';
 import { clubOpening, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
-import { el, btn, field, select, money, signed, keyed, kitPicker, portraitIdentity, pageHeading, metric, table, stats, statList, xpProgress, fatigue, comparison, disclosure } from './career-components.mjs';
+import { el, btn, field, select, money, signed, keyed, kitPicker, portraitIdentity, pageHeading, squadHeading, metric, table, stats, statList, xpProgress, fatigue, comparison, disclosure } from './career-components.mjs';
 function download(text, filename) {
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })), a = el('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -227,7 +227,7 @@ export function mountCareer(root, mountMatch) {
     function describeStrategy() { strategyHelp.textContent = { balanced: 'Une répartition équilibrée entre progression, soutien et défense.', possession: 'Protège le porteur par des blocages, des sorties de pression et des relais sûrs.', pressing: 'Met la pression sur le porteur adverse et conteste les accès au ballon.' }[strategy.value]; }
     describeStrategy(); teamPlans.append(field('Plan collectif', strategy), opening.root, undo);
     const recruitment = btn('Recruter un joueur', () => { modalKind = 'recruitment'; renderMarket(locked, modal.body); modal.show('Recrutement', recruitment); }); recruitment.classList.add('rb-recruit-tile'); recruitment.setAttribute('aria-haspopup', 'dialog');
-    teamControls.append(el('h4', '', 'Les cinq titulaires'), lineup, recruitment);
+    teamControls.append(squadHeading(), lineup, recruitment);
     for (const [index, id] of career.lineup.entries()) {
       const s = keyed(select(names, id), `lineup-${index}`); s.disabled = locked; slotControls.push(s);
       const row = el('div', 'rb-lineup-slot'), copy = el('div', 'rb-slot-copy'), pick = btn('', () => { selectedPlayer = preparationSlotPlayer = s.value; deployment.update({ selectedPlayerId: selectedPlayer }); renderActive(); });

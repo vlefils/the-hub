@@ -25,6 +25,11 @@ export function pageHeading(title, description = '') {
   const head = el('div', 'rb-section-heading'), h = el('h3', '', title); h.setAttribute('tabindex', '-1'); head.append(h);
   if (description) head.append(el('p', 'rb-muted', description)); return head;
 }
+export function squadHeading() {
+  const heading = el('div', 'rb-squad-heading');
+  heading.append(el('h4', '', 'Les cinq titulaires'), el('span', 'rb-muted rb-squad-fatigue-label', 'Fatigue'));
+  return heading;
+}
 export function metric(label, value, context = '') {
   const block = el('div', 'rb-metric'); block.append(el('span', 'rb-muted', label), el('strong', '', value));
   if (context) block.append(el('small', 'rb-muted', context)); return block;

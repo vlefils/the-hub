@@ -1,4 +1,4 @@
-import { el, btn, field, select, money, statList, xpProgress, fatigue, portraitIdentity, table, disclosure } from '../career-components.mjs';
+import { el, btn, field, select, money, squadHeading, statList, xpProgress, fatigue, portraitIdentity, table, disclosure } from '../career-components.mjs';
 import { ARCHETYPES } from '../classes.mjs';
 import { STRATEGIES, ROLES, INSTRUCTIONS } from '../data.mjs';
 import { compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
@@ -64,7 +64,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   const court = el('div', 'rb-court-workspace'); court.append(editor.root, bench);
   saveBar.append(save, status); tactics.append(court, selectors);
   const recruit = btn('Recruter un joueur', onRecruit); recruit.classList.add('rb-recruit-tile'); recruit.setAttribute('aria-haspopup', 'dialog'); recruit.setAttribute('data-readonly-control', 'true');
-  squad.append(el('h4', '', 'Les cinq titulaires'), slots, recruit, kit);
+  squad.append(squadHeading(), slots, recruit, kit);
   sidebar.append(inspector); root.append(squad, tactics, saveBar, sidebar);
   const baseline = JSON.stringify(preparationDraft(club));
   function read() {
