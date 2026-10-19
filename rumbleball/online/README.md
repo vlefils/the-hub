@@ -12,9 +12,9 @@ Le batch replays/KO du 18 octobre est validé localement. Le propriétaire a con
 
 ## Règles retenues
 
-- Ligue privée de 2, 4, 6 ou 8 clubs, six par défaut ; un utilisateur possède un club par ligue. Le créateur partage un code et lance la saison lorsque tous les clubs sont présents.
+- Ligue privée avec salle d’attente ouverte : aucun nombre de clubs à choisir à la création. Un utilisateur possède un club par ligue. Le créateur partage le code, peut ajouter ou retirer des bots et lance la saison à partir de deux clubs. Le nombre d’inscrits est alors figé ; une limite technique de 128 clubs protège le calendrier et le tableau de playoffs. Les anciennes salles d’attente deviennent également ouvertes.
 - Club neuf de six recrues de niveau 1 ; 2 400 chromas moins 1 800 de contrats, soit 600 disponibles. Les carrières locales ne peuvent pas être importées dans une ligue.
-- Phase de groupe aller-retour : `2 × (clubs − 1)` journées. Une journée par soirée. Classement 3/1/0, puis victoires, puis ordre d’inscription. Elle est suivie des playoffs ; la nouvelle saison démarre automatiquement après leur finale, avec progression et équipement conservés et fatigue remise à zéro.
+- Phase de groupe aller-retour : `2 × (clubs − 1)` journées si le total est pair, `2 × clubs` s’il est impair. Chaque club rencontre les autres à domicile et à l’extérieur ; un total impair donne deux journées de repos par club, avec récupération et XP de banc, sans résultat fictif. Une journée par soirée. Classement 3/1/0, puis victoires, puis ordre d’inscription. Elle est suivie des playoffs ; la nouvelle saison démarre automatiquement après leur finale, avec progression et équipement conservés et fatigue remise à zéro.
 - **20 h Europe/Paris**, en tenant compte des changements d’heure. Toutes les équipes sont figées à cette heure, y compris celles qui joueront plus tard.
 - Matchs successifs dans chaque ligue. Le match suivant commence deux minutes après la fin du précédent. Les autres ligues peuvent avoir leur propre soirée en parallèle.
 - Décompte réservé de 3,5 secondes, puis dix rounds de douze secondes. Les prolongations du moteur prolongent aussi le créneau de diffusion avant la pause.
@@ -25,7 +25,15 @@ Le batch replays/KO du 18 octobre est validé localement. Le propriétaire a con
 
 ### Playoffs
 
-Les 50 % premiers sont arrondis au multiple de quatre supérieur, dans la limite des inscrits : **2 qualifiés sur 2**, **4 sur 4/6/8**. Les places sont signalées dans le classement de groupe avec la légende « Les X premières équipes se qualifient pour les playoffs. » Quatre qualifiés donnent les demi-finales 1er–4e et 2e–3e, puis une finale dans un tableau fixe. Le moteur de tableau gère aussi les exemptions des meilleures têtes de série pour des effectifs plus grands, sans augmenter les capacités de ligue proposées.
+Les 50 % premiers sont arrondis au multiple de quatre supérieur, dans la limite des inscrits : **2 qualifiés sur 2**, **3 sur 3**, **4 sur 4 à 8**, **8 sur 9 à 16**. Les places sont signalées dans le classement de groupe avec la légende « Les X premières équipes se qualifient pour les playoffs. » Quatre qualifiés donnent les demi-finales 1er–4e et 2e–3e, puis une finale dans un tableau fixe. Le tableau gère aussi les exemptions des meilleures têtes de série pour un nombre de qualifiés qui n’est pas une puissance de deux.
+
+### Bots
+
+Les bots sont des clubs gérés par le serveur, sans compte Auth ni accès à l’API. Seul le créateur peut les ajouter ou les retirer avant le lancement. Ils sont identifiés dans la salle d’attente, qui se rafraîchit toutes les quatre secondes sans reconstruire la préparation en cours.
+
+Chaque bot commence avec les mêmes six joueurs et 600 chromas qu’un humain. Au verrouillage, il paie les mêmes salaires, reçoit le même revenu, attribue ses gains de caractéristiques, recrute selon les postes disponibles et fait tourner les joueurs selon leur fatigue. Il équipe des armes contondantes gratuites puis achète protections, implants et armes avancées avec la logique commune aux adversaires de campagne. Les prix du catalogue s’appliquent et le budget d’achat réserve la prochaine masse salariale. Les achats ne sont effectués qu’une fois par journée et sont compilés dans les équipes des matchs et replays.
+
+Les bots résident dans le champ JSON `bots`, séparé de `members` réservé aux utilisateurs Auth. Aucune migration SQL supplémentaire : redéployer l’API et le worker. La liste des ligues compte les humains et les bots sans transmettre les clubs privés.
 
 Au règlement de la dernière soirée de groupe, le serveur fige les têtes de série et retire **toute la fatigue de tous les joueurs**, remplaçants compris. Les demi-finales se jouent à 20 h lors de la soirée suivante ; la finale lors de celle d’après. Une ligue de deux clubs passe directement à sa soirée de finale. La fatigue reste acquise entre deux tours. Sans vainqueur après les prolongations habituelles, le meilleur classement de groupe qualifie l’équipe ; le replay conserve le résultat nul.
 

@@ -16,6 +16,16 @@
 .rb-online-code { overflow-wrap: anywhere; user-select: all; }
 .rb-online-lock { color: #ffdb78; font-weight: 600; }
 .rb-online-notice { margin-block: 1rem; max-width: 58rem; }
+.rb-waiting-room { display: grid; grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr); gap: 1.5rem 2rem; padding-block: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--rb-line, #34423d); }
+.rb-waiting-room h2 { margin: .25rem 0; }
+.rb-waiting-room p { margin-block: .5rem; }
+.rb-waiting-room .rb-online-code { font-family: monospace; font-size: .95rem; }
+.rb-waiting-clubs { list-style: none; margin: 0 0 .75rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: .5rem 1rem; max-height: 12rem; overflow-y: auto; scrollbar-gutter: stable; }
+.rb-waiting-clubs > li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding-block: .5rem; min-width: 0; }
+.rb-waiting-clubs > li > div { min-width: 0; overflow-wrap: anywhere; }
+.rb-waiting-clubs small { display: block; margin-top: .15rem; }
+.rb-waiting-clubs .rb-button { flex: 0 0 auto; }
+@media (max-width: 800px) { .rb-waiting-room { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 650px) {
   .rb-online-lineup { grid-template-columns: 1fr; padding-bottom: 1rem; border-bottom: 1px solid #34423d; }
   .rb-online-nav .rb-button { flex: 1 1 auto; }

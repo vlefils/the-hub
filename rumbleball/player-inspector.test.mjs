@@ -39,16 +39,21 @@ test('fiche : trois onglets, clavier et sélection conservée entre deux joueurs
   assert.ok(e.root.querySelector('.rb-player-tactics') ?? e.root.querySelector('.rb-tactical-player'));
 });
 
-test('bureau : survol sans achat, réserve et objet porté transférés au bon joueur', async () => {
+test('bureau : détail au clic stable au survol et au focus, transfert confirmé séparément', async () => {
   let c = career(); const [a, b] = c.clubs[0].players;
   c = buyItem(c, 'vest', a.id); c = buyItem(c, 'armor', b.id);
   const e = environment(exportCareer(c)), media = screen(e); mountCareer(e.root, (await import('./ui.mjs')).mountMatch);
   await button(e.root.querySelector('.rb-inspector-tabs'), 'Équipement').click(); await slot(e.root, 'torso').click();
   const dialog = e.root.querySelector('.rb-equipment-dialog'); assert.equal(dialog.open, true);
   assert.match(dialog.textContent, /Matériel du club/); assert.match(dialog.textContent, /Magasin/);
-  await card(dialog, 'mesh_armor').emit('pointerenter');
+  const initial = dialog.querySelector('.rb-gear-preview').textContent;
+  await card(dialog, 'mesh_armor').emit('pointerenter'); await card(dialog, 'mesh_armor').emit('focus');
+  assert.equal(dialog.querySelector('.rb-gear-preview').textContent, initial);
+  await card(dialog, 'mesh_armor').click();
   assert.match(dialog.querySelector('.rb-gear-preview').textContent, /aucune pénalité de vitesse/);
-  assert.equal(button(dialog, 'Acheter et équiper · 450 chromas'), undefined); assert.equal(e.saved().balance, c.balance);
+  assert.ok(button(dialog, 'Acheter et équiper · 450 chromas')); assert.equal(e.saved().balance, c.balance);
+  await card(dialog, 'vest', 'owned').emit('pointerenter');
+  assert.match(dialog.querySelector('.rb-gear-preview').textContent, /aucune pénalité de vitesse/);
   await card(dialog, 'armor', 'owned').click();
   assert.match(dialog.querySelector('.rb-gear-preview').textContent, new RegExp(b.name));
   assert.equal(document.activeElement.textContent, 'Transférer et équiper');

@@ -15,9 +15,9 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
   modal.root.classList.add('rb-equipment-dialog');
   const layout = el('div', 'rb-gear-browser'), collection = el('div', 'rb-gear-collection'), preview = el('aside', 'rb-gear-preview');
   const carried = equipmentAt(player, club.inventory, location), cards = [], entries = [];
-  let selected, displayed, previewMode, pending = false;
+  let selected, displayed, pending = false;
   const budget = el('p', 'rb-gear-budget'); budget.append(el('span', 'rb-muted', player.name), el('strong', '', `Solde · ${money(club.balance)}`));
-  const message = el('p', 'rb-muted', 'Survolez un objet ou parcourez-le au clavier pour comparer ses effets. Cliquez pour le sélectionner.');
+  const message = el('p', 'rb-muted', 'Cliquez sur un objet pour comparer ses effets, puis choisissez de l’équiper ou de l’acheter.');
   collection.append(message);
 
   async function act(action) {
@@ -30,13 +30,13 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
       }
     }
   }
-  function show(entry, hover = false) {
-    const item = CATALOGUE[entry.itemId], onlyPreview = hover && selected !== entry;
-    if (displayed === entry && previewMode === onlyPreview) return;
-    displayed = entry; previewMode = onlyPreview;
+  function show(entry) {
+    const item = CATALOGUE[entry.itemId];
+    if (displayed === entry) return;
+    displayed = entry;
     preview.scrollTop = 0;
     if (entry.source === 'catalogue') {
-      preview.replaceChildren(playerShop(club, player, { ...options, location, selectedItem: entry.itemId, showPicker: false, previewOnly: onlyPreview,
+      preview.replaceChildren(playerShop(club, player, { ...options, location, selectedItem: entry.itemId, showPicker: false,
         onBuy: (...args) => act(() => options.onBuy?.(...args)) }));
       return;
     }
@@ -47,7 +47,6 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
     if (entry.inventoryId) equipMutable(inventory, entry.inventoryId, player.id, location);
     preview.replaceChildren(heading, el('p', 'rb-muted', entry.owner), comparison(compilePlayer(player, club.inventory), compilePlayer(player, inventory)));
     if (item.description) preview.append(el('p', 'rb-muted', item.description));
-    if (onlyPreview) { preview.append(el('p', 'rb-muted', 'Cliquez sur cet objet pour le sélectionner.')); return; }
     if (options.locked) { preview.append(el('p', 'rb-muted', 'Équipe verrouillée · consultation uniquement.')); return; }
     if (!entry.inventoryId) { preview.append(el('p', 'rb-muted', 'Implant déjà installé. Choisissez un modèle du magasin pour le remplacer.')); return; }
     const equipped = carried?.id === entry.inventoryId;
@@ -68,9 +67,8 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
     for (const entry of items) {
       const item = CATALOGUE[entry.itemId], card = btn('', () => { choose(entry); (preview.querySelector('input') ?? [...preview.querySelectorAll('button')].find(button => !button.disabled))?.focus({ preventScroll: true }); }); card.classList.add('rb-gear-card');
       card.dataset.itemId = entry.itemId; card.dataset.source = entry.source; card.dataset.inventoryId = entry.inventoryId ?? '';
-      card.title = `${item.name} · ${item.effect}`; card.setAttribute('aria-label', `${item.name} · ${entry.owner} · ${item.effect}`);
+      card.setAttribute('aria-label', `${item.name} · ${entry.owner} · ${item.effect}`);
       card.append(equipmentArtwork(entry.itemId, ''), el('strong', '', item.name), el('small', 'rb-muted', entry.owner));
-      card.addEventListener('pointerenter', () => show(entry, true)); card.addEventListener('focus', () => show(entry, true));
       entries.push(entry); cards.push([card, entry]); grid.append(card);
     }
     if (items.length) group.append(grid); collection.append(group);

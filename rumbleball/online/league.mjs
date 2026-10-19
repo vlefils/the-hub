@@ -1,15 +1,20 @@
 // Authoritative league transitions. This module runs on the server; browser
 // projections deliberately omit seeds, private clubs and future match frames.
-import { createCareer, confirmDraft, configureTeam, recruit, sellPlayer, buyItem, assignProtection, sellProtection, setClubColor, setClubCrest, improveAbilities } from '../career.mjs';
+import { createCareer, confirmDraft, configureTeam, recruit, sellPlayer, buyItem, assignProtection, sellProtection, setClubColor, setClubCrest, improveAbilities, aiLineup, equipAiClub } from '../career.mjs';
 import { identifyClub, validCrest, cosmeticHash, CRESTS } from '../identity.mjs';
 import { createMatch, stepMatch, CURRENT_RULES } from '../engine.mjs';
-import { compilePlayer, salary, progressPlayer } from '../progression.mjs';
+import { compilePlayer, salary, progressPlayer, recruitmentPrice, MAX_SQUAD_SIZE } from '../progression.mjs';
+import { PROFILES } from '../data.mjs';
+import { KIT_COLORS } from '../appearance.mjs';
 import { clubDeployment } from '../deployment.mjs';
 import { clubOpening } from '../openings.mjs';
-import { ensureClubDevelopment, XP_THRESHOLDS, MAX_LEVEL } from '../player-development.mjs';
+import { ensureClubDevelopment, automaticAbilityIncreases, XP_THRESHOLDS, MAX_LEVEL } from '../player-development.mjs';
 import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture, playoffWinner } from '../playoffs.mjs';
 
 export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: 3500 });
+export const MAX_LEAGUE_CLUBS = 128;
+export const leagueParticipants = s => [...s.members, ...(s.bots ?? [])];
+export const groupDays = count => 2 * (count + count % 2 - 1);
 const need = (ok, message) => { if (!ok) throw new Error(message); };
 const copy = (value) => structuredClone(value);
 const instant = (value) => { const n = new Date(value).getTime(); need(Number.isFinite(n), 'Date invalide.'); return n; };
@@ -57,23 +62,44 @@ const edits = {
   equip: (c, p) => assignProtection(c, p.itemId, p.playerId ?? null, p.location), sellProtection: (c, p) => sellProtection(c, p.itemId),
   color: (c, p) => setClubColor(c, p.color),
 };
-export function createLeague({ id, userId, name, clubName, color, crestId, inviteCode, seed, capacity = 6 }, now) {
-  need([2, 4, 6, 8].includes(capacity), 'Une ligue accueille 2, 4, 6 ou 8 clubs.');
+export function createLeague({ id, userId, name, clubName, color, crestId, inviteCode, seed }, now) {
   need(typeof inviteCode === 'string' && inviteCode.length >= 16, 'Code d’invitation invalide.');
-  return { version: 1, id, name: text(name, 'Nom de ligue'), ownerId: userId, inviteCode, seed, capacity, status: 'lobby',
+  return { version: 1, id, name: text(name, 'Nom de ligue'), ownerId: userId, inviteCode, seed, capacity: null, status: 'lobby', bots: [], botSequence: 0,
     season: 1, day: 0, completedDays: 0, phase: 'groups', playoffs: null, playoffHistory: [], nextLockAt: null, night: null, history: [],
     members: [{ userId, club: makeClub(userId, clubName, `${seed}:${userId}`, color, crestId, `${id}:${userId}`), draft: null }], createdAt: iso(instant(now)) };
 }
 export function joinLeague(input, userId, { clubName, color, crestId }, now) {
   const s = copy(input); need(s.status === 'lobby', 'Cette saison a déjà commencé.');
   need(!s.members.some((m) => m.userId === userId), 'Vous participez déjà à cette ligue.');
-  need(s.members.length < s.capacity, 'La ligue est complète.');
+  need(leagueParticipants(s).length < MAX_LEAGUE_CLUBS, 'La ligue accueille au maximum 128 clubs.');
+  s.capacity = null;
   s.members.push({ userId, club: makeClub(userId, clubName, `${s.seed}:${userId}`, color, crestId, `${s.id}:${userId}`), draft: null }); return s;
 }
 export function startLeague(input, userId, now) {
   const s = copy(input); need(s.ownerId === userId, 'Seul le créateur peut lancer la saison.');
-  need(s.status === 'lobby' && s.members.length === s.capacity, 'La ligue doit être complète pour commencer.');
-  s.status = 'preparation'; s.nextLockAt = nextLock(now); return s;
+  need(s.status === 'lobby', 'Cette saison a déjà commencé.');
+  need(leagueParticipants(s).length >= 2, 'Il faut au moins deux clubs pour commencer.');
+  s.capacity = leagueParticipants(s).length; s.status = 'preparation'; s.nextLockAt = nextLock(now); return s;
+}
+const BOT_NAMES = ['Néon Dogs', 'Circuit Fantôme', 'Chrome Union', 'Les Déphaseurs', 'Secteur Zéro', 'Les Ferrailleurs', 'Signal Noir', 'Les Spectres'];
+export function addBot(input, userId) {
+  const s = copy(input);
+  need(s.ownerId === userId, 'Seul le créateur peut ajouter des bots.');
+  need(s.status === 'lobby', 'Les bots se gèrent dans la salle d’attente, avant le lancement.');
+  need(leagueParticipants(s).length < MAX_LEAGUE_CLUBS, 'La ligue accueille au maximum 128 clubs.');
+  const n = s.botSequence = (s.botSequence ?? 0) + 1, id = `bot:${s.id}:${n}`;
+  const name = BOT_NAMES[(n - 1) % BOT_NAMES.length] + (n > BOT_NAMES.length ? ` ${Math.ceil(n / BOT_NAMES.length)}` : '');
+  const club = makeClub(id, name, `${s.seed}:${id}`, KIT_COLORS[n % KIT_COLORS.length], undefined, `${s.id}:${id}`);
+  club.strategy = ['balanced', 'pressing', 'possession'][(n - 1) % 3];
+  (s.bots ??= []).push({ userId: id, club }); s.capacity = null;
+  return s;
+}
+export function removeBot(input, userId, botId) {
+  const s = copy(input);
+  need(s.ownerId === userId, 'Seul le créateur peut retirer des bots.');
+  need(s.status === 'lobby', 'Les bots se gèrent dans la salle d’attente, avant le lancement.');
+  need(s.bots?.some(bot => bot.userId === botId), 'Bot introuvable.');
+  s.bots = s.bots.filter(bot => bot.userId !== botId); s.capacity = null; return s;
 }
 export function isLocked(s, now) { return s.status === 'broadcast' || s.status === 'preparation' && instant(now) >= instant(s.nextLockAt); }
 export function editPreparation(input, userId, command, payload, now) {
@@ -91,12 +117,15 @@ export function editPreparation(input, userId, command, payload, now) {
 }
 export function fixturesFor(s) {
   if (s.phase === 'playoffs') return playoffFixtures(s.playoffs).map(match => [match.homeId, match.awayId]);
-  const ids = s.members.map((m) => m.userId), n = ids.length, day = s.day % (2 * (n - 1));
+  const ids = leagueParticipants(s).map((m) => m.userId);
+  if (ids.length < 2) return [];
+  if (ids.length % 2) ids.push(null);
+  const n = ids.length, day = s.day % (2 * (n - 1));
   for (let i = 0; i < day % (n - 1); i++) ids.splice(1, 0, ids.pop());
-  return Array.from({ length: n / 2 }, (_, i) => day < n - 1 ? [ids[i], ids[n - 1 - i]] : [ids[n - 1 - i], ids[i]]);
+  return Array.from({ length: n / 2 }, (_, i) => day < n - 1 ? [ids[i], ids[n - 1 - i]] : [ids[n - 1 - i], ids[i]]).filter(pair => pair.every(Boolean));
 }
 function configFor(s, [homeId, awayId], seed) {
-  const home = s.members.find((m) => m.userId === homeId).club, away = s.members.find((m) => m.userId === awayId).club;
+  const clubs = leagueParticipants(s), home = clubs.find((m) => m.userId === homeId).club, away = clubs.find((m) => m.userId === awayId).club;
   return { seed, rulesVersion: CURRENT_RULES, teamNames: { home: home.name, away: away.name }, kitColors: { home: home.kitColor, away: away.kitColor }, crestIds: { home: home.crestId, away: away.crestId },
     strategy: home.strategy, awayStrategy: away.strategy, openings: { home: clubOpening(home), away: clubOpening(away) },
     deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') },
@@ -113,9 +142,30 @@ function transaction(club, amount, label, id) {
   if (club.transactions.some((t) => t.id === id)) return;
   club.balance += amount; club.transactions.push({ id, amount, label, balance: club.balance });
 }
+function prepareBot(s, bot) {
+  let c = bot.club;
+  for (const p of c.players) automaticAbilityIncreases(p);
+  const reserve = () => c.players.reduce((sum, p) => sum + salary(p), 0);
+  if (c.players.length < MAX_SQUAD_SIZE) {
+    const count = profile => c.players.filter(p => PROFILES[p.profile].archetype === PROFILES[profile].archetype).length;
+    const offer = [...c.market].sort((a, b) => count(a.profile) - count(b.profile) || recruitmentPrice(a) - recruitmentPrice(b)).find(p => c.balance - reserve() >= recruitmentPrice(p) + salary(p));
+    if (offer) {
+      const recruited = recruit(careerView(c, s.completedDays % 10), offer.id);
+      c = { ...recruited.clubs[0], lineup: recruited.lineup, inventory: recruited.inventory, market: recruited.market, balance: recruited.balance, transactions: recruited.transactions };
+      for (const p of c.players) automaticAbilityIncreases(p);
+    }
+  }
+  // Free club-issued blunt weapons follow the same inventory rules as human purchases.
+  for (const p of c.players) if (!c.inventory.some(item => item.playerId === p.id && ['rightHand', 'leftHand'].includes(item.location))) {
+    const issued = buyItem(careerView(c, s.completedDays % 10), PROFILES[p.profile].archetype === 'belier' ? 'maul' : 'tonfa', p.id, false, 'rightHand');
+    c.inventory = issued.inventory; c.transactions = issued.transactions;
+  }
+  equipAiClub(c, s.completedDays + 1, (amount, label) => transaction(c, amount, label, `bot-gear-${s.completedDays}-${c.transactions.length}`));
+  c.lineup = aiLineup(c); bot.club = c;
+}
 function freezeNight(s, now) {
   const start = Math.max(instant(s.nextLockAt), instant(now));
-  for (const m of s.members) {
+  for (const m of leagueParticipants(s)) {
     if (m.draft) m.club = m.draft;
     identifyClub(m.club, `${s.id}:${m.userId}`, m.club.market);
     ensureClubDevelopment(m.club, `${s.id}:${m.userId}`);
@@ -123,7 +173,12 @@ function freezeNight(s, now) {
     transaction(m.club, ONLINE_RULES.dailyIncome, 'Revenu de ligue', `income-${s.completedDays}`);
     transaction(m.club, -m.club.players.reduce((n, p) => n + salary(p), 0), 'Salaires de la journée', `wages-${s.completedDays}`);
   }
-  const games = fixturesFor(s).map((sides, index) => {
+  for (const bot of s.bots ?? []) prepareBot(s, bot);
+  const fixtures = fixturesFor(s), playing = new Set(fixtures.flat());
+  if (s.phase !== 'playoffs') for (const m of leagueParticipants(s)) if (!playing.has(m.userId)) {
+    for (const p of m.club.players) progressPlayer(p, false, false);
+  }
+  const games = fixtures.map((sides, index) => {
     const playoff = s.phase === 'playoffs' ? playoffFixtures(s.playoffs)[index] : null;
     const id = playoff?.id ?? `${s.id}:s${s.season}:d${s.day}:m${index}`, seed = `${s.seed}:${id}`;
     const config = configFor(s, sides, seed), initial = createMatch(config);
@@ -136,7 +191,7 @@ function settle(s, game) {
   if (game.settled) return;
   const state = game.broadcast.final, winnerId = state.result.winnerId === 'home' ? game.homeId : state.result.winnerId === 'away' ? game.awayId : null;
   for (const [side, id] of [['home', game.homeId], ['away', game.awayId]]) {
-    const c = s.members.find((m) => m.userId === id).club;
+    const c = leagueParticipants(s).find((m) => m.userId === id).club;
     ensureClubDevelopment(c, `${s.id}:${id}`);
     for (const p of c.players) {
       const played = state.players.find((q) => q.teamId === side && q.playerId === p.id);
@@ -174,10 +229,10 @@ export function advanceLeague(input, now, { maxRounds = Infinity } = {}) {
     if (s.phase === 'playoffs' && s.playoffs.championId) {
       (s.playoffHistory ??= []).push({ season: s.season, bracket: copy(s.playoffs) });
       s.season++; s.day = 0; s.phase = 'groups'; s.playoffs = null;
-      for (const m of s.members) for (const p of m.club.players) p.fatigue = 0;
-    } else if (s.phase !== 'playoffs' && s.day === 2 * (s.members.length - 1)) {
+      for (const m of leagueParticipants(s)) for (const p of m.club.players) p.fatigue = 0;
+    } else if (s.phase !== 'playoffs' && s.day === groupDays(leagueParticipants(s).length)) {
       s.playoffs = createPlayoffs(leagueTable(s).map(row => row.id), `${s.id}:s${s.season}:playoffs`); s.phase = 'playoffs';
-      for (const m of s.members) for (const p of m.club.players) p.fatigue = 0;
+      for (const m of leagueParticipants(s)) for (const p of m.club.players) p.fatigue = 0;
     }
     // Recover one delayed evening without retroactively playing many seasons.
     s.nextLockAt = nextLock(now);
@@ -185,7 +240,7 @@ export function advanceLeague(input, now, { maxRounds = Infinity } = {}) {
   return s;
 }
 export function leagueTable(s) {
-  const rows = s.members.map((m, order) => ({ id: m.userId, name: m.club.name, order, played: 0, wins: 0, draws: 0, losses: 0, points: 0 }));
+  const rows = leagueParticipants(s).map((m, order) => ({ id: m.userId, name: m.club.name, order, played: 0, wins: 0, draws: 0, losses: 0, points: 0 }));
   for (const g of s.history.filter(g => g.season === s.season && g.phase !== 'playoffs')) for (const id of [g.homeId, g.awayId]) {
     const r = rows.find((r) => r.id === id); r.played++;
     if (!g.winnerId) { r.draws++; r.points++; } else if (g.winnerId === id) { r.wins++; r.points += 3; } else r.losses++;
@@ -228,10 +283,10 @@ export function leagueProjection(s, userId, now) {
       roundStartsAt: iso(instant(active.playsAt) + index * ONLINE_RULES.roundMs),
       turns: t < instant(active.playsAt) ? [] : round.turns.map((turn) => ({ before: publicState(turn.before, active.id), after: publicState(turn.after, active.id), events: copy(turn.events) })) };
   }
-  return { id: s.id, name: s.name, ownerId: s.ownerId, capacity: s.capacity, status: s.status, season: s.season, day: s.day,
+  return { id: s.id, name: s.name, ownerId: s.ownerId, capacity: s.status === 'lobby' ? null : s.capacity, maxClubs: MAX_LEAGUE_CLUBS, status: s.status, season: s.season, day: s.day,
     phase: s.phase ?? 'groups', playoffs: copy(s.playoffs ?? null), playoffHistory: copy(s.playoffHistory ?? []),
-    members: s.members.map((m) => ({ userId: m.userId, name: m.club.name, kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
+    members: leagueParticipants(s).map((m) => ({ userId: m.userId, name: m.club.name, isBot: (s.bots ?? []).some(bot => bot.userId === m.userId), kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
     serverTime: iso(t), nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
     club: ownClub, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
-    history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
+    history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: s.status === 'lobby' ? [] : s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

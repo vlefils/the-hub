@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague, nextLock, isLocked, fixturesFor, leagueProjection, ONLINE_RULES } from './league.mjs';
+import { createLeague, joinLeague, startLeague, addBot, removeBot, editPreparation, advanceLeague, nextLock, isLocked, fixturesFor, leagueProjection, leagueParticipants, groupDays, ONLINE_RULES } from './league.mjs';
 import { salary, compilePlayer } from '../progression.mjs';
 import { createLeagueService } from './server.mjs';
 
@@ -19,9 +19,10 @@ test('Paris : 20 h en été/hiver, changement d’heure et frontière exacte du 
   assert.equal(nextLock(lock), '2026-10-19T18:00:00.000Z');
   const s = fixture(); assert.equal(isLocked(s, '2026-10-18T17:59:59.999Z'), false); assert.equal(isLocked(s, lock), true);
 });
-test('lobby : capacité, propriétaire, participants uniques et absence de démarrage incomplet', () => {
+test('lobby ouvert : au moins deux clubs, propriétaire, participants uniques et inscriptions closes au lancement', () => {
   const s = createLeague({ id: 'l', userId: 'u', name: 'Ligue', clubName: 'Club', inviteCode: 'a'.repeat(32), seed: 's' }, day);
-  assert.throws(() => startLeague(s, 'u', day), /complète/);
+  assert.equal(s.capacity, null); assert.deepEqual(leagueProjection(s, 'u', day).upcoming, []);
+  assert.throws(() => startLeague(s, 'u', day), /au moins deux/);
   assert.throws(() => joinLeague(s, 'u', { clubName: 'Autre' }, day), /déjà/);
   assert.throws(() => startLeague(s, 'other', day), /créateur/);
   const full = fixture(); assert.throws(() => joinLeague(full, 'new', { clubName: 'Tard' }, day), /commencé/);
@@ -105,14 +106,17 @@ test('améliorations serveur : choix contrôlés, brouillon annulable, propriét
   const result = await service.command('u0', { action: 'advance', leagueId: s.id, payload: { playerId: p.id, changes: { constitution: 2 } } });
   assert.equal(result.league.club.players[0].advancements.length, 1); assert.equal(result.revision, 2);
 });
-test('calendrier : aller-retour complet pour 2, 4, 6 et 8 clubs, un match par club et journée', () => {
-  for (const capacity of [2, 4, 6, 8]) {
+test('calendrier ouvert : aller-retour pair ou impair et au-delà de huit clubs, avec repos équilibrés', () => {
+  for (const capacity of [2, 3, 4, 5, 6, 7, 8, 10, 12]) {
     const s = fixture(capacity), pairs = new Set();
-    for (s.day = 0; s.day < 2 * (capacity - 1); s.day++) {
-      const fixtures = fixturesFor(s); assert.equal(new Set(fixtures.flat()).size, capacity);
+    const rests = new Map(s.members.map(m => [m.userId, 0]));
+    for (s.day = 0; s.day < groupDays(capacity); s.day++) {
+      const fixtures = fixturesFor(s); assert.equal(new Set(fixtures.flat()).size, capacity - capacity % 2);
+      for (const id of rests.keys()) if (!fixtures.flat().includes(id)) rests.set(id, rests.get(id) + 1);
       for (const [home, away] of fixtures) { const key = `${home}:${away}`; assert.equal(pairs.has(key), false); pairs.add(key); }
     }
     assert.equal(pairs.size, capacity * (capacity - 1));
+    assert.ok([...rests.values()].every(count => count === (capacity % 2 ? 2 : 0)));
   }
 });
 test('soirée : tous figés à 20 h, salaires uniques, revenu fixe, deux minutes de pause et résultats à l’heure', () => {
@@ -209,4 +213,102 @@ test('service : authentification, projection, conflit réessayé et double worke
   assert.equal(state.members[0].club.transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
   let calls = 0; while (!state.night.games[0].broadcast.final.finished) { assert.ok(++calls <= 13); await service.tick(); }
   clock = state.night.endsAt; await service.tick(); await service.tick(); assert.equal(state.history.length, 1);
+});
+
+test('bots : ajout et retrait réservés au créateur, identifiants persistants et aucune fausse adhésion Auth', () => {
+  const initial = createLeague({ id: 'l', userId: 'owner', name: 'Ligue', clubName: 'Club', inviteCode: 'a'.repeat(32), seed: 'bots' }, day);
+  let s = addBot(initial, 'owner'); const first = s.bots[0].userId;
+  assert.equal(initial.bots.length, 0); assert.equal(s.members.length, 1); assert.equal(s.bots[0].club.balance, 600);
+  s = joinLeague(s, 'friend', { clubName: 'Ami' }, day);
+  assert.throws(() => addBot(s, 'friend'), /créateur/);
+  assert.throws(() => removeBot(s, 'friend', first), /créateur/);
+  assert.throws(() => removeBot(s, 'owner', 'friend'), /introuvable/);
+  s = removeBot(s, 'owner', first); s = addBot(s, 'owner');
+  assert.notEqual(s.bots[0].userId, first);
+  const view = leagueProjection(s, 'owner', day);
+  assert.equal(view.members.length, 3); assert.equal(view.members.filter(m => m.isBot).length, 1);
+  assert.equal(view.members.at(-1).club, undefined); assert.equal(view.capacity, null);
+  assert.throws(() => leagueProjection(s, s.bots[0].userId, day), /réservé/);
+  assert.throws(() => editPreparation(s, s.bots[0].userId, 'buy', {}, day), /participez/);
+  s = startLeague(s, 'owner', day); assert.equal(s.capacity, 3);
+  assert.throws(() => addBot(s, 'owner'), /avant le lancement/);
+  assert.throws(() => removeBot(s, 'owner', s.bots[0].userId), /avant le lancement/);
+});
+
+test('bots : achats réels au tarif commun, rotation, recrutement et niveaux sur plusieurs saisons', () => {
+  let s = createLeague({ id: 'bots', userId: 'human', name: 'Ligue', clubName: 'Club', inviteCode: 'a'.repeat(32), seed: 'bot-management' }, day);
+  s = startLeague(addBot(s, 'human'), 'human', day);
+  const initial = structuredClone(s);
+  for (let i = 0; i < 18; i++) {
+    const oldLineup = [...s.bots[0].club.lineup];
+    const transactionCount = s.bots[0].club.transactions.length;
+    s = advanceLeague(s, s.nextLockAt, { maxRounds: 0 });
+    const c = s.bots[0].club, purchases = c.transactions.filter(t => t.id.startsWith('bot-gear-'));
+    const spent = c.transactions.slice(transactionCount).some(t => t.amount < 0 && t.label !== 'Salaires de la journée');
+    if (spent) assert.ok(c.balance >= c.players.reduce((sum, p) => sum + salary(p), 0), 'Les achats réservent les prochains salaires ; les salaires seuls peuvent réduire cette réserve.');
+    assert.ok(c.inventory.some(item => item.location === 'rightHand'));
+    assert.equal(new Set(c.inventory.map(item => item.id)).size, c.inventory.length);
+    assert.deepEqual(advanceLeague(s, s.nextLockAt, { maxRounds: 0 }), s, 'Un nouvel appel du worker ne rachète pas d’équipement.');
+    if (!i) { assert.equal(c.players.length, 7); assert.ok(purchases.some(t => t.amount < 0)); }
+    if (i === 1) assert.notDeepEqual(c.lineup, oldLineup, 'Les remplaçants reposés entrent en jeu.');
+    s = advanceLeague(s, s.nextLockAt); s = advanceLeague(s, s.night.endsAt);
+  }
+  const bot = s.bots[0].club;
+  assert.ok(bot.players.length > 6 && bot.players.length <= 10); assert.ok(bot.players.some(p => p.advancements.length));
+  assert.equal(initial.bots[0].club.inventory.length, 0);
+});
+
+test('bot solvable : une arme avancée est achetée, débitée et compilée dans la bonne main', () => {
+  let s = createLeague({ id: 'rich', userId: 'human', name: 'Ligue', clubName: 'Club', inviteCode: 'a'.repeat(32), seed: 'rich-bot' }, day);
+  s = startLeague(addBot(s, 'human'), 'human', day); s.completedDays = 1;
+  s.bots[0].club.balance = 2000; s.bots[0].club.players[0].implant = 'fibers';
+  s = advanceLeague(s, s.nextLockAt, { maxRounds: 0 });
+  const bot = s.bots[0].club, gear = bot.inventory.find(item => ['arc_tonfa', 'gravity_maul'].includes(item.itemId));
+  assert.ok(gear); assert.equal(gear.location, 'rightHand');
+  const cost = gear.itemId === 'arc_tonfa' ? 400 : 600;
+  assert.ok(bot.transactions.some(t => t.id.startsWith('bot-gear-') && t.amount === -cost));
+  assert.equal(bot.balance, 2000 + 210 - 90 - 300 - cost);
+  const compiled = s.night.games[0].config.rosters.away.find(p => p.playerId === gear.playerId);
+  assert.equal(compiled.attack.bonus, compilePlayer(bot.players.find(p => p.id === gear.playerId)).attack.bonus + 1);
+});
+
+test('bot solvable : implant acheté après les protections et bonus présents au coup d’envoi', () => {
+  let s = createLeague({ id: 'implant', userId: 'human', name: 'Ligue', clubName: 'Club', inviteCode: 'a'.repeat(32), seed: 'implant-bot' }, day);
+  s = startLeague(addBot(s, 'human'), 'human', day);
+  const c = s.bots[0].club; c.balance = 2000;
+  c.inventory = c.players.slice(0, 3).map((p, i) => ({ id: `fixture-vest-${i}`, itemId: 'vest', playerId: p.id, location: 'torso' }));
+  s = advanceLeague(s, s.nextLockAt, { maxRounds: 0 });
+  const bot = s.bots[0].club, implanted = bot.players.find(p => p.implant);
+  assert.ok(implanted); assert.ok(bot.transactions.some(t => t.id.startsWith('bot-gear-') && t.amount === -300));
+  assert.equal(bot.balance, 2000 + 210 - 90 - 300 - 300);
+  const compiled = s.night.games[0].config.rosters.away.find(p => p.playerId === implanted.id);
+  assert.deepEqual(compiled, compilePlayer(implanted, bot.inventory));
+});
+
+test('ligue impaire : repos récupérateur sans faux résultat et playoffs après le dernier aller-retour', () => {
+  let s = fixture(3); s.members.forEach(m => m.club.players.forEach(p => { p.fatigue = 6; }));
+  const idle = s.members.find(m => !fixturesFor(s).flat().includes(m.userId)).userId;
+  s = advanceLeague(s, lock, { maxRounds: 0 });
+  const resting = s.members.find(m => m.userId === idle).club;
+  assert.ok(resting.players.every(p => p.fatigue < 6 && p.xp === 4));
+  assert.equal(s.history.length, 0); assert.deepEqual(advanceLeague(s, lock, { maxRounds: 0 }), s);
+  s = advanceLeague(s, lock); s = advanceLeague(s, s.night.endsAt);
+  while (s.phase !== 'playoffs') { s = advanceLeague(s, s.nextLockAt); s = advanceLeague(s, s.night.endsAt); }
+  assert.equal(s.completedDays, 6); assert.equal(s.history.length, 6);
+  assert.ok(leagueParticipants(s).every(m => m.club.players.every(p => p.fatigue === 0)));
+  assert.ok(leagueProjection(s, 'u0', s.nextLockAt).table.every(row => row.played === 4));
+});
+
+test('service lobby : ajouts concurrents sans perte, payload financier ignoré et bots sans accès authentifié', async () => {
+  let state = createLeague({ id: 'l', userId: 'owner', name: 'Ligue', clubName: 'Club', inviteCode: 'a'.repeat(32), seed: 's' }, day), revision = 1;
+  const store = { async get() { return { id: state.id, state: structuredClone(state), revision }; },
+    async commit(id, expected, next) { if (expected !== revision) throw new Error('RB_CONFLICT'); state = next; return ++revision; } };
+  const service = createLeagueService(store, { now: () => day });
+  await Promise.all([1, 2].map(() => service.command('owner', { action: 'addBot', leagueId: 'l', payload: { userId: 'spoofed', balance: 999999 } })));
+  assert.equal(state.bots.length, 2); assert.equal(state.members.length, 1);
+  assert.ok(state.bots.every(bot => bot.club.balance === 600));
+  assert.equal(new Set(state.bots.map(bot => bot.userId)).size, 2);
+  await assert.rejects(() => service.command(state.bots[0].userId, { action: 'get', leagueId: 'l' }), /réservé/);
+  await service.command('owner', { action: 'removeBot', leagueId: 'l', payload: { botId: state.bots[0].userId } });
+  const started = await service.command('owner', { action: 'start', leagueId: 'l' }); assert.equal(started.league.capacity, 2);
 });

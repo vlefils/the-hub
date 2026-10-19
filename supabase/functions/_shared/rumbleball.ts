@@ -15,8 +15,8 @@ export const store = {
   async list(userId: string) {
     const memberships = checked(await admin.from('rb_memberships').select('league_id').eq('user_id', userId));
     if (!memberships.length) return [];
-    const rows = checked(await admin.from('rb_leagues').select('id,name,status,capacity,member_count').in('id', memberships.map((m: any) => m.league_id)));
-    return rows.map((r: any) => ({ id: r.id, name: r.name, status: r.status, members: r.member_count, capacity: r.capacity }));
+    const rows = checked(await admin.from('rb_leagues').select('id,name,status,capacity,member_count,bots:state->bots').in('id', memberships.map((m: any) => m.league_id)));
+    return rows.map((r: any) => ({ id: r.id, name: r.name, status: r.status, members: r.member_count + (r.bots?.length ?? 0), capacity: r.status === 'lobby' ? null : r.capacity }));
   },
   async due(now: string) { return checked(await admin.from('rb_leagues').select('id').lte('next_tick_at', now).order('next_tick_at').limit(1)); },
 };

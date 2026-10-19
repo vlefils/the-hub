@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createLeague } from '../../rumbleball/online/league.mjs';
+import { createLeague, addBot, startLeague } from '../../rumbleball/online/league.mjs';
 const { PGlite } = await import(pathToFileURL(resolve(process.argv[2])));
 const db = new PGlite();
 await db.exec('create role anon; create role authenticated; create role service_role bypassrls; create schema auth; create table auth.users(id uuid primary key); alter default privileges in schema public grant all on tables to service_role;');
@@ -11,7 +11,7 @@ const sql = await readFile(new URL('../migrations/20261018090000_rumbleball.sql'
 await db.exec(sql); await db.exec(sql); // Reapplying the isolated setup preserves rows.
 const owner = '00000000-0000-4000-8000-000000000001', id = '00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users(id) values($1)', [owner]);
-const state = createLeague({ id, userId: owner, name: 'Ligue SQL', clubName: 'Club SQL', inviteCode: 'a'.repeat(32), seed: 'sql' }, new Date().toISOString());
+const state = addBot(createLeague({ id, userId: owner, name: 'Ligue SQL', clubName: 'Club SQL', inviteCode: 'a'.repeat(32), seed: 'sql' }, new Date().toISOString()), owner);
 const commit = (revision, s, prep = false) => db.query('select public.rb_commit_league($1,$2,$3,$4) as revision', [id, revision, s, prep]);
 for (const role of ['anon', 'authenticated']) {
   await db.exec(`set role ${role}`);
@@ -22,9 +22,12 @@ for (const role of ['anon', 'authenticated']) {
 await db.exec('set role service_role');
 assert.equal((await commit(0, state)).rows[0].revision, 1);
 assert.equal((await db.query('select * from public.rb_memberships')).rows.length, 1);
+const lobby = (await db.query("select capacity, member_count, jsonb_array_length(state->'bots') as bots from public.rb_leagues")).rows[0];
+assert.equal(lobby.capacity, null); assert.equal(lobby.member_count, 1); assert.equal(lobby.bots, 1, 'Le bot ne requiert aucun utilisateur Auth ni migration SQL.');
 await assert.rejects(() => commit(0, state), /RB_CONFLICT/);
-const locked = { ...state, status: 'preparation', nextLockAt: '2000-01-01T19:00:00Z' };
+const locked = { ...startLeague(state, owner, new Date().toISOString()), nextLockAt: '2000-01-01T19:00:00Z' };
 assert.equal((await commit(1, locked)).rows[0].revision, 2);
+assert.equal((await db.query('select capacity from public.rb_leagues')).rows[0].capacity, 2, 'La capacité est figée au lancement, bots compris.');
 await assert.rejects(() => commit(2, state, true), /RB_LOCKED/);
 assert.equal((await db.query('select revision from public.rb_leagues')).rows[0].revision, 2);
 assert.equal((await commit(2, locked, false)).rows[0].revision, 3);

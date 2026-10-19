@@ -1,5 +1,5 @@
 // Transport-independent handlers, exercised with a fake DB and real game engine.
-import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague, leagueProjection, replayProjection } from './league.mjs';
+import { createLeague, joinLeague, startLeague, addBot, removeBot, editPreparation, advanceLeague, leagueProjection, replayProjection } from './league.mjs';
 const need = (ok, message) => { if (!ok) throw new Error(message); };
 export function createLeagueService(store, { now = () => new Date().toISOString(), uuid = () => crypto.randomUUID() } = {}) {
   async function update(id, transition, preparation) {
@@ -34,7 +34,12 @@ export function createLeagueService(store, { now = () => new Date().toISOString(
       const archive = await store.replay?.(leagueId, payload.matchId);
       return { replay: replayProjection(row.state, userId, payload.matchId, archive, now()) };
     }
-    const updated = await update(leagueId, (s, time) => action === 'start' ? startLeague(s, userId, time) : editPreparation(s, userId, action, payload, time), true);
+    const updated = await update(leagueId, (s, time) => {
+      if (action === 'start') return startLeague(s, userId, time);
+      if (action === 'addBot') return addBot(s, userId);
+      if (action === 'removeBot') return removeBot(s, userId, payload.botId);
+      return editPreparation(s, userId, action, payload, time);
+    }, true);
     return { league: leagueProjection(updated.state, userId, now()), revision: updated.revision };
   }
   async function tick(leagueId) {

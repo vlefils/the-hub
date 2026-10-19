@@ -16,7 +16,7 @@ async function online(t, lobby = false, capacity = 2) {
   const store = { async get() { return { id: state.id, revision, state: structuredClone(state) }; }, async list() { return [{ id: state.id, name: state.name, members: capacity, capacity }]; }, async commit(id, expected, next) { assert.equal(expected, revision); state = next; return ++revision; } };
   const service = createLeagueService(store, { now: () => clock });
   const mounted = await mountOnline(e.root, { enabled: true }, async () => ({ auth: { async getSession() { return { data: { session: { user: { id: 'a', email: 'test@example.invalid' } } } }; }, onAuthStateChange() {} }, request(action, leagueId, payload) { if (fail && action === 'configure') { fail = false; throw Error('Connexion interrompue'); } return service.command('a', { action, leagueId, payload }); } }));
-  await button(e.root, `Ligue · ${capacity}/${capacity} clubs`).click();
+  await button(e.root, `Ligue · ${capacity} clubs`).click();
   const strategy = () => descendants(e.root.querySelector('.rb-online-body')).find(n => n.tagName === 'select' && n.children.some(o => o.value === 'possession'));
   const poll = async () => { const [id, fn] = [...pending][0]; pending.delete(id); await fn(); };
   return { ...e, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); }, async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
@@ -59,10 +59,10 @@ test('broadcast : 20 h écarte la saisie non enregistrée, avertit et laisse les
   assert.match(e.root.querySelector('.rb-squad-detail').textContent, new RegExp(player.name)); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
 });
 
-test('broadcast : enregistrer libère le rafraîchissement du lobby sans réactiver une ancienne saisie', async t => {
+test('broadcast : après sauvegarde, le rafraîchissement de la salle préserve le formulaire et les tactiques', async t => {
   const e = await online(t, true); e.strategy().value = 'possession'; await e.strategy().emit('change'); await e.root.querySelector('form').emit('submit');
   const savedForm = e.root.querySelector('form'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true);
-  e.remoteChange(); await e.poll(); assert.equal(e.root.contains(savedForm), false); assert.equal(e.strategy().value, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
+  e.remoteChange(); await e.poll(); assert.equal(e.root.contains(savedForm), true); assert.equal(e.strategy().value, 'possession'); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
 });
 
 test('équipement : joueur conservé après achat et transfert, réserve lisible et verrouillage respecté', async t => {

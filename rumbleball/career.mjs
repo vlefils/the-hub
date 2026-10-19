@@ -195,12 +195,17 @@ function manageAiClub(c, club, fixture, wages, winnerId) {
   }
   // Keep savings for the next contract instead of spending them on gear daily.
   if (!recruited && club.players.length < MAX_SQUAD_SIZE && club.inventory.length) return;
+  equipAiClub(club, c.completedDays + 1, transaction);
+}
+// Shared by campaign opponents and online bots. Reserve the next full payroll.
+export function equipAiClub(club, turn, transaction) {
+  const budget = () => Math.max(0, club.balance - club.players.reduce((sum, p) => sum + salary(p), 0));
   const order = aiLineup(club).map(id => club.players.find(p => p.id === id));
   order.push(...club.players.filter(p => !order.includes(p)));
   const unprotected = order.find(p => !club.inventory.some(item => item.playerId === p.id && CATALOGUE[item.itemId]?.slot === 'protection'));
   const implant = order.find(p => !p.implant && club.inventory.some(item => item.playerId === p.id && CATALOGUE[item.itemId]?.slot === 'protection'));
   const armable = order.find(p => !club.inventory.some(item => item.playerId === p.id && (CATALOGUE[item.itemId]?.enhancement ?? 0) > 0));
-  if (armable && club.players.some(p => p.implant) && (c.completedDays + 1) % 2 === 0) {
+  if (armable && club.players.some(p => p.implant) && turn % 2 === 0) {
     const heavy = PROFILES[armable.profile].archetype === 'belier', upgrade = heavy ? 'gravity_maul' : 'arc_tonfa';
     const armed = club.inventory.some(item => item.playerId === armable.id && CATALOGUE[item.itemId]?.die);
     const itemId = budget() >= CATALOGUE[upgrade].price ? upgrade : !armed ? heavy ? 'maul' : 'tonfa' : null;
@@ -211,9 +216,9 @@ function manageAiClub(c, club, fixture, wages, winnerId) {
       if (!reserve) club.inventory.push({ id, itemId, playerId: null }); equipMutable(club.inventory, id, armable.id, 'rightHand'); return;
     }
   }
-  const firstImplant = implant && club.inventory.length >= 3 && !club.players.some(p => p.implant);
+  const firstImplant = implant && club.inventory.filter(item => CATALOGUE[item.itemId]?.slot === 'protection').length >= 3 && !club.players.some(p => p.implant);
   if (firstImplant && budget() < 300) return;
-  const upgrade = firstImplant || implant && (c.completedDays + 1) % 3 === 0 && budget() >= 300;
+  const upgrade = firstImplant || implant && turn % 3 === 0 && budget() >= 300;
   const p = upgrade ? implant : unprotected ?? implant;
   if (!p) return;
   const type = PROFILES[p.profile].archetype;
