@@ -363,16 +363,22 @@ body.rb-app {
 @media (min-width: 1200px) {
   .rb-app-main:has([data-workspace-screen]) { padding-bottom: .75rem; }
   .rb-app .rb-career[data-workspace-screen] { max-width: none; gap: .65rem; padding-bottom: 0; }
-  .rb-app-header { min-height: 5rem; grid-template-columns: 12rem minmax(0, 1fr) 20rem 7rem; gap: 0 1rem; }
+  .rb-app-header { min-height: 5rem; grid-template-columns: 12rem minmax(0, 1fr) 22rem 7rem; gap: 0 1rem; padding-block: .25rem; }
   .rb-shell-context .rb-club-header { flex-wrap: nowrap; gap: 1rem; }
+  .rb-shell-context .rb-club-header h3 { font-size: 1.2rem; margin: 0; }
+  .rb-app .rb-shell-context :is(.rb-club-header, .rb-online-identity) .rb-eyebrow { margin: 0; font-size: .75rem; line-height: 1.2; }
   .rb-shell-context .rb-club-header > .rb-club-identity { min-width: 0; }
   .rb-app .rb-shell-context .rb-career-finances > div > dd { font-size: .8rem; }
   .rb-shell-context .rb-career-finances { flex-wrap: nowrap; gap: .75rem; }
   .rb-hub-link { min-height: 0; }
+  .rb-app .rb-workspace-navigation { padding-block: .15rem; }
+  .rb-app .rb-shell-tools .rb-career-top > .rb-controls:last-child { flex-wrap: nowrap; }
+  .rb-shell-tools .rb-save-tools { padding-block: 0; }
+  .rb-shell-tools .rb-save-tools > summary { min-height: 1.6rem; padding-block: .2rem; }
   .rb-app-brand { padding-block: .35rem; }
   .rb-app-brand h1 { font-size: 2.35rem; }
   .rb-app-brand h1 span { font-size: 1.35rem; margin-top: .35rem; }
-  .rb-app .rb-workspace-navigation > .rb-button { min-height: 2.4rem; padding: .4rem 1.25rem; font-size: 1.2rem; }
+  .rb-app .rb-workspace-navigation > .rb-button { min-height: 2.2rem; padding: .35rem 1.25rem; font-size: 1.2rem; }
   .rb-app .rb-broadcast-banner { min-height: 5rem; grid-template-columns: minmax(0, 1fr) 6rem minmax(0, 1fr) minmax(11rem, .65fr); margin-bottom: .5rem; padding: .5rem 1.25rem; gap: .4rem 1rem; }
   .rb-broadcast-deadline { font-size: .75rem; line-height: 1.35; padding-left: .75rem; }
   .rb-broadcast-banner > .rb-club-identity { font-size: clamp(1.4rem, 2vw, 2.2rem); }
@@ -396,7 +402,7 @@ body.rb-app {
   .rb-app .rb-broadcast-squad > .rb-career-disclosure > summary { min-height: 1.8rem; padding: .25rem 0; }
   .rb-app .rb-broadcast-squad > .rb-quiet-action { min-height: 1.8rem; padding: .25rem 0; line-height: 1.3; }
   .rb-app .rb-broadcast-tactics { gap: .3rem; }
-  .rb-app .rb-court-workspace { --rb-court-width: clamp(18rem, calc((100svh - 30rem) * 1.5), 52rem); --rb-bench-width: 6.5rem; gap: .5rem; }
+  .rb-app .rb-court-workspace { --rb-court-width: clamp(18rem, calc((100svh - 32rem) * 1.5), 52rem); --rb-bench-width: 6.5rem; gap: .5rem; }
   .rb-court-workspace:has(.is-expanded) { --rb-bench-width: 12rem; }
   .rb-app .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) { gap: .3rem; padding: .4rem; }
   .rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) { gap: .2rem; padding: .3rem 0; }
@@ -405,7 +411,7 @@ body.rb-app {
   .rb-court-workspace .rb-bench-name .rb-athlete-portrait { width: 2.25rem; }
   .rb-app .rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) .rb-button:not(.rb-bench-name) { min-height: 1.65rem; padding: .2rem; font-size: .75rem; }
   .rb-app .rb-deployment-titlebar h4 { font-size: 1.15rem; }
-  .rb-app .rb-deployment-titlebar select { min-height: 1.8rem !important; }
+  .rb-app .rb-deployment-titlebar select { min-height: 1.8rem !important; padding: .2rem .35rem; line-height: 1.25; }
   .rb-deployment-titlebar, .rb-app .rb-deployment-layout { margin-top: 0; margin-bottom: .2rem; gap: .25rem; }
   .rb-app .rb-deployment > p { font-size: .75rem; }
   .rb-app .rb-deployment-columns { padding-bottom: .15rem; }
