@@ -378,7 +378,8 @@ export function mountMatch(root, callbacks = {}) {
     }
     heading.prepend(athletePortrait(p, state.teams.find(t => t.id === p.teamId)?.kitColor, { large: true }));
     selected.append(heading, element('p', 'rb-archetype', archetypeLabel(p)), stats,
-      element('p', 'rb-muted', `${sportingWeapon(p).name} · attaque +${p.attack.bonus} · 1d${p.attack.die} + ${p.attack.flat} contondants.`));
+      element('p', 'rb-muted', `${sportingWeapon(p).name} · attaque ${signed(p.attack.bonus)} · 1d${p.attack.die} ${signed(p.attack.flat)} contondants.`));
+    if (p.offhandAttack) selected.append(element('p', 'rb-muted', `Seconde arme · 1d${p.offhandAttack.die} ${signed(p.offhandAttack.flat)} · utilise l’action bonus après une attaque.`));
     const gear = visibleGear(p);
     if (gear.protection || gear.implant) selected.append(element('p', 'rb-muted', `Protection : ${CATALOGUE[gear.protection]?.name ?? 'aucune'} · Implant : ${CATALOGUE[gear.implant]?.name ?? 'aucun'}.`));
     const classCopy = element('div', 'rb-class-details');

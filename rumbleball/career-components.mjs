@@ -42,7 +42,8 @@ export function table(headers, rows, { highlight = -1, caption = '', qualifying 
 export function stats(p) { return `${p.maxHp} PV · CA ${p.armor} · ${p.speed.toLocaleString('fr-FR')} m · Lutte ${signed(p.skills.wrestling)} · Acrobaties ${signed(p.skills.acrobatics)}`; }
 export function statList(p) {
   const list = el('dl', 'rb-player-stats');
-  const entries = [['PV max.', p.maxHp], ['CA', p.armor], ['Vitesse', `${p.speed.toLocaleString('fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)], ['Attaque', signed(p.attack.bonus)]];
+  const entries = [['PV max.', p.maxHp], ['CA', p.armor], ['Vitesse', `${p.speed.toLocaleString('fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)], ['Attaque', signed(p.attack.bonus)], ['Dégâts', damageText(p.attack)]];
+  if (p.offhandAttack) entries.push(['Seconde arme', `${damageText(p.offhandAttack)} · action bonus`]);
   for (const [key, label] of [['adrenaline', 'Adrénaline'], ['focus', 'Concentration'], ['calls', 'Appels']]) if (p.caps?.[key]) entries.push([label, p.caps[key]]);
   if (p.archetype === 'belier' && p.chargeDC !== undefined) entries.push(['DD percussion', p.chargeDC]);
   for (const [label, value] of entries) {
@@ -68,22 +69,16 @@ export function comparison(before, after, beforeImplant = null, afterImplant = n
   for (const [label, a, b] of entries) if (a !== b) {
     const row = el('div'); row.append(el('dt', '', label), el('dd', b > a ? 'rb-gain' : 'rb-loss', `${a.toLocaleString('fr-FR')} → ${b.toLocaleString('fr-FR')}${label === 'Vitesse' ? ' m' : ''}`)); root.append(row);
   }
+  for (const [label, a, b] of [['Dégâts', damageText(before.attack), damageText(after.attack)], ['Seconde arme', before.offhandAttack ? damageText(before.offhandAttack) : 'Aucune', after.offhandAttack ? damageText(after.offhandAttack) : 'Aucune']]) if (a !== b) {
+    const row = el('div'); row.append(el('dt', '', label), el('dd', '', `${a} → ${b}`)); root.append(row);
+  }
   if (beforeImplant !== afterImplant && [beforeImplant, afterImplant].includes('regulator')) {
     const row = el('div'); row.append(el('dt', '', 'Fatigue de participation'), el('dd', afterImplant === 'regulator' ? 'rb-gain' : 'rb-loss', `+${beforeImplant === 'regulator' ? 1 : 2} → +${afterImplant === 'regulator' ? 1 : 2}`)); root.append(row);
   }
   if (!root.children.length) root.append(el('p', 'rb-muted', 'Aucune variation des caractéristiques.'));
   return root;
 }
-export function equipmentSlots(p, inventory) {
-  const slots = el('dl', 'rb-equipment-slots'), protection = inventory.find((i) => i.playerId === p.id);
-  for (const [label, id] of [['Protection', protection?.itemId], ['Implant', p.implant]]) {
-    const row = el('div'), value = el('dd'), item = CATALOGUE[id];
-    row.dataset.slot = label === 'Protection' ? 'protection' : 'implant';
-    if (item) { const art = equipmentArtwork(id, ''); value.append(art, el('span', '', item.name)); }
-    else { row.classList.add('is-empty'); value.append(el('span', 'rb-muted', 'Emplacement libre')); }
-    row.append(el('dt', 'rb-muted', label), value); slots.append(row);
-  } return slots;
-}
+export const damageText = attack => `1d${attack.die}${attack.flat ? ` ${signed(attack.flat)}` : ''}`;
 export function equipmentArtwork(id, name) {
   const image = el('img', 'rb-equipment-art'); image.src = gearImage(id); image.alt = name; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async';
   image.addEventListener('error', () => { image.hidden = true; }); return image;

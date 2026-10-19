@@ -23,11 +23,13 @@ export function defensiveForecast(state, actor) {
     for (const enemy of enemies) {
       if (delay(state, enemy.id) >= Math.min(horizon, remaining)) continue;
       if (!reach.get(enemy.id).some((p) => distance(p, cell) <= 1)) continue;
-      const chance = Math.max(.05, Math.min(.95, (21 + enemy.attack.bonus - armorAgainst(player, enemy)) / 20));
-      const hit = dodging && !player.grappledBy ? chance * chance : chance;
       const holder = carrier(state);
       const contest = withBall ? 1 : holder?.id === enemy.id ? .1 : .35;
-      hits += hit * contest; damage += hit * contest * ((enemy.attack.die + 1) / 2 + enemy.attack.flat);
+      for (const attack of [enemy.attack, ...(enemy.offhandAttack ? [enemy.offhandAttack] : [])]) {
+        const chance = Math.max(.05, Math.min(.95, (21 + attack.bonus - armorAgainst(player, enemy)) / 20));
+        const hit = dodging && !player.grappledBy ? chance * chance : chance;
+        hits += hit * contest; damage += hit * contest * ((attack.die + 1) / 2 + attack.flat);
+      }
     }
     return { damage, hits };
   };

@@ -70,12 +70,12 @@ test('équipement : joueur conservé après achat et transfert, réserve lisible
   await descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${e.state().members[0].club.players[1].name}`).click();
   await button(e.root.querySelector('.rb-player-inspector'), 'Acheter et équiper · 100 chromas').click();
   assert.match(e.root.querySelector('.rb-player-inspector').querySelector('.rb-player-shop').querySelector('select').getAttribute('aria-label'), new RegExp(e.state().members[0].club.players[1].name));
-  const slots = e.root.querySelector('.rb-equipment-slots');
+  const slots = e.root.querySelector('.rb-body-slots');
   assert.match(slots.textContent, /Plastron léger/); assert.ok(slots.querySelector('img'));
   const assignment = descendants(e.root).find(n => n.dataset.focusKey === 'player-protection');
   assert.equal(assignment.value, e.state().members[0].draft.inventory[0].id); assignment.value = ''; await assignment.emit('change');
   assert.equal(e.state().members[0].draft.inventory[0].playerId, null);
-  assert.match(e.root.querySelector('.rb-equipment-slots').textContent, /Emplacement libre/);
+  assert.match(e.root.querySelector('.rb-body-slots').textContent, /Libre/);
   await e.lock();
   assert.equal(descendants(e.root).find(n => n.dataset.focusKey === 'player-protection').disabled, true);
   assert.equal(button(e.root.querySelector('.rb-player-inspector'), 'Acheter et équiper · 100 chromas').disabled, true);
@@ -134,6 +134,22 @@ test('fiche en préparation : achat du matériel pour un remplaçant sans quitte
   await button(e.root, `Faire entrer ${reserve.name}`).click(); await e.root.querySelector('form').emit('submit');
   assert.equal(e.state().members[0].draft.lineup[2], reserve.id);
   assert.deepEqual(e.state().members[0].draft.deployment[2], position); e.mounted.stop();
+});
+
+test('body en ligne : armer les deux mains du remplaçant préserve les tactiques, puis annulation restitue le matériel', async t => {
+  const e = await online(t), club = e.state().members[0].club, reserve = club.players.find(p => !club.lineup.includes(p.id));
+  const slot = id => e.root.querySelectorAll('.rb-body-slot').find(node => node.dataset.slot === id);
+  e.strategy().value = 'possession'; await e.strategy().emit('change'); await button(e.root, reserve.name).click();
+  await slot('leftHand').click();
+  let choice = e.root.querySelector('.rb-player-shop').querySelector('select'); choice.value = 'tonfa'; await choice.emit('change'); await button(e.root, 'Acheter et équiper · 150 chromas').click();
+  assert.equal(slot('leftHand').getAttribute('aria-pressed'), 'true'); assert.match(slot('leftHand').textContent, /Tonfa/);
+  await slot('rightHand').click(); choice = e.root.querySelector('.rb-player-shop').querySelector('select'); choice.value = 'knuckles'; await choice.emit('change'); await button(e.root, 'Acheter et équiper · 75 chromas').click();
+  const draft = e.state().members[0].draft;
+  assert.deepEqual(draft.inventory.map(item => [item.itemId, item.location, item.playerId]), [['tonfa', 'leftHand', reserve.id], ['knuckles', 'rightHand', reserve.id]]);
+  assert.equal(e.strategy().value, 'possession'); assert.deepEqual(draft.lineup, club.lineup); assert.match(e.root.querySelector('.rb-player-inspector').textContent, /Seconde arme/);
+  await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(e.state().members[0].club.balance, club.balance); assert.equal(e.state().members[0].club.inventory.length, 0);
+  await e.lock(); assert.equal(e.root.querySelectorAll('.rb-body-slot').every(node => !node.disabled), true); await slot('leftHand').click();
+  assert.equal(e.root.querySelector('.rb-player-shop').querySelector('select').disabled, true); e.mounted.stop();
 });
 
 test('recrutement en ligne : modale, banc, saisie préservée et annulation de la préparation', async t => {

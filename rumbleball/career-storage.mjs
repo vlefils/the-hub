@@ -9,6 +9,7 @@ import { validOpening } from './openings.mjs';
 import { MAX_LEVEL, validPlayerDevelopment, ensureCareerDevelopment } from './player-development.mjs';
 import { validPlayoffs, playoffFixtures } from './playoffs.mjs';
 import { ensureCareerPlayoffs } from './career.mjs';
+import { validEquipmentInventory } from './equipment.mjs';
 
 export const CAREER_KEY = 'the-hub.rumbleball.career.v1';
 const check = (condition) => { if (!condition) throw new Error('Sauvegarde de carrière invalide ou incompatible.'); };
@@ -39,11 +40,8 @@ export function validateCareer(c) {
     club.players.forEach(validatePlayer);
     if (index && (club.balance !== undefined || club.inventory !== undefined || club.transactions !== undefined)) {
       check(integer(club.balance, -Number.MAX_SAFE_INTEGER) && Array.isArray(club.inventory) && Array.isArray(club.transactions));
-      const equipped = new Set(), itemIds = new Set(), entries = new Set();
-      for (const item of club.inventory) {
-        check(name(item.id) && !itemIds.has(item.id) && CATALOGUE[item.itemId]?.slot === 'protection' && (item.playerId === null || club.players.some(p => p.id === item.playerId)));
-        itemIds.add(item.id); if (item.playerId) { check(!equipped.has(item.playerId)); equipped.add(item.playerId); }
-      }
+      check(validEquipmentInventory(club.inventory, club.players.map(p => p.id)));
+      const entries = new Set();
       let balance = 600;
       for (const t of club.transactions) {
         check(name(t.id) && !entries.has(t.id) && name(t.fixtureId) && typeof t.label === 'string' && t.label.length <= 200 && integer(t.amount, -Number.MAX_SAFE_INTEGER) && integer(t.balance, -Number.MAX_SAFE_INTEGER)); entries.add(t.id);
@@ -56,12 +54,7 @@ export function validateCareer(c) {
   check(Array.isArray(c.market) && c.market.length <= 12); c.market.forEach(validatePlayer);
   const ownedIds = c.clubs[0].players.map((p) => p.id);
   check(Array.isArray(c.lineup) && new Set(c.lineup).size === c.lineup.length && c.lineup.every((id) => ownedIds.includes(id)) && c.lineup.length === (c.status === 'draft' ? 0 : 5));
-  check(Array.isArray(c.inventory) && new Set(c.inventory.map((i) => i.id)).size === c.inventory.length);
-  const equipped = new Set();
-  for (const item of c.inventory) {
-    check(name(item.id) && CATALOGUE[item.itemId]?.slot === 'protection' && (item.playerId === null || ownedIds.includes(item.playerId)));
-    if (item.playerId) { check(!equipped.has(item.playerId)); equipped.add(item.playerId); }
-  }
+  check(validEquipmentInventory(c.inventory, ownedIds));
   check(Array.isArray(c.tieOrder) && c.tieOrder.length === 6 && new Set(c.tieOrder).size === 6 && c.tieOrder.every((id) => clubIds.includes(id)));
   check(Array.isArray(c.schedule) && c.schedule.length === 10);
   const fixtureIds = new Set(), pairCounts = new Map();
@@ -126,7 +119,7 @@ export function validateCareer(c) {
       check(integer(saved.hp) && Number.isFinite(saved.movement) && saved.movement >= 0 && saved.classState && Array.isArray(m.state.aids) && Array.isArray(m.state.calls));
       if (m.state.version >= 3) check(JSON.stringify(p.startPosition) === JSON.stringify(saved.startPosition));
       return ['playerId', 'id', 'teamId', 'name', 'level', 'archetype', 'maxHp', 'armor', 'speed', 'number', 'role', 'instruction', 'initiativeDie', 'initiative', 'initiativeTie', 'proficiencyBonus', 'chargeDC'].every((key) => p[key] === saved[key])
-        && ['skills', 'abilities', 'attack'].every((key) => JSON.stringify(p[key]) === JSON.stringify(saved[key]));
+        && ['skills', 'abilities', 'attack', 'weapon', 'offhandAttack'].every((key) => JSON.stringify(p[key]) === JSON.stringify(saved[key]));
     }));
     if (m.settled) {
       check(m.summary && Array.isArray(m.summary.progress) && ['reward', 'wages', 'debtRepaid', 'remainingDebt', 'available', 'seasonPrize'].every((key) => integer(m.summary[key])));

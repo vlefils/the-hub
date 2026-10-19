@@ -232,6 +232,29 @@ body.rb-app {
 .rb-player-shop-preview p { margin: 0; font-size: .8rem; }
 .rb-player-shop-preview .rb-button { width: 100%; }
 .rb-player-shop .rb-equipment-heading { gap: .7rem; font-size: .85rem; }
+.rb-player-equipment { min-width: 0; }
+.rb-player-equipment > h4 { margin-block: .5rem; }
+.rb-equipment-workbench { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; align-items: start; }
+.rb-body-slots { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); gap: .4rem; align-items: center; padding: .6rem 0; width: 100%; max-width: 24rem; margin-inline: auto; }
+.rb-equipment-body { position: absolute; inset: 0 10%; width: 80%; height: 100%; object-fit: contain; z-index: -1; opacity: .75; pointer-events: none; }
+.rb-app .rb-body-slot { display: grid; justify-items: center; gap: .25rem; min-width: 0; padding: .45rem .25rem; margin: 0; border: 1px solid #3c566a; border-radius: 3px; background: #0a2031e8; box-shadow: none; color: #e9f1f6; }
+.rb-app .rb-body-slot[aria-pressed='true'] { border-color: #ff8952; background: #17394de8; }
+.rb-body-slot[data-slot='head'] { grid-area: 1 / 2; }
+.rb-body-slot[data-slot='torso'] { grid-area: 2 / 2; }
+.rb-body-slot[data-slot='rightHand'] { grid-area: 2 / 1; }
+.rb-body-slot[data-slot='leftHand'] { grid-area: 2 / 3; }
+.rb-body-slot[data-slot='gloves'] { grid-area: 3 / 1; }
+.rb-body-slot[data-slot='implant'] { grid-area: 3 / 3; }
+.rb-body-slot[data-slot='feet'] { grid-area: 4 / 2; }
+.rb-body-slot small { font-size: .8rem; line-height: 1.2; }
+.rb-body-slot strong { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 .85rem/1.3 'Rajdhani', sans-serif; }
+.rb-player-inspector .rb-body-slot .rb-equipment-art { width: 2rem; height: 2rem; }
+.rb-empty-slot { display: grid; place-items: center; width: 2rem; height: 2rem; font-size: 1.5rem; color: #7896ac; }
+.rb-equipment-context { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid #315367; }
+.rb-equipment-context h5 { margin: 0; font: 700 1.2rem/1.3 'Rajdhani', sans-serif; }
+.rb-equipment-context p, .rb-equipment-context .rb-field, .rb-equipment-help { font-size: .85rem; line-height: 1.5; }
+.rb-equipment-context .rb-player-shop h4 { font-size: 1.1rem; }
+.rb-player-inventory .rb-field { margin-bottom: .5rem; }
 
 /* Solo uses the same arena and inspector, with automatic preparation saves. */
 .rb-app .rb-career > .rb-broadcast-banner { margin-bottom: 0; }

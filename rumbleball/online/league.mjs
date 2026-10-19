@@ -53,8 +53,8 @@ const edits = {
   },
   recruit: (c, p) => recruit(c, p.playerId), sell: (c, p) => sellPlayer(c, p.playerId),
   advance: (c, p) => improveAbilities(c, p.playerId, p.changes),
-  buy: (c, p) => buyItem(c, p.itemId, p.playerId ?? null, p.replaceConfirmed === true),
-  equip: (c, p) => assignProtection(c, p.itemId, p.playerId ?? null), sellProtection: (c, p) => sellProtection(c, p.itemId),
+  buy: (c, p) => buyItem(c, p.itemId, p.playerId ?? null, p.replaceConfirmed === true, p.location),
+  equip: (c, p) => assignProtection(c, p.itemId, p.playerId ?? null, p.location), sellProtection: (c, p) => sellProtection(c, p.itemId),
   color: (c, p) => setClubColor(c, p.color),
 };
 export function createLeague({ id, userId, name, clubName, color, crestId, inviteCode, seed, capacity = 6 }, now) {

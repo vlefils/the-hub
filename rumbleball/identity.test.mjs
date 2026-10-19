@@ -14,7 +14,7 @@ import { installTestDOM } from './test-support/dom.mjs';
 const club = () => { const c = createCareer('Les Chromes', 'broadcast-identity'); return confirmDraft(c, c.market.slice(0, 6).map(p => p.id)); };
 const cosmeticFree = value => Array.isArray(value) ? value.map(cosmeticFree) : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).filter(([key]) => !['portraitId', 'crestId', 'kitColor'].includes(key)).map(([key, item]) => [key, cosmeticFree(item)])) : value;
 
-test('catalogue : 32 portraits, 16 emblèmes et huit équipements livrés avec leurs miniatures', async () => {
+test('catalogue : portraits, emblèmes et tous les équipements livrés avec leurs miniatures', async () => {
   assert.equal(PORTRAITS.length, 32); assert.equal(CRESTS.length, 16);
   assert.equal(new Set(PORTRAITS.map(p => p.id)).size, 32); assert.equal(new Set(CRESTS.map(p => p.id)).size, 16);
   assert.equal(new Set(PORTRAITS.map(p => p.skin)).size, 6);

@@ -5,7 +5,7 @@ import { matchKits } from './appearance.mjs';
 import { validCrest } from './identity.mjs';
 import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
 import { defaultOpening, openingDeployment, validOpening } from './openings.mjs';
-import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat } from './rules.mjs';
+import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat, performAttack, distance } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
 export const CURRENT_RULES = 6;
@@ -131,7 +131,8 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
   if (finishByKnockouts(state, events)) return events;
   const useClassAction = (path = []) => {
     const choice = decideClassAction(state, actor, path);
-    if (choice) resolveClassAction(state, actor, choice, events);
+    const saveBonusForWeapon = actor.offhandAttack && actor.action && choice?.type !== 'feint' && decideTurn(state, actor).action.type === 'attack';
+    if (choice && !saveBonusForWeapon) resolveClassAction(state, actor, choice, events);
   };
   useClassAction();
   if (finishByKnockouts(state, events)) return events;
@@ -187,6 +188,12 @@ function stepMutable(state, { stopAtRoundEnd = false } = {}) {
         if (!resolveAction(state, actor, next, events)) throw new Error(`Action de suivi illégale : ${actor.id}`);
         if (finishByKnockouts(state, events)) return events;
       }
+    }
+    if (actor.hp > 0 && actor.offhandReady && actor.bonusAction) {
+      const target = state.players.filter(p => p.teamId !== actor.teamId && p.hp > 0 && distance(actor.position, p.position) <= 1)
+        .sort((a, b) => Number(b.id === action.targetId) - Number(a.id === action.targetId) || a.hp - b.hp || a.id.localeCompare(b.id))[0];
+      if (target) performAttack(state, actor, target, events, null, null, true);
+      if (finishByKnockouts(state, events)) return events;
     }
     // Damage or a failed pass can leave the ball at the actor's feet after the
     // action. Use the remaining interaction once, without restoring any budget.

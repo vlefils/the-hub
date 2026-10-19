@@ -60,7 +60,7 @@ test('équipement visible : transfert de protection et remplacement d’implant 
   c = buyItem(c, 'legs', a.id); const legs = render(a.id);
   c = buyItem(c, 'interface', a.id, true); assert.notEqual(render(a.id), legs);
   const frozen = launchCareerMatch(c).current.state.players.find((p) => p.playerId === a.id);
-  assert.deepEqual(frozen.visualGear, { protection: null, implant: 'interface' }); assert.deepEqual(playerLook(frozen), look);
+  assert.deepEqual(frozen.visualGear, { protection: null, implant: 'interface', head: null, torso: null, gloves: null, feet: null, rightHand: null, leftHand: null }); assert.deepEqual(playerLook(frozen), look);
 });
 
 test('les armes illustrent les attaques existantes ; les couleurs ne changent aucun jet ni résultat', () => {

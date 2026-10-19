@@ -340,14 +340,16 @@ export function provokesOpportunity(actor, mover, from, to) {
     && !mover.disengaged && !mover.grappledBy && inside(from) && inside(to) && distance(from, to) === 1
     && distance(actor.position, from) <= 1 && distance(actor.position, to) > 1;
 }
-export function performAttack(state, actor, target, events, opportunity = null, technique = null) {
-  if (actor.hp <= 0 || !target || target.hp <= 0 || actor.teamId === target.teamId || distance(actor.position, target.position) > 1 || !(opportunity ? actor.reaction : actor.action)) return false;
+export function performAttack(state, actor, target, events, opportunity = null, technique = null, offhand = false) {
+  const available = offhand ? actor.bonusAction && actor.offhandReady && actor.offhandAttack && !opportunity && !technique : opportunity ? actor.reaction : actor.action;
+  if (actor.hp <= 0 || !target || target.hp <= 0 || actor.teamId === target.teamId || distance(actor.position, target.position) > 1 || !available) return false;
   if (opportunity && (!opportunity.from || !opportunity.to || !sameCell(target.position, opportunity.from)
     || !provokesOpportunity(actor, target, opportunity.from, opportunity.to)
     || !canStep(state, target, opportunity.from, opportunity.to))) return false;
   if (technique && (opportunity || technique !== 'percussion' || actor.archetype !== 'belier' || actor.classState.adrenaline < 2 || (actor.chargeRun?.steps ?? 0) < 2)) return false;
   if (opportunity) { actor.reaction = false; cancelReadiedPass(state, actor, events, 'réaction dépensée'); }
-  else { actor.action = false; actor.chargeRun = null; }
+  else if (offhand) { actor.bonusAction = false; actor.offhandReady = false; }
+  else { actor.action = false; actor.chargeRun = null; if (actor.offhandAttack) actor.offhandReady = true; }
   if (technique) {
     actor.classState.adrenaline -= 2;
     classEvent(state, events, 'percussion', actor, `${actor.name} lance une percussion sur ${target.name}.`, { targetId: target.id, label: 'Percussion' });
@@ -355,11 +357,12 @@ export function performAttack(state, actor, target, events, opportunity = null, 
   const trigger = opportunity ? { from: { ...opportunity.from }, to: { ...opportunity.to }, attackerPosition: { ...actor.position }, reach: 1 } : null;
   const message = opportunity
     ? `${actor.name} tente une attaque d’opportunité sur ${target.name} : sortie d’allonge tentée de ${cellLabel(trigger.from)} vers ${cellLabel(trigger.to)}. L’attaque précède le déplacement.`
-    : `${actor.name} attaque ${target.name}.`;
-  emit(state, events, opportunity ? 'opportunity' : 'attack', message, { playerId: actor.id, targetId: target.id, ...(trigger ? { trigger } : {}) });
+    : offhand ? `${actor.name} frappe ${target.name} avec sa seconde arme (action bonus).` : `${actor.name} attaque ${target.name}.`;
+  emit(state, events, opportunity ? 'opportunity' : 'attack', message, { playerId: actor.id, targetId: target.id, ...(trigger ? { trigger } : {}), ...(offhand ? { offhand: true } : {}) });
   const helped = aided(state, actor, target.id, 'attack');
   const armor = armorAgainst(target, actor);
-  const roll = check(state, actor.attack.bonus, events, `${actor.name} · attaque contre CA ${armor}`, {
+  const attack = offhand ? actor.offhandAttack : actor.attack;
+  const roll = check(state, attack.bonus, events, `${actor.name} · attaque contre CA ${armor}`, {
     advantage: target.prone || helped,
     disadvantage: actor.prone || (target.dodging && !target.grappledBy),
   });
@@ -367,9 +370,9 @@ export function performAttack(state, actor, target, events, opportunity = null, 
     emit(state, events, 'miss', `${actor.name} manque ${target.name}.`);
     return true;
   }
-  const dice = Array.from({ length: roll.natural === 20 ? 2 : 1 }, () => randomInt(state, actor.attack.die) + 1);
-  emit(state, events, 'roll', `${roll.natural === 20 ? 'Critique ! ' : ''}Dégâts : ${dice.join(' + ')} + ${actor.attack.flat}`, { dice, critical: roll.natural === 20 });
-  dealDamage(state, actor, target, dice.reduce((a, b) => a + b, actor.attack.flat), events);
+  const dice = Array.from({ length: roll.natural === 20 ? 2 : 1 }, () => randomInt(state, attack.die) + 1);
+  emit(state, events, 'roll', `${roll.natural === 20 ? 'Critique ! ' : ''}Dégâts : ${dice.join(' + ')} + ${attack.flat}`, { dice, critical: roll.natural === 20 });
+  dealDamage(state, actor, target, dice.reduce((a, b) => a + b, attack.flat), events);
   if (technique && target.hp > 0) {
     const dc = actor.chargeDC ?? 13;
     const save = check(state, stat(target, 'strength'), events, `${target.name} · résister à la percussion, DD ${dc}`).total;
@@ -635,6 +638,7 @@ function resolveActionEvents(state, actor, action, events) {
 export function beginTurn(state, actor, events) {
   cancelReadiedPass(state, actor, events, 'début de son prochain tour');
   actor.action = true; actor.bonusAction = true; actor.interaction = true; actor.pickedUp = false;
+  if (actor.offhandAttack) actor.offhandReady = false;
   actor.chargeRun = null; actor.feintTargetId = null;
   state.calls = (state.calls ?? []).filter((c) => c.sourceId !== actor.id);
   actor.movement = actor.speed; actor.dodging = false; actor.disengaged = false;

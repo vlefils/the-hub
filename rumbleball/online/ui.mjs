@@ -36,7 +36,7 @@ export async function mountOnline(root, config, connect) {
       if (entered) { modal.close(); tab = 'Club'; }
       const discarded = justLocked && teamDraft?.dirty;
       if (entered || justLocked || ['configure', 'cancel'].includes(action)) {
-        const context = !entered && teamDraft ? { selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, shopItem: teamDraft.shopItem } : null;
+        const context = !entered && teamDraft ? { selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, shopItem: teamDraft.shopItem, equipmentSlot: teamDraft.equipmentSlot } : null;
         teamDraft = context ? { ...preparationDraft(next.club), ...context } : null; formDirty = false;
       }
       league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
@@ -197,8 +197,8 @@ export async function mountOnline(root, config, connect) {
     teamDraft ??= preparationDraft(c);
     const editor = mountTeamEditor({ club: c, league, draft: teamDraft, locked: league.locked, hasDraft: league.hasDraft,
       onDirty(dirty) { formDirty = dirty; }, onSave: payload => attempt(() => send('configure', payload)),
-      onBuy: (itemId, playerId, replaceConfirmed) => attempt(() => send('buy', { itemId, playerId, replaceConfirmed })),
-      onAssign: (itemId, playerId) => attempt(() => send('equip', { itemId, playerId })),
+      onBuy: (itemId, playerId, replaceConfirmed, location) => attempt(() => send('buy', { itemId, playerId, replaceConfirmed, location })),
+      onAssign: (itemId, playerId, location) => attempt(() => send('equip', { itemId, playerId, location })),
       onSellGear: itemId => attempt(() => send('sellProtection', { itemId })),
       onAdvance: (playerId, changes) => attempt(() => send('advance', { playerId, changes })),
       onRecruit() { marketOpen = true; modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); },

@@ -1,12 +1,11 @@
-import { el, btn, field, select, money, statList, xpProgress, fatigue, equipmentSlots, portraitIdentity, table, disclosure } from '../career-components.mjs';
+import { el, btn, field, select, money, statList, xpProgress, fatigue, portraitIdentity, table, disclosure } from '../career-components.mjs';
 import { ARCHETYPES } from '../classes.mjs';
 import { STRATEGIES, ROLES, INSTRUCTIONS } from '../data.mjs';
 import { compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
 import { OPENINGS, openingDeployment } from '../openings.mjs';
 import { deploymentEditor, draggablePlayer, PLAYER_DRAG_TYPE } from '../deployment-ui.mjs';
 import { moveDeployment } from '../deployment.mjs';
-import { playerShop } from '../player-shop.mjs';
-import { playerInventory } from '../player-inventory.mjs';
+import { playerEquipment } from '../player-equipment.mjs';
 import { abilitySummary, abilityPendingBadge, playerAdvancement } from '../player-development-ui.mjs';
 import { playoffPlaces } from '../playoffs.mjs';
 import { qualificationLegend } from '../playoffs-ui.mjs';
@@ -93,7 +92,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     const label = el('span', 'rb-archetype'); label.append(archetypeIcon(compiled.archetype), ` ${ARCHETYPES[compiled.archetype].name}`);
     playerTactics.replaceChildren(field('Rôle', role), field('Consigne', instruction));
     const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
-    detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, abilitySummary(compiled), statList(compiled), playerAdvancement(club, p, { locked, onAdvance }), equipmentSlots(p, club.inventory), playerShop(club, p, { locked, onBuy, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; } }), playerInventory(club, p, { locked, onAssign, onSell: onSellGear }));
+    detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, abilitySummary(compiled), statList(compiled), playerAdvancement(club, p, { locked, onAdvance }), playerEquipment(club, p, { locked, onBuy, selectedSlot: draft.equipmentSlot, onSlot: slot => { draft.equipmentSlot = slot; draft.shopItem = undefined; }, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; }, onAssign, onSell: onSellGear }));
     if (index >= 0) detail.append(field('Remplacer ce titulaire', replacement), order);
     else detail.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
     detail.append(el('small', 'rb-muted', `${money(salary(p))} / journée`));

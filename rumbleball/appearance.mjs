@@ -25,9 +25,10 @@ export function playerLook(player) {
     hairStyle: HAIR_STYLES[(hash >>> 12) % HAIR_STYLES.length] };
 }
 export function visibleGear(player) {
-  return { protection: player.visualGear?.protection ?? null, implant: player.visualGear?.implant ?? null };
+  return { ...player.visualGear, protection: player.visualGear?.protection ?? null, implant: player.visualGear?.implant ?? null };
 }
 export function sportingWeapon(player) {
+  if (player.weapon) return player.weapon;
   if (player.archetype === 'belier' && player.attack?.die >= 8) return { id: 'maul', name: 'Massue d’arène' };
   if (player.archetype === 'escamoteur') return { id: 'tonfa', name: 'Tonfa d’arène' };
   return { id: 'baton', name: 'Matraque d’arène' };

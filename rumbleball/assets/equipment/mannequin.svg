@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 520" fill="none">
+ <defs><linearGradient id="shell" x1="58" y1="0" x2="180" y2="460" gradientUnits="userSpaceOnUse"><stop stop-color="#8e9da9"/><stop offset=".45" stop-color="#526879"/><stop offset="1" stop-color="#273e50"/></linearGradient><linearGradient id="core"><stop stop-color="#233d50"/><stop offset=".5" stop-color="#4c6578"/><stop offset="1" stop-color="#233d50"/></linearGradient></defs>
+ <g stroke="#9fb5c5" stroke-width="1.5" stroke-linejoin="round">
+  <path d="M101 25Q120 14 139 25L143 61L135 81L120 90L105 81L97 61Z" fill="url(#shell)"/>
+  <path d="M104 45H136L132 57H108Z" fill="#1b3447"/><path d="M111 87V104H129V87" fill="#334d60"/>
+  <path d="M110 101L84 108L70 136L82 171L90 215L105 232H135L150 215L158 171L170 136L156 108L130 101Z" fill="url(#shell)"/>
+  <path d="M87 121L118 135L153 121M120 136V197M91 177L115 184M125 184L149 177M96 201H144" stroke="#bfd0dc" opacity=".55"/>
+  <path d="M82 111L65 115L53 146L57 174L73 177L85 146Z" fill="url(#core)"/>
+  <path d="M158 111L175 115L187 146L183 174L167 177L155 146Z" fill="url(#core)"/>
+  <path d="M57 178L48 211L47 251L61 259L73 218L73 180Z" fill="url(#shell)"/>
+  <path d="M183 178L192 211L193 251L179 259L167 218L167 180Z" fill="url(#shell)"/>
+  <path d="M46 251L39 267L42 284L50 289L61 277L62 259ZM194 251L201 267L198 284L190 289L179 277L178 259Z" fill="#40586b"/>
+  <circle cx="65" cy="176" r="9" fill="#1f384b"/><circle cx="175" cy="176" r="9" fill="#1f384b"/>
+  <path d="M91 221L88 258L106 280H134L152 258L149 221L131 233H109Z" fill="url(#core)"/>
+  <path d="M90 263L84 312L90 361L109 365L117 316L116 280ZM150 263L156 312L150 361L131 365L123 316L124 280Z" fill="url(#shell)"/>
+  <path d="M90 381L86 430L88 475H109L114 429L108 382ZM150 381L154 430L152 475H131L126 429L132 382Z" fill="url(#core)"/>
+  <path d="M91 361L87 375L95 387H105L114 375L109 365ZM149 361L153 375L145 387H135L126 375L131 365Z" fill="#718696"/>
+  <path d="M89 475L78 492V503H113L110 476ZM151 475L162 492V503H127L130 476Z" fill="#344e63"/>
+ </g><path d="M120 108V124M94 246H146M96 315V348M144 315V348" stroke="#71c5d0" stroke-width="2" opacity=".6"/>
+</svg>

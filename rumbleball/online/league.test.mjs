@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLeague, joinLeague, startLeague, editPreparation, advanceLeague, nextLock, isLocked, fixturesFor, leagueProjection, ONLINE_RULES } from './league.mjs';
-import { salary } from '../progression.mjs';
+import { salary, compilePlayer } from '../progression.mjs';
 import { createLeagueService } from './server.mjs';
 
 const day = '2026-10-18T10:00:00Z', lock = '2026-10-18T18:00:00.000Z';
@@ -37,6 +37,33 @@ test('préparation : achats et équipe persistants, annulation intégrale et ét
   assert.throws(() => editPreparation(s, 'u0', 'cancel', {}, lock), /verrouillées/);
   assert.throws(() => editPreparation(s, 'intruder', 'buy', {}, day), /participez/);
   assert.throws(() => editPreparation(s, 'u0', 'replaceState', { balance: 999999 }, day), /inconnue/);
+});
+
+test('équipement serveur : deux mains indépendantes, protections localisées, annulation et compilation figée', () => {
+  const initial = fixture(), before = structuredClone(initial), player = initial.members[0].club.players[0];
+  let s = initial;
+  for (const [itemId, location] of [['tonfa', 'rightHand'], ['tonfa', 'leftHand'], ['gloves', 'gloves'], ['soles', 'feet']]) s = editPreparation(s, 'u0', 'buy', { itemId, playerId: player.id, location }, day);
+  const draft = s.members[0].draft; assert.equal(draft.inventory.length, 4); assert.equal(draft.balance, 0);
+  assert.equal(draft.inventory.filter(item => item.itemId === 'tonfa').length, 2);
+  assert.deepEqual(draft.inventory.filter(item => item.itemId === 'tonfa').map(item => item.location), ['rightHand', 'leftHand']);
+  assert.equal(leagueProjection(s, 'u1', day).club.inventory.length, 0);
+  assert.deepEqual(editPreparation(s, 'u0', 'cancel', {}, day), before); assert.deepEqual(initial, before);
+  const frozen = advanceLeague(s, lock), compiled = frozen.night.games[0].config.rosters.home[0];
+  assert.equal(compiled.offhandAttack.die, 6); assert.equal(compiled.skills.wrestling, compilePlayer(player).skills.wrestling + 1);
+  assert.equal(compiled.visualGear.gloves, 'gloves'); assert.equal(compiled.visualGear.feet, 'soles');
+  assert.throws(() => editPreparation(s, 'u0', 'equip', { itemId: draft.inventory[0].id, playerId: player.id, location: 'head' }, day), /incompatible/);
+  assert.throws(() => editPreparation(s, 'u0', 'equip', { itemId: draft.inventory[0].id, playerId: player.id, location: 'leftHand' }, lock), /verrouillées/);
+});
+
+test('équipement serveur : emplacement falsifié refusé sans débit et deux mains remettent les anciennes armes en réserve', () => {
+  const initial = fixture(), p = initial.members[0].club.players[0];
+  for (const payload of [{ itemId: 'maul', location: 'head' }, { itemId: 'helmet', location: 'leftHand' }, { itemId: 'tonfa', location: '__proto__' }]) assert.throws(() => editPreparation(initial, 'u0', 'buy', { ...payload, playerId: p.id }, day), /incompatible/);
+  assert.equal(initial.members[0].club.balance, 600); assert.equal(initial.members[0].draft, null);
+  let s = editPreparation(initial, 'u0', 'buy', { itemId: 'tonfa', playerId: p.id, location: 'rightHand' }, day);
+  s = editPreparation(s, 'u0', 'buy', { itemId: 'shield', playerId: p.id, location: 'leftHand' }, day);
+  s = editPreparation(s, 'u0', 'buy', { itemId: 'maul', playerId: p.id, location: 'rightHand' }, day);
+  const draft = s.members[0].draft; assert.equal(draft.inventory.filter(item => item.playerId === p.id).length, 1);
+  assert.ok(draft.inventory.slice(0, 2).every(item => item.playerId === null)); assert.equal(draft.balance, 0);
 });
 
 test('améliorations serveur : choix contrôlés, brouillon annulable, propriétaire et verrouillage', async () => {

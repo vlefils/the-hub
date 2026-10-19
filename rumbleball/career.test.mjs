@@ -151,21 +151,24 @@ test('clubs adverses : vingt journées de rotation, progression, contrats et éq
   assert.throws(() => validateCareer(invalid), /invalide/);
 });
 
-test('clubs adverses : achètent aussi des implants quand le budget préserve les salaires et contrats', () => {
+test('clubs adverses : achètent implants et armes quand le budget préserve les salaires et contrats', () => {
   let c = club(5, 'ai-implant-budget'); const ai = c.clubs[1];
   ai.balance += 3000; ai.transactions.push({ id: 'test-grant', fixtureId: 'initial-budget', amount: 3000, label: 'Dotation de test', balance: ai.balance });
-  for (let day = 0; day < 4; day++) c = complete(c);
+  for (let day = 0; day < 6; day++) c = complete(c);
   const managed = c.clubs[1]; assert.equal(managed.players.length, 10);
   assert.ok(managed.players.some(p => p.implant)); assert.ok(managed.transactions.some(t => /Régulateur|augmentées|contractiles|visuomotrice/.test(t.label)));
+  assert.ok(managed.inventory.some(item => CATALOGUE[item.itemId].slot === 'weapon'));
   assert.ok(managed.balance >= managed.players.reduce((sum, p) => sum + salary(p), 0)); validateCareer(c);
 });
-test('équipement : deux emplacements, bonus non cumulés, transfert, revente et destruction d’implant', () => {
+test('équipement : pièces localisées, transfert, revente et destruction d’implant', () => {
   let c = club(); const [a, b] = ownedPlayers(c), base = compilePlayer(a);
   c = buyItem(c, 'vest', a.id); const gear = c.inventory[0].id;
   assert.equal(compilePlayer(ownedPlayers(c)[0], c.inventory).maxHp, base.maxHp);
   assert.equal(compilePlayer(ownedPlayers(c)[0], c.inventory).armor, base.armor + 1);
-  c = buyItem(c, 'gloves', a.id); assert.equal(c.inventory.filter((i) => i.playerId === a.id).length, 1);
+  c = buyItem(c, 'gloves', a.id); assert.equal(c.inventory.filter((i) => i.playerId === a.id).length, 2);
   assert.equal(compilePlayer(ownedPlayers(c)[0], c.inventory).maxHp, base.maxHp);
+  assert.equal(compilePlayer(ownedPlayers(c)[0], c.inventory).armor, base.armor + 1);
+  assert.equal(compilePlayer(ownedPlayers(c)[0], c.inventory).skills.wrestling, base.skills.wrestling + 1);
   c = assignProtection(c, gear, b.id); assert.equal(c.inventory.find((i) => i.id === gear).playerId, b.id);
   c = buyItem(c, 'legs', a.id); assert.equal(compilePlayer(ownedPlayers(c)[0], c.inventory).speed, base.speed + 1.5);
   assert.throws(() => buyItem(c, 'fibers', a.id), /détruit/);
@@ -173,7 +176,7 @@ test('équipement : deux emplacements, bonus non cumulés, transfert, revente et
   assert.equal(compilePlayer(ownedPlayers(c)[0], c.inventory).speed, base.speed);
   const before = c.balance; c = sellProtection(c, gear); assert.equal(c.balance, before + 50);
   assert.deepEqual(compilePlayer(ownedPlayers(c)[0], c.inventory), compilePlayer(ownedPlayers(c)[0], c.inventory));
-  assert.equal(Object.keys(CATALOGUE).length, 8); validateCareer(c);
+  assert.equal(CATALOGUE.maul.hands, 2); assert.equal(CATALOGUE.tonfa.light, true); validateCareer(c);
 });
 test('moteur : effectifs compilés, identifiants permanents, noms et stratégie adverse, ressources restaurées', () => {
   let c = club(); for (const p of ownedPlayers(c)) { p.xp = 140; p.fatigue = 6; } c = launchCareerMatch(c);

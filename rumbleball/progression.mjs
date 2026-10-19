@@ -1,21 +1,12 @@
 import { PROFILES, clone, modifier } from './data.mjs';
 import { classCaps } from './classes.mjs';
 import { MAX_LEVEL, XP_THRESHOLDS, levelOf, proficiencyBonus, effectiveAbilities, fatigueRecovery, ensurePlayerDevelopment, pendingAbilityLevels } from './player-development.mjs';
-export { MAX_LEVEL, XP_THRESHOLDS, levelOf, proficiencyBonus, effectiveAbilities, fatigueRecovery };
+import { CATALOGUE, equippedItems, itemLocation } from './equipment.mjs';
+export { MAX_LEVEL, XP_THRESHOLDS, levelOf, proficiencyBonus, effectiveAbilities, fatigueRecovery, CATALOGUE };
 
 export const MAX_SQUAD_SIZE = 10;
 export const recruitmentPrice = (p) => 300 + 150 * (levelOf(p) - 1);
 export const salary = (p) => 15 + 5 * (levelOf(p) - 1);
-export const CATALOGUE = {
-  vest: { name: 'Plastron léger', slot: 'protection', price: 100, effect: '+1 CA', armor: 1 },
-  armor: { name: 'Armure renforcée', slot: 'protection', price: 150, effect: '+2 CA · −1,5 m', armor: 2, speed: -1.5 },
-  gloves: { name: 'Gants de lutte', slot: 'protection', price: 150, effect: '+1 Lutte', wrestling: 1 },
-  soles: { name: 'Semelles adhérentes', slot: 'protection', price: 150, effect: '+1 Acrobaties', acrobatics: 1 },
-  legs: { name: 'Jambes augmentées', slot: 'implant', price: 300, effect: '+1,5 m', speed: 1.5 },
-  fibers: { name: 'Fibres contractiles', slot: 'implant', price: 300, effect: '+1 Lutte', wrestling: 1 },
-  interface: { name: 'Interface visuomotrice', slot: 'implant', price: 300, effect: '+1 Acrobaties', acrobatics: 1 },
-  regulator: { name: 'Régulateur d’effort', slot: 'implant', price: 300, effect: 'Participation : +1 fatigue au lieu de +2 ; KO : +1 conservé' },
-};
 
 // Always start from immutable base data; never recompile an already modified profile.
 export function compilePlayer(player, inventory = []) {
@@ -35,13 +26,26 @@ export function compilePlayer(player, inventory = []) {
   }
   result.trainedSkills = Object.keys(base.skills);
   if (base.archetype === 'escamoteur') result.speed += 1.5 * tiers;
-  const protection = inventory.find((item) => item.playerId === player.id);
-  result.visualGear = { protection: protection?.itemId ?? null, implant: player.implant ?? null };
-  for (const id of [protection?.itemId, player.implant]) {
+  const worn = equippedItems(player, inventory), protection = worn.find(item => CATALOGUE[item.itemId]?.slot === 'protection');
+  result.visualGear = { protection: protection?.itemId ?? null, implant: player.implant ?? null,
+    ...Object.fromEntries(['head', 'torso', 'gloves', 'feet', 'rightHand', 'leftHand'].map(location => [location, worn.find(item => itemLocation(item) === location || CATALOGUE[item.itemId]?.hands === 2 && ['rightHand', 'leftHand'].includes(location))?.itemId ?? null])) };
+  for (const id of [...worn.map(item => item.itemId), player.implant]) {
     const item = CATALOGUE[id];
     if (!item) continue;
     for (const key of ['maxHp', 'armor', 'speed']) result[key] += item[key] ?? 0;
     for (const key of ['wrestling', 'acrobatics']) result.skills[key] += item[key] ?? 0;
+  }
+  const weapons = worn.filter(item => CATALOGUE[item.itemId]?.die), main = weapons.find(item => itemLocation(item) === 'rightHand') ?? weapons[0], secondary = weapons.find(item => item !== main);
+  result.offhandAttack = null;
+  if (main) {
+    const weapon = CATALOGUE[main.itemId], attackMod = modifier(weapon.finesse ? Math.max(abilities.strength, abilities.dexterity) : abilities.strength);
+    const other = worn.find(item => CATALOGUE[item.itemId]?.slot === 'weapon' && item !== main);
+    result.attack = { bonus: attackMod + mastery, die: weapon.versatile && !other ? weapon.versatile : weapon.die, flat: attackMod };
+    result.weapon = { id: main.itemId, name: weapon.name, location: itemLocation(main) };
+    if (secondary && weapon.light && CATALOGUE[secondary.itemId].light) {
+      const off = CATALOGUE[secondary.itemId], mod = modifier(off.finesse ? Math.max(abilities.strength, abilities.dexterity) : abilities.strength);
+      result.offhandAttack = { bonus: mod + mastery, die: off.die, flat: Math.min(0, mod) };
+    }
   }
   if (player.fatigue >= 3) result.speed -= 1.5;
   if (player.fatigue >= 5) for (const key of ['wrestling', 'athletics', 'acrobatics']) result.skills[key]--;
