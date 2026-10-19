@@ -155,7 +155,7 @@ test('Club : deux vues, fiche sélectionnée dans la préparation, équipement e
   const e = environment(exportCareer(c)); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
   assert.deepEqual(classNode(e.root, 'rb-workspace-navigation').children.map(n => n.textContent), ['Club', 'Ligue']);
   assert.equal(classNode(e.root, 'rb-roster-table'), null); assert.ok(classNode(e.root, 'rb-lineup-form'));
-  await classNode(e.root, 'rb-lineup-slots').children[1].querySelector('button').click();
+  await classNode(e.root, 'rb-lineup-slots').children[1].click();
   const detail = classNode(e.root, 'rb-player-inspector'), xp = detail.querySelector('progress'); assert.equal(xp.value, '0'); assert.equal(xp.max, 30);
   assert.match(detail.querySelector('.rb-player-shop').querySelector('select').getAttribute('aria-label'), new RegExp(c.clubs[0].players[1].name));
   const max = xpProgress({ name: 'Maximum', xp: 770, fatigue: 0 }); assert.equal(max.querySelector('progress').value, '1'); assert.match(max.textContent, /Maximum/);
@@ -218,7 +218,8 @@ test('préparation : sélection liée au terrain, rotation, retour sur une ouver
   const e = environment(exportCareer(c)); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await button(e.root, 'Club').click();
   const formation = structuredClone(e.saved().clubs[0].deployment), opening = classNode(e.root, 'rb-opening-select'); opening.value = 'wings'; await opening.emit('change');
   await button(e.root, 'Rétablir le placement précédent').click(); assert.deepEqual(e.saved().clubs[0].deployment, formation); assert.equal(e.saved().clubs[0].opening, c.clubs[0].opening);
-  const selector = classNode(e.root, 'rb-deployment-player'); selector.value = '2'; await selector.emit('change');
+  await classNode(e.root, 'rb-lineup-slots').children[2].querySelector('.rb-athlete-portrait').click();
+  assert.equal(classNode(e.root, 'rb-deployment-player').value, '2'); assert.deepEqual(e.saved().lineup, c.lineup); assert.deepEqual(e.saved().clubs[0].deployment, formation);
   assert.match(classNode(e.root, 'rb-tactical-player').textContent, new RegExp(c.clubs[0].players[2].name));
   const role = descendants(e.root).find((n) => n.dataset.focusKey === 'active-role'); role.focus(); role.value = 'defender'; await role.emit('change');
   assert.equal(classNode(e.root, 'rb-tactical-player').parentNode, classNode(e.root, 'rb-player-inspector'));

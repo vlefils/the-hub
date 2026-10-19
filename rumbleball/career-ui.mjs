@@ -226,6 +226,7 @@ export function mountCareer(root, mountMatch) {
       const s = keyed(select(names, id), `lineup-${index}`); s.disabled = locked; slotControls.push(s);
       const row = el('div', 'rb-lineup-slot'), copy = el('div', 'rb-slot-copy'), pick = btn('', () => { selectedPlayer = preparationSlotPlayer = s.value; deployment.update({ selectedPlayerId: selectedPlayer }); renderActive(); });
       pick.classList.add('rb-squad-name'); pick.setAttribute('aria-label', `Sélectionner le titulaire ${index + 1} sur le terrain`);
+      row.addEventListener('click', event => { if (!event.target.closest('button')) pick.click(); });
       row.append(copy); lineup.append(row); slotCopies.push({ row, copy, pick });
       s.addEventListener('change', () => attempt(() => {
         const duplicate = slotControls.find((other, otherIndex) => otherIndex !== index && other.value === s.value);

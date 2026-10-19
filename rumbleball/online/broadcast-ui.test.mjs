@@ -55,7 +55,7 @@ test('broadcast : 20 h écarte la saisie non enregistrée, avertit et laisse les
   e.strategy().value = 'possession'; await e.strategy().emit('change'); await e.lock();
   assert.match(e.root.textContent, /modifications non enregistrées n’ont pas été retenues/); assert.equal(e.strategy().value, original); assert.equal(e.strategy().disabled, true);
   const player = e.state().members[0].club.players.find(p => p.id === e.state().members[0].club.lineup[1]);
-  const details = descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${player.name}`); assert.equal(details.disabled, undefined); await details.click();
+  const details = descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${player.name}`); assert.equal(details.disabled, undefined); await details.parentNode.click();
   assert.match(e.root.querySelector('.rb-squad-detail').textContent, new RegExp(player.name)); assert.equal(button(e.root, 'Enregistrer la préparation').disabled, true); e.mounted.stop();
 });
 
@@ -84,7 +84,7 @@ test('équipement : joueur conservé après achat et transfert, réserve lisible
 
 test('Club : rôle et consigne dans la fiche à droite avec l’équipement', async t => {
   const e = await online(t), player = e.state().members[0].club.players[2];
-  const pick = descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${player.name}`); await pick.click();
+  const pick = descendants(e.root).find(n => n.getAttribute('aria-label') === `Détails de ${player.name}`); await pick.parentNode.querySelector('.rb-fatigue').click();
   const tactics = e.root.querySelector('.rb-player-tactics'); assert.ok(e.root.querySelector('.rb-player-inspector').contains(tactics));
   assert.equal(e.root.querySelector('.rb-broadcast-squad').querySelector('.rb-player-tactics'), null);
   const role = tactics.querySelector('select'); role.value = 'defender'; await role.emit('change');
