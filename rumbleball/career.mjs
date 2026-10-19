@@ -45,7 +45,7 @@ function generateMarket(career, initial = false) {
   const profiles = initial ? [0, 1, 2, 3, 4, 0, 0, 1, 2, 2, 4, 4] : [0, 1, 2, 4, ...shuffle([0, 1, 2, 3, 4], `${career.seed}:market:${career.completedDays}`).slice(0, 2)];
   const used = new Set(career.clubs.flatMap(club => club.players.map(p => p.name)));
   const market = profiles.map((profile, index) => {
-    const id = `offer-${career.completedDays}-${index}`, name = initial && index < 5 ? PROFILES[profile].trainingName : playerName(`${career.seed}:name:${id}`, used); used.add(name);
+    const id = `offer-${career.completedDays}-${index}`, name = initial && index < 5 ? PROFILES[profile].trainingName : playerName(`${career.seed}:name:${id}`, used, 'neutral', PROFILES[profile].archetype); used.add(name);
     return player(id, name, profile, Math.min(5, 1 + Math.floor(career.completedDays / 5)));
   });
   identifyClub(team(career), `${career.seed}:club`, market);
@@ -162,9 +162,9 @@ function manageAiClub(c, club, fixture, wages, winnerId) {
     const count = profile => club.players.filter(p => PROFILES[p.profile].archetype === PROFILES[profile].archetype).length;
     const profile = [...new Set(preferred)].sort((a, b) => count(a) - count(b))[0];
     const id = `${club.id}-recruit-${c.completedDays + 1}`, used = new Set(c.clubs.flatMap(other => other.players.map(p => p.name)).concat(c.market.map(p => p.name)));
-    const p = player(id, playerName(`${c.seed}:name:${id}`, used), profile, Math.min(5, 1 + Math.floor((c.completedDays + 1) / 5)));
+    const p = player(id, playerName(`${c.seed}:name:${id}`, used, 'neutral', PROFILES[profile].archetype), profile, Math.min(5, 1 + Math.floor((c.completedDays + 1) / 5)));
     identifyClub(club, `${c.seed}:${club.id}`, [p]);
-    p.name = playerName(`${c.seed}:name:${id}`, used, playerGender(p));
+    p.name = playerName(`${c.seed}:name:${id}`, used, playerGender(p), PROFILES[profile].archetype);
     if (budget() >= recruitmentPrice(p) + salary(p)) { transaction(-recruitmentPrice(p), `Recrutement : ${p.name}`); club.players.push(p); recruited = true; }
   }
   // Keep savings for the next contract instead of spending them on gear daily.

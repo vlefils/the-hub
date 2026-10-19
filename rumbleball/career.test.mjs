@@ -7,6 +7,8 @@ import { assertInvariants } from './rules.mjs';
 import { CATALOGUE, XP_THRESHOLDS, compilePlayer, levelOf, progressPlayer, salary, recruitmentPrice } from './progression.mjs';
 import { createCareer, confirmDraft, configureTeam, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, settleCareerMatch, saveCareerTurn, nextSeason, standings, aiLineup } from './career.mjs';
 import { CAREER_KEY, validateCareer, persistCareer, loadCareer, importCareer, exportCareer } from './career-storage.mjs';
+import { playerNameMatchesGender, playerNamingClass } from './player-names.mjs';
+import { playerGender } from './identity.mjs';
 
 const club = (count = 5, seed = 'test-career') => { const c = createCareer('Les Rebuts', seed); return confirmDraft(c, c.market.slice(0, count).map((p) => p.id)); };
 function complete(input, forcedResult) {
@@ -130,6 +132,7 @@ test('clubs adverses : vingt journées de rotation, progression, contrats et éq
       assert.equal(today.find(t => t.label === 'Salaires de la journée').amount, -wages);
       assert.equal(today.filter(t => t.label === 'Prime de match').length, 1);
       assert.ok(ai.players.length >= 7 && ai.players.length <= 10);
+      assert.ok(ai.players.every(p => playerNameMatchesGender(p.name, playerGender(p), playerNamingClass(p))));
       if (!day) { assert.equal(ai.players.length, 8); assert.equal(ai.inventory.length, 1); assert.ok(aiLineup(ai).some(id => !played.includes(id))); }
     }
     assert.deepEqual(settleCareerMatch(c), c); assert.deepEqual(importCareer(exportCareer(c)), c);
