@@ -277,11 +277,12 @@ export function mountCareer(root, mountMatch) {
       });
       const techniques = playerTechniques(compiled);
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length <= 5 ? 'Cinq joueurs minimum.' : '';
-      const sell = blocked(btn(`Céder · ${money(recruitmentPrice(p) / 2)}`, () => showConfirmation(`Céder ${p.name} pour ${money(recruitmentPrice(p) / 2)} ? Son implant quitte le club ; son équipement retourne en réserve.`, () => update(() => sellPlayer(career, p.id)))), reason);
+      const sell = blocked(btn(`Céder le joueur · ${money(recruitmentPrice(p) / 2)}`, () => showConfirmation(`Céder ${p.name} pour ${money(recruitmentPrice(p) / 2)} ? Son implant quitte le club ; son équipement retourne en réserve.`, () => update(() => sellPlayer(career, p.id)))), reason);
       inspector.replaceChildren(portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', archetypeLabel(compiled))), progress);
       const overview = [active, abilitySummary(compiled), statList(compiled)];
       if (!career.lineup.includes(p.id)) overview.push(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
-      inspectorPanels(inspector, { overview, equipment: [equipment], progression: [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`), techniques, playerMilestones(compiled), sell],
+      overview.push(sell);
+      inspectorPanels(inspector, { overview, equipment: [equipment], progression: [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`), techniques, playerMilestones(compiled)],
         points: compiled.pendingAbilityIncreases * 2, selected: preparationInspectorTab, onSelect: key => { preparationInspectorTab = key; } });
       for (const control of [role, instruction]) control.addEventListener('change', () => attempt(() => { assignments[p.id] = { role: role.value, instruction: instruction.value }; commitLineup(); role.title = ROLE_DESCRIPTIONS[role.value]; }));
       refreshSlots();

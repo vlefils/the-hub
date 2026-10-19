@@ -4,9 +4,11 @@
 
 La fiche longue réunissait les réglages, toutes les statistiques, la progression, le mannequin, la réserve et le magasin dans la colonne droite. À partir de 1 200 px, trois onglets affichent un seul ensemble à la fois. Identité, XP et fatigue restent communs :
 
-- Joueur : rôle, consigne, caractéristiques et statistiques dérivées.
+- Joueur : rôle, consigne, caractéristiques, statistiques dérivées et cession du joueur.
 - Équipement : mannequin et sept emplacements ; la réserve et le magasin sortent de la colonne.
-- Progression : points de caractéristiques, informations de progression et cession. L’onglet signale les points disponibles.
+- Progression : points de caractéristiques et informations de progression. L’onglet signale les points disponibles.
+
+Sur ordinateur, le contenu de Progression peut défiler dans la fiche. La hauteur disponible suit les autres colonnes de préparation ; déplier les paliers ne doit pas agrandir la page. Identité, XP, fatigue et onglets restent hors de cette zone. Le panneau accepte le focus clavier et garde le défilement de molette à l’intérieur. La fiche conserve son déroulement habituel sur mobile. Tous les compteurs et barres de fatigue portent désormais un libellé visible « Fatigue », dans la fiche, les titulaires, le banc et les détails des clubs.
 
 Les techniques de classe sont affichées directement dans Progression, avec leurs effets et leurs réserves actuelles, en solo comme en ligne. Une technique est acquise au départ ; Percussion, Exploitation sportive, Appel de jeu et Lecture de trajectoire se débloquent au niveau 3. Les techniques verrouillées sont grises et indiquent leur niveau requis. Une liste séparée présente les autres paliers : caractéristiques aux niveaux 3, 6, 9 et 12 ; maîtrise et réserves aux niveaux 4, 7 et 10 ; vitesse de l’Escamoteur aux niveaux 3 et 5. Les nouveaux matchs utilisent les règles v7 ; les rencontres et replays v2 à v6 restent inchangés. L’Exhibition sans niveaux conserve toutes les techniques.
 

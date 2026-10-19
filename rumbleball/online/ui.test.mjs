@@ -44,6 +44,11 @@ test('interface : équipe préparée côté serveur puis annulation, et gestion 
   const mounted = await mountOnline(e.root, { enabled: true }, async () => api);
   await button(e.root, `${state.name} · 2/2 clubs`).click();
   const form = descendants(e.root).find((n) => n.tagName === 'form');
+  const panels = form.querySelectorAll('.rb-inspector-panel'), overview = panels.find(panel => panel.dataset.panel === 'player'), progression = panels.find(panel => panel.dataset.panel === 'progression');
+  assert.ok(overview.querySelectorAll('button').some(button => button.textContent.startsWith('Céder')));
+  assert.ok(!progression.querySelectorAll('button').some(button => button.textContent.startsWith('Céder')));
+  assert.equal(progression.getAttribute('tabindex'), '0');
+  assert.ok(form.querySelectorAll('.rb-fatigue-value').every(value => value.textContent.startsWith('Fatigue ')));
   const strategy = descendants(form).find((n) => n.tagName === 'select' && n.children.some((o) => o.value === 'possession'));
   strategy.value = 'possession'; await form.emit('submit');
   assert.equal(state.members[0].draft.strategy, 'possession'); assert.match(e.root.textContent, /Préparation enregistrée/);

@@ -6,6 +6,7 @@ let sequence = 0;
 
 // CSS exposes the full existing document on small screens; desktop shows one panel.
 export function inspectorPanels(host, { overview, equipment, progression, points = 0, selected = 'player', onSelect = () => {} }) {
+  host.classList.add('rb-inspector-content');
   const entries = [['player', 'Joueur', overview], ['equipment', 'Équipement', equipment], ['progression', `Progression${points ? ` · ${points}` : ''}`, progression]];
   const id = `rb-inspector-${++sequence}`, tabs = el('div', 'rb-inspector-tabs'), panels = [];
   tabs.setAttribute('role', 'tablist'); tabs.setAttribute('aria-label', 'Fiche du joueur');
@@ -24,6 +25,7 @@ export function inspectorPanels(host, { overview, equipment, progression, points
     button.setAttribute('role', 'tab'); button.setAttribute('aria-controls', panel.id); button.setAttribute('data-readonly-control', 'true');
     button.dataset.focusKey = `inspector-tab-${key}`;
     panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', button.id);
+    if (key === 'progression') panel.setAttribute('tabindex', '0');
     panel.append(...nodes); tabs.append(button); panels.push([key, button, panel]);
     button.addEventListener('keydown', event => {
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;

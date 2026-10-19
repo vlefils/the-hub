@@ -217,6 +217,8 @@ body.rb-app {
 .rb-player-status-strip .rb-fatigue small { font-size: .7rem; }
 .rb-player-inspector .rb-inspector-back { min-height: 1.8rem; padding-block: .2rem; }
 .rb-player-inspector .rb-player-xp, .rb-player-inspector .rb-fatigue { font-size: .8rem; }
+.rb-fatigue-value { white-space: nowrap; }
+.rb-fatigue-value > .rb-muted { font-size: inherit; }
 .rb-player-inspector .rb-player-stats { gap: .8rem; padding: .8rem 0; border-block: 1px solid #2c4b60; }
 .rb-player-inspector .rb-player-stats dt { font-size: .75rem; }
 .rb-player-inspector .rb-player-stats dd { font-size: 1.1rem; font-weight: 700; }
@@ -475,6 +477,12 @@ body.rb-app {
   .rb-app .rb-inspector-tabs .rb-button { padding: .35rem .25rem; min-width: 0; min-height: 2rem; font-size: .85rem; line-height: 1.25; color: #a8bfd1; background: none; border: 0; border-bottom: 3px solid transparent; border-radius: 0; box-shadow: none; }
   .rb-app .rb-inspector-tabs [aria-selected='true'] { color: #fff; border-bottom-color: #ff793d; }
   .rb-inspector-panel[data-active='false'] { display: none; }
+  /* The other preparation columns set the available height, independently of XP content. */
+  .rb-workspace-sidebar:has([data-panel='progression'][data-active='true']) { contain: size; align-self: stretch; min-block-size: 0; }
+  .rb-workspace-sidebar:has([data-panel='progression'][data-active='true']) .rb-player-inspector { block-size: 100%; min-block-size: 0; box-sizing: border-box; }
+  .rb-player-inspector:has([data-panel='progression'][data-active='true']):has(.rb-inspector-content) { grid-template-rows: minmax(0, 1fr); }
+  .rb-inspector-content:has([data-panel='progression'][data-active='true']) { block-size: 100%; min-block-size: 0; grid-template-rows: auto auto auto minmax(0, 1fr); }
+  .rb-inspector-panel[data-panel='progression'] { min-block-size: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; align-content: start; }
   .rb-player-inspector .rb-equipment-inline { display: none; }
   .rb-player-inspector .rb-equipment-workbench { display: block; }
   .rb-player-inspector .rb-player-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }

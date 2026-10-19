@@ -325,6 +325,6 @@ test('impayés : achats bloqués, préparation accessible et cession qui rembour
   assert.match(classNode(e.root, 'rb-career-debt').textContent, /Vous pouvez jouer/);
   await button(e.root, 'Recruter un joueur').click(); assert.ok(descendants(e.root).filter((n) => n.tagName === 'button' && n.textContent.startsWith('Recruter ·')).every((n) => n.disabled));
   await button(e.root, 'Club').click(); assert.equal(button(e.root, 'Lancer la rencontre').disabled, false);
-  await button(e.root, 'Céder · 450 chromas').click(); await button(e.root, 'Confirmer').click();
+  await button(e.root, 'Céder le joueur · 450 chromas').click(); await button(e.root, 'Confirmer').click();
   assert.equal(e.saved().balance, 370); assert.equal(e.saved().clubs[0].players.length, 7); assert.equal(classNode(e.root, 'rb-career-debt'), null);
 });

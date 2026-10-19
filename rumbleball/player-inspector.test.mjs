@@ -23,6 +23,11 @@ test('fiche : trois onglets, clavier et sélection conservée entre deux joueurs
   const c = career(); c.clubs[0].players[0].xp = 50;
   const e = environment(exportCareer(c)); screen(e); mountCareer(e.root, (await import('./ui.mjs')).mountMatch);
   const inspector = e.root.querySelector('.rb-player-inspector'), tabs = inspector.querySelector('.rb-inspector-tabs');
+  const panels = inspector.querySelectorAll('.rb-inspector-panel'), overview = panels.find(panel => panel.dataset.panel === 'player'), progression = panels.find(panel => panel.dataset.panel === 'progression');
+  assert.ok(overview.querySelectorAll('button').some(button => button.textContent.startsWith('Céder')));
+  assert.ok(!progression.querySelectorAll('button').some(button => button.textContent.startsWith('Céder')));
+  assert.equal(progression.getAttribute('tabindex'), '0');
+  assert.ok(e.root.querySelectorAll('.rb-fatigue-value').every(value => value.textContent.startsWith('Fatigue ')));
   assert.equal(tabs.getAttribute('role'), 'tablist'); assert.equal(tabs.children.length, 3);
   assert.match(tabs.textContent, /Progression · 2/);
   await button(tabs, 'Équipement').click(); assert.equal(activeTab(e.root).textContent, 'Équipement');
