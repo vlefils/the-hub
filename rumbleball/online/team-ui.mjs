@@ -74,6 +74,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
   }
   function highlight() {
     for (const row of slots.children) row.classList.toggle('is-selected', row.dataset.playerId === selected);
+    for (const row of bench.children) if (row.dataset.playerId) { const active = row.dataset.playerId === selected; row.classList.toggle('is-selected', active); row.querySelector('.rb-bench-name').setAttribute('aria-pressed', String(active)); }
     editor.update({ selectedPlayerId: selected });
   }
   function drawDetail() {
@@ -91,7 +92,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
     const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
     detail.replaceChildren(portraitIdentity(compiled, draft.color, el('h3', '', p.name), label), progress, playerTactics, statList(compiled), equipmentSlots(p, club.inventory), playerShop(club, p, { locked, onBuy, selectedItem: draft.shopItem, onItem: id => { draft.shopItem = id; } }), playerInventory(club, p, { locked, onAssign, onSell: onSellGear }));
     if (index >= 0) detail.append(field('Remplacer ce titulaire', replacement), order);
-    else detail.append(el('p', 'rb-muted', 'Sur le banc · glissez ce joueur sur le terrain pour le faire entrer.'));
+    else detail.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
     detail.append(el('small', 'rb-muted', `${money(salary(p))} / journée`));
     inspector.replaceChildren(detail);
     highlight();
@@ -112,6 +113,7 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
       row.append(portrait, pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p)); slots.append(row);
     }
     const reserves = club.players.filter(p => !draft.lineup.includes(p.id));
+    bench.classList.toggle('is-expanded', reserves.length > 3);
     if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant.'));
     else bench.append(el('p', 'rb-muted', 'Disponibles'));
     for (const p of reserves) {
@@ -120,7 +122,9 @@ export function mountTeamEditor({ club, league, draft, locked, hasDraft, onSave,
       }); enter.disabled = locked; enter.setAttribute('aria-label', `Faire entrer ${p.name}`);
       controls.append(enter);
       const pick = btn('', () => { selected = draft.selected = p.id; drawDetail(); highlight(); }); pick.setAttribute('data-readonly-control', 'true'); pick.classList.add('rb-bench-name'); pick.setAttribute('aria-label', p.name);
+      pick.title = `Gérer ${p.name} · statistiques, rôle et équipement`; row.dataset.playerId = p.id;
       pick.append(athletePortrait(compilePlayer(p, club.inventory), draft.color), el('span', '', p.name)); draggablePlayer(pick, p.id, locked);
+      row.addEventListener('click', event => { if (!event.target.closest('button')) pick.click(); });
       row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
       row.addEventListener('drop', event => { const index = draft.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); replaceAt(index, p.id); });
       row.append(pick, fatigue(p), controls); bench.append(row);

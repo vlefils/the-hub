@@ -21,7 +21,9 @@ Le batch replays/KO du 18 octobre est validé localement. Le propriétaire a con
 - Les nouvelles rencontres utilisent les règles v6 : cinq joueurs KO dans une équipe entraînent sa défaite immédiate. Les rencontres déjà calculées ou commencées sous les règles v2 à v5 les conservent jusqu’à leur fin.
 - La gestion rouvre après la dernière rencontre de la soirée. Sans nouvelle préparation, le club reconduit automatiquement son équipe.
 - **210 chromas par journée**, versés au verrouillage, puis prélèvement des salaires de tout l’effectif. **+100 en cas de victoire**, au terme de sa diffusion ; aucune prime supplémentaire pour nul/défaite ni prime de classement dans ce mode.
-- 210 couvre six salaires au niveau 5. Les septième et huitième joueurs augmentent les dépenses. Les achats ne créent pas de découvert ; seuls les salaires peuvent le faire. Le revenu et les ventes réduisent une dette existante.
+- Dix joueurs maximum, dont cinq titulaires. 210 couvre six salaires au niveau 5 ; chaque remplaçant supplémentaire augmente les dépenses. Les achats ne créent pas de découvert ; seuls les salaires peuvent le faire. Le revenu et les ventes réduisent une dette existante.
+
+Les noms des joueurs et des offres utilisent un pool de 4 096 combinaisons sans suffixe numérique. Leur génération publique est indépendante de la graine secrète des rencontres. La limite de dix est contrôlée par le serveur : après cette mise à jour, redéployer `rumbleball-api` et `rumbleball-worker` avec les commandes de la section Installation. Aucune migration SQL supplémentaire n’est nécessaire.
 
 ## Préparation annulable
 

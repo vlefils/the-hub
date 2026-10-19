@@ -35,9 +35,13 @@ Les cinq adversaires de carrière ont chacun leur ouverture. En Exhibition, le c
 
 Les [ligues en ligne](online/README.md) sont accessibles par **Multijoueur** : comptes Supabase partagés avec Riftbound, invitations, préparations annulables et soirées à 20 h Europe/Paris. Le serveur fige les équipes, diffuse les matchs successivement avec deux minutes de pause et verse 210 chromas par journée plus 100 par victoire. La carrière locale et l’Exhibition restent accessibles. L’activation et la soirée hébergée de validation sont décrites dans le [compte rendu](playtests/online-activation-2026-10-18.md).
 
-Le batch suivant ajoute les **replays des ligues** à partir des images enregistrées : lecture, pause, vitesses et parcours des rounds, sans changement de progression. Les rôles et consignes sont placés sous le joueur sélectionné en composition, et l’onglet Équipement reste visible sur mobile. Les contrôles et la procédure de publication figurent dans la [validation du batch](playtests/replays-ko-mobile-2026-10-18.md).
+Les **replays des ligues** permettent lecture, pause, vitesses et parcours des rounds, sans changement de progression. Ils se trouvent dans Ligue, avec le direct et le programme. La [validation du batch](playtests/replays-ko-mobile-2026-10-18.md) décrit leur fonctionnement et leur publication.
 
-Fonder un club donne 2 400 chromas. Choisir cinq à huit des douze candidats, puis valider les contrats en une fois. Les vues **Effectif**, **Recrutement**, **Équipement** et **Ligue** donnent accès à la composition, aux consignes, aux achats et au calendrier. Composition, consignes et placement sont enregistrés automatiquement ; choisir un titulaire déjà présent échange les deux positions. Dans **Déploiement**, choisir le joueur puis cliquer une case de sa moitié ; une case occupée échange les deux joueurs. Les flèches parcourent les cases et Entrée valide le placement. La même interface existe en Exhibition. Les cinq adversaires disposent de sept joueurs fixes, progressent et font tourner leurs titulaires en fonction de leur fatigue ; aucune adaptation à la puissance du club.
+Fonder un club donne 2 400 chromas pour les premiers contrats parmi douze candidats. Le club accueille cinq à dix joueurs, avec cinq titulaires. La vue **Club** regroupe composition, banc, fiche du joueur et équipement ; **Ligue** regroupe classement et calendrier. Le recrutement s’ouvre en modale depuis la carte sous les titulaires. Cliquer un portrait sur le terrain ou le banc permet de gérer caractéristiques, rôle, consigne et matériel dans la fiche droite. Composition, consignes et placement sont enregistrés automatiquement ; choisir un titulaire déjà présent échange les deux positions. Le glisser-déposer, le clic et le clavier permettent le placement ; les flèches parcourent les cases et Entrée valide.
+
+Les cinq adversaires commencent avec sept joueurs. Ils font tourner leurs titulaires selon la fatigue, gagnent la même XP et récupèrent sur le banc. Un budget initial de 600 chromas finance leur gestion : salaires de tout l’effectif, mêmes primes de match que le joueur, contrats jusqu’à dix joueurs et achats de protections ou d’implants adaptés aux archétypes. Les achats préservent les prochains salaires ; ils ne créent pas de découvert. Économies, joueurs et matériel sont conservés entre les saisons, sans adaptation à la puissance du club. Les anciennes sauvegardes acquièrent cette gestion au prochain règlement de match.
+
+Les nouveaux joueurs utilisent un pool de 4 096 noms sans numéros. Les anciens suffixes générés sont remplacés de façon déterministe, en conservant identifiants, portraits et progression. Les états et images des rencontres déjà commencées restent inchangés.
 
 Dix journées aller-retour par saison. Les salaires de tout l’effectif sont prélevés une seule fois au lancement, même si le solde devient négatif. Seuls les salaires permettent le découvert : les achats restent bloqués jusqu’au remboursement par primes ou ventes. Prime de match : défaite 200, nul 275, victoire 350 ; classement : 600 / 400 / 200 / 100 / 100 / 100. La nouvelle saison conserve argent, dette, joueurs et équipement et remet la fatigue à zéro.
 
@@ -51,7 +55,7 @@ Dans **Sauvegarde → Redémarrer la campagne**, une confirmation permet d’eff
 
 La [passe de finition graphique du 18 octobre](playtests/ui-finitions-2026-10-18.md) complète les menus mobiles, les emplacements illustrés, la réserve et le magasin communs, ainsi que les portraits du bilan et des adversaires.
 
-Limites : une carrière, huit joueurs, cinq niveaux, aucun intérêt bancaire, blessure permanente, entraînement payant, bâtiment, sponsor négociable, multijoueur ou transfert entre clubs.
+Limites de la carrière locale : une carrière, dix joueurs, cinq niveaux, aucun intérêt bancaire, blessure permanente, entraînement payant, bâtiment, sponsor négociable ou transfert entre clubs. Le multijoueur utilise ses propres ligues.
 
 ## Essayer en local
 
@@ -66,7 +70,7 @@ Ouvrir <http://127.0.0.1:8766/#outils-rumbleball> pour la présentation, ou <htt
 ## Vérifier
 
 ```sh
-node --test rumbleball/*.test.mjs
+node --test rumbleball/*.test.mjs rumbleball/online/*.test.mjs
 ```
 
 Les tests couvrent les règles, les décisions, la reproduction pas à pas, 500 matchs avec classes, 30 matchs de compositions spécialisées ou mixtes, le journal narratif et la chronologie visuelle (trajets, lutte, réactions, KO, passes, techniques, annulation et animations réduites). Le rapport donne victoires par équipe et stratégie, prolongations et actions choisies. Les tests utilisent uniquement les modules intégrés de Node.

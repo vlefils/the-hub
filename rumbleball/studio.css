@@ -111,7 +111,8 @@ body.rb-app {
 .rb-app .rb-recruit-tile { display: flex; align-items: center; gap: .8rem; width: 100%; margin-top: .5rem; padding: .8rem; min-height: 4.5rem; background: #0c2839; border: 1px dashed #54809b; box-shadow: none; color: #b6dbf4; text-align: left; font: 700 1.2rem/1.2 'Rajdhani', sans-serif; }
 .rb-recruit-tile::before { content: '+'; display: grid; place-items: center; flex: 0 0 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid #54809b; font: 500 2rem/1 'Space Grotesk', sans-serif; }
 .rb-broadcast-squad > .rb-career-disclosure { margin-top: 1rem; }
-.rb-court-workspace { --rb-court-width: max(35rem, calc((100svh - 38rem) * 1.5)); display: grid; grid-template-columns: minmax(0, 1fr) minmax(5.5rem, 7rem); gap: .75rem; align-items: start; min-width: 0; width: min(100%, calc(var(--rb-court-width) + 7.75rem)); margin-inline: auto; }
+.rb-court-workspace { --rb-court-width: max(35rem, calc((100svh - 38rem) * 1.5)); --rb-bench-width: 7rem; display: grid; grid-template-columns: minmax(0, 1fr) minmax(5.5rem, var(--rb-bench-width)); gap: .75rem; align-items: start; min-width: 0; width: min(100%, calc(var(--rb-court-width) + var(--rb-bench-width) + .75rem)); margin-inline: auto; }
+.rb-court-workspace:has(.is-expanded) { --rb-bench-width: 13rem; }
 .rb-app .rb-court-workspace .rb-deployment-board { width: 100%; }
 .rb-app .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) { display: grid; gap: .65rem; margin: 0; padding: .75rem .5rem; min-width: 0; min-height: 12rem; background: #071b29; border: 1px dashed #4a728b; border-radius: 4px; }
 .rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) { display: grid; gap: .4rem; padding: .6rem 0; margin: 0; border: 0; border-top: 1px solid #29485c; background: none; }
@@ -122,6 +123,12 @@ body.rb-app {
 .rb-court-workspace .rb-controls { justify-content: center; }
 .rb-app .rb-court-workspace :is(.rb-bench-entry, .rb-bench-player) .rb-button:not(.rb-bench-name) { font-size: .7rem; padding: .3rem; min-height: 2rem; text-align: center; }
 .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) > p { text-align: center; font-size: .75rem; }
+.rb-app .rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench).is-expanded { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rb-court-workspace > :is(.rb-broadcast-bench, .rb-bench) > :is(h4, p) { grid-column: 1 / -1; }
+.rb-court-workspace :is(.rb-bench-entry, .rb-bench-player).is-selected { background: #153447; box-shadow: inset 0 0 0 1px #ff793d; border-radius: 4px; }
+.rb-app .rb-court-workspace .rb-bench-name { padding: .35rem; border-radius: 3px; }
+.rb-app .rb-court-workspace .rb-bench-name:hover { background: #193c50; }
+.rb-court-workspace .rb-bench-name[aria-pressed='true'] .rb-athlete-portrait { border-color: #ff793d; }
 
 /* The court is a code drawn surface. Cells stay real accessible drop targets. */
 .rb-app .rb-deployment-layout { gap: .5rem; margin-top: .5rem; }

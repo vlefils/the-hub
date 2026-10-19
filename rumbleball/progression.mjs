@@ -2,6 +2,7 @@ import { PROFILES, clone, modifier } from './data.mjs';
 import { classCaps } from './classes.mjs';
 
 export const XP_THRESHOLDS = [0, 20, 50, 90, 140];
+export const MAX_SQUAD_SIZE = 10;
 export const levelOf = (p) => XP_THRESHOLDS.filter((xp) => p.xp >= xp).length;
 export const recruitmentPrice = (p) => 300 + 150 * (levelOf(p) - 1);
 export const salary = (p) => 15 + 5 * (levelOf(p) - 1);

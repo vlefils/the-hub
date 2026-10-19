@@ -1,5 +1,5 @@
 import { el, btn, field, select, money, metric, table, statList, portraitIdentity, pageHeading } from '../career-components.mjs';
-import { compilePlayer, salary, recruitmentPrice } from '../progression.mjs';
+import { compilePlayer, salary, recruitmentPrice, MAX_SQUAD_SIZE } from '../progression.mjs';
 import { mountMatch } from '../ui.mjs';
 import { crestPicker, clubIdentity, matchBanner } from '../broadcast-components.mjs';
 import { mountTeamEditor, preparationDraft } from './team-ui.mjs';
@@ -195,13 +195,13 @@ export async function mountOnline(root, config, connect) {
     body.append(editor.root);
   }
   function renderMarket(body, c) {
-    body.append(el('p', 'rb-muted', `${c.players.length}/8 places occupées · Contrats annulables avant 20 h. Les offres changent après chaque rencontre.`));
+    body.append(el('p', 'rb-muted', `${c.players.length}/${MAX_SQUAD_SIZE} places occupées · Contrats annulables avant 20 h. Les offres changent après chaque rencontre.`));
     const list = el('div', 'rb-market-list'); body.append(list);
     for (const p of c.market) {
       const row = el('section', 'rb-career-player'), price = recruitmentPrice(p), compiled = compilePlayer(p);
       row.append(portraitIdentity(compiled, c.kitColor, el('h4', '', p.name)), el('p', 'rb-muted', `Niveau ${compiled.level} · ${money(salary(p))} / journée`), statList(compiled), el('p', 'rb-purchase-projection', `Après contrat : ${money(c.balance - price)}.`));
       const buy = action(`Recruter · ${money(price)}`, 'recruit', { playerId: p.id }, true);
-      const blocked = c.balance < 0 ? 'Salaires impayés : achats bloqués.' : c.players.length >= 8 ? 'Huit joueurs maximum.' : c.balance < price ? `Il manque ${price - c.balance} chromas.` : '';
+      const blocked = c.balance < 0 ? 'Salaires impayés : achats bloqués.' : c.players.length >= MAX_SQUAD_SIZE ? 'Dix joueurs maximum.' : c.balance < price ? `Il manque ${price - c.balance} chromas.` : '';
       if (blocked) { buy.disabled = true; row.append(el('small', 'rb-muted', blocked)); } row.append(buy); list.append(row);
     }
   }

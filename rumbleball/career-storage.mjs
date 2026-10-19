@@ -1,9 +1,10 @@
 import { PROFILES, ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
-import { CATALOGUE } from './progression.mjs';
+import { CATALOGUE, MAX_SQUAD_SIZE } from './progression.mjs';
 import { assertInvariants } from './rules.mjs';
 import { createMatch } from './engine.mjs';
 import { validKitColor } from './appearance.mjs';
 import { validCrest, validPortrait } from './identity.mjs';
+import { replaceLegacyPlayerNames } from './player-names.mjs';
 import { validDeployment } from './deployment.mjs';
 import { validOpening } from './openings.mjs';
 
@@ -31,8 +32,23 @@ export function validateCareer(c) {
     check(club.deployment === undefined || validDeployment(club.deployment));
     check(club.opening === undefined || validOpening(club.opening));
     check(name(club.id) && name(club.name) && name(club.style) && Object.hasOwn(STRATEGIES, club.strategy) && Array.isArray(club.players));
-    check(index ? club.players.length === 7 : c.status === 'draft' ? club.players.length === 0 : club.players.length >= 5 && club.players.length <= 8);
+    check(!index && c.status === 'draft' ? club.players.length === 0 : club.players.length >= 5 && club.players.length <= MAX_SQUAD_SIZE);
     club.players.forEach(validatePlayer);
+    if (index && (club.balance !== undefined || club.inventory !== undefined || club.transactions !== undefined)) {
+      check(integer(club.balance, -Number.MAX_SAFE_INTEGER) && Array.isArray(club.inventory) && Array.isArray(club.transactions));
+      const equipped = new Set(), itemIds = new Set(), entries = new Set();
+      for (const item of club.inventory) {
+        check(name(item.id) && !itemIds.has(item.id) && CATALOGUE[item.itemId]?.slot === 'protection' && (item.playerId === null || club.players.some(p => p.id === item.playerId)));
+        itemIds.add(item.id); if (item.playerId) { check(!equipped.has(item.playerId)); equipped.add(item.playerId); }
+      }
+      let balance = 600;
+      for (const t of club.transactions) {
+        check(name(t.id) && !entries.has(t.id) && name(t.fixtureId) && typeof t.label === 'string' && t.label.length <= 200 && integer(t.amount, -Number.MAX_SAFE_INTEGER) && integer(t.balance, -Number.MAX_SAFE_INTEGER)); entries.add(t.id);
+        if (t.amount < 0 && t.label !== 'Salaires de la journée') check(balance >= -t.amount);
+        balance += t.amount; check(integer(balance, -Number.MAX_SAFE_INTEGER) && t.balance === balance);
+      }
+      check(balance === club.balance);
+    }
   }
   check(Array.isArray(c.market) && c.market.length <= 12); c.market.forEach(validatePlayer);
   const ownedIds = c.clubs[0].players.map((p) => p.id);
@@ -117,7 +133,9 @@ export function importCareer(json) {
   if (typeof json !== 'string' || json.length > 8_000_000) throw new Error('Fichier JSON trop volumineux.');
   let data; try { data = JSON.parse(json); } catch { throw new Error('Ce fichier ne contient pas un JSON lisible.'); }
   if (data?.format !== 'the-hub-rumbleball' || data.version !== 1) throw new Error('Format de carrière inconnu.');
-  return validateCareer(data.career);
+  const career = validateCareer(data.career);
+  replaceLegacyPlayerNames([...career.clubs.flatMap(club => club.players), ...career.market], `${career.seed}:players`);
+  return career;
 }
 export function loadCareer(storage) {
   try { const raw = storage.getItem(CAREER_KEY); return { career: raw ? importCareer(raw) : null, error: null, hasSave: Boolean(raw) }; }

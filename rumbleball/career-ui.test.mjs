@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mountCareer } from './career-ui.mjs';
 import { CAREER_KEY, importCareer } from './career-storage.mjs';
-import { createCareer, confirmDraft, buyItem, launchCareerMatch, saveCareerTurn } from './career.mjs';
+import { createCareer, confirmDraft, recruit, buyItem, launchCareerMatch, saveCareerTurn } from './career.mjs';
 import { simulateMatch } from './engine.mjs';
 import { exportCareer } from './career-storage.mjs';
 import { xpProgress } from './career-components.mjs';
@@ -191,6 +191,24 @@ test('préparation solo : glisser depuis le banc remplace la bonne place et cons
   assert.deepEqual(e.saved().clubs[0].deployment[3], position);
   assert.equal(new Set(e.saved().clubs[0].deployment.map(p => `${p.x},${p.y}`)).size, 5);
   assert.match(classNode(e.root, 'rb-player-inspector').textContent, new RegExp(reserve.name));
+});
+
+test('banc de cinq : sélectionner et gérer le dernier remplaçant sans modifier les titulaires', async () => {
+  let c = createCareer('Les Dix', 'ui-ten'); c = confirmDraft(c, c.market.slice(0, 8).map(p => p.id));
+  // Fund this UI fixture independently of the season simulation.
+  c.balance += 1200; c.transactions.push({ id: 'test-budget', amount: 1200, balance: c.balance, label: 'Dotation de test' });
+  c = recruit(c, c.market[0].id); c = recruit(c, c.market[0].id);
+  const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
+  const bench = classNode(e.root, 'rb-bench'), reserve = c.clubs[0].players[9];
+  assert.equal(bench.querySelectorAll('.rb-bench-name').length, 5); assert.equal(bench.classList.contains('is-expanded'), true);
+  await button(bench, reserve.name).click(); assert.equal(button(classNode(e.root, 'rb-bench'), reserve.name).getAttribute('aria-pressed'), 'true');
+  const role = descendants(e.root).find(n => n.dataset.focusKey === 'active-role'); role.value = 'defender'; await role.emit('change');
+  const instruction = descendants(e.root).find(n => n.dataset.focusKey === 'active-instruction'); instruction.value = 'cautious'; await instruction.emit('change');
+  assert.equal(e.saved().clubs[0].players[9].role, 'defender'); assert.equal(e.saved().clubs[0].players[9].instruction, 'cautious');
+  await button(classNode(e.root, 'rb-player-inspector'), 'Acheter et équiper · 100 chromas').click();
+  assert.equal(e.saved().inventory[0].playerId, reserve.id); assert.deepEqual(e.saved().lineup, c.lineup);
+  await button(e.root, 'Recruter un joueur').click(); assert.match(classNode(e.root, 'rb-management-dialog').textContent, /10\/10 places/);
+  assert.ok(descendants(classNode(e.root, 'rb-management-dialog')).filter(n => n.dataset.focusKey?.startsWith('recruit-')).every(n => n.disabled));
 });
 
 test('recrutement solo : modale depuis la liste, arrivée sur le banc et fermeture sans quitter Club', async () => {

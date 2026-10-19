@@ -84,4 +84,5 @@ test('multi : les identités publiques ne dépendent jamais de la graine secrèt
   const a = createLeague({ ...options, seed: 'private-one' }, '2026-10-18T10:00:00Z').members[0].club;
   const b = createLeague({ ...options, seed: 'private-two' }, '2026-10-18T10:00:00Z').members[0].club;
   assert.equal(a.crestId, b.crestId); assert.deepEqual(a.players.map(p => p.portraitId), b.players.map(p => p.portraitId)); assert.deepEqual(a.market.map(p => p.portraitId), b.market.map(p => p.portraitId));
+  assert.deepEqual(a.players.map(p => p.name), b.players.map(p => p.name)); assert.deepEqual(a.market.map(p => p.name), b.market.map(p => p.name));
 });

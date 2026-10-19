@@ -133,3 +133,22 @@ test('recrutement en ligne : modale, banc, saisie préservée et annulation de l
   await button(dialog, 'Fermer').click(); assert.equal(dialog.hidden, true);
   await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(e.strategy().value, base.strategy); e.mounted.stop();
 });
+
+test('dix joueurs en ligne : cinquième remplaçant consultable et configurable, onzième contrat bloqué', async t => {
+  const e = await online(t), club = e.state().members[0].club;
+  club.balance += 1200; club.transactions.push({ id: 'test-budget', amount: 1200, balance: club.balance, label: 'Dotation de test' });
+  await button(e.root, 'Club').click(); await button(e.root, 'Recruter un joueur').click();
+  for (let i = 0; i < 4; i++) await button(e.root.querySelector('.rb-management-dialog'), 'Recruter · 300 chromas').click();
+  const dialog = e.root.querySelector('.rb-management-dialog'), prepared = e.state().members[0].draft;
+  assert.equal(prepared.players.length, 10); assert.match(dialog.textContent, /10\/10 places/);
+  assert.ok(descendants(dialog).filter(n => n.tagName === 'button' && n.textContent === 'Recruter · 300 chromas').every(n => n.disabled));
+  await button(dialog, 'Fermer').click(); const reserve = prepared.players[9], bench = e.root.querySelector('.rb-broadcast-bench');
+  assert.equal(bench.querySelectorAll('.rb-bench-name').length, 5); await button(bench, reserve.name).click();
+  assert.equal(button(bench, reserve.name).getAttribute('aria-pressed'), 'true');
+  const controls = e.root.querySelector('.rb-player-tactics').querySelectorAll('select'); controls[0].value = 'defender'; await controls[0].emit('change'); controls[1].value = 'cautious'; await controls[1].emit('change');
+  await button(e.root.querySelector('.rb-player-inspector'), 'Acheter et équiper · 100 chromas').click(); await e.root.querySelector('form').emit('submit');
+  const next = e.state().members[0].draft, p = next.players.find(p => p.id === reserve.id);
+  assert.equal(p.role, 'defender'); assert.equal(p.instruction, 'cautious'); assert.equal(next.inventory[0].playerId, p.id); assert.deepEqual(next.lineup, club.lineup);
+  assert.throws(() => editPreparation(e.state(), 'a', 'recruit', { playerId: next.market[0].id }, '2026-10-18T10:00:00Z'), /dix joueurs/);
+  e.mounted.stop();
+});

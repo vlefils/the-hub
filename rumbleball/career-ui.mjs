@@ -1,6 +1,6 @@
 import { ROLES, ROLE_DESCRIPTIONS, INSTRUCTIONS, STRATEGIES, STARTS } from './data.mjs';
 import { ARCHETYPES, archetypeLabel, classAbilities } from './classes.mjs';
-import { XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice } from './progression.mjs';
+import { XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice, MAX_SQUAD_SIZE } from './progression.mjs';
 import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings } from './career.mjs';
 import { CAREER_KEY, loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
 import { KIT_COLORS, clubKit } from './appearance.mjs';
@@ -165,7 +165,7 @@ export function mountCareer(root, mountMatch) {
     for (const [title, copy] of [['Recrutez', 'Quatre archétypes, des équipements et des implants.'], ['Préparez', 'Vos rôles, vos consignes, votre placement.'], ['Entrez dans l’arène', 'Les joueurs agissent seuls. Le club progresse avec vous.']]) { const step = el('li'); step.append(el('strong', '', title), el('span', '', copy)); steps.append(step); }
     introduction.append(steps);
     const form = el('form', 'rb-career-create'), input = el('input'); input.required = true; input.maxLength = 80; input.placeholder = 'Les Rebuts du Chrome';
-    form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', '2 400 chromas pour recruter cinq à huit joueurs. Une ligue de six clubs, dix journées par saison, cinq titulaires par match. Votre carrière est sauvegardée dans ce navigateur.'), field('Nom du club', input));
+    form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', '2 400 chromas pour vos premiers contrats. Cinq titulaires par match et jusqu’à dix joueurs dans le club. Une ligue de six clubs, dix journées par saison. Votre carrière est sauvegardée dans ce navigateur.'), field('Nom du club', input));
     const color = kitPicker(KIT_COLORS[0]), preview = el('div', 'rb-kit-preview');
     const showKit = () => preview.replaceChildren(...[0, 1, 2, 4].map((profile) => playerPortrait(compilePlayer({ id: `preview-${profile}`, name: 'Aperçu', profile, xp: 0, fatigue: 0 }), color.value)));
     color.addEventListener('input', showKit); showKit(); form.append(field('Couleur des maillots', color), preview);
@@ -180,7 +180,7 @@ export function mountCareer(root, mountMatch) {
     manager.append(el('p', 'rb-eyebrow', career.clubs[0].name), el('h3', '', 'Choisir votre effectif initial'), el('p', 'rb-muted', 'Sélection réversible. Les contrats sont payés ensemble à la validation. Les cinq premières recrues sélectionnées seront titulaires ; leur ordre restera modifiable.'));
     const color = kitPicker(clubKit(career.clubs[0])); color.addEventListener('change', () => update(() => setClubColor(career, color.value))); manager.append(field('Couleur des maillots', color)); const crest = crestPicker(career.clubs[0].crestId, color.value); crest.choice.addEventListener('change', () => update(() => setClubCrest(career, crest.value))); manager.append(crest.root);
     const list = el('div', 'rb-candidate-list'), footer = el('div', 'rb-draft-total'), total = el('strong'), confirm = btn('Valider les contrats', () => update(() => confirmDraft(career, [...draftIds])), true);
-    function totals() { const chosen = career.market.filter((p) => draftIds.has(p.id)), cost = chosen.reduce((sum, p) => sum + recruitmentPrice(p), 0), wages = chosen.reduce((sum, p) => sum + salary(p), 0); total.textContent = `${draftIds.size}/8 joueurs · contrats ${money(cost)} · reste ${money(2400 - cost)} · après les premiers salaires : ${money(2400 - cost - wages)}${2400 - cost - wages < 0 ? ' (salaires impayés autorisés)' : ''}`; confirm.disabled = draftIds.size < 5 || draftIds.size > 8 || cost > 2400; }
+    function totals() { const chosen = career.market.filter((p) => draftIds.has(p.id)), cost = chosen.reduce((sum, p) => sum + recruitmentPrice(p), 0), wages = chosen.reduce((sum, p) => sum + salary(p), 0); total.textContent = `${draftIds.size}/${MAX_SQUAD_SIZE} joueurs · contrats ${money(cost)} · reste ${money(2400 - cost)} · après les premiers salaires : ${money(2400 - cost - wages)}${2400 - cost - wages < 0 ? ' (salaires impayés autorisés)' : ''}`; confirm.disabled = draftIds.size < 5 || draftIds.size > MAX_SQUAD_SIZE || cost > 2400; }
     for (const p of career.market) {
       const row = el('label', 'rb-candidate'), checkbox = el('input'); checkbox.type = 'checkbox'; checkbox.checked = draftIds.has(p.id);
       checkbox.addEventListener('change', () => { if (checkbox.checked) draftIds.add(p.id); else draftIds.delete(p.id); totals(); });
@@ -237,13 +237,15 @@ export function mountCareer(root, mountMatch) {
       const target = ownedPlayers(career).find((p) => p.id === (career.lineup.includes(selectedPlayer) ? selectedPlayer : deployment.selectedPlayerId));
       bench.replaceChildren(el('h4', '', 'Banc'));
       const reserves = ownedPlayers(career).filter((p) => !career.lineup.includes(p.id));
+      bench.classList.toggle('is-expanded', reserves.length > 3);
       if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant.'));
       else bench.append(el('p', 'rb-muted', 'Disponibles'));
       for (const p of reserves) {
         const b = keyed(blocked(btn('Faire entrer', () => { const index = Math.max(0, career.lineup.indexOf(deployment.selectedPlayerId)); slotControls[index].value = p.id; selectedPlayer = p.id; attempt(() => { commitLineup(); renderActive(); active.querySelector('select')?.focus({ preventScroll: true }); }); }), locked ? 'Rencontre en cours.' : ''), `bench-${p.id}`); b.setAttribute('aria-label', `Faire entrer ${p.name}`);
-        const row = el('div', 'rb-bench-player'), pick = btn('', () => { selectedPlayer = p.id; renderActive(); }); pick.classList.add('rb-bench-name'); pick.setAttribute('aria-label', p.name);
+        const row = el('div', 'rb-bench-player'), pick = btn('', () => { selectedPlayer = p.id; renderActive(); }); pick.classList.add('rb-bench-name'); pick.setAttribute('aria-label', p.name); pick.title = `Gérer ${p.name} · statistiques, rôle et équipement`; pick.setAttribute('aria-pressed', String(selectedPlayer === p.id)); row.classList.toggle('is-selected', selectedPlayer === p.id);
         pick.append(athletePortrait(compilePlayer(p, career.inventory), clubKit(own)), el('span', '', p.name)); draggablePlayer(pick, p.id, locked);
         b.title = `Remplace ${target.name}`;
+        row.addEventListener('click', event => { if (!event.target.closest('button')) pick.click(); });
         row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
         row.addEventListener('drop', event => attempt(() => { const index = career.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); slotControls[index].value = p.id; selectedPlayer = p.id; commitLineup(); renderActive(); }));
         row.append(pick, fatigue(p), b); bench.append(row);
@@ -261,6 +263,7 @@ export function mountCareer(root, mountMatch) {
       }));
       inspector.append(playerInventory({ ...own, inventory: career.inventory }, p, { locked, onAssign: (id, playerId) => update(() => assignProtection(career, id, playerId)), onSell: id => update(() => sellProtection(career, id)) }));
       const slot = career.lineup.indexOf(p.id); if (slot >= 0) inspector.append(field('Remplacer ce titulaire', slotControls[slot]));
+      else inspector.append(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
       const techniques = disclosure('Techniques et progression', 'player-techniques', el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`));
       for (const [label, description] of classAbilities(compiled)) techniques.append(el('h4', '', label), el('p', 'rb-muted', description)); inspector.append(techniques);
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length <= 5 ? 'Cinq joueurs minimum.' : '';
@@ -289,7 +292,7 @@ export function mountCareer(root, mountMatch) {
   }
   function renderMarket(locked, target) {
     target.replaceChildren();
-    target.append(pageHeading('Marché des recrues', `${ownedPlayers(career).length}/8 places occupées · Offres conservées jusqu’à la fin de la journée, puis six nouvelles recrues.`));
+    target.append(pageHeading('Marché des recrues', `${ownedPlayers(career).length}/${MAX_SQUAD_SIZE} places occupées · Offres conservées jusqu’à la fin de la journée, puis six nouvelles recrues.`));
     comparePlayer = ownedPlayers(career).some((p) => p.id === comparePlayer) ? comparePlayer : career.lineup[0];
     const filter = keyed(select({ '': 'Tous les archétypes', ...Object.fromEntries(Object.entries(ARCHETYPES).map(([id, a]) => [id, a.name])) }, marketFilter), 'market-filter');
     const compare = keyed(select(Object.fromEntries(ownedPlayers(career).map((p) => [p.id, p.name])), comparePlayer), 'market-compare');
@@ -302,7 +305,7 @@ export function mountCareer(root, mountMatch) {
       row.append(portraitIdentity(compiled, clubKit(career.clubs[0]), el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled))), el('p', 'rb-muted', `Niveau ${levelOf(p)} · ${money(salary(p))} / journée · Fatigue 0/6`), statList(compiled));
       row.append(disclosure(`Comparer à ${existing.name}`, `offer-${p.id}`, el('p', 'rb-muted', `Votre joueur : niveau ${levelOf(existing)}, fatigue ${existing.fatigue}/6, équipement compris. Recrue : sans équipement et sans fatigue.`), comparison(reference, compiled, existing.implant, p.implant)));
       row.append(el('p', 'rb-purchase-projection', `Après contrat : ${money(career.balance - recruitmentPrice(p))} · Nouveaux salaires : ${money(payroll(career) + salary(p))} / journée.`));
-      const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length === 8 ? 'Effectif complet : huit joueurs maximum.' : purchaseBlock(career, recruitmentPrice(p));
+      const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length >= MAX_SQUAD_SIZE ? 'Effectif complet : dix joueurs maximum.' : purchaseBlock(career, recruitmentPrice(p));
       row.append(keyed(blocked(btn(`Recruter · ${money(recruitmentPrice(p))}`, () => update(() => recruit(career, p.id))), reason), `recruit-${p.id}`)); if (reason) row.append(el('small', 'rb-muted', reason)); list.append(row);
     }
     if (!offers.length) list.append(el('p', 'rb-empty-state', career.market.length ? 'Aucune offre pour cet archétype. Choisissez un autre filtre.' : 'Toutes les offres ont été recrutées. Le marché sera renouvelé après la journée.'));

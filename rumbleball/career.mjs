@@ -1,6 +1,7 @@
 import { PROFILES, ROLES, INSTRUCTIONS, STRATEGIES, clone } from './data.mjs';
 import { createMatch, simulateMatch, seedHash, CURRENT_RULES } from './engine.mjs';
-import { compilePlayer, recruitmentPrice, salary, levelOf, progressPlayer, CATALOGUE, XP_THRESHOLDS } from './progression.mjs';
+import { compilePlayer, recruitmentPrice, salary, levelOf, progressPlayer, CATALOGUE, XP_THRESHOLDS, MAX_SQUAD_SIZE } from './progression.mjs';
+import { playerName } from './player-names.mjs';
 import { KIT_COLORS, clubKit, validKitColor } from './appearance.mjs';
 import { identifyCareer, validCrest } from './identity.mjs';
 import { clubDeployment, validDeployment } from './deployment.mjs';
@@ -42,8 +43,11 @@ function player(id, name, profile, level = 1) {
 }
 function generateMarket(career, initial = false) {
   const profiles = initial ? [0, 1, 2, 3, 4, 0, 0, 1, 2, 2, 4, 4] : [0, 1, 2, 4, ...shuffle([0, 1, 2, 3, 4], `${career.seed}:market:${career.completedDays}`).slice(0, 2)];
-  const names = ['Echo', 'Magma', 'Pixel', 'Crank', 'Lentille', 'Boussole', 'Cobalt', 'Marteau', 'Flash', 'Glitch', 'Prisme', 'Radar'];
-  return profiles.map((profile, index) => player(`offer-${career.completedDays}-${index}`, initial && index < 5 ? PROFILES[profile].trainingName : `${names[index]} ${career.completedDays + 1}`, profile, Math.min(5, 1 + Math.floor(career.completedDays / 5))));
+  const used = new Set(career.clubs.flatMap(club => club.players.map(p => p.name)));
+  return profiles.map((profile, index) => {
+    const id = `offer-${career.completedDays}-${index}`, name = initial && index < 5 ? PROFILES[profile].trainingName : playerName(`${career.seed}:name:${id}`, used); used.add(name);
+    return player(id, name, profile, Math.min(5, 1 + Math.floor(career.completedDays / 5)));
+  });
 }
 function seasonSchedule(career) {
   const ids = shuffle(career.clubs.map((c) => c.id), `${career.seed}:schedule:${career.season}`), first = [];
@@ -70,6 +74,7 @@ export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0])
   need(validKitColor(kitColor), 'Couleur de maillot invalide.');
   const career = { version: 1, seed: String(seed).slice(0, 80), status: 'draft', balance: 2400, season: 1, day: 0, completedDays: 0,
     clubs: [{ id: 'club', name: name.trim(), kitColor, style: 'Votre club', strategy: 'balanced', opening: DEFAULT_OPENING, deployment: openingDeployment(), players: [] }, ...CLUBS.map(([clubName, style, strategy, profiles], index) => ({ id: `ai-${index}`, name: clubName, kitColor: KIT_COLORS[index + 1], style, strategy, opening: CLUB_OPENINGS[index], deployment: openingDeployment(CLUB_OPENINGS[index]),
+      balance: 600, inventory: [], transactions: [],
       players: profiles.map((profile, number) => { const p = player(`ai-${index}-${number}`, `${PROFILES[profile].name} ${number + 1}`, profile); if ([1, 4].includes(index)) p.instruction = 'aggressive'; if (index === 1) p.role = number < 3 ? 'blocker' : p.role; if (index === 3 && number < 3) p.role = 'relay'; return p; }) }))],
     lineup: [], inventory: [], transactions: [], market: [], schedule: [], tieOrder: [], current: null, seasonHistory: [] };
   career.market = generateMarket(career, true);
@@ -79,7 +84,7 @@ export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0])
 }
 export function confirmDraft(input, ids) {
   const c = identifiedCopy(input); need(c.status === 'draft', 'Club déjà créé.');
-  need(new Set(ids).size === ids.length && ids.length >= 5 && ids.length <= 8, 'Sélectionnez de cinq à huit joueurs différents.');
+  need(new Set(ids).size === ids.length && ids.length >= 5 && ids.length <= MAX_SQUAD_SIZE, 'Sélectionnez de cinq à dix joueurs différents.');
   const selected = ids.map((id) => c.market.find((p) => p.id === id)); need(selected.every(Boolean), 'Candidat inconnu.');
   spend(c, selected.reduce((sum, p) => sum + recruitmentPrice(p), 0), 'Contrats initiaux');
   team(c).players = selected; c.lineup = ids.slice(0, 5); c.market = c.market.filter((p) => !ids.includes(p.id)); c.status = 'active'; return c;
@@ -102,7 +107,7 @@ export function setClubCrest(input, crestId) {
   need(validCrest(crestId), 'Blason inconnu.'); team(c).crestId = crestId; return c;
 }
 export function recruit(input, id) {
-  const c = identifiedCopy(input); editable(c); need(ownedPlayers(c).length < 8, 'Effectif complet : huit joueurs maximum.');
+  const c = identifiedCopy(input); editable(c); need(ownedPlayers(c).length < MAX_SQUAD_SIZE, 'Effectif complet : dix joueurs maximum.');
   const p = c.market.find((q) => q.id === id); need(p, 'Offre indisponible.'); spend(c, recruitmentPrice(p), `Recrutement : ${p.name}`);
   team(c).players.push(p); c.market = c.market.filter((q) => q.id !== id); return c;
 }
@@ -138,11 +143,51 @@ export function sellProtection(input, id) {
 export function aiLineup(club) {
   return [...club.players].sort((a, b) => a.fatigue - b.fatigue || b.xp - a.xp || a.id.localeCompare(b.id)).slice(0, 5).map((p) => p.id);
 }
+function manageAiClub(c, club, fixture, wages, winnerId) {
+  // Old saves acquire the same starting management budget when first settled.
+  club.balance ??= 600; club.inventory ??= []; club.transactions ??= [];
+  const transaction = (amount, label) => {
+    club.balance += amount;
+    club.transactions.push({ id: `${fixture.id}-${club.transactions.length}`, fixtureId: fixture.id, amount, label, balance: club.balance });
+  };
+  transaction(-wages, 'Salaires de la journée');
+  transaction(!winnerId ? 275 : winnerId === club.id ? 350 : 200, 'Prime de match');
+  const reserve = () => club.players.reduce((sum, p) => sum + salary(p), 0);
+  const budget = () => Math.max(0, club.balance - reserve());
+  let recruited = false;
+  if (club.players.length < MAX_SQUAD_SIZE) {
+    const preferred = CLUBS[Number(club.id.slice(3))]?.[3] ?? [0, 1, 2, 3, 4];
+    const count = profile => club.players.filter(p => PROFILES[p.profile].archetype === PROFILES[profile].archetype).length;
+    const profile = [...new Set(preferred)].sort((a, b) => count(a) - count(b))[0];
+    const id = `${club.id}-recruit-${c.completedDays + 1}`, used = new Set(c.clubs.flatMap(other => other.players.map(p => p.name)).concat(c.market.map(p => p.name)));
+    const p = player(id, playerName(`${c.seed}:name:${id}`, used), profile, Math.min(5, 1 + Math.floor((c.completedDays + 1) / 5)));
+    if (budget() >= recruitmentPrice(p) + salary(p)) { transaction(-recruitmentPrice(p), `Recrutement : ${p.name}`); club.players.push(p); recruited = true; }
+  }
+  // Keep savings for the next contract instead of spending them on gear daily.
+  if (!recruited && club.players.length < MAX_SQUAD_SIZE && club.inventory.length) return;
+  const order = aiLineup(club).map(id => club.players.find(p => p.id === id));
+  order.push(...club.players.filter(p => !order.includes(p)));
+  const unprotected = order.find(p => !club.inventory.some(item => item.playerId === p.id));
+  const implant = order.find(p => !p.implant && club.inventory.some(item => item.playerId === p.id));
+  const firstImplant = implant && club.inventory.length >= 3 && !club.players.some(p => p.implant);
+  if (firstImplant && budget() < 300) return;
+  const upgrade = firstImplant || implant && (c.completedDays + 1) % 3 === 0 && budget() >= 300;
+  const p = upgrade ? implant : unprotected ?? implant;
+  if (!p) return;
+  const type = PROFILES[p.profile].archetype;
+  const protection = p === unprotected;
+  const itemId = protection ? type === 'belier' ? 'gloves' : type === 'capitaine' ? 'vest' : 'soles'
+    : p.fatigue >= 3 ? 'regulator' : type === 'escamoteur' ? 'legs' : type === 'passeur' ? 'interface' : 'fibers';
+  if (budget() < CATALOGUE[itemId].price) return;
+  transaction(-CATALOGUE[itemId].price, `${CATALOGUE[itemId].name} : ${p.name}`);
+  if (protection) club.inventory.push({ id: `${club.id}-gear-${club.transactions.length}`, itemId, playerId: p.id });
+  else p.implant = itemId;
+}
 function matchConfig(c, fixture) {
   // Keep the managed club on the left of the broadcast, even in an away fixture.
   const home = team(c), away = c.clubs.find((club) => club.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
   return { seed: fixture.seed, rulesVersion: CURRENT_RULES, openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home), away: clubKit(away, c.clubs.indexOf(away)) }, crestIds: { home: home.crestId, away: away.crestId }, strategy: home.strategy, awayStrategy: away.strategy,
-    rosters: { home: c.lineup.map((id) => compilePlayer(home.players.find((p) => p.id === id), c.inventory)), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id))) } };
+    rosters: { home: c.lineup.map((id) => compilePlayer(home.players.find((p) => p.id === id), c.inventory)), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id), away.inventory)) } };
 }
 export function launchCareerMatch(input) {
   const c = identifiedCopy(input); editable(c); const fixture = nextFixture(c); need(fixture && !fixture.result, 'La saison est terminée.');
@@ -159,8 +204,10 @@ function applyProgress(club, state, side) {
 function recordFixture(c, fixture, state, homeId, awayId) {
   const winnerId = state.result.winnerId === 'home' ? homeId : state.result.winnerId === 'away' ? awayId : null;
   fixture.result = { winnerId, round: state.result.round };
-  const homeProgress = applyProgress(c.clubs.find((club) => club.id === homeId), state, 'home');
-  applyProgress(c.clubs.find((club) => club.id === awayId), state, 'away');
+  const home = c.clubs.find(club => club.id === homeId), away = c.clubs.find(club => club.id === awayId);
+  const wages = [home, away].map(club => club.players.reduce((sum, p) => sum + salary(p), 0));
+  const homeProgress = applyProgress(home, state, 'home'); applyProgress(away, state, 'away');
+  for (const [index, club] of [home, away].entries()) if (club.id !== 'club') manageAiClub(c, club, fixture, wages[index], winnerId);
   return homeProgress;
 }
 export function settleCareerMatch(input) {
@@ -173,7 +220,7 @@ export function settleCareerMatch(input) {
   for (const other of c.schedule[c.day].filter((f) => f.id !== fixture.id)) {
     const home = c.clubs.find((club) => club.id === other.homeId), away = c.clubs.find((club) => club.id === other.awayId);
     const state = simulateMatch({ seed: other.seed, rulesVersion: CURRENT_RULES, openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home, c.clubs.indexOf(home)), away: clubKit(away, c.clubs.indexOf(away)) }, strategy: home.strategy, awayStrategy: away.strategy,
-      rosters: { home: aiLineup(home).map((id) => compilePlayer(home.players.find((p) => p.id === id))), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id))) } }).state;
+      rosters: { home: aiLineup(home).map((id) => compilePlayer(home.players.find((p) => p.id === id), home.inventory)), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id), away.inventory)) } }).state;
     recordFixture(c, other, state, home.id, away.id);
   }
   const reward = current.state.result.winnerId === 'home' ? 350 : current.state.result.winnerId === 'away' ? 200 : 275;

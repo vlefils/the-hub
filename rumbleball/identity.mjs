@@ -1,4 +1,5 @@
 // Stable cosmetic catalogue. Never import the simulation RNG here.
+import { replaceLegacyPlayerNames } from './player-names.mjs';
 const asset = (path) => new URL(`./assets/broadcast/${path}`, import.meta.url).href;
 export const PORTRAITS = Object.freeze([
   {
@@ -358,6 +359,7 @@ export function cosmeticHash(value) {
 export function identifyClub(club, namespace, market = []) {
   if (!validCrest(club.crestId)) club.crestId = CRESTS[cosmeticHash(`${namespace}:crest`) % CRESTS.length].id;
   const players = [...club.players, ...market], used = new Set(players.filter(p => validPortrait(p.portraitId)).map(p => p.portraitId));
+  replaceLegacyPlayerNames(players, namespace);
   for (const p of players) {
     if (validPortrait(p.portraitId)) continue;
     let index = cosmeticHash(`${namespace}:portrait:${p.id}`) % PORTRAITS.length;
@@ -370,6 +372,7 @@ export function identifyClub(club, namespace, market = []) {
   return club;
 }
 export function identifyCareer(career) {
+  replaceLegacyPlayerNames([...career.clubs.flatMap(club => club.players), ...career.market], `${career.seed}:players`);
   for (const c of career.clubs) identifyClub(c, `${career.seed}:${c.id}`, c.id === 'club' ? career.market : []);
   return career;
 }

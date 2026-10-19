@@ -23,7 +23,8 @@ test('création : douze profils fixes, trois par archétype, cinq Recrues, contr
   for (const type of ['belier', 'escamoteur', 'capitaine', 'passeur']) assert.equal(c.market.filter((p) => PROFILES[p.profile].archetype === type).length, 3);
   assert.deepEqual(c.market.slice(0, 5).map((p) => p.name), PROFILES.map((p) => p.trainingName));
   assert.throws(() => confirmDraft(c, c.market.slice(0, 4).map((p) => p.id)), /cinq/);
-  assert.throws(() => confirmDraft(c, c.market.slice(0, 9).map((p) => p.id)), /huit/);
+  assert.throws(() => confirmDraft(c, c.market.slice(0, 11).map((p) => p.id)), /dix/);
+  assert.throws(() => confirmDraft(c, c.market.slice(0, 9).map((p) => p.id)), /manque/);
   assert.throws(() => confirmDraft(c, Array(5).fill(c.market[0].id)), /différents/);
   const next = confirmDraft(c, c.market.slice(0, 8).map((p) => p.id));
   assert.equal(next.balance, 0); assert.equal(next.transactions.length, 1); assert.equal(next.lineup.length, 5);
@@ -89,6 +90,55 @@ test('effectif : composition, consignes, rotation, limites et cession d’un tit
   assert.throws(() => configureTeam(c, Array(5).fill(reverse[0]), {}, 'balanced'), /distincts/);
   const ai = c.clubs[1], first = aiLineup(ai); for (const p of ai.players.filter((p) => first.includes(p.id))) p.fatigue = 2;
   assert.ok(aiLineup(ai).some((id) => !first.includes(id)));
+});
+
+test('effectif : recrutement jusqu’à dix, cinq remplaçants, sauvegarde et refus du onzième', () => {
+  let c = club(5, 'ten-players');
+  for (let day = 0; day < 6 && ownedPlayers(c).length < 10; day++) {
+    while (ownedPlayers(c).length < 10 && c.market.length && c.balance >= recruitmentPrice(c.market[0])) c = recruit(c, c.market[0].id);
+    if (ownedPlayers(c).length < 10) c = complete(c, 'home');
+  }
+  assert.equal(ownedPlayers(c).length, 10); assert.equal(c.lineup.length, 5);
+  assert.equal(ownedPlayers(c).filter(p => !c.lineup.includes(p.id)).length, 5);
+  assert.throws(() => recruit(c, c.market[0].id), /dix joueurs/);
+  assert.deepEqual(importCareer(exportCareer(c)), c);
+  const invalid = structuredClone(c); invalid.clubs[0].players.push({ ...c.market[0] });
+  assert.throws(() => validateCareer(invalid), /invalide/);
+});
+
+test('clubs adverses : vingt journées de rotation, progression, contrats et équipement avec budgets persistants', { timeout: 120000 }, () => {
+  let c = club(5, 'ai-management');
+  // Legacy saves have seven players and no club economy yet.
+  for (const ai of c.clubs.slice(1)) { delete ai.balance; delete ai.inventory; delete ai.transactions; }
+  c = importCareer(exportCareer(c));
+  for (let day = 0; day < 20; day++) {
+    if (c.day === 10) c = nextSeason(c);
+    const before = structuredClone(c.clubs.slice(1)), launched = launchCareerMatch(c);
+    const fixture = nextFixture(c), opponent = before.find(ai => ai.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
+    assert.deepEqual(launched.current.config.rosters.away, aiLineup(opponent).map(id => compilePlayer(opponent.players.find(p => p.id === id), opponent.inventory)));
+    const simulation = simulateMatch(launched.current.config); c = saveCareerTurn(launched, simulation.state, simulation.events); validateCareer(c);
+    for (const ai of c.clubs.slice(1)) {
+      const old = before.find(other => other.id === ai.id), played = aiLineup(old), wages = old.players.reduce((sum, p) => sum + salary(p), 0);
+      for (const p of old.players) {
+        const next = ai.players.find(q => q.id === p.id), starter = played.includes(p.id);
+        assert.equal(next.xp, p.xp + (starter ? 10 : 4));
+        if (starter) assert.ok(next.fatigue >= Math.min(6, p.fatigue + (p.implant === 'regulator' ? 1 : 2)));
+        else assert.equal(next.fatigue, Math.max(0, p.fatigue - 3));
+      }
+      const today = ai.transactions.filter(t => t.fixtureId.startsWith(`s${c.season}-d${c.day}-`));
+      assert.equal(today.filter(t => t.label === 'Salaires de la journée').length, 1);
+      assert.equal(today.find(t => t.label === 'Salaires de la journée').amount, -wages);
+      assert.equal(today.filter(t => t.label === 'Prime de match').length, 1);
+      assert.ok(ai.players.length >= 7 && ai.players.length <= 10);
+      if (!day) { assert.equal(ai.players.length, 8); assert.equal(ai.inventory.length, 1); assert.ok(aiLineup(ai).some(id => !played.includes(id))); }
+    }
+    assert.deepEqual(settleCareerMatch(c), c); assert.deepEqual(importCareer(exportCareer(c)), c);
+  }
+  assert.ok(c.clubs.slice(1).every(ai => ai.players.some(p => levelOf(p) >= 3) && ai.inventory.length > 0));
+  assert.ok(c.clubs.slice(1).some(ai => ai.players.length === 10));
+  assert.ok(c.clubs.slice(1).some(ai => ai.players.some(p => p.implant)));
+  const invalid = structuredClone(c); invalid.clubs[1].inventory[0].playerId = 'unknown';
+  assert.throws(() => validateCareer(invalid), /invalide/);
 });
 test('équipement : deux emplacements, bonus non cumulés, transfert, revente et destruction d’implant', () => {
   let c = club(); const [a, b] = ownedPlayers(c), base = compilePlayer(a);
@@ -167,7 +217,7 @@ test('plusieurs saisons : journées complètes, cinq offres de niveau, XP/fatigu
       assert.equal(c.day, day + 1); assert.equal(c.schedule.flat().filter((f) => f.result).length, 3 * (day + 1));
       assert.ok(c.market.every((p) => levelOf(p) === Math.min(5, 1 + Math.floor(c.completedDays / 5))));
     }
-    assert.ok(c.clubs.slice(1).every((club) => club.players.every((p) => p.xp > 0)));
+    assert.ok(c.clubs.slice(1).every((club) => club.players.filter(p => !p.id.includes('-recruit-')).every(p => p.xp > 0)));
     assert.equal(c.transactions.filter((t) => t.fixtureId === `season-${season}`).length, 1);
     assert.ok(c.table.every((r) => r.played === 10)); assert.equal(c.seasonHistory.length, season);
     const balance = c.balance, xp = ownedPlayers(c).map((p) => p.xp); c = nextSeason(c);
