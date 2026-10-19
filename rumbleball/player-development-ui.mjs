@@ -1,7 +1,8 @@
 import { el, btn, field, select, signed, comparison } from './career-components.mjs';
 import { modifier } from './data.mjs';
+import { classAbilities } from './classes.mjs';
 import { compilePlayer } from './progression.mjs';
-import { ABILITY_LABELS, pendingAbilityLevels, abilityIncreaseError, applyAbilityIncrease } from './player-development.mjs';
+import { ABILITY_LABELS, ABILITY_LEVELS, MAX_LEVEL, proficiencyBonus, pendingAbilityLevels, abilityIncreaseError, applyAbilityIncrease } from './player-development.mjs';
 
 export function abilitySummary(compiled) {
   const root = el('section', 'rb-ability-summary'), list = el('dl', 'rb-ability-scores'); root.setAttribute('aria-label', 'Caractéristiques et maîtrise');
@@ -15,6 +16,39 @@ export function abilitySummary(compiled) {
 }
 export function abilityPendingBadge(player) {
   const count = pendingAbilityLevels(player).length, badge = el('small', 'rb-development-count', count ? `${count * 2} points à attribuer` : ''); badge.hidden = !count; return badge;
+}
+export function playerTechniques(compiled) {
+  const root = el('section', 'rb-player-techniques'), list = el('div', 'rb-technique-list');
+  root.setAttribute('aria-label', 'Techniques de classe');
+  root.append(el('h4', '', 'Techniques de classe'));
+  for (const [name, description] of classAbilities(compiled)) {
+    const technique = el('article', 'rb-technique');
+    technique.append(el('h5', '', name), el('small', 'rb-muted', 'Niveau 1 · Disponible'), el('p', '', description)); list.append(technique);
+  }
+  root.append(list); return root;
+}
+export function playerMilestones(compiled) {
+  const root = el('section', 'rb-player-milestones'), list = el('ol', 'rb-milestone-list');
+  root.setAttribute('aria-label', 'Paliers de progression');
+  root.append(el('h4', '', 'Paliers de progression'));
+  for (let level = 2; level <= MAX_LEVEL; level++) {
+    const gains = [];
+    if (ABILITY_LEVELS.includes(level)) gains.push('Caractéristiques : deux +1 ou un +2 à attribuer.');
+    const mastery = proficiencyBonus(level);
+    if (mastery > proficiencyBonus(level - 1)) {
+      gains.push(`Maîtrise ${signed(mastery)} sur les attaques et les compétences entraînées.`);
+      const resource = { belier: 'Réserve d’Adrénaline +2.', passeur: 'Réserve de concentration +1.', capitaine: 'Réserve d’appels +1.' }[compiled.archetype];
+      if (resource) gains.push(resource);
+      if (compiled.archetype === 'belier') gains.push('DD de percussion +1.');
+    }
+    if (compiled.archetype === 'escamoteur' && [3, 5].includes(level)) gains.push('Vitesse +1,5 m.');
+    if (!gains.length) continue;
+    const unlocked = compiled.level >= level, step = el('li', `rb-milestone${unlocked ? '' : ' is-locked'}`), copy = el('div');
+    step.dataset.level = String(level); step.dataset.unlocked = String(unlocked);
+    copy.append(el('small', '', unlocked ? 'Débloqué' : 'À débloquer'), el('p', '', gains.join(' ')));
+    step.append(el('strong', '', `Niv. ${level}`), copy); list.append(step);
+  }
+  root.append(list); return root;
 }
 export function playerAdvancement(club, player, { locked = false, onAdvance } = {}) {
   const root = el('section', 'rb-player-advancement'), pending = pendingAbilityLevels(player);

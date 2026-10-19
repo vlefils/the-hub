@@ -1,5 +1,5 @@
 import { ROLES, ROLE_DESCRIPTIONS, INSTRUCTIONS, STRATEGIES, STARTS } from './data.mjs';
-import { ARCHETYPES, archetypeLabel, classAbilities } from './classes.mjs';
+import { ARCHETYPES, archetypeLabel } from './classes.mjs';
 import { XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice, MAX_SQUAD_SIZE } from './progression.mjs';
 import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings, improveAbilities, careerSeasonFinished, advanceCareerPlayoffs } from './career.mjs';
 import { CAREER_KEY, loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
@@ -10,7 +10,7 @@ import { deploymentEditor, draggablePlayer, PLAYER_DRAG_TYPE } from './deploymen
 import { clubDeployment, moveDeployment } from './deployment.mjs';
 import { workspaceHeader, workspaceNavigation } from './workspace-header.mjs';
 import { playerEquipment } from './player-equipment.mjs';
-import { abilitySummary, abilityPendingBadge, playerAdvancement } from './player-development-ui.mjs';
+import { abilitySummary, abilityPendingBadge, playerAdvancement, playerTechniques, playerMilestones } from './player-development-ui.mjs';
 import { playoffPlaces, currentPlayoffRound } from './playoffs.mjs';
 import { qualificationLegend, playoffBracket } from './playoffs-ui.mjs';
 import { managementDialog } from './management-dialog.mjs';
@@ -272,14 +272,13 @@ export function mountCareer(root, mountMatch) {
         locked, selectedSlot: preparationEquipmentSlot, selectedItem: preparationShopItem, onSlot: slot => { preparationEquipmentSlot = slot; preparationShopItem = undefined; }, onItem: id => { preparationShopItem = id; }, onBuy: (id, playerId, confirmed, location) => update(() => buyItem(career, id, playerId, confirmed, location)),
         onAssign: (id, playerId, location) => update(() => assignProtection(career, id, playerId, location)), onSell: id => update(() => sellProtection(career, id))
       });
-      const techniques = disclosure('Techniques et progression', 'player-techniques', el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`));
-      for (const [label, description] of classAbilities(compiled)) techniques.append(el('h4', '', label), el('p', 'rb-muted', description));
+      const techniques = playerTechniques(compiled);
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length <= 5 ? 'Cinq joueurs minimum.' : '';
       const sell = blocked(btn(`Céder · ${money(recruitmentPrice(p) / 2)}`, () => showConfirmation(`Céder ${p.name} pour ${money(recruitmentPrice(p) / 2)} ? Son implant quitte le club ; son équipement retourne en réserve.`, () => update(() => sellPlayer(career, p.id)))), reason);
       inspector.replaceChildren(portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', archetypeLabel(compiled))), progress);
       const overview = [active, abilitySummary(compiled), statList(compiled)];
       if (!career.lineup.includes(p.id)) overview.push(el('p', 'rb-muted', 'Sur le banc · rôle, consigne et équipement modifiables comme pour un titulaire.'));
-      inspectorPanels(inspector, { overview, equipment: [equipment], progression: [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), techniques, sell],
+      inspectorPanels(inspector, { overview, equipment: [equipment], progression: [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`), techniques, playerMilestones(compiled), sell],
         points: compiled.pendingAbilityIncreases * 2, selected: preparationInspectorTab, onSelect: key => { preparationInspectorTab = key; } });
       for (const control of [role, instruction]) control.addEventListener('change', () => attempt(() => { assignments[p.id] = { role: role.value, instruction: instruction.value }; commitLineup(); role.title = ROLE_DESCRIPTIONS[role.value]; }));
       refreshSlots();

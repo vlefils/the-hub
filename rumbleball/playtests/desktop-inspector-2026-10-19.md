@@ -8,6 +8,8 @@ La fiche longue réunissait les réglages, toutes les statistiques, la progressi
 - Équipement : mannequin et sept emplacements ; la réserve et le magasin sortent de la colonne.
 - Progression : points de caractéristiques, informations de progression et cession. L’onglet signale les points disponibles.
 
+Les techniques de classe sont affichées directement dans Progression, avec leurs effets et leurs réserves actuelles, en solo comme en ligne. Elles sont toutes disponibles dès le niveau 1 dans les règles sportives actuelles. Une liste séparée présente les vrais paliers à venir : caractéristiques aux niveaux 3, 6, 9 et 12 ; maîtrise et réserves aux niveaux 4, 7 et 10 ; vitesse de l’Escamoteur aux niveaux 3 et 5. Les paliers futurs sont gris et portent la mention « À débloquer » ; ceux déjà atteints indiquent « Débloqué ». Cette présentation n’ajoute aucun verrouillage de technique aux matchs.
+
 Les boutons natifs utilisent les rôles de tabulation, les relations de panneaux et la navigation par flèches, Début et Fin. Le choix est conservé au changement de joueur, aux achats et aux rafraîchissements en ligne. Les onglets restent consultables pendant le verrouillage.
 
 ## Modale
@@ -35,3 +37,5 @@ Sous 1 440 px, aucune barre d’onglets ni modale d’équipement : les panneaux
 Commandes : `node --test rumbleball/player-inspector.test.mjs rumbleball/career-ui.test.mjs rumbleball/online/broadcast-ui.test.mjs rumbleball/equipment.test.mjs rumbleball/preparation-workspace.test.mjs rumbleball/deployment.test.mjs rumbleball/online/ui.test.mjs`, puis `node --test rumbleball/identity.test.mjs`.
 
 La validation est fondée sur les tests DOM et la revue du responsive CSS ; aucune nouvelle capture de navigateur n’est revendiquée. Les règles, le catalogue et le serveur ne changent pas ; aucun SQL ni redéploiement Supabase n’est nécessaire.
+
+Après l’affichage des techniques et des paliers, les 45 tests de `player-inspector.test.mjs`, `career-ui.test.mjs`, `online/broadcast-ui.test.mjs` et `online/ui.test.mjs` ont été relancés avec succès.

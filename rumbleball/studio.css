@@ -230,6 +230,18 @@ body.rb-app {
 .rb-inspector-tabs { display: none; }
 .rb-inspector-panel { display: grid; gap: .75rem; min-width: 0; }
 .rb-inspector-panel > :first-child { margin-top: 0; }
+.rb-player-techniques > h4, .rb-player-milestones > h4 { margin: .5rem 0 1rem; }
+.rb-technique-list { display: grid; gap: 1.25rem; }
+.rb-technique { min-width: 0; }
+.rb-technique h5 { margin: 0 0 .25rem; font: 700 1.15rem/1.25 'Rajdhani', sans-serif; }
+.rb-technique small { font-size: .75rem; }
+.rb-technique p { margin: .4rem 0 0; color: #c2d0dd; font-size: .875rem; line-height: 1.55; }
+.rb-milestone-list { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.rb-milestone { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: .75rem; color: #e6eef5; }
+.rb-milestone > strong { font: 700 1.05rem/1.4 'Rajdhani', sans-serif; }
+.rb-milestone small { font-size: .75rem; }
+.rb-milestone p { margin: .2rem 0 0; font-size: .875rem; line-height: 1.5; }
+.rb-milestone.is-locked { color: #9ca9b5; }
 .rb-player-shop { display: grid; gap: .65rem; padding-top: 1rem; border-top: 1px solid #2c4b60; }
 .rb-player-shop h4 { margin-bottom: 0; }
 .rb-player-shop-preview { display: grid; gap: .65rem; }
