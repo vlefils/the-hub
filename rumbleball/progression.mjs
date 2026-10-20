@@ -2,6 +2,7 @@ import { PROFILES, clone, modifier } from './data.mjs';
 import { classCaps } from './classes.mjs';
 import { MAX_LEVEL, XP_THRESHOLDS, levelOf, proficiencyBonus, effectiveAbilities, fatigueRecovery, ensurePlayerDevelopment, pendingAbilityLevels } from './player-development.mjs';
 import { CATALOGUE, equippedItems, itemLocation } from './equipment.mjs';
+import { LONG_RULES, injured, isLongCareer } from './career-rules.mjs';
 export { MAX_LEVEL, XP_THRESHOLDS, levelOf, proficiencyBonus, effectiveAbilities, fatigueRecovery, CATALOGUE };
 
 export const MAX_SQUAD_SIZE = 10;
@@ -9,12 +10,12 @@ export const recruitmentPrice = (p) => 300 + 150 * (levelOf(p) - 1);
 export const salary = (p) => 15 + 5 * (levelOf(p) - 1);
 
 // Always start from immutable base data; never recompile an already modified profile.
-export function compilePlayer(player, inventory = []) {
+export function compilePlayer(player, inventory = [], policy = {}) {
   const base = clone(PROFILES[player.profile]);
   if (!base) throw new Error('Profil de joueur inconnu.');
   const level = levelOf(player), tiers = Number(level >= 3) + Number(level >= 5), abilities = effectiveAbilities(player), mastery = proficiencyBonus(level);
   const result = { ...base, name: player.name, playerId: player.id, level, ...(player.portraitId ? { portraitId: player.portraitId } : {}),
-    role: player.role, instruction: player.instruction, fatigue: player.fatigue, abilities, proficiencyBonus: mastery, recovery: fatigueRecovery(player), pendingAbilityIncreases: pendingAbilityLevels(player).length };
+    role: player.role, instruction: player.instruction, fatigue: player.fatigue, abilities, proficiencyBonus: mastery, recovery: fatigueRecovery(player) + (CATALOGUE[player.implant]?.recovery ?? 0), pendingAbilityIncreases: pendingAbilityLevels(player).length };
   const brute = base.archetype === 'belier', constitution = modifier(abilities.constitution), attackStat = modifier(abilities[brute ? 'strength' : 'dexterity']);
   result.maxHp = Math.max(1, (brute ? 12 : 8) + (level - 1) * (brute ? 7 : 5) + level * constitution);
   result.armor = 10 + modifier(abilities.dexterity);
@@ -49,14 +50,21 @@ export function compilePlayer(player, inventory = []) {
   }
   if (player.fatigue >= 3) result.speed -= 1.5;
   if (player.fatigue >= 5) for (const key of ['wrestling', 'athletics', 'acrobatics']) result.skills[key]--;
+  if (isLongCareer(policy) || policy.careerRules === LONG_RULES) {
+    if (player.fatigue >= 8) { result.attack.bonus--; if (result.offhandAttack) result.offhandAttack.bonus--; }
+  }
   result.caps = classCaps(result);
   return result;
 }
 
-export function progressPlayer(player, starter, ko = false) {
+export function progressPlayer(player, starter, ko = false, policy = {}) {
   ensurePlayerDevelopment(player);
   const beforeLevel = levelOf(player), beforeFatigue = player.fatigue;
-  player.xp += starter ? 10 : 4;
-  player.fatigue = starter ? Math.min(6, player.fatigue + (player.implant === 'regulator' ? 1 : 2) + Number(ko)) : Math.max(0, player.fatigue - fatigueRecovery(player));
-  return { playerId: player.id, name: player.name, xp: starter ? 10 : 4, beforeLevel, level: levelOf(player), beforeFatigue, fatigue: player.fatigue, ko };
+  const long = isLongCareer(policy), unavailable = long && injured(player);
+  const xp = policy.fixed || policy.forfeit || unavailable ? 0 : starter ? long ? 8 : 10 : 4;
+  player.xp += xp;
+  const participation = player.implant === 'regulator' ? 1 : CATALOGUE[player.implant]?.participationFatigue ?? 2;
+  player.fatigue = starter ? Math.min(long ? 10 : 6, player.fatigue + participation + Number(ko)) : Math.max(0, player.fatigue - fatigueRecovery(player) - (CATALOGUE[player.implant]?.recovery ?? 0));
+  if (unavailable) player.injuryMatches--;
+  return { playerId: player.id, name: player.name, xp, beforeLevel, level: levelOf(player), beforeFatigue, fatigue: player.fatigue, ko, ...(long ? { injuryMatches: player.injuryMatches ?? 0 } : {}) };
 }

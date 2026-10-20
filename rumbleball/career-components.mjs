@@ -3,6 +3,7 @@ import { ABILITY_LABELS } from './player-development.mjs';
 import { athletePortrait } from './visuals.mjs';
 import { gearImage, gearFallback } from './identity.mjs';
 import { signed, damageText } from './formatters.mjs';
+import { fatigueLimit, isLongCareer, fatigueEffect, injured, injuryChance } from './career-rules.mjs';
 export { signed, damageText };
 
 export const el = (tag, cls = '', text) => { const node = document.createElement(tag); node.className = cls; if (text !== undefined) node.textContent = text; return node; };
@@ -34,13 +35,14 @@ export function metric(label, value, context = '') {
   const block = el('div', 'rb-metric'); block.append(el('span', 'rb-muted', label), el('strong', '', value));
   if (context) block.append(el('small', 'rb-muted', context)); return block;
 }
-export function table(headers, rows, { highlight = -1, caption = '', qualifying = 0 } = {}) {
+export function table(headers, rows, { highlight = -1, caption = '', qualifying = 0, relegating = 0 } = {}) {
   const wrap = el('div', 'rb-table-scroll'), t = el('table', 'rb-stats-table'), head = el('thead'), body = el('tbody'), hr = el('tr');
   if (caption) t.append(el('caption', 'rb-sr-only', caption));
   for (const text of headers) { const th = el('th', '', text); th.scope = 'col'; hr.append(th); } head.append(hr);
   for (const [index, values] of rows.entries()) {
     const row = el('tr', index === highlight ? 'rb-own-club' : '');
     if (index < qualifying) row.classList.add('rb-playoff-qualifier');
+    if (relegating && index >= rows.length - relegating) row.classList.add('rb-relegation-place');
     for (const [i, value] of values.entries()) { const cell = el(i ? 'td' : 'th'); if (!i) cell.scope = 'row'; if (value instanceof Node) cell.append(value); else cell.textContent = String(value); row.append(cell); } body.append(row);
   }
   t.append(head, body); wrap.append(t); return wrap;
@@ -62,12 +64,14 @@ export function xpProgress(p) {
   progress.setAttribute('aria-label', `XP de ${p.name} : ${level === MAX_LEVEL ? 'niveau maximum' : `${p.xp - start} sur ${max} vers le niveau ${level + 1}`}`);
   root.append(el('span', '', `Niv. ${level}`), progress, el('small', 'rb-muted', level === MAX_LEVEL ? 'Maximum' : `${p.xp - start}/${max} XP`)); return root;
 }
-export function fatigue(p) {
+export function fatigue(p, policy = {}) {
+  const cap = fatigueLimit(policy), long = isLongCareer(policy);
   const root = el('div', `rb-fatigue${p.fatigue >= 5 ? ' is-exhausted' : p.fatigue >= 3 ? ' is-tired' : ''}`), meter = el('span', 'rb-fatigue-meter'); meter.setAttribute('aria-hidden', 'true');
-  for (let i = 0; i < 6; i++) meter.append(el('i', i < p.fatigue ? 'is-filled' : ''));
-  const effect = p.fatigue >= 5 ? '−1,5 m · −1 aux compétences physiques' : p.fatigue >= 3 ? 'Vitesse −1,5 m' : 'Aucun malus';
-  root.title = `Fatigue ${p.fatigue}/6 · ${effect}`;
-  const value = el('span', 'rb-fatigue-value'); value.append(el('span', 'rb-muted', 'Fatigue '), el('strong', '', `${p.fatigue}/6`));
+  for (let i = 0; i < cap; i++) meter.append(el('i', i < p.fatigue ? 'is-filled' : ''));
+  const effect = fatigueEffect(p.fatigue, long);
+  root.title = `Fatigue ${p.fatigue}/${cap} · ${effect}${long ? ` · Blessure sur KO : ${(injuryChance(p.fatigue) * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %` : ''}`;
+  const value = el('span', 'rb-fatigue-value'); value.append(el('span', 'rb-muted', 'Fatigue '), el('strong', '', `${p.fatigue}/${cap}`));
+  if (long && injured(p)) value.append(el('span', 'rb-injury-label', `Blessé · ${p.injuryMatches} match${p.injuryMatches > 1 ? 's' : ''}`));
   root.append(value, meter, el('small', 'rb-muted', effect)); return root;
 }
 export function comparison(before, after, beforeImplant = null, afterImplant = null) {
@@ -88,6 +92,7 @@ export function comparison(before, after, beforeImplant = null, afterImplant = n
 }
 export function equipmentArtwork(id, name) {
   const image = el('img', 'rb-equipment-art'); image.src = gearImage(id); image.alt = name; image.width = image.height = 128; image.loading = 'lazy'; image.decoding = 'async';
+  if (CATALOGUE[id]?.longOnly) image.classList.add(`rb-equipment-tier-${CATALOGUE[id].tier}`);
   image.addEventListener('error', () => { const fallback = gearFallback(id); if (fallback && image.src !== fallback) image.src = fallback; else image.hidden = true; }); return image;
 }
 export function disclosure(label, key, ...children) {

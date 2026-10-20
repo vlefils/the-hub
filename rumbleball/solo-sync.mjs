@@ -9,6 +9,7 @@ const jsonOf = game => game.state ? exportCareer(game.state) : null;
 const gameOf = record => {
   const state = record.json ? importCareer(record.json) : null;
   return { id: record.id, revision: record.revision, state, clubName: state?.clubs[0].name ?? 'Nouvelle partie', season: state?.season ?? null,
+    mode: state?.mode ?? 'classic', division: state?.longCareer?.division ?? null,
     completedDays: state?.completedDays ?? 0, status: state?.status ?? 'empty', updatedAt: record.updatedAt, isCopy: Boolean(record.forkedFrom || record.isCopy), pending: Boolean(record.pending) };
 };
 export async function accountRequest(client, owner, action, payload = {}) {

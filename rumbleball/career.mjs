@@ -8,7 +8,9 @@ import { identifyCareer, identifyClub, playerGender, validCrest } from './identi
 import { clubDeployment, validDeployment } from './deployment.mjs';
 import { DEFAULT_OPENING, clubOpening, openingDeployment, validOpening } from './openings.mjs';
 import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture } from './playoffs.mjs';
-import { equipMutable, compatibleLocation, equipmentDefinition, itemLocation } from './equipment.mjs';
+import { equipMutable, compatibleLocation, equipmentDefinition, equipmentAvailable, itemLocation } from './equipment.mjs';
+import { isLongCareer, LONG_RULES, injured, matchReward } from './career-rules.mjs';
+import { createLongOpponents, longRecruitLevel, applyInjury, availablePlayers, repairLongLineup, longSeasonOutcome } from './long-career.mjs';
 
 export const SEASON_PRIZES = [600, 400, 200, 100, 100, 100];
 const CLUBS = [
@@ -59,7 +61,10 @@ function generateMarket(career, initial = false) {
   const market = profiles.map((profile, index) => {
     const playoffDay = career.playoffs ? `-p${career.playoffs.rounds.filter(round => round.matches.every(match => match.winnerId)).length}` : '';
     const id = `offer-${career.completedDays}${playoffDay}-${index}`, name = initial && index < 5 ? PROFILES[profile].trainingName : playerName(`${career.seed}:name:${id}`, used, 'neutral', PROFILES[profile].archetype); used.add(name);
-    return player(id, name, profile, Math.min(MAX_LEVEL, 1 + Math.floor(career.completedDays / 5)), career.seed);
+    const offerId = isLongCareer(career) ? `offer-s${career.season}-${career.completedDays}${playoffDay}-${index}` : id;
+    const candidate = player(offerId, name, profile, isLongCareer(career) ? longRecruitLevel(career, offerId) : Math.min(MAX_LEVEL, 1 + Math.floor(career.completedDays / 5)), career.seed);
+    if (isLongCareer(career)) candidate.injuryMatches = 0;
+    return candidate;
   });
   identifyClub(team(career), `${career.seed}:club`, market);
   return market;
@@ -77,21 +82,24 @@ export function standings(career) {
   for (const fixture of career.schedule.flat()) if (fixture.result) {
     for (const clubId of [fixture.homeId, fixture.awayId]) {
       const row = rows.find((r) => r.clubId === clubId); row.played++;
-      if (!fixture.result.winnerId) { row.draws++; row.points++; }
+      if (fixture.result.kind === 'double-forfeit') row.losses++;
+      else if (!fixture.result.winnerId) { row.draws++; row.points++; }
       else if (fixture.result.winnerId === clubId) { row.wins++; row.points += 3; }
       else row.losses++;
     }
   }
   return rows.sort((a, b) => b.points - a.points || b.wins - a.wins || career.tieOrder.indexOf(a.clubId) - career.tieOrder.indexOf(b.clubId));
 }
-export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0]) {
+export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0], { mode = 'classic' } = {}) {
   need(typeof name === 'string' && name.trim().length > 0 && name.trim().length <= 80, 'Donnez au club un nom de 1 à 80 caractères.');
   need(validKitColor(kitColor), 'Couleur de maillot invalide.');
+  need(['classic', 'long'].includes(mode), 'Mode de carrière inconnu.');
   const career = { version: 1, seed: String(seed).slice(0, 80), status: 'draft', balance: 2400, season: 1, day: 0, completedDays: 0,
     clubs: [{ id: 'club', name: name.trim(), kitColor, style: 'Votre club', strategy: 'balanced', opening: DEFAULT_OPENING, deployment: openingDeployment(), players: [] }, ...CLUBS.map(([clubName, style, strategy, profiles], index) => ({ id: `ai-${index}`, name: clubName, kitColor: KIT_COLORS[index + 1], style, strategy, opening: CLUB_OPENINGS[index], deployment: openingDeployment(CLUB_OPENINGS[index]),
       balance: 600, inventory: [], transactions: [],
       players: profiles.map((profile, number) => { const p = player(`ai-${index}-${number}`, `${PROFILES[profile].name} ${number + 1}`, profile, 1, seed); if ([1, 4].includes(index)) p.instruction = 'aggressive'; if (index === 1) p.role = number < 3 ? 'blocker' : p.role; if (index === 3 && number < 3) p.role = 'relay'; return p; }) }))],
     lineup: [], inventory: [], transactions: [], market: [], schedule: [], tieOrder: [], current: null, playoffs: null, seasonHistory: [] };
+  if (mode === 'long') { career.mode = 'long'; career.longCareer = { version: 1, division: 1 }; career.clubs = [career.clubs[0], ...createLongOpponents(career.seed, 1)]; }
   career.market = generateMarket(career, true);
   career.tieOrder = shuffle(career.clubs.map((c) => c.id), `${career.seed}:ties:1`);
   career.schedule = seasonSchedule(career); career.table = standings(career);
@@ -107,6 +115,7 @@ export function confirmDraft(input, ids) {
 export function configureTeam(input, lineup, assignments, strategy, deployment, opening) {
   const c = identifiedCopy(input); editable(c);
   need(lineup.length === 5 && new Set(lineup).size === 5 && lineup.every((id) => ownedPlayers(c).some((p) => p.id === id)), 'Choisissez exactement cinq titulaires distincts.');
+  if (isLongCareer(c)) need(lineup.every(id => c.lineup.includes(id) || !injured(ownedPlayers(c).find(p => p.id === id))), 'Un joueur blessé ne peut pas entrer dans la composition.');
   need(Object.hasOwn(STRATEGIES, strategy), 'Plan collectif inconnu.');
   if (opening !== undefined) { need(validOpening(opening), 'Ouverture inconnue.'); team(c).opening = opening; }
   if (deployment !== undefined) { need(validDeployment(deployment), 'Placez cinq joueurs distincts dans votre moitié de terrain.'); team(c).deployment = clone(deployment); }
@@ -124,7 +133,7 @@ export function setClubCrest(input, crestId) {
 export function recruit(input, id) {
   const c = identifiedCopy(input); editable(c); need(ownedPlayers(c).length < MAX_SQUAD_SIZE, 'Effectif complet : dix joueurs maximum.');
   const p = c.market.find((q) => q.id === id); need(p, 'Offre indisponible.'); spend(c, recruitmentPrice(p), `Recrutement : ${p.name}`);
-  team(c).players.push(p); c.market = c.market.filter((q) => q.id !== id); return c;
+  team(c).players.push(p); c.market = c.market.filter((q) => q.id !== id); repairLongLineup(c); return c;
 }
 export function improveAbilities(input, playerId, changes) {
   const c = identifiedCopy(input); editable(c);
@@ -138,10 +147,11 @@ export function sellPlayer(input, id) {
   for (const item of c.inventory) if (item.playerId === id) item.playerId = null;
   team(c).players = ownedPlayers(c).filter((q) => q.id !== id);
   c.lineup = c.lineup.filter((q) => q !== id); if (c.lineup.length < 5) c.lineup.push(ownedPlayers(c).find((q) => !c.lineup.includes(q.id)).id);
-  return c;
+  repairLongLineup(c); return c;
 }
 export function buyItem(input, itemId, playerId = null, replaceConfirmed = false, location) {
   const c = identifiedCopy(input); editable(c); const item = equipmentDefinition(itemId); need(item, 'Article inconnu.');
+  need(equipmentAvailable(itemId, c.mode), 'Cet équipement est réservé à la carrière longue.');
   need(location === undefined || compatibleLocation(itemId, location), 'Emplacement incompatible.');
   const p = ownedPlayers(c).find((q) => q.id === playerId);
   need(playerId === null || p, 'Joueur inconnu.');
@@ -168,7 +178,7 @@ export function sellProtection(input, id) {
   transact(c, CATALOGUE[item.itemId].price / 2, `Vente : ${CATALOGUE[item.itemId].name}`); c.inventory = c.inventory.filter((q) => q.id !== id); return c;
 }
 export function aiLineup(club) {
-  return [...club.players].sort((a, b) => a.fatigue - b.fatigue || b.xp - a.xp || a.id.localeCompare(b.id)).slice(0, 5).map((p) => p.id);
+  return club.players.filter(p => !injured(p)).sort((a, b) => a.fatigue - b.fatigue || b.xp - a.xp || a.id.localeCompare(b.id)).slice(0, 5).map((p) => p.id);
 }
 function manageAiClub(c, club, fixture, wages, winnerId) {
   for (const p of club.players) automaticAbilityIncreases(p);
@@ -233,39 +243,59 @@ export function equipAiClub(club, turn, transaction) {
 function matchConfig(c, fixture) {
   // Keep the managed club on the left of the broadcast, even in an away fixture.
   const home = team(c), away = c.clubs.find((club) => club.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId));
-  return { seed: fixture.seed ?? `${c.seed}:${fixture.id}`, rulesVersion: CURRENT_RULES, openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home), away: clubKit(away, c.clubs.indexOf(away)) }, crestIds: { home: home.crestId, away: away.crestId }, strategy: home.strategy, awayStrategy: away.strategy,
-    rosters: { home: c.lineup.map((id) => compilePlayer(home.players.find((p) => p.id === id), c.inventory)), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id), away.inventory)) } };
+  return { seed: fixture.seed ?? `${c.seed}:${fixture.id}`, rulesVersion: CURRENT_RULES, ...(isLongCareer(c) ? { careerRules: LONG_RULES } : {}), openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home), away: clubKit(away, c.clubs.indexOf(away)) }, crestIds: { home: home.crestId, away: away.crestId }, strategy: home.strategy, awayStrategy: away.strategy,
+    rosters: { home: c.lineup.map((id) => compilePlayer(home.players.find((p) => p.id === id), c.inventory, c)), away: aiLineup(away).map((id) => compilePlayer(away.players.find((p) => p.id === id), away.inventory, c)) } };
+}
+export function careerForfeit(career) {
+  if (!isLongCareer(career)) return false;
+  const fixture = nextFixture(career); if (!fixture) return false;
+  return career.clubs.filter(club => [fixture.homeId, fixture.awayId].includes(club.id)).some(club => availablePlayers(club).length < 5);
 }
 export function launchCareerMatch(input) {
   const c = identifiedCopy(input); editable(c); const fixture = nextFixture(c); need(fixture && !fixture.result, 'La saison est terminée.');
+  if (careerForfeit(c)) {
+    const away = c.clubs.find(club => club.id === (fixture.homeId === 'club' ? fixture.awayId : fixture.homeId)), wages = payroll(c);
+    transact(c, -wages, 'Salaires de la journée', fixture.id);
+    c.current = { kind: 'forfeit', fixtureId: fixture.id, config: { seed: fixture.seed ?? `${c.seed}:${fixture.id}`, teamNames: { home: team(c).name, away: away.name } }, turns: [], wages, settled: false, summary: null };
+    return settleCareerMatch(c);
+  }
   need(c.lineup.length === 5 && new Set(c.lineup).size === 5 && c.lineup.every((id) => ownedPlayers(c).some((p) => p.id === id)), 'Cinq titulaires sont nécessaires.');
+  if (isLongCareer(c)) need(c.lineup.every(id => !injured(ownedPlayers(c).find(p => p.id === id))), 'Remplacez les joueurs blessés avant de lancer le match.');
   const config = matchConfig(c, fixture), wages = payroll(c);
   transact(c, -wages, 'Salaires de la journée', fixture.id);
   c.current = { fixtureId: fixture.id, config, state: createMatch(config), turns: [], wages, settled: false, summary: null };
   return c;
 }
-function applyProgress(club, state, side) {
-  const participants = state.players.filter((p) => p.teamId === side);
-  return club.players.map((p) => { const played = participants.find((q) => q.playerId === p.id); return progressPlayer(p, Boolean(played), played?.hp === 0); });
+function applyProgress(c, club, state, side, fixtureId) {
+  const participants = state?.players.filter((p) => p.teamId === side) ?? [];
+  return club.players.map((p) => {
+    const played = participants.find((q) => q.playerId === p.id), fatigue = p.fatigue;
+    const progress = progressPlayer(p, Boolean(played), played?.hp === 0, { mode: c.mode, fixed: isLongCareer(c) && club.id !== 'club', forfeit: !state });
+    if (isLongCareer(c) && played?.hp === 0) { const duration = applyInjury(c, p, fixtureId, fatigue); progress.injuryMatches = p.injuryMatches ?? 0; if (duration) progress.newInjury = duration; }
+    return progress;
+  });
 }
 function recordFixture(c, fixture, state, homeId, awayId) {
-  const winnerId = state.result.winnerId === 'home' ? homeId : state.result.winnerId === 'away' ? awayId : null;
-  const result = { winnerId, round: state.result.round };
-  if (c.day === 10) settlePlayoffFixture(c.playoffs, fixture.id, result); else fixture.result = result;
   const home = c.clubs.find(club => club.id === homeId), away = c.clubs.find(club => club.id === awayId);
+  const ready = [home, away].map(club => availablePlayers(club).length >= 5);
+  const winnerId = state ? state.result.winnerId === 'home' ? homeId : state.result.winnerId === 'away' ? awayId : null : ready[0] !== ready[1] ? ready[0] ? homeId : awayId : null;
+  const result = { winnerId, round: state?.result.round ?? 0, ...(!state ? { kind: ready[0] || ready[1] ? 'forfeit' : 'double-forfeit' } : {}) };
+  if (c.day === 10) settlePlayoffFixture(c.playoffs, fixture.id, result, { allowForfeit: isLongCareer(c) }); else fixture.result = result;
   const wages = [home, away].map(club => club.players.reduce((sum, p) => sum + salary(p), 0));
-  const homeProgress = applyProgress(home, state, 'home'); applyProgress(away, state, 'away');
-  for (const [index, club] of [home, away].entries()) if (club.id !== 'club') manageAiClub(c, club, fixture, wages[index], winnerId);
+  const homeProgress = applyProgress(c, home, state, 'home', fixture.id); applyProgress(c, away, state, 'away', fixture.id);
+  for (const [index, club] of [home, away].entries()) if (club.id !== 'club' && !isLongCareer(c)) manageAiClub(c, club, fixture, wages[index], winnerId);
+  if (!state && c.current?.fixtureId === fixture.id) c.current.result = { ...result, winnerId: winnerId === homeId ? 'home' : winnerId === awayId ? 'away' : null };
   return homeProgress;
 }
 function simulateOtherFixture(c, fixture) {
   const home = c.clubs.find(club => club.id === fixture.homeId), away = c.clubs.find(club => club.id === fixture.awayId);
-  const state = simulateMatch({ seed: fixture.seed ?? `${c.seed}:${fixture.id}`, rulesVersion: CURRENT_RULES, openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home, c.clubs.indexOf(home)), away: clubKit(away, c.clubs.indexOf(away)) }, strategy: home.strategy, awayStrategy: away.strategy,
-    rosters: { home: aiLineup(home).map(id => compilePlayer(home.players.find(p => p.id === id), home.inventory)), away: aiLineup(away).map(id => compilePlayer(away.players.find(p => p.id === id), away.inventory)) } }).state;
+  if (isLongCareer(c) && [home, away].some(club => availablePlayers(club).length < 5)) { recordFixture(c, fixture, null, home.id, away.id); return; }
+  const state = simulateMatch({ seed: fixture.seed ?? `${c.seed}:${fixture.id}`, rulesVersion: CURRENT_RULES, ...(isLongCareer(c) ? { careerRules: LONG_RULES } : {}), openings: { home: clubOpening(home), away: clubOpening(away) }, deployments: { home: clubDeployment(home), away: clubDeployment(away, 'away') }, teamNames: { home: home.name, away: away.name }, kitColors: { home: clubKit(home, c.clubs.indexOf(home)), away: clubKit(away, c.clubs.indexOf(away)) }, strategy: home.strategy, awayStrategy: away.strategy,
+    rosters: { home: aiLineup(home).map(id => compilePlayer(home.players.find(p => p.id === id), home.inventory, c)), away: aiLineup(away).map(id => compilePlayer(away.players.find(p => p.id === id), away.inventory, c)) } }).state;
   recordFixture(c, fixture, state, home.id, away.id);
 }
 function archivePlayoffs(c) {
-  if (c.playoffs?.championId) Object.assign(c.seasonHistory.at(-1), { championId: c.playoffs.championId, playoffs: clone(c.playoffs) });
+  if (c.playoffs?.championId) Object.assign(c.seasonHistory.at(-1), { championId: c.playoffs.championId, playoffs: clone(c.playoffs), ...(isLongCareer(c) ? longSeasonOutcome(c) : {}) });
 }
 export function advanceCareerPlayoffs(input) {
   const c = identifiedCopy(input); editable(c);
@@ -277,13 +307,14 @@ export function advanceCareerPlayoffs(input) {
 export function settleCareerMatch(input) {
   const c = identifiedCopy(input), current = c.current;
   need(current, 'Aucune rencontre en cours.'); if (current.settled) return c;
-  need(current.state.finished, 'La rencontre n’est pas terminée.');
+  need(current.kind === 'forfeit' || current.state.finished, 'La rencontre n’est pas terminée.');
   const fixtures = [...careerFixtures(c)], group = c.day < 10;
   const fixture = fixtures.find(f => f.id === current.fixtureId); need(fixture && !fixture.result, 'Cette rencontre a déjà été réglée.');
   const awayId = fixture.homeId === 'club' ? fixture.awayId : fixture.homeId;
-  const progress = recordFixture(c, fixture, current.state, 'club', awayId);
+  const progress = recordFixture(c, fixture, current.kind === 'forfeit' ? null : current.state, 'club', awayId);
   for (const other of fixtures.filter(f => f.id !== fixture.id)) simulateOtherFixture(c, other);
-  const reward = current.state.result.winnerId === 'home' ? 350 : current.state.result.winnerId === 'away' ? 200 : 275;
+  const result = current.kind === 'forfeit' ? current.result : current.state.result;
+  const reward = matchReward(c, result.winnerId, result.kind);
   const debtBefore = Math.max(0, -c.balance); transact(c, reward, 'Prime de match', fixture.id);
   if (group) { c.day++; c.completedDays++; }
   c.market = generateMarket(c); identifyCareer(c); c.table = standings(c);
@@ -291,11 +322,12 @@ export function settleCareerMatch(input) {
   if (group && c.day === 10) {
     rank = c.table.findIndex((row) => row.clubId === 'club') + 1; seasonPrize = SEASON_PRIZES[rank - 1];
     transact(c, seasonPrize, `Prime de classement : ${rank}e`, `season-${c.season}`);
-    c.seasonHistory.push({ season: c.season, table: clone(c.table), prize: seasonPrize });
+    c.seasonHistory.push({ season: c.season, table: clone(c.table), prize: seasonPrize, ...(isLongCareer(c) ? { division: c.longCareer.division } : {}) });
     ensureCareerPlayoffs(c);
     for (const entry of progress) entry.fatigue = 0;
   }
   archivePlayoffs(c);
+  repairLongLineup(c);
   current.settled = true;
   current.summary = { reward, wages: current.wages, debtRepaid: Math.min(debtBefore, reward + seasonPrize), remainingDebt: Math.max(0, -c.balance), available: Math.max(0, c.balance), balance: c.balance, seasonPrize, rank, progress, ...(group && c.day === 10 ? { fatigueReset: true } : {}) };
   return c;
@@ -308,8 +340,13 @@ export function saveCareerTurn(input, state, events) {
 }
 export function nextSeason(input) {
   const c = identifiedCopy(input); editable(c); need(careerSeasonFinished(c), 'Terminez la phase de groupe et les playoffs.');
+  if (isLongCareer(c)) {
+    archivePlayoffs(c); c.longCareer.division = longSeasonOutcome(c).nextDivision;
+    c.clubs = [team(c), ...createLongOpponents(c.seed, c.longCareer.division)];
+  }
   c.season++; c.day = 0; c.current = null; c.playoffs = null;
-  for (const club of c.clubs) for (const p of club.players) p.fatigue = 0;
+  for (const club of c.clubs) for (const p of club.players) { p.fatigue = 0; if (isLongCareer(c)) p.injuryMatches = 0; }
+  if (isLongCareer(c)) { c.market = generateMarket(c); repairLongLineup(c); }
   c.tieOrder = shuffle(c.clubs.map((club) => club.id), `${c.seed}:ties:${c.season}`);
   c.schedule = seasonSchedule(c); c.table = standings(c); return c;
 }

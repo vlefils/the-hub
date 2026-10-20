@@ -7,7 +7,8 @@ import { playerLook } from './appearance.mjs';
 import { createCareer, confirmDraft, setClubCrest, launchCareerMatch, buyItem, recruit } from './career.mjs';
 import { importCareer, exportCareer } from './career-storage.mjs';
 import { simulateMatch } from './engine.mjs';
-import { createLeague, joinLeague, startLeague, editPreparation, leagueProjection, advanceLeague } from './online/league.mjs';
+import { createLeague, joinLeague, editPreparation, leagueProjection, advanceLeague } from './online/league.mjs';
+import { startReadyLeague as startLeague } from './test-support/online.mjs';
 import { athletePortrait } from './visuals.mjs';
 import { installTestDOM } from './test-support/dom.mjs';
 

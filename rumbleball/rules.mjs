@@ -3,6 +3,7 @@ import { ARCHETYPES, classCaps, isRunner, canUseTechnique } from './classes.mjs'
 import { isCenterBall } from './deployment.mjs';
 import { openingPlan } from './openings.mjs';
 import { damageDice } from './attack-damage.mjs';
+import { fatigueDisadvantage } from './career-rules.mjs';
 
 export const distance = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 export const sameCell = (a, b) => a.x === b.x && a.y === b.y;
@@ -33,12 +34,29 @@ export function emit(state, events, type, message, data = {}) {
   events.push({ round: state.round, phase: state.phase, actorId: state.activeId ?? null, type, message, ...data });
 }
 export function check(state, bonus, events, label, { advantage = false, disadvantage = false, playerId } = {}) {
+  disadvantage ||= fatigueDisadvantage(state, playerById(state, playerId));
   const dice = [randomInt(state, 20) + 1];
   if (advantage !== disadvantage) dice.push(randomInt(state, 20) + 1);
   const natural = dice.length === 1 ? dice[0] : advantage ? Math.max(...dice) : Math.min(...dice);
   const total = natural + bonus;
   emit(state, events, 'roll', `${label} : ${dice.join(' / ')} ${bonus >= 0 ? '+' : '−'} ${Math.abs(bonus)} = ${total}`, { dice, natural, bonus, total, ...(playerId ? { playerId } : {}) });
   return { natural, total };
+}
+// Public distributions for tactical estimates; never consume simulation RNG.
+export function d20Probability(state, player, die, advantage = false, disadvantage = false) {
+  disadvantage ||= fatigueDisadvantage(state, player);
+  return advantage === disadvantage ? 1 / 20 : advantage ? (2 * die - 1) / 400 : (41 - 2 * die) / 400;
+}
+export function d20Cdf(state, player, fraction, advantage = false) {
+  const disadvantage = fatigueDisadvantage(state, player);
+  return advantage === disadvantage ? fraction : advantage ? fraction ** 2 : 1 - (1 - fraction) ** 2;
+}
+export function attackHitChance(state, actor, target, dodging = target.dodging) {
+  const advantage = target.prone || state.aids.some(a => a.allyId === actor.id && a.kind === 'attack' && a.enemyId === target.id);
+  const disadvantage = actor.prone || dodging && !target.grappledBy;
+  let chance = 0;
+  for (let die = 1; die <= 20; die++) if (die === 20 || die !== 1 && die + actor.attack.bonus >= armorAgainst(target, actor)) chance += d20Probability(state, actor, die, advantage, disadvantage);
+  return chance;
 }
 function aided(state, actor, enemyId, kind) {
   const index = state.aids.findIndex((a) => a.allyId === actor.id && a.kind === kind && (kind !== 'attack' || a.enemyId === enemyId));
@@ -328,7 +346,7 @@ export function dealDamage(state, actor, target, amount, events) {
     emit(state, events, 'ko', `${target.name} est KO, stable et hors du match.`, { playerId: target.id });
   } else if (damage > 0 && state.ball.carrierId === target.id) {
     const dc = Math.max(10, damage);
-    const total = check(state, stat(target, 'constitution'), events, `${target.name} · tenue de balle, DD ${dc}`).total;
+    const total = check(state, stat(target, 'constitution'), events, `${target.name} · tenue de balle, DD ${dc}`, { playerId: target.id }).total;
     if (total < dc) dropBall(state, target, events, actor);
     else emit(state, events, 'hold', `${target.name} conserve la balle.`);
   }
@@ -376,7 +394,7 @@ export function performAttack(state, actor, target, events, opportunity = null, 
   dealDamage(state, actor, target, dice.reduce((a, b) => a + b, attack.flat), events);
   if (technique && target.hp > 0) {
     const dc = actor.chargeDC ?? 13;
-    const save = check(state, stat(target, 'strength'), events, `${target.name} · résister à la percussion, DD ${dc}`).total;
+    const save = check(state, stat(target, 'strength'), events, `${target.name} · résister à la percussion, DD ${dc}`, { playerId: target.id }).total;
     if (save < dc) pushAway(state, actor, target, events);
     else emit(state, events, 'hold', `${target.name} résiste à la percussion.`);
   }

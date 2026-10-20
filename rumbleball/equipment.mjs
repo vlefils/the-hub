@@ -31,8 +31,29 @@ export const CATALOGUE = {
   kinetic_implant: { name: 'Faisceau Kinetic', slot: 'implant', location: 'implant', tier: 3, appearance: 'fibers', price: 600, effect: '+1,5 m · +1 Lutte', description: 'Des fibres neuromusculaires qui combinent propulsion et puissance de préhension.', speed: 1.5, wrestling: 1 },
   reflex_implant: { name: 'Noyau Synapse', slot: 'implant', location: 'implant', tier: 3, appearance: 'interface', price: 600, effect: '+1 CA · +1 Acrobaties', description: 'Une interface réflexe pour anticiper le contact et conserver son équilibre.', armor: 1, acrobatics: 1 },
 };
-export const EQUIPMENT_TIERS = ['Dotation gratuite', 'Standard', 'Avancé', 'Élite'];
+// Long-career variants share their family's artwork and contact-safe mechanics.
+const longFamilies = {
+  knuckles: ['pulse_knuckles', 'Poings', 'knuckles'], tonfa: ['arc_tonfa', 'Tonfa', 'tonfa'],
+  bat: ['shock_bat', 'Batte', 'bat'], maul: ['gravity_maul', 'Marteau', 'maul'],
+  shield: ['aegis_shield', 'Bouclier', 'shield'], helmet: ['bastion_helmet', 'Casque', 'helmet'],
+  armor: ['bulwark_armor', 'Plastron', 'armor'], gloves: ['grapple_gloves', 'Gantelets', 'gloves'],
+  boots: ['ghost_boots', 'Bottes', 'soles'], regulator: ['regulator', 'Régulateur', 'regulator'],
+};
+for (const [tier, suffix, multiplier] of [[4, 'Prototype', 2], [5, 'Singularité', 4]]) for (const [family, [baseId, label, appearance]] of Object.entries(longFamilies)) {
+  const base = CATALOGUE[baseId], item = { ...base, name: `${label} ${suffix}`, tier, longOnly: true, appearance, artwork: baseId, price: base.price * multiplier,
+    description: `Série ${suffix} du circuit longue carrière. ${base.slot === 'weapon' ? 'Contact contondant, exclusivement non létal.' : 'Équipement de compétition du circuit supérieur.'}` };
+  if (base.die) { item.enhancement = tier - 1; item.effect = `${base.count ?? 1}d${base.die}${base.versatile ? ` · 1d${base.versatile} à deux mains` : ''} · +${item.enhancement} toucher et dégâts · ${base.hands === 2 ? 'deux mains · Force' : base.finesse ? 'légère · finesse' : 'Force'}`; }
+  else if (family === 'shield') { item.armor = tier; item.effect = `+${tier} CA · une main · un seul bouclier`; }
+  else if (family === 'helmet') { item.armor = tier - 2; item.acrobatics = tier - 3; item.effect = `+${item.armor} CA · +${item.acrobatics} Acrobaties`; }
+  else if (family === 'armor') { item.armor = tier; item.effect = `+${tier} CA · −1,5 m`; }
+  else if (family === 'gloves') { item.wrestling = tier - 1; item.effect = `+${item.wrestling} Lutte`; }
+  else if (family === 'boots') { item.acrobatics = tier - 1; item.effect = `+${item.acrobatics} Acrobaties`; }
+  else { item.participationFatigue = 1; item.recovery = tier - 3; item.effect = `Participation : +1 fatigue · récupération au repos +${item.recovery} · KO : +1 conservé`; }
+  CATALOGUE[`${family}_${suffix.toLowerCase().replace('é', 'e')}`] = item;
+}
+export const EQUIPMENT_TIERS = ['Dotation gratuite', 'Standard', 'Avancé', 'Élite', 'Prototype', 'Singularité'];
 export const equipmentTier = item => item.price === 0 ? 0 : item.tier ?? 1;
+export const equipmentAvailable = (id, mode = 'classic') => Boolean(equipmentDefinition(id)) && (!CATALOGUE[id].longOnly || mode === 'long');
 export const ARENA_WEAPON_RULE = 'Armes de contact contondantes et non létales uniquement. Armes tranchantes et perforantes interdites.';
 const need = (ok, text) => { if (!ok) throw new Error(text); };
 export const equipmentDefinition = id => typeof id === 'string' && Object.hasOwn(CATALOGUE, id) ? CATALOGUE[id] : null;

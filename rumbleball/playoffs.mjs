@@ -32,13 +32,18 @@ export const playoffFixtures = bracket => currentPlayoffRound(bracket)?.matches.
 export function playoffWinner(bracket, homeId, awayId, winnerId) {
   return winnerId ?? (bracket.seeds.indexOf(homeId) < bracket.seeds.indexOf(awayId) ? homeId : awayId);
 }
-export function settlePlayoffFixture(bracket, id, result) {
+export function validFixtureResult(result, homeId, awayId, { allowForfeit = false } = {}) {
+  if (!result || ![null, homeId, awayId].includes(result.winnerId)) return false;
+  if (result.kind === 'forfeit' || result.kind === 'double-forfeit') return allowForfeit && result.round === 0 && (result.kind === 'forfeit' ? result.winnerId !== null : result.winnerId === null);
+  return (result.kind === undefined || result.kind === 'played') && Number.isInteger(result.round) && result.round >= 1 && result.round <= 13;
+}
+export function settlePlayoffFixture(bracket, id, result, options = {}) {
   const match = playoffFixtures(bracket).find(match => match.id === id);
-  need(match && result && [null, match.homeId, match.awayId].includes(result.winnerId) && Number.isInteger(result.round) && result.round >= 1 && result.round <= 13);
-  match.result = copy(result); match.winnerId = playoffWinner(bracket, match.homeId, match.awayId, result.winnerId); match.decision = result.winnerId ? 'match' : 'ranking';
+  need(match && validFixtureResult(result, match.homeId, match.awayId, options));
+  match.result = copy(result); match.winnerId = playoffWinner(bracket, match.homeId, match.awayId, result.winnerId); match.decision = result.kind && result.kind !== 'played' ? result.kind : result.winnerId ? 'match' : 'ranking';
   return refresh(bracket);
 }
-export function validPlayoffs(bracket, ranking, id) {
+export function validPlayoffs(bracket, ranking, id, options = {}) {
   try {
     const expected = createPlayoffs(ranking, id);
     need(bracket && bracket.id === id && bracket.size === expected.size && JSON.stringify(bracket.seeds) === JSON.stringify(expected.seeds) && bracket.rounds.length === expected.rounds.length);
@@ -47,7 +52,7 @@ export function validPlayoffs(bracket, ranking, id) {
       for (let i = 0; i < round.matches.length; i++) {
         const match = round.matches[i], canonical = expected.rounds[r].matches[i];
         need(match.id === canonical.id && match.homeId === canonical.homeId && match.awayId === canonical.awayId);
-        if (match.result !== null) settlePlayoffFixture(expected, match.id, match.result);
+        if (match.result !== null) settlePlayoffFixture(expected, match.id, match.result, options);
         need(match.winnerId === canonical.winnerId && match.decision === canonical.decision);
       }
     }

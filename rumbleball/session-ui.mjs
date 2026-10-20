@@ -82,6 +82,7 @@ export async function mountSession(root, { connect = connectOnline, config = ONL
       const row = btn('', () => attempt(() => openGame(game.id))), identity = el('div'), summary = el('div');
       row.classList.add('rb-solo-entry'); row.setAttribute('aria-label', `Ouvrir la partie ${game.clubName}${game.isCopy ? ' · copie' : ''}`);
       identity.append(el('h3', '', game.clubName), el('p', 'rb-muted', game.status === 'empty' ? 'Club à créer' : game.status === 'draft' ? 'Recrutement initial en cours' : `Saison ${game.season} · ${game.completedDays} journées terminées`));
+      if (game.mode === 'long') identity.append(el('small', 'rb-solo-mode', `Carrière longue · Ligue ${game.division}/6`));
       summary.append(el('small', game.pending ? 'rb-online-lock' : 'rb-muted', game.pending ? 'Progression locale à synchroniser' : `Sauvegardé le ${date(game.updatedAt)}`));
       if (game.isCopy) summary.append(el('small', 'rb-muted', 'Copie conservée après un conflit entre appareils'));
       row.append(identity, summary, el('span', 'rb-solo-resume', 'Reprendre →')); list.append(row);

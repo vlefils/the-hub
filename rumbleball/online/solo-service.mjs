@@ -3,6 +3,7 @@ import { importCareer } from '../career-storage.mjs';
 const need = (ok, message) => { if (!ok) throw new Error(message); };
 const validId = id => typeof id === 'string' && /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(id);
 export const soloSummary = row => ({ id: row.id, revision: Number(row.revision), clubName: row.club_name ?? row.state?.clubs[0].name ?? 'Nouvelle partie',
+  mode: row.mode ?? row.state?.mode ?? 'classic', division: Number(row.division ?? row.state?.longCareer?.division) || null,
   season: row.season ?? row.state?.season ?? null, completedDays: row.completed_days ?? row.state?.completedDays ?? 0,
   status: row.status ?? row.state?.status ?? 'empty', updatedAt: row.updated_at, createdAt: row.created_at, isCopy: Boolean(row.forked_from) });
 

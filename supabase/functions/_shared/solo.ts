@@ -3,7 +3,7 @@ const checked = ({ data, error }: any) => { if (error) throw new Error(error.mes
 export const soloStore = {
   async get(ownerId: string, id: string) { return checked(await admin.from('rb_solo_saves').select('*').eq('owner_id', ownerId).eq('id', id).maybeSingle()); },
   async list(ownerId: string) {
-    return checked(await admin.from('rb_solo_saves').select('id,revision,club_name,season,completed_days,status,created_at,updated_at,forked_from').eq('owner_id', ownerId).order('updated_at', { ascending: false }));
+    return checked(await admin.from('rb_solo_saves').select('id,revision,club_name,season,completed_days,status,created_at,updated_at,forked_from,mode:state->>mode,division:state->longCareer->>division').eq('owner_id', ownerId).order('updated_at', { ascending: false }));
   },
   async commit(ownerId: string, save: any) {
     return checked(await admin.rpc('rb_commit_solo', { p_owner_id: ownerId, p_id: save.id, p_expected_revision: save.revision,

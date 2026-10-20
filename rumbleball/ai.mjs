@@ -1,12 +1,13 @@
 import {
   active, allies, armorAgainst, canReceivePass, carrier, chargeRun, collectiveOpening, distance, hasCheckHelp, hasPassCall, interceptionCandidates, legalAction, legalClassAction,
-  inside, movementView, openPassReceiver, opponents, playerById, provokesOpportunity, reachableCells, readiedPasser, shouldTakeOpportunity, skill, trajectory,
+  inside, movementView, openPassReceiver, opponents, playerById, provokesOpportunity, reachableCells, readiedPasser, shouldTakeOpportunity, skill, trajectory, d20Probability, d20Cdf, attackHitChance,
 } from './rules.mjs';
 import { isRunner, canUseTechnique } from './classes.mjs';
 import { OPENINGS, openingPlan } from './openings.mjs';
 import { isCenterBall } from './deployment.mjs';
 import { evasiveDecision, evasiveMovement } from './evasion.mjs';
 import { averageDamage } from './attack-damage.mjs';
+import { LONG_RULES } from './career-rules.mjs';
 
 const nearestDistance = (players, cell) => Math.min(12, ...players.map((p) => distance(p.position, cell)));
 const order = (a, b) => a.id.localeCompare(b.id);
@@ -129,7 +130,7 @@ export function passCompletionChance(state, actor, receiver, precision = false) 
     const total = die + skill(actor, 'acrobatics');
     if (total < dc) continue;
     const tiedOrLower = interceptor ? Math.max(0, Math.min(1, (total - skill(interceptor, 'acrobatics')) / 20)) : 1;
-    chance += (advantage ? (2 * die - 1) / 400 : 1 / 20) * (interceptAdvantage ? tiedOrLower ** 2 : tiedOrLower);
+    chance += d20Probability(state, actor, die, advantage) * d20Cdf(state, interceptor, tiedOrLower, Boolean(interceptAdvantage));
   }
   return chance;
 }
@@ -190,7 +191,7 @@ export function stripSuccessChance(state, actor, holder, exploit = false) {
     // A tie leaves possession with the defender. Helpers and class openings
     // are public state; calculating the distribution spends no dice or aid.
     const lower = Math.max(0, Math.min(1, (die + attack - defense - 1) / 20));
-    chance += (advantage ? (2 * die - 1) / 400 : 1 / 20) * (defenseAdvantage ? lower ** 2 : lower);
+    chance += d20Probability(state, actor, die, advantage) * d20Cdf(state, holder, lower, defenseAdvantage);
   }
   return chance;
 }
@@ -200,7 +201,8 @@ function possessionUntilNextTurn(state, holder) {
   for (const enemy of opponents(state, holder)) {
     if (distance(enemy.position, holder.position) > 1 || turnsUntil(state, enemy.id) >= turnsUntil(state, holder.id)) continue;
     let steal = 0;
-    for (let die = 1; die <= 20; die++) steal += Math.max(0, Math.min(1, (die + skill(enemy, 'wrestling') - defense - 1) / 20)) / 20;
+    if (state.careerRules === LONG_RULES) steal = stripSuccessChance(state, enemy, holder);
+    else for (let die = 1; die <= 20; die++) steal += Math.max(0, Math.min(1, (die + skill(enemy, 'wrestling') - defense - 1) / 20)) / 20;
     retained *= 1 - steal;
   }
   return retained;
@@ -457,7 +459,7 @@ export function decideTurn(state, actor) {
       if (task === 'cover' && distance(actor.position, enemy.position) > 1) continue;
       if (enemy.id === holder?.id) add(cell, { type: 'strip', targetId: enemy.id }, state.version >= 5 ? stripValue(here, actorHere, enemy, task, aggression)
         : 106 + skill(actor, 'wrestling') * 3 + Number(actor.role === 'retriever') * 16 + aggression * .3 + Number(plan.opening?.id === 'press') * 15);
-      const hitChance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
+      const hitChance = state.careerRules === LONG_RULES ? attackHitChance(here, actorHere, enemy) : Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
       const ko = enemy.hp <= averageDamage(actor.attack);
       const distraction = (supporting && (!danger || passingGame(state, actor)) || task === 'cover' && enemy.id !== holder?.id)
         ? actor.instruction === 'aggressive' ? 10 : passingGame(state, actor) && supporting ? 45 : 30 : 0;

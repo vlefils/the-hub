@@ -8,6 +8,7 @@ import { cellLabel } from './rules.mjs';
 import { arenaBackdrop, ballArtwork, pawnArtwork, playerPortrait, athletePortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
 import { KIT_COLORS, characterKey, readableKit, sportingWeapon, visibleGear } from './appearance.mjs';
 import { CATALOGUE } from './progression.mjs';
+import { LONG_RULES, fatigueEffect } from './career-rules.mjs';
 import { narrateTurn } from './narration.mjs';
 import { courtPoint, createCourtPlayback, nextCourtTurnDelay, ROUND_DURATION } from './playback.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
@@ -381,6 +382,7 @@ export function mountMatch(root, callbacks = {}) {
     selected.append(heading, element('p', 'rb-archetype', archetypeLabel(p)), stats,
       element('p', 'rb-muted', `${sportingWeapon(p).name} · bonus d’attaque ${signed(p.attack.bonus)} · ${damageText(p.attack)} contondants.`));
     if (p.offhandAttack) selected.append(element('p', 'rb-muted', `Seconde arme · bonus d’attaque ${signed(p.offhandAttack.bonus)} · ${damageText(p.offhandAttack)} · utilise l’action bonus après une attaque.`));
+    if (state.careerRules === LONG_RULES) selected.append(element('p', 'rb-muted', `Fatigue ${p.fatigue}/10 · ${fatigueEffect(p.fatigue, true)}`));
     const gear = visibleGear(p);
     if (gear.protection || gear.implant) selected.append(element('p', 'rb-muted', `Protection : ${CATALOGUE[gear.protection]?.name ?? 'aucune'} · Implant : ${CATALOGUE[gear.implant]?.name ?? 'aucun'}.`));
     const classCopy = element('div', 'rb-class-details');

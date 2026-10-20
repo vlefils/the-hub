@@ -1,5 +1,5 @@
 import { el, btn, money, comparison, equipmentArtwork } from './career-components.mjs';
-import { CATALOGUE, EQUIPMENT_SLOTS, equipmentAt, compatibleLocation, equipMutable, equipmentTier, EQUIPMENT_TIERS } from './equipment.mjs';
+import { CATALOGUE, EQUIPMENT_SLOTS, equipmentAt, compatibleLocation, equipMutable, equipmentTier, EQUIPMENT_TIERS, equipmentAvailable } from './equipment.mjs';
 import { compilePlayer } from './progression.mjs';
 import { managementDialog } from './management-dialog.mjs';
 import { playerShop } from './player-shop.mjs';
@@ -45,7 +45,7 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
     heading.append(equipmentArtwork(entry.itemId, ''), copy);
     const inventory = structuredClone(club.inventory);
     if (entry.inventoryId) equipMutable(inventory, entry.inventoryId, player.id, location);
-    preview.replaceChildren(heading, el('p', 'rb-muted', entry.owner), comparison(compilePlayer(player, club.inventory), compilePlayer(player, inventory)));
+    preview.replaceChildren(heading, el('p', 'rb-muted', entry.owner), comparison(compilePlayer(player, club.inventory, club), compilePlayer(player, inventory, club)));
     if (item.description) preview.append(el('p', 'rb-muted', item.description));
     if (options.locked) { preview.append(el('p', 'rb-muted', 'Équipe verrouillée · consultation uniquement.')); return; }
     if (!entry.inventoryId) { preview.append(el('p', 'rb-muted', 'Implant déjà installé. Choisissez un modèle du magasin pour le remplacer.')); return; }
@@ -77,7 +77,7 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
     ? player.implant ? [{ source: 'owned', itemId: player.implant, owner: 'Implant installé' }] : []
     : club.inventory.filter(item => compatibleLocation(item.itemId, location)).map(item => ({ source: 'owned', itemId: item.itemId, inventoryId: item.id, playerId: item.playerId,
       owner: carried?.id === item.id ? 'Équipé ici' : item.playerId === player.id ? 'Porté dans l’autre main' : item.playerId ? `Porté par ${club.players.find(p => p.id === item.playerId)?.name ?? 'un coéquipier'}` : 'Réserve du club' }));
-  const catalogue = Object.entries(CATALOGUE).filter(([id]) => compatibleLocation(id, location)).sort(([, a], [, b]) => equipmentTier(a) - equipmentTier(b) || a.price - b.price)
+  const catalogue = Object.entries(CATALOGUE).filter(([id]) => equipmentAvailable(id, club.mode) && compatibleLocation(id, location)).sort(([, a], [, b]) => equipmentTier(a) - equipmentTier(b) || a.price - b.price)
     .map(([itemId, item]) => ({ source: 'catalogue', itemId, owner: item.price === 0 ? 'Gratuit' : `${EQUIPMENT_TIERS[equipmentTier(item)]} · ${money(item.price)}` }));
   section(location === 'implant' ? 'Implant actuel' : 'Matériel du club', owned, location === 'implant' ? 'Aucun implant installé.' : 'Aucune pièce du club pour cet emplacement.');
   const free = catalogue.filter(entry => CATALOGUE[entry.itemId].price === 0);

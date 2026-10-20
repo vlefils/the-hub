@@ -1,4 +1,12 @@
 /* Layout only: the shell owns the available space; the pitch never sizes the page. */
+.rb-injury-label { display: block; color: var(--rb-bad, #ff9a87); font-weight: 600; font-size: .8rem; line-height: 1.3; }
+.rb-fatigue-meter { max-width: 100%; }
+.rb-fatigue-meter i { flex: 0 1 .65rem; min-width: 0; }
+.rb-relegation-place > :first-child { box-shadow: inset 3px 0 var(--rb-bad, #ff9a87); }
+.rb-equipment-tier-4 { filter: hue-rotate(30deg) saturate(1.15); }
+.rb-equipment-tier-5 { filter: hue-rotate(165deg) saturate(1.25); }
+.rb-solo-mode { color: var(--rb-accent); }
+.rb-career-mode-description { min-height: 3lh; }
 .rb-save-dialog { max-width: 36rem; }
 .rb-save-dialog .rb-save-actions { display: grid; gap: .75rem; }
 .rb-save-dialog .rb-save-actions > .rb-button { justify-content: start; text-align: left; }

@@ -1,9 +1,10 @@
 import {
   allies, armorAgainst, carrier, distance, hasCheckHelp, hasPassCall,
-  legalAction, openPassReceiver, opponents, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill,
+  legalAction, openPassReceiver, opponents, provokesOpportunity, reachableCells, shouldTakeOpportunity, skill, attackHitChance,
 } from './rules.mjs';
 import { canUseTechnique } from './classes.mjs';
 import { averageDamage, damageChance } from './attack-damage.mjs';
+import { LONG_RULES } from './career-rules.mjs';
 
 const delay = (state, id) => {
   const gap = state.initiative.indexOf(id) - state.turnIndex;
@@ -29,7 +30,7 @@ export function defensiveForecast(state, actor) {
       const contest = withBall ? 1 : holder?.id === enemy.id ? .1 : .35;
       for (const attack of [enemy.attack, ...(enemy.offhandAttack ? [enemy.offhandAttack] : [])]) {
         const chance = Math.max(.05, Math.min(.95, (21 + attack.bonus - armorAgainst(player, enemy)) / 20));
-        const hit = dodging && !player.grappledBy ? chance * chance : chance;
+        const hit = state.careerRules === LONG_RULES ? attackHitChance(state, { ...enemy, attack }, player, dodging) : dodging && !player.grappledBy ? chance * chance : chance;
         hits += hit * contest; damage += hit * contest * averageDamage(attack);
       }
     }
@@ -45,7 +46,7 @@ export function defensiveForecast(state, actor) {
         if (!provokesOpportunity(enemy, actor, from, to) || !shouldTakeOpportunity(state, enemy, actor)) continue;
         spent.add(enemy.id);
         const hit = Math.max(.05, Math.min(.95, (21 + enemy.attack.bonus - armorAgainst(actor, enemy)) / 20));
-        value += (dodging ? hit * hit : hit) * (state.ball.carrierId === actor.id ? 32 : 15);
+        value += (state.careerRules === LONG_RULES ? attackHitChance(state, enemy, actor, dodging) : dodging ? hit * hit : hit) * (state.ball.carrierId === actor.id ? 32 : 15);
       }
       from = to;
     }
@@ -115,7 +116,7 @@ export function evasiveDecision(state, actor, plan, passChance) {
     const positional = positionValue(actor, entry.position) - forecast.routeRisk(entry.path) - entry.cost * .1;
     for (const enemy of foes.filter((p) => distance(p.position, entry.position) <= 1)) {
       const chance = Math.max(.05, Math.min(.95, (21 + actor.attack.bonus - armorAgainst(enemy, actor)) / 20));
-      const hit = enemy.dodging && !enemy.grappledBy ? chance * chance : enemy.prone ? 1 - (1 - chance) ** 2 : chance;
+      const hit = state.careerRules === LONG_RULES ? attackHitChance(state, actor, enemy) : enemy.dodging && !enemy.grappledBy ? chance * chance : enemy.prone ? 1 - (1 - chance) ** 2 : chance;
       const damage = Math.min(enemy.hp, averageDamage(actor.attack));
       const kill = damageChance(actor.attack, enemy.hp) * hit;
       add(entry, { type: 'attack', targetId: enemy.id }, positional + damage * hit * 9 + kill * 55 + Number(focus?.id === enemy.id) * 18);

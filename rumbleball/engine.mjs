@@ -5,6 +5,7 @@ import { matchKits } from './appearance.mjs';
 import { validCrest } from './identity.mjs';
 import { CENTER, defaultDeployment, validDeployment } from './deployment.mjs';
 import { defaultOpening, openingDeployment, validOpening } from './openings.mjs';
+import { LONG_RULES, fatigueDisadvantage } from './career-rules.mjs';
 import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat, performAttack, distance } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
@@ -22,6 +23,7 @@ function centerBall(state) {
   state.ball = { carrierId: null, position: state.version >= 3 ? { ...CENTER } : { x: 5 + randomInt(state, 2), y: 3 + randomInt(state, 2) } };
 }
 export function createMatch(config = {}) {
+  if (config.careerRules !== undefined && config.careerRules !== LONG_RULES) throw new Error('Règles de carrière inconnues.');
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
   const version = [2, 3, 4, 5, 6].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
@@ -33,7 +35,7 @@ export function createMatch(config = {}) {
     if (!validDeployment(deployments[side], side)) throw new Error('Déploiement invalide : cinq cases distinctes dans la moitié de chaque équipe.');
   }
   const state = {
-    version, seed, rng: seedHash(seed), round: 1, turnIndex: 0, activeId: null,
+    version, seed, rng: seedHash(seed), ...(config.careerRules ? { careerRules: config.careerRules } : {}), round: 1, turnIndex: 0, activeId: null,
     phase: 'regular', finished: false, result: null, turns: 0, aids: [], calls: [], lastDecision: null,
     teams: [
       { id: 'home', kitColor: kits.home, ...(validCrest(config.crestIds?.home) ? { crestId: config.crestIds.home } : {}), name: config.teamNames?.home ?? 'Les Recrues', strategy: Object.hasOwn(STRATEGIES, config.strategy) ? config.strategy : 'balanced', ...(version >= 4 ? { opening: openings.home } : {}) },
@@ -61,7 +63,7 @@ export function createMatch(config = {}) {
     }),
   };
   centerBall(state);
-  for (const p of state.players) { p.initiativeDie = randomInt(state, 20) + 1; p.initiative = p.initiativeDie + stat(p, 'dexterity'); p.initiativeTie = randomInt(state, 1000000); }
+  for (const p of state.players) { p.initiativeDie = randomInt(state, 20) + 1; if (fatigueDisadvantage(state, p)) p.initiativeDie = Math.min(p.initiativeDie, randomInt(state, 20) + 1); p.initiative = p.initiativeDie + stat(p, 'dexterity'); p.initiativeTie = randomInt(state, 1000000); }
   state.initiative = [...state.players].sort((a, b) => b.initiative - a.initiative || stat(b, 'dexterity') - stat(a, 'dexterity') || a.initiativeTie - b.initiativeTie || a.id.localeCompare(b.id)).map((p) => p.id);
   assertInvariants(state);
   return state;

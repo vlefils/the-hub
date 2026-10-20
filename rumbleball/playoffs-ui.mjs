@@ -17,7 +17,7 @@ export function playoffBracket(bracket, clubs, ownId) {
         const club = clubs.find(club => club.id === id), row = el('div', `rb-playoff-team${id && id === match.winnerId ? ' is-winner' : ''}`);
         row.append(el('small', 'rb-muted', id ? `#${bracket.seeds.indexOf(id) + 1}` : '—'), el('span', '', club?.name ?? (r ? `Vainqueur de la rencontre ${i * 2 + side + 1}` : 'Exempt'))); card.append(row);
       }
-      card.append(el('small', 'rb-muted', match.decision === 'ranking' ? 'Égalité après prolongations · meilleur classement qualifié' : match.decision === 'bye' ? 'Qualification directe' : match.winnerId ? 'Terminé' : match.homeId && match.awayId ? 'À jouer' : 'En attente'));
+      card.append(el('small', 'rb-muted', match.decision === 'double-forfeit' ? 'Double forfait · meilleur classement qualifié' : match.decision === 'forfeit' ? 'Victoire par forfait' : match.decision === 'ranking' ? 'Égalité après prolongations · meilleur classement qualifié' : match.decision === 'bye' ? 'Qualification directe' : match.winnerId ? 'Terminé' : match.homeId && match.awayId ? 'À jouer' : 'En attente'));
       matches.append(card);
     }
     column.append(matches); tree.append(column);

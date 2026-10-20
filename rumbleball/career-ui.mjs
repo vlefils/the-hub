@@ -1,7 +1,7 @@
 import { ROLES, ROLE_DESCRIPTIONS, INSTRUCTIONS, STRATEGIES, STARTS } from './data.mjs';
 import { ARCHETYPES, archetypeLabel } from './classes.mjs';
-import { CATALOGUE, XP_THRESHOLDS, compilePlayer, levelOf, salary, recruitmentPrice, MAX_SQUAD_SIZE } from './progression.mjs';
-import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings, improveAbilities, careerSeasonFinished, advanceCareerPlayoffs, aiLineup } from './career.mjs';
+import { CATALOGUE, XP_THRESHOLDS, compilePlayer as compileProfile, levelOf, salary, recruitmentPrice, MAX_SQUAD_SIZE } from './progression.mjs';
+import { createCareer, confirmDraft, configureTeam, setClubColor, setClubCrest, ownedPlayers, payroll, nextFixture, managementLocked, purchaseBlock, recruit, sellPlayer, buyItem, assignProtection, sellProtection, launchCareerMatch, saveCareerTurn, nextSeason, standings, improveAbilities, careerSeasonFinished, advanceCareerPlayoffs, aiLineup, careerForfeit } from './career.mjs';
 import { CAREER_KEY, loadCareer, persistCareer, exportCareer, importCareer } from './career-storage.mjs';
 import { KIT_COLORS, clubKit } from './appearance.mjs';
 import { playerPortrait, teamCrest, athletePortrait } from './visuals.mjs';
@@ -17,7 +17,9 @@ import { managementDialog } from './management-dialog.mjs';
 import { inspectorPanels } from './player-inspector.mjs';
 import { clubOpening, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
-import { el, btn, field, select, money, signed, keyed, kitPicker, portraitIdentity, pageHeading, squadHeading, metric, table, stats, statList, xpProgress, fatigue, comparison, disclosure } from './career-components.mjs';
+import { el, btn, field, select, money, signed, keyed, kitPicker, portraitIdentity, pageHeading, squadHeading, metric, table, stats, statList, xpProgress, fatigue as playerFatigue, comparison, disclosure } from './career-components.mjs';
+import { isLongCareer, divisionOf, DIVISIONS, fatigueLimit, injured, injuryChance } from './career-rules.mjs';
+import { availablePlayers, longSeasonOutcome } from './long-career.mjs';
 function download(text, filename) {
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })), a = el('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -29,6 +31,8 @@ export function mountCareer(root, mountMatch, options = {}) {
   let active = true;
   const loaded = loadCareer(storage);
   let career = loaded.career, tab = 'Club', mode = 'career', unsaved = false, selectedPlayer = null, draftIds = new Set(), pendingImport = null;
+  const compilePlayer = (player, inventory = []) => compileProfile(player, inventory, career ?? {});
+  const fatigue = player => playerFatigue(player, career ?? {});
   let marketFilter = '', comparePlayer = null, calendarDay = null, formationUndo = null;
   let preparationShopItem, preparationSlotPlayer, preparationEquipmentSlot;
   let preparationInspectorTab = 'player';
@@ -138,7 +142,7 @@ export function mountCareer(root, mountMatch, options = {}) {
     manager.dataset.workspaceScreen = tab;
     const locked = managementLocked(career), club = career.clubs[0];
     const header = el('header', 'rb-club-header'), identity = el('div');
-    identity.append(el('p', 'rb-eyebrow', `Saison ${career.season} · ${career.playoffs ? currentPlayoffRound(career.playoffs)?.name ?? 'Saison terminée' : `${career.day}/10 journées terminées`}`), el('h3', '', club.name));
+    identity.append(el('p', 'rb-eyebrow', `${isLongCareer(career) ? `Ligue ${divisionOf(career).level}/6 · ` : ''}Saison ${career.season} · ${career.playoffs ? currentPlayoffRound(career.playoffs)?.name ?? 'Saison terminée' : `${career.day}/10 journées terminées`}`), el('h3', '', club.name));
     const finances = el('dl', 'rb-career-finances');
     const amounts = [['Solde', money(career.balance), career.balance < 0 ? 'rb-away' : ''], ['Prochains salaires', money(payroll(career)), '']];
     if (career.balance < 0) amounts.push(['Salaires impayés', money(-career.balance), 'rb-away']);
@@ -173,7 +177,7 @@ export function mountCareer(root, mountMatch, options = {}) {
       window.scrollTo?.({ top: scroll, behavior: 'instant' });
     }
   }
-  function resultLabel() { return career.current.state.result.winnerId === 'home' ? 'Victoire' : career.current.state.result.winnerId === 'away' ? 'Défaite' : 'Match nul'; }
+  function resultLabel() { const result = career.current.result ?? career.current.state.result; return result.kind === 'double-forfeit' ? 'Double forfait' : `${result.winnerId === 'home' ? 'Victoire' : result.winnerId === 'away' ? 'Défaite' : 'Match nul'}${career.current.kind === 'forfeit' ? ' par forfait' : ''}`; }
   function renderCreation() {
     const welcome = el('section', 'rb-career-welcome'), introduction = el('div', 'rb-career-introduction');
     introduction.append(el('p', 'rb-eyebrow', 'Bienvenue dans l’arène'), el('h2', '', 'Du chrome. Du contact. Un club à vous.'), el('p', '', 'Recrutez vos cinq titulaires, préparez vos tactiques et regardez-les se disputer le ballon. Deux minutes pour le tenir jusqu’à la sirène.'));
@@ -182,6 +186,10 @@ export function mountCareer(root, mountMatch, options = {}) {
     introduction.append(steps);
     const form = el('form', 'rb-career-create'), input = el('input'); input.required = true; input.maxLength = 80; input.placeholder = 'Les Rebuts du Chrome';
     form.append(el('p', 'rb-eyebrow', 'Rumbleball Manager'), el('h3', '', 'Fonder votre club'), el('p', 'rb-muted', `2 400 chromas pour vos premiers contrats. Cinq titulaires par match et jusqu’à dix joueurs dans le club. Six clubs, dix journées de groupe, puis les quatre premiers en playoffs. ${options.sync ? 'Cette partie est sauvegardée sur votre compte.' : 'Votre carrière est sauvegardée dans ce navigateur.'}`), field('Nom du club', input));
+    const careerType = select({ classic: 'Carrière classique', long: 'Carrière longue' }, 'classic'), modeDescription = el('p', 'rb-muted rb-career-mode-description');
+    careerType.setAttribute('aria-label', 'Type de carrière');
+    const describeMode = () => { modeDescription.textContent = careerType.value === 'long' ? 'Six niveaux de ligue. Les finalistes montent, les deux derniers descendent. Progression lente, fatigue sur 10, blessures et équipements Prototype / Singularité.' : 'Une ligue de six clubs, une progression rapide et des adversaires qui recrutent et s’équipent au fil des saisons.'; };
+    careerType.addEventListener('change', describeMode); describeMode(); form.append(field('Type de carrière', careerType), modeDescription);
     const color = kitPicker(KIT_COLORS[0]), preview = el('div', 'rb-kit-preview');
     const showKit = () => preview.replaceChildren(...[0, 1, 2, 4].map((profile) => playerPortrait(compilePlayer({ id: `preview-${profile}`, name: 'Aperçu', profile, xp: 0, fatigue: 0 }), color.value)));
     color.addEventListener('input', showKit); showKit(); form.append(field('Couleur des maillots', color), preview);
@@ -189,7 +197,7 @@ export function mountCareer(root, mountMatch, options = {}) {
     let replace;
     if (loaded.hasSave) { replace = el('input'); replace.type = 'checkbox'; replace.required = true; form.append(field('Remplacer la sauvegarde existante, après avoir conservé une copie si nécessaire.', replace)); }
     const submit = btn('Choisir les premières recrues', () => {}, true); submit.type = 'submit'; form.append(submit);
-    form.addEventListener('submit', (event) => { event.preventDefault(); const seed = `club-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`; update(() => setClubCrest(createCareer(input.value, seed, color.value), crest.value)); });
+    form.addEventListener('submit', (event) => { event.preventDefault(); const seed = `club-${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`; update(() => setClubCrest(createCareer(input.value, seed, color.value, { mode: careerType.value }), crest.value)); });
     welcome.append(introduction, form); manager.append(welcome);
   }
   function renderDraft() {
@@ -224,7 +232,7 @@ export function mountCareer(root, mountMatch, options = {}) {
     const positions = locked ? career.current.config.deployments?.home ?? STARTS.map(([x, y]) => ({ x, y })) : clubDeployment(career.clubs[0]);
     const deployment = deploymentEditor({ players: deploymentPlayers(), positions, color: clubKit(career.clubs[0]), disabled: locked, selectedPlayerId: career.lineup.includes(selectedPlayer) ? selectedPlayer : preparationSlotPlayer, interactivePlayers: true,
       onDropPlayer: (id, position) => attempt(() => {
-        if (locked || !ownedPlayers(career).some(p => p.id === id)) return;
+        if (locked || !ownedPlayers(career).some(p => p.id === id && !injured(p))) return;
         const occupied = deployment.value.findIndex(p => p.x === position.x && p.y === position.y), index = occupied >= 0 ? occupied : Math.max(0, career.lineup.indexOf(deployment.selectedPlayerId));
         deployment.update({ positions: moveDeployment(deployment.value, index, position) }); slotControls[index].value = id; selectedPlayer = id; commitLineup(); renderActive();
       }), onSelect: (id) => { selectedPlayer = preparationSlotPlayer = id; renderActive(); }, onChange: () => attempt(commitLineup) });
@@ -253,7 +261,7 @@ export function mountCareer(root, mountMatch, options = {}) {
         const p = ownedPlayers(career).find((p) => p.id === slotControls[index].value);
         const compiled = compilePlayer(p, career.inventory); pick.textContent = `${index + 1} · ${p.name}`; pick.title = p.name;
         row.classList.toggle('is-selected', p.id === selectedPlayer); copy.replaceChildren(athletePortrait(compiled, clubKit(career.clubs[0])), pick, el('small', 'rb-archetype', `${ARCHETYPES[compiled.archetype].name} · niv. ${compiled.level}`), fatigue(p), abilityPendingBadge(p));
-        draggablePlayer(copy.children[0], p.id, locked);
+        draggablePlayer(copy.children[0], p.id, locked || injured(p));
       }
       const target = ownedPlayers(career).find((p) => p.id === (career.lineup.includes(selectedPlayer) ? selectedPlayer : deployment.selectedPlayerId));
       bench.replaceChildren(el('h4', '', 'Banc'));
@@ -262,13 +270,13 @@ export function mountCareer(root, mountMatch, options = {}) {
       if (!reserves.length) bench.append(el('p', 'rb-muted', 'Aucun remplaçant.'));
       else bench.append(el('p', 'rb-muted', 'Disponibles'));
       for (const p of reserves) {
-        const b = keyed(blocked(btn('Faire entrer', () => { const index = Math.max(0, career.lineup.indexOf(deployment.selectedPlayerId)); slotControls[index].value = p.id; selectedPlayer = p.id; attempt(() => { commitLineup(); renderActive(); active.querySelector('select')?.focus({ preventScroll: true }); }); }), locked ? 'Rencontre en cours.' : ''), `bench-${p.id}`); b.setAttribute('aria-label', `Faire entrer ${p.name}`);
+        const b = keyed(blocked(btn('Faire entrer', () => { const index = Math.max(0, career.lineup.indexOf(deployment.selectedPlayerId)); slotControls[index].value = p.id; selectedPlayer = p.id; attempt(() => { commitLineup(); renderActive(); active.querySelector('select')?.focus({ preventScroll: true }); }); }), locked ? 'Rencontre en cours.' : injured(p) ? `Blessé : encore ${p.injuryMatches} matchs.` : ''), `bench-${p.id}`); b.setAttribute('aria-label', `Faire entrer ${p.name}`);
         const row = el('div', 'rb-bench-player'), pick = btn('', () => { selectedPlayer = p.id; renderActive(); }); pick.classList.add('rb-bench-name'); pick.setAttribute('aria-label', p.name); pick.title = `Gérer ${p.name} · statistiques, rôle et équipement`; pick.setAttribute('aria-pressed', String(selectedPlayer === p.id)); row.classList.toggle('is-selected', selectedPlayer === p.id);
-        pick.append(athletePortrait(compilePlayer(p, career.inventory), clubKit(own)), el('span', '', p.name)); draggablePlayer(pick, p.id, locked);
+        pick.append(athletePortrait(compilePlayer(p, career.inventory), clubKit(own)), el('span', '', p.name)); draggablePlayer(pick, p.id, locked || injured(p));
         b.title = `Remplace ${target.name}`;
         row.addEventListener('click', event => { if (!event.target.closest('button')) pick.click(); });
         row.addEventListener('dragover', event => { if (!locked && [...event.dataTransfer.types].includes(PLAYER_DRAG_TYPE)) event.preventDefault(); });
-        row.addEventListener('drop', event => attempt(() => { const index = career.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || index < 0) return; event.preventDefault(); slotControls[index].value = p.id; selectedPlayer = p.id; commitLineup(); renderActive(); }));
+        row.addEventListener('drop', event => attempt(() => { const index = career.lineup.indexOf(event.dataTransfer.getData(PLAYER_DRAG_TYPE)); if (locked || injured(p) || index < 0) return; event.preventDefault(); slotControls[index].value = p.id; selectedPlayer = p.id; commitLineup(); renderActive(); }));
         row.append(pick, fatigue(p), abilityPendingBadge(p), b); bench.append(row);
       }
     }
@@ -279,7 +287,7 @@ export function mountCareer(root, mountMatch, options = {}) {
       role.title = ROLE_DESCRIPTIONS[role.value];
       const compiled = compilePlayer(p, career.inventory);
       const progress = el('div', 'rb-player-status-strip'); progress.append(xpProgress(p), fatigue(p));
-      const equipment = playerEquipment({ ...own, balance: career.balance, inventory: career.inventory }, p, {
+      const equipment = playerEquipment({ ...own, mode: career.mode, balance: career.balance, inventory: career.inventory }, p, {
         locked, selectedSlot: preparationEquipmentSlot, selectedItem: preparationShopItem, onSlot: slot => { preparationEquipmentSlot = slot; preparationShopItem = undefined; }, onItem: id => { preparationShopItem = id; }, onBuy: (id, playerId, confirmed, location) => update(() => buyItem(career, id, playerId, confirmed, location)),
         onAssign: (id, playerId, location) => update(() => assignProtection(career, id, playerId, location)), onSell: id => update(() => sellProtection(career, id))
       });
@@ -288,8 +296,9 @@ export function mountCareer(root, mountMatch, options = {}) {
       const sell = blocked(btn(`Céder le joueur · ${money(recruitmentPrice(p) / 2)}`, () => showConfirmation(`Céder ${p.name} pour ${money(recruitmentPrice(p) / 2)} ? Son implant quitte le club ; son équipement retourne en réserve.`, () => update(() => sellPlayer(career, p.id)))), reason);
       inspector.replaceChildren(portraitIdentity(compiled, clubKit(own), el('h3', '', p.name), el('p', 'rb-archetype', `${archetypeLabel(compiled)}${career.lineup.includes(p.id) ? '' : ' · Banc'}`)), progress);
       const overview = [active, abilitySummary(compiled), statList(compiled)];
+      if (isLongCareer(career)) overview.unshift(el('p', injured(p) ? 'rb-injury-label' : 'rb-muted', injured(p) ? `Indisponible pour les ${p.injuryMatches} prochains matchs du club.` : `Blessure sur KO : ${(injuryChance(p.fatigue) * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} % à cette fatigue. Récupération : 1 à 4 matchs.`));
       overview.push(sell);
-      inspectorPanels(inspector, { overview, equipment: [equipment], progression: [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement({ inventory: career.inventory }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée`), techniques, playerMilestones(compiled)],
+      inspectorPanels(inspector, { overview, equipment: [equipment], progression: [el('p', 'rb-muted', compiled.pendingAbilityIncreases ? `${compiled.pendingAbilityIncreases * 2} points de caractéristiques à attribuer.` : 'Aucun point de caractéristique à répartir pour le moment.'), playerAdvancement({ inventory: career.inventory, mode: career.mode }, p, { locked, onAdvance: (id, changes) => update(() => improveAbilities(career, id, changes)) }), el('p', 'rb-muted', `${p.xp} XP cumulée · ${money(salary(p))} par journée${isLongCareer(career) ? ' · Match : +8 XP · Banc : +4 XP · Blessure / forfait : +0 XP' : ''}`), techniques, playerMilestones(compiled)],
         points: compiled.pendingAbilityIncreases * 2, selected: preparationInspectorTab, onSelect: key => { preparationInspectorTab = key; } });
       for (const control of [role, instruction]) control.addEventListener('change', () => attempt(() => { assignments[p.id] = { role: role.value, instruction: instruction.value }; commitLineup(); role.title = ROLE_DESCRIPTIONS[role.value]; }));
       refreshSlots();
@@ -308,8 +317,11 @@ export function mountCareer(root, mountMatch, options = {}) {
     preparation.append(teamControls, tactics, sidebar); form.append(preparation);
     const launch = el('div', 'rb-launch-bar'), copy = el('div');
     const finished = careerSeasonFinished(career), spectating = !fixture && !finished && career.playoffs;
+    const forfeit = !finished && !spectating && careerForfeit(career), ownForfeit = forfeit && availablePlayers(own).length < 5;
     copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : finished ? 'La saison est terminée' : spectating ? `${currentPlayoffRound(career.playoffs).name} · autres clubs` : `Après salaires : ${money(career.balance - payroll(career))}`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : finished ? 'Vous pouvez commencer la saison suivante.' : spectating ? 'Votre club ne joue pas ce tour. Aucun salaire prélevé.' : 'Primes versées après le match.'));
-    launch.append(copy, finished ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : spectating ? btn(`Simuler · ${currentPlayoffRound(career.playoffs).name}`, () => update(() => advanceCareerPlayoffs(career)), true) : blocked(btn('Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); rail.append(launch);
+    if (forfeit) copy.replaceChildren(el('strong', 'rb-injury-label', ownForfeit ? `${availablePlayers(own).length}/5 joueurs disponibles` : 'Adversaire indisponible'), el('p', 'rb-muted', ownForfeit ? 'Recrutez ou avancez par forfait pour laisser récupérer les blessés. Salaires maintenus.' : 'La victoire sera enregistrée sans jouer. Salaires maintenus, aucun gain d’XP.'));
+    if (finished && isLongCareer(career)) { const outcome = longSeasonOutcome(career); copy.replaceChildren(el('strong', '', outcome.movement === 'promotion' ? `Montée en ligue ${outcome.nextDivision}` : outcome.movement === 'relegation' ? `Descente en ligue ${outcome.nextDivision}` : `Maintien en ligue ${outcome.division}`), el('p', 'rb-muted', 'Intersaison : fatigue et blessures retirées.')); }
+    launch.append(copy, finished ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : spectating ? btn(`Simuler · ${currentPlayoffRound(career.playoffs).name}`, () => update(() => advanceCareerPlayoffs(career)), true) : blocked(btn(forfeit ? ownForfeit ? 'Déclarer forfait et avancer' : 'Enregistrer le forfait adverse' : 'Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); rail.append(launch);
     formNotice.classList.add('rb-sr-only'); rail.append(formNotice);
     if (career.current?.settled) { const summary = btn('Voir le bilan', () => go('Bilan')); summary.classList.add('rb-quiet-action'); launch.append(summary); }
     form.addEventListener('submit', (event) => event.preventDefault()); manager.append(form); renderActive();
@@ -331,8 +343,8 @@ export function mountCareer(root, mountMatch, options = {}) {
     const offers = career.market.filter((p) => !marketFilter || compilePlayer(p).archetype === marketFilter);
     for (const p of offers) {
       const row = el('section', 'rb-career-player'), compiled = compilePlayer(p);
-      row.append(portraitIdentity(compiled, clubKit(career.clubs[0]), el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled))), el('p', 'rb-muted', `Niveau ${levelOf(p)} · ${money(salary(p))} / journée · Fatigue 0/6`), abilitySummary(compiled), statList(compiled));
-      row.append(disclosure(`Comparer à ${existing.name}`, `offer-${p.id}`, el('p', 'rb-muted', `Votre joueur : niveau ${levelOf(existing)}, fatigue ${existing.fatigue}/6, équipement compris. Recrue : sans équipement et sans fatigue.`), comparison(reference, compiled, existing.implant, p.implant)));
+      row.append(portraitIdentity(compiled, clubKit(career.clubs[0]), el('h4', '', p.name), el('span', 'rb-archetype', archetypeLabel(compiled))), el('p', 'rb-muted', `Niveau ${levelOf(p)} · ${money(salary(p))} / journée · Fatigue 0/${fatigueLimit(career)}`), abilitySummary(compiled), statList(compiled));
+      row.append(disclosure(`Comparer à ${existing.name}`, `offer-${p.id}`, el('p', 'rb-muted', `Votre joueur : niveau ${levelOf(existing)}, fatigue ${existing.fatigue}/${fatigueLimit(career)}, équipement compris. Recrue : sans équipement et sans fatigue.`), comparison(reference, compiled, existing.implant, p.implant)));
       row.append(el('p', 'rb-purchase-projection', `Après contrat : ${money(career.balance - recruitmentPrice(p))} · Nouveaux salaires : ${money(payroll(career) + salary(p))} / journée.`));
       const reason = locked ? 'Rencontre en cours.' : ownedPlayers(career).length >= MAX_SQUAD_SIZE ? 'Effectif complet : dix joueurs maximum.' : purchaseBlock(career, recruitmentPrice(p));
       row.append(keyed(blocked(btn(`Recruter · ${money(recruitmentPrice(p))}`, () => update(() => recruit(career, p.id))), reason), `recruit-${p.id}`)); if (reason) row.append(el('small', 'rb-muted', reason)); list.append(row);
@@ -342,19 +354,26 @@ export function mountCareer(root, mountMatch, options = {}) {
   }
   function renderLeague() {
     const rows = standings(career), layout = el('div', 'rb-league-layout'), ranking = el('section'), calendar = el('section', 'rb-league-calendar');
-    const heading = pageHeading('La ligue', `Saison ${career.season} · Cliquez sur un club pour consulter son effectif et sa rotation.`);
+    const heading = pageHeading('La ligue', `${isLongCareer(career) ? `Ligue ${divisionOf(career).level} · ${divisionOf(career).name} · ` : ''}Saison ${career.season} · Cliquez sur un club pour consulter son effectif et sa rotation.`);
+    if (isLongCareer(career)) {
+      const leagues = btn('Les six ligues', () => {
+        modalKind = 'divisions'; modal.body.replaceChildren(table(['Ligue', 'Bots', 'Recrues', 'Victoire'], DIVISIONS.map(d => [`${d.level}. ${d.name}`, `Niv. ${d.botLevels.join('–')}`, `Niv. ${d.recruitLevels.join('–')}`, money(d.victory)]), { highlight: career.longCareer.division - 1 }), el('p', 'rb-muted', 'Les quatre premiers jouent les playoffs. Les deux finalistes montent ; les deux derniers du groupe descendent. Les adversaires gardent leurs dix joueurs, leurs niveaux et leur matériel. Le niveau des recrues dépend uniquement de la ligue.'));
+        modal.show('Carrière longue · les six ligues', leagues);
+      }); leagues.classList.add('rb-quiet-action'); heading.append(leagues);
+    }
     if (career.seasonHistory.length) { const history = btn('Historique des saisons', () => { modalKind = 'history'; renderSeasonHistory(history); }); history.classList.add('rb-quiet-action'); heading.append(history); }
     manager.append(heading);
     const clubLink = club => clubIdentity(club, { compact: true, onClick: (club, trigger) => { modalKind = 'club'; modalClubId = club.id; renderClubDetails(club, trigger); } });
-    ranking.append(el('h4', '', 'Classement · phase de groupe'), table(['Club', 'Joués', 'V', 'N', 'D', 'Points'], rows.map((r) => [clubLink(career.clubs.find(c => c.id === r.clubId)), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: rows.findIndex((r) => r.clubId === 'club'), qualifying: playoffPlaces(rows.length), caption: 'Classement de la phase de groupe. Les places qualificatives pour les playoffs sont signalées. V : victoires, N : nuls, D : défaites.' }), qualificationLegend(playoffPlaces(rows.length)),
+    ranking.append(el('h4', '', 'Classement · phase de groupe'), table(['Club', 'Joués', 'V', 'N', 'D', 'Points'], rows.map((r) => [clubLink(career.clubs.find(c => c.id === r.clubId)), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: rows.findIndex((r) => r.clubId === 'club'), qualifying: playoffPlaces(rows.length), relegating: isLongCareer(career) && career.longCareer.division > 1 ? 2 : 0, caption: 'Classement de la phase de groupe. Les places qualificatives pour les playoffs sont signalées. V : victoires, N : nuls, D : défaites.' }), qualificationLegend(playoffPlaces(rows.length)),
       el('p', 'rb-muted', 'Victoire : 3 points · nul : 1. Départage par victoires, puis ordre fixé en début de saison.'), disclosure('Primes de classement', 'league-prizes', el('p', 'rb-muted', '1er : 600 · 2e : 400 · 3e : 200 · 4e à 6e : 100 chromas.')));
+    if (isLongCareer(career)) ranking.querySelector('.rb-qualification-legend').append(` ${career.longCareer.division < 6 ? 'Les deux finalistes montent.' : 'La finale désigne le champion de la ligue maximale.'} ${career.longCareer.division > 1 ? 'Les deux derniers du groupe descendent.' : 'Aucune descente depuis la première ligue.'}`);
     calendarDay = Math.min(9, Math.max(0, calendarDay ?? career.day));
     const day = keyed(select(Object.fromEntries(career.schedule.map((_, i) => [i, `Journée ${i + 1}${i < career.day ? ' · terminée' : i === career.day ? ' · à jouer' : ''}`])), calendarDay), 'calendar-day');
     day.addEventListener('change', () => { calendarDay = Number(day.value); renderManagement(); }); calendar.append(el('h4', '', 'Calendrier'), field('Journée à consulter', day));
     for (const f of career.schedule[calendarDay]) {
       const home = career.clubs.find((c) => c.id === f.homeId), away = career.clubs.find((c) => c.id === f.awayId), own = [f.homeId, f.awayId].includes('club');
       const row = el('div', `rb-fixture-row${own ? ' is-own' : ''}`);
-      row.append(clubLink(home), clubLink(away), el('p', 'rb-muted', !f.result ? 'À jouer' : f.result.winnerId ? `Victoire : ${career.clubs.find((c) => c.id === f.result.winnerId).name}` : 'Match nul')); calendar.append(row);
+      row.append(clubLink(home), clubLink(away), el('p', 'rb-muted', !f.result ? 'À jouer' : f.result.kind === 'double-forfeit' ? 'Double forfait · aucun point' : f.result.winnerId ? `Victoire${f.result.kind === 'forfeit' ? ' par forfait' : ''} : ${career.clubs.find((c) => c.id === f.result.winnerId).name}` : 'Match nul')); calendar.append(row);
     } layout.append(ranking, calendar); manager.append(layout);
     if (career.playoffs) { layout.classList.add('has-playoffs'); layout.append(playoffBracket(career.playoffs, career.clubs, 'club')); }
   }
@@ -365,15 +384,16 @@ export function mountCareer(root, mountMatch, options = {}) {
     modal.body.append(table(['Joueur', 'Rotation', 'Niveau / XP', 'Fatigue', 'Équipement'], club.players.map(p => {
       const compiled = compilePlayer(p, inventory), equipment = inventory.filter(item => item.playerId === p.id).map(item => CATALOGUE[item.itemId]?.name);
       if (p.implant) equipment.push(CATALOGUE[p.implant]?.name);
-      return [portraitIdentity(compiled, clubKit(club), el('strong', '', p.name), el('small', 'rb-muted', ARCHETYPES[compiled.archetype].name)), lineup.includes(p.id) ? 'Titulaire' : 'Banc', `${levelOf(p)} · ${p.xp} XP`, fatigue(p), equipment.filter(Boolean).join(', ') || 'Matériel d’entraînement'];
+      return [portraitIdentity(compiled, clubKit(club), el('strong', '', p.name), el('small', 'rb-muted', ARCHETYPES[compiled.archetype].name)), injured(p) ? `Blessé · ${p.injuryMatches} matchs` : lineup.includes(p.id) ? 'Titulaire' : 'Banc', `${levelOf(p)} · ${p.xp} XP`, fatigue(p), equipment.filter(Boolean).join(', ') || 'Matériel d’entraînement'];
     }), { caption: `Effectif et rotation de ${club.name}` }));
     modal.show(`Clubs adverses et rotation · ${club.name}`, trigger);
   }
   function renderSeasonHistory(trigger) {
     modal.body.replaceChildren();
     for (const past of career.seasonHistory) {
-      const history = disclosure(`Saison ${past.season} · classement de groupe`, `season-${past.season}`, table(['Club', 'Points'], past.table.map((r, i) => [`${i + 1}. ${r.name}`, r.points]), { highlight: past.table.findIndex((r) => r.clubId === 'club') }));
-      if (past.playoffs && past.season !== career.season) history.append(playoffBracket(past.playoffs, career.clubs, 'club')); modal.body.append(history);
+      const history = disclosure(`Saison ${past.season}${past.division ? ` · ligue ${past.division}` : ''} · classement de groupe`, `season-${past.season}`, table(['Club', 'Points'], past.table.map((r, i) => [`${i + 1}. ${r.name}`, r.points]), { highlight: past.table.findIndex((r) => r.clubId === 'club') }));
+      if (past.nextDivision) history.append(el('p', 'rb-muted', past.movement === 'promotion' ? `Montée en ligue ${past.nextDivision}` : past.movement === 'relegation' ? `Descente en ligue ${past.nextDivision}` : `Maintien en ligue ${past.division}`));
+      if (past.playoffs && past.season !== career.season) history.append(playoffBracket(past.playoffs, past.table.map(r => ({ id: r.clubId, name: r.name })), 'club')); modal.body.append(history);
     }
     modal.show('Historique des saisons', trigger);
   }
@@ -397,13 +417,13 @@ export function mountCareer(root, mountMatch, options = {}) {
         for (const [key, label] of [['adrenaline', 'Adrénaline'], ['calls', 'Appels de jeu'], ['focus', 'Concentration']]) if (after.caps[key] > before.caps[key]) promotion.append(el('p', 'rb-gain', `${label} : ${before.caps[key]} → ${after.caps[key]}`));
       } panel.append(promotion);
     }
-    panel.append(table(['Joueur', 'XP gagnée', 'Niveau', 'Fatigue'], summary.progress.map((p) => {
+    panel.append(table(['Joueur', 'XP gagnée', 'Niveau', 'Fatigue', ...(isLongCareer(career) ? ['Disponibilité'] : [])], summary.progress.map((p) => {
       const owner = ownedPlayers(career).find((player) => player.id === p.playerId);
       const name = owner ? portraitIdentity(compilePlayer(owner, career.inventory), clubKit(career.clubs[0]), el('strong', '', p.name)) : p.name;
-      return [name, `+${p.xp}${p.ko ? ' · KO' : ''}`, p.level > p.beforeLevel ? `${p.beforeLevel} → ${p.level}` : p.level, `${p.beforeFatigue} → ${p.fatigue}/6`];
+      return [name, `+${p.xp}${p.ko ? ' · KO' : ''}`, p.level > p.beforeLevel ? `${p.beforeLevel} → ${p.level}` : p.level, `${p.beforeFatigue} → ${p.fatigue}/${fatigueLimit(career)}`, ...(isLongCareer(career) ? [p.newInjury ? `Blessure · ${p.newInjury} matchs` : p.injuryMatches ? `Retour dans ${p.injuryMatches} matchs` : 'Disponible'] : [])];
     })));
     panel.append(disclosure('Détail des primes et salaires', 'summary-finances', el('p', '', `Prime brute : ${money(summary.reward)} · Salaires prélevés au coup d’envoi : ${money(summary.wages)}${summary.seasonPrize ? ` · Prime de classement (${summary.rank}e) : ${money(summary.seasonPrize)}` : ''}`), el('p', 'rb-muted', `Dont ${money(summary.debtRepaid)} absorbés par les impayés. Ce remboursement est déjà compris dans le solde. Dette restante : ${money(summary.remainingDebt)}.`)));
-    const actions = el('div', 'rb-controls'); actions.append(btn(careerSeasonFinished(career) ? 'Retour au club · saison terminée' : 'Préparer la prochaine rencontre', () => go('Club'), true), btn('Faire tourner l’effectif', () => go('Club')), btn('Revoir le terrain et le fil du match · sans récompense supplémentaire', () => openMatch())); panel.append(actions); target.append(panel);
+    const actions = el('div', 'rb-controls'); actions.append(btn(careerSeasonFinished(career) ? 'Retour au club · saison terminée' : 'Préparer la prochaine rencontre', () => go('Club'), true), btn('Faire tourner l’effectif', () => go('Club'))); if (career.current.kind !== 'forfeit') actions.append(btn('Revoir le terrain et le fil du match · sans récompense supplémentaire', () => openMatch())); panel.append(actions); target.append(panel);
   }
   function showConfirmation(text, action, confirmLabel = 'Confirmer') {
     const dialog = el('dialog', 'rb-career-dialog'), actions = el('div', 'rb-controls');
@@ -417,10 +437,11 @@ export function mountCareer(root, mountMatch, options = {}) {
     attempt(() => {
       // Save the charged, frozen match before allowing the first simulated turn.
       if (unsaved && !save()) return;
-      career = launchCareerMatch(career); formationUndo = null; if (save()) openMatch(true); else renderManagement();
+      career = launchCareerMatch(career); formationUndo = null; if (save() && career.current.kind !== 'forfeit') openMatch(true); else { if (career.current.kind === 'forfeit') modalKind = 'summary'; renderManagement(); }
     });
   }
   function openMatch(autoplay = false) {
+    if (career.current?.kind === 'forfeit') return go('Bilan');
     if (unsaved && !save()) return;
     modal.close();
     workspaceHeader({ navigation: null }); manager.hidden = true; matchArea.hidden = false; matchActions.hidden = false; view.load(career.current, autoplay, { kickoff: autoplay });

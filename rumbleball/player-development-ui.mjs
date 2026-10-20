@@ -68,7 +68,7 @@ export function playerAdvancement(club, player, { locked = false, onAdvance } = 
     if (locked) preview.append(el('p', 'rb-muted', 'Équipe verrouillée. Attribuez ces points à la prochaine préparation.'));
     else if (first.value && second.value) {
       if (error) preview.append(el('p', 'rb-loss', error));
-      else { const next = structuredClone(player); applyAbilityIncrease(next, gains); preview.append(comparison(compilePlayer(player, club.inventory), compilePlayer(next, club.inventory))); }
+      else { const next = structuredClone(player); applyAbilityIncrease(next, gains); preview.append(comparison(compilePlayer(player, club.inventory, club), compilePlayer(next, club.inventory, club))); }
     }
   }
   root.append(el('h4', '', `Amélioration du niveau ${pending[0]}`), el('p', 'rb-muted', 'Deux caractéristiques différentes : +1 chacune. La même deux fois : +2. Maximum 20.'), field('Premier point', first), field('Second point', second), preview, confirm);
