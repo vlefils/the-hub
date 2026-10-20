@@ -9,7 +9,7 @@ import { validOpening } from './openings.mjs';
 import { MAX_LEVEL, XP_THRESHOLDS, levelOf, validPlayerDevelopment, ensureCareerDevelopment } from './player-development.mjs';
 import { validPlayoffs, playoffFixtures, validFixtureResult } from './playoffs.mjs';
 import { ensureCareerPlayoffs } from './career.mjs';
-import { validEquipmentInventory, equipmentAvailable } from './equipment.mjs';
+import { validEquipmentInventory, equipmentAvailable, validIssuedWeapons, ensureCareerEquipment } from './equipment.mjs';
 import { isLongCareer, fatigueLimit, LONG_RULES, divisionOf } from './career-rules.mjs';
 
 export const CAREER_KEY = 'the-hub.rumbleball.career.v1';
@@ -30,7 +30,7 @@ export function validateCareer(c) {
   check(c.mode === undefined || ['classic', 'long'].includes(c.mode));
   const long = isLongCareer(c), cap = fatigueLimit(c), playoffOptions = { allowForfeit: long };
   check(long ? c.longCareer?.version === 1 && integer(c.longCareer.division, 1) && c.longCareer.division <= 6 : c.longCareer === undefined);
-  const validInventory = (items, ids) => validEquipmentInventory(items, ids) && items.every(item => equipmentAvailable(item.itemId, c.mode));
+  const validInventory = (items, players) => validEquipmentInventory(items, players.map(p => p.id), players) && items.every(item => equipmentAvailable(item.itemId, c.mode));
   check(integer(c.balance, -Number.MAX_SAFE_INTEGER) && integer(c.season, 1) && integer(c.day) && c.day <= 10 && integer(c.completedDays));
   check(c.completedDays === (c.season - 1) * 10 + c.day);
   check(Array.isArray(c.clubs) && c.clubs.length === 6 && c.clubs[0].id === 'club');
@@ -42,6 +42,7 @@ export function validateCareer(c) {
     check(long ? integer(p.injuryMatches) && p.injuryMatches <= 4 : p.injuryMatches === undefined || p.injuryMatches === 0);
     check(Object.hasOwn(ROLES, p.role) && Object.hasOwn(INSTRUCTIONS, p.instruction));
     check(validPlayerDevelopment(p));
+    check(p.issuedWeapons === undefined || validIssuedWeapons(p.issuedWeapons));
     check(p.implant === null || CATALOGUE[p.implant]?.slot === 'implant' && equipmentAvailable(p.implant, c.mode));
     check(!playerIds.has(p.id)); playerIds.add(p.id);
   };
@@ -54,12 +55,12 @@ export function validateCareer(c) {
     check(!index && c.status === 'draft' ? club.players.length === 0 : club.players.length >= 5 && club.players.length <= MAX_SQUAD_SIZE);
     club.players.forEach(validatePlayer);
     if (long && index) {
-      check(club.players.length === 10 && validInventory(club.inventory, club.players.map(p => p.id)));
+      check(club.players.length === 10 && validInventory(club.inventory, club.players));
       check(club.players.every(p => initialLevelIn(p, divisionOf(c).botLevels)));
     }
     if (index && !long && (club.balance !== undefined || club.inventory !== undefined || club.transactions !== undefined)) {
       check(integer(club.balance, -Number.MAX_SAFE_INTEGER) && Array.isArray(club.inventory) && Array.isArray(club.transactions));
-      check(validInventory(club.inventory, club.players.map(p => p.id)));
+      check(validInventory(club.inventory, club.players));
       const entries = new Set();
       let balance = 600;
       for (const t of club.transactions) {
@@ -74,7 +75,7 @@ export function validateCareer(c) {
   if (long) check(c.market.every(p => initialLevelIn(p, divisionOf(c).recruitLevels) && p.fatigue === 0 && p.injuryMatches === 0));
   const ownedIds = c.clubs[0].players.map((p) => p.id);
   check(Array.isArray(c.lineup) && new Set(c.lineup).size === c.lineup.length && c.lineup.every((id) => ownedIds.includes(id)) && c.lineup.length === (c.status === 'draft' ? 0 : 5));
-  check(validInventory(c.inventory, ownedIds));
+  check(validInventory(c.inventory, c.clubs[0].players));
   check(Array.isArray(c.tieOrder) && c.tieOrder.length === 6 && new Set(c.tieOrder).size === 6 && c.tieOrder.every((id) => clubIds.includes(id)));
   check(Array.isArray(c.schedule) && c.schedule.length === 10);
   const fixtureIds = new Set(), pairCounts = new Map();
@@ -137,7 +138,7 @@ export function validateCareer(c) {
     if (m.settled) check(m.state.result && [null, 'home', 'away'].includes(m.state.result.winnerId) && integer(m.state.result.round, m.state.version >= 6 ? 1 : 10));
     else check(m.state.result === null);
     check(['home', 'away'].every((side) => m.state.stats?.[side] && ['passesAttempted', 'passesCompleted', 'recoveries', 'knockouts'].every((key) => integer(m.state.stats[side][key]))));
-    check([2, 3, 4, 5, 6, 7].includes(m.state.version));
+    check([2, 3, 4, 5, 6, 7, 8].includes(m.state.version));
     check(m.config.rulesVersion === undefined || m.config.rulesVersion === m.state.version);
     const initial = createMatch({ ...m.config, rulesVersion: m.state.version });
     if (m.state.version >= 4) check(m.state.teams.every((team, i) => validOpening(team.opening) && team.opening === initial.teams[i].opening));
@@ -161,7 +162,7 @@ export function importCareer(json) {
   if (typeof json !== 'string' || json.length > 8_000_000) throw new Error('Fichier JSON trop volumineux.');
   let data; try { data = JSON.parse(json); } catch { throw new Error('Ce fichier ne contient pas un JSON lisible.'); }
   if (data?.format !== 'the-hub-rumbleball' || data.version !== 1) throw new Error('Format de carrière inconnu.');
-  return ensureCareerPlayoffs(ensureCareerDevelopment(identifyCareer(validateCareer(data.career))));
+  return ensureCareerEquipment(ensureCareerPlayoffs(ensureCareerDevelopment(identifyCareer(validateCareer(data.career)))));
 }
 export function loadCareer(storage) {
   try { const raw = storage.getItem(CAREER_KEY); return { career: raw ? importCareer(raw) : null, error: null, hasSave: Boolean(raw) }; }

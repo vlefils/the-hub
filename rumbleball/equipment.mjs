@@ -1,3 +1,5 @@
+import { PROFILES } from './data.mjs';
+
 export const EQUIPMENT_SLOTS = { head: 'Tête', torso: 'Torse', gloves: 'Gants', feet: 'Bottes', implant: 'Implant', rightHand: 'Main droite', leftHand: 'Main gauche' };
 export const HAND_SLOTS = ['rightHand', 'leftHand'];
 export const CATALOGUE = {
@@ -60,14 +62,57 @@ export const equipmentDefinition = id => typeof id === 'string' && Object.hasOwn
 export const itemLocation = item => equipmentDefinition(item.itemId)?.slot === 'weapon' ? item.location ?? 'rightHand' : equipmentDefinition(item.itemId)?.location;
 export const compatibleLocation = (id, location) => Boolean(equipmentDefinition(id)) && (CATALOGUE[id].slot === 'weapon' ? HAND_SLOTS.includes(location) : CATALOGUE[id].location === location);
 export const occupiedSlots = (item, location = itemLocation(item)) => equipmentDefinition(item.itemId)?.hands === 2 ? HAND_SLOTS : [location];
-export function equippedItems(player, inventory = []) { return inventory.filter(item => item.playerId === player.id); }
+export const isIssuedWeapon = id => equipmentDefinition(id)?.slot === 'weapon' && CATALOGUE[id].price === 0;
+export const defaultIssuedWeapons = player => ({ rightHand: PROFILES[player.profile]?.archetype === 'belier' ? 'maul' : 'tonfa', leftHand: null });
+function initialIssuedWeapons(player, inventory) {
+  const held = inventory.filter(item => item.playerId === player.id && CATALOGUE[item.itemId]?.slot === 'weapon');
+  if (!held.length) return PROFILES[player.profile] ? defaultIssuedWeapons(player) : { rightHand: null, leftHand: null };
+  return Object.fromEntries(HAND_SLOTS.map(slot => [slot, held.find(item => isIssuedWeapon(item.itemId) && itemLocation(item) === slot)?.itemId ?? null]));
+}
+export function validIssuedWeapons(weapons) {
+  if (!weapons || typeof weapons !== 'object' || Array.isArray(weapons) || Object.keys(weapons).length !== 2 || !HAND_SLOTS.every(slot => Object.hasOwn(weapons, slot) && (weapons[slot] === null || isIssuedWeapon(weapons[slot])))) return false;
+  const held = HAND_SLOTS.map(slot => weapons[slot]).filter(Boolean);
+  return !(held.length > 1 && (held.some(id => CATALOGUE[id].hands === 2) || held.every(id => CATALOGUE[id].shield)));
+}
+export function ensureClubEquipment(club, market = [], inventory = club.inventory ?? []) {
+  for (const p of [...club.players, ...market]) p.issuedWeapons ??= initialIssuedWeapons(p, inventory);
+  // Legacy free copies become personal choices, never a finite club reserve.
+  for (let i = inventory.length - 1; i >= 0; i--) if (isIssuedWeapon(inventory[i].itemId)) inventory.splice(i, 1);
+  return club;
+}
+export function ensureCareerEquipment(career) {
+  for (const [i, club] of career.clubs.entries()) ensureClubEquipment(club, i === 0 ? career.market : [], i === 0 ? career.inventory : club.inventory ?? []);
+  return career;
+}
+export function issuedEquipment(player, inventory = []) {
+  const choices = player.issuedWeapons ?? initialIssuedWeapons(player, inventory);
+  return HAND_SLOTS.filter(slot => choices[slot]).map(slot => ({ id: `issued:${player.id}:${slot}`, itemId: choices[slot], playerId: player.id, location: slot, issued: true }));
+}
+export function equippedItems(player, inventory = []) {
+  const owned = inventory.filter(item => item.playerId === player.id);
+  const issued = issuedEquipment(player, inventory).filter(item => !owned.some(old => occupiedSlots(old).some(slot => occupiedSlots(item).includes(slot)) || CATALOGUE[old.itemId]?.shield && CATALOGUE[item.itemId]?.shield));
+  return [...owned, ...issued];
+}
 export function equipmentAt(player, inventory, location) {
   return equippedItems(player, inventory).find(item => occupiedSlots(item).includes(location)) ?? null;
 }
-export function equipMutable(inventory, id, playerId, location) {
+function clearIssuedSlots(player, inventory, slots, shield = false) {
+  player.issuedWeapons ??= initialIssuedWeapons(player, inventory);
+  for (const item of issuedEquipment(player, inventory)) if (occupiedSlots(item).some(slot => slots.includes(slot)) || shield && CATALOGUE[item.itemId].shield) player.issuedWeapons[item.location] = null;
+}
+export function equipIssuedWeapon(player, inventory, itemId, location = 'rightHand') {
+  need(isIssuedWeapon(itemId), 'Arme de dotation inconnue.'); need(HAND_SLOTS.includes(location), 'Emplacement incompatible.');
+  const item = { itemId, location }, slots = occupiedSlots(item), shield = CATALOGUE[itemId].shield;
+  clearIssuedSlots(player, inventory, slots, shield);
+  for (const old of inventory) if (old.playerId === player.id && (occupiedSlots(old).some(slot => slots.includes(slot)) || shield && CATALOGUE[old.itemId]?.shield)) old.playerId = null;
+  player.issuedWeapons[location] = itemId;
+}
+export function removeIssuedWeapon(player, inventory, location) { clearIssuedSlots(player, inventory, [location]); }
+export function equipMutable(inventory, id, playerId, location, player) {
   const item = inventory.find(item => item.id === id), definition = equipmentDefinition(item?.itemId);
   need(definition && definition.slot !== 'implant', 'Équipement inconnu.');
   const target = location ?? itemLocation(item); need(compatibleLocation(item.itemId, target), 'Emplacement incompatible.');
+  if (playerId !== null && player) clearIssuedSlots(player, inventory, occupiedSlots(item, target), definition.shield);
   if (playerId !== null) for (const old of inventory) if (old.id !== id && old.playerId === playerId && (occupiedSlots(old).some(slot => occupiedSlots(item, target).includes(slot)) || definition.shield && CATALOGUE[old.itemId]?.shield)) old.playerId = null;
   item.playerId = playerId; if (definition.slot === 'weapon') item.location = target;
   return item;
@@ -76,10 +121,11 @@ export function previewEquipment(player, inventory, itemId, location) {
   const next = structuredClone(player), items = structuredClone(inventory ?? []);
   need(equipmentDefinition(itemId), 'Équipement inconnu.');
   if (CATALOGUE[itemId].slot === 'implant') next.implant = itemId;
-  else { let id = '__preview__'; while (items.some(item => item.id === id)) id += '_'; items.push({ id, itemId, playerId: null }); equipMutable(items, id, player.id, location); }
+  else if (isIssuedWeapon(itemId)) equipIssuedWeapon(next, items, itemId, location);
+  else { let id = '__preview__'; while (items.some(item => item.id === id)) id += '_'; items.push({ id, itemId, playerId: null }); equipMutable(items, id, player.id, location, next); }
   return { player: next, inventory: items };
 }
-export function validEquipmentInventory(inventory, playerIds) {
+export function validEquipmentInventory(inventory, playerIds, players = []) {
   if (!Array.isArray(inventory)) return false;
   const ids = new Set(), occupied = new Set(), shields = new Set();
   for (const item of inventory) {
@@ -90,6 +136,13 @@ export function validEquipmentInventory(inventory, playerIds) {
     if (item.playerId !== null) {
       for (const slot of occupiedSlots(item)) { const key = `${item.playerId}:${slot}`; if (occupied.has(key)) return false; occupied.add(key); }
       if (definition.shield) { if (shields.has(item.playerId)) return false; shields.add(item.playerId); }
+    }
+  }
+  for (const p of players) if (p.issuedWeapons !== undefined) {
+    if (!validIssuedWeapons(p.issuedWeapons)) return false;
+    for (const item of issuedEquipment(p)) {
+      for (const slot of occupiedSlots(item)) { const key = `${p.id}:${slot}`; if (occupied.has(key)) return false; occupied.add(key); }
+      if (CATALOGUE[item.itemId].shield) { if (shields.has(p.id)) return false; shields.add(p.id); }
     }
   }
   return true;

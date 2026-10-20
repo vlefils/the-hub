@@ -1,4 +1,4 @@
-import { PROFILES, clone, modifier } from './data.mjs';
+import { PROFILES, CLASS_SPEEDS, clone, modifier } from './data.mjs';
 import { classCaps } from './classes.mjs';
 import { MAX_LEVEL, XP_THRESHOLDS, levelOf, proficiencyBonus, effectiveAbilities, fatigueRecovery, ensurePlayerDevelopment, pendingAbilityLevels } from './player-development.mjs';
 import { CATALOGUE, equippedItems, itemLocation } from './equipment.mjs';
@@ -13,6 +13,7 @@ export const salary = (p) => 15 + 5 * (levelOf(p) - 1);
 export function compilePlayer(player, inventory = [], policy = {}) {
   const base = clone(PROFILES[player.profile]);
   if (!base) throw new Error('Profil de joueur inconnu.');
+  base.speed = CLASS_SPEEDS[base.archetype];
   const level = levelOf(player), tiers = Number(level >= 3) + Number(level >= 5), abilities = effectiveAbilities(player), mastery = proficiencyBonus(level);
   const result = { ...base, name: player.name, playerId: player.id, level, ...(player.portraitId ? { portraitId: player.portraitId } : {}),
     role: player.role, instruction: player.instruction, fatigue: player.fatigue, abilities, proficiencyBonus: mastery, recovery: fatigueRecovery(player) + (CATALOGUE[player.implant]?.recovery ?? 0), pendingAbilityIncreases: pendingAbilityLevels(player).length };
@@ -38,6 +39,11 @@ export function compilePlayer(player, inventory = [], policy = {}) {
   }
   const weapons = worn.filter(item => CATALOGUE[item.itemId]?.die), main = weapons.find(item => itemLocation(item) === 'rightHand') ?? weapons[0], secondary = weapons.find(item => item !== main);
   result.offhandAttack = null;
+  if (!main) {
+    const attackMod = modifier(Math.max(abilities.strength, abilities.dexterity));
+    result.attack = { bonus: attackMod + mastery, die: 4, flat: attackMod };
+    result.weapon = { id: 'knuckles', name: CATALOGUE.knuckles.name };
+  }
   if (main) {
     const weapon = CATALOGUE[main.itemId], attackMod = modifier(weapon.finesse ? Math.max(abilities.strength, abilities.dexterity) : abilities.strength);
     const other = worn.find(item => CATALOGUE[item.itemId]?.slot === 'weapon' && item !== main);

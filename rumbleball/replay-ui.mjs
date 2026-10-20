@@ -3,7 +3,8 @@ import { el, btn, field, select } from './career-components.mjs';
 // Recorded server frames only: replay controls never resolve a game turn.
 export function mountReplay(root, replay, mountMatch) {
   root.replaceChildren();
-  const controls = el('div', 'rb-controls rb-replay-controls'), matchRoot = el('div');
+  root.classList.add('rb-replay-player');
+  const controls = el('div', 'rb-controls rb-replay-controls'), matchRoot = el('div', 'rb-replay-match');
   const status = el('p', 'rb-form-status'); status.setAttribute('role', 'status');
   const speed = select({ 1: '×1', 2: '×2', 4: '×4', 8: '×8' }, 1);
   const cursor = el('input'); cursor.type = 'range'; cursor.min = -1; cursor.max = replay.rounds.length - 1; cursor.step = 1;
@@ -17,8 +18,10 @@ export function mountReplay(root, replay, mountMatch) {
   const next = btn('Round suivant', () => { pause(); advance(false); });
   const beginning = btn('Revenir au début', () => { pause(); index = -1; show(false); });
   controls.append(play, next, beginning, field('Vitesse du replay', speed));
-  root.append(controls, field('Parcourir les rounds', cursor), status, matchRoot);
+  const toolbar = el('div', 'rb-replay-toolbar'); toolbar.append(controls, field('Parcourir les rounds', cursor), status);
+  root.append(matchRoot);
   const view = mountMatch(matchRoot);
+  if (view.setPlaybackControls) view.setPlaybackControls(toolbar); else root.prepend(toolbar);
   function show(animate) {
     const round = replay.rounds[index];
     view.broadcast({ initial: replay.initial, turns: round?.turns ?? [], previousEvents: replay.rounds.slice(0, Math.max(0, index)).flatMap(r => r.turns.map(t => t.events)) }, 0, { speed: Number(speed.value), animate });

@@ -1,10 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createMatch } from './engine.mjs';
+import { createMatch, stepMatch } from './engine.mjs';
 import { createCareer, confirmDraft } from './career.mjs';
 import { CAREER_KEY, exportCareer } from './career-storage.mjs';
 import { mountCareer } from './career-ui.mjs';
 import { environment, descendants, button, classNode } from './test-support/dom.mjs';
+
+function endOfRound(initial) {
+  let state = initial;
+  while (!state.finished && state.round === initial.round) state = stepMatch(state, { stopAtRoundEnd: true }).state;
+  return state;
+}
 
 // Drive presentation time and autoplay separately from the engine, without a browser.
 function clock(t) {
@@ -103,14 +109,15 @@ test('carrière : sauvegarde après chaque tour du lot, arrêt sur erreur interm
   assert.match(classNode(e.root, 'rb-error').textContent, /non enregistrée/);
   await button(e.root, 'Retour au club · mettre en pause').click(); await button(e.root, 'Réessayer la sauvegarde').click();
   assert.equal(e.saved().current.state.turns, 3);
+  const expected = endOfRound(e.saved().current.state);
   await button(e.root, 'Reprendre la rencontre').click(); await button(e.root, 'Round suivant').click();
-  const resumed = e.saved(); assert.equal(resumed.current.state.round, 2); assert.equal(resumed.current.state.turns, 10);
-  assert.equal(resumed.current.turns.length, 10); assert.equal(resumed.transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
+  const resumed = e.saved(); assert.equal(resumed.current.state.round, 2); assert.deepEqual(resumed.current.state, expected);
+  assert.equal(resumed.current.turns.length, expected.turns); assert.equal(resumed.transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
   assert.equal(resumed.transactions.filter((t) => t.label === 'Prime de match').length, 0);
   await button(e.root, 'Retour au club · mettre en pause').click();
   const reloaded = environment(e.storage.getItem(CAREER_KEY)); mountCareer(reloaded.root, mountMatch);
   await button(reloaded.root, 'Reprendre la rencontre').click();
-  assert.match(classNode(reloaded.root, 'rb-playback-status').textContent, /Pause · round 2/); assert.equal(reloaded.saved().current.turns.length, 10);
+  assert.match(classNode(reloaded.root, 'rb-playback-status').textContent, /Pause · round 2/); assert.equal(reloaded.saved().current.turns.length, expected.turns);
 });
 
 test('coup d’envoi : 3, 2, 1, START puis arrivée au centre sans consommer de temps de jeu ni de jets', async (t) => {
@@ -186,7 +193,8 @@ test('carrière : intro seulement au lancement, animations réduites et reprise 
   await button(reloaded.root, 'Reprendre la rencontre').click();
   assert.equal(classNode(reloaded.root, 'rb-kickoff').hidden, true); assert.equal(c.timers.size, 0);
   assert.equal(reloaded.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 1);
+  const expected = endOfRound(reloaded.saved().current.state);
   await button(reloaded.root, 'Reprendre').click(); c.elapse(0);
-  assert.equal(reloaded.saved().current.state.turns, 10); assert.equal(classNode(reloaded.root, 'rb-kickoff').hidden, true);
+  assert.deepEqual(reloaded.saved().current.state, expected); assert.equal(classNode(reloaded.root, 'rb-kickoff').hidden, true);
   await button(reloaded.root, 'Retour au club · mettre en pause').click();
 });

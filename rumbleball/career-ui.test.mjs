@@ -173,7 +173,7 @@ test('caractéristiques UI : visibles avant contrat et dans la modale de recrute
   for (const check of descendants(candidates).filter(n => n.type === 'checkbox').slice(0, 5)) { check.checked = true; await check.emit('change'); }
   await button(e.root, 'Valider les contrats').click();
   await button(e.root, 'Recruter un joueur').click();
-  const dialog = classNode(e.root, 'rb-management-dialog');
+  const dialog = classNode(e.root, 'rb-career-management-dialog');
   assert.equal(dialog.querySelectorAll('.rb-ability-scores').length, 7); assert.match(dialog.textContent, /Récupération sur le banc/);
 });
 
@@ -263,8 +263,8 @@ test('banc de cinq : sélectionner et gérer le dernier remplaçant sans modifie
   assert.equal(e.saved().clubs[0].players[9].role, 'defender'); assert.equal(e.saved().clubs[0].players[9].instruction, 'cautious');
   await button(classNode(e.root, 'rb-player-inspector'), 'Acheter et équiper · 100 chromas').click();
   assert.equal(e.saved().inventory[0].playerId, reserve.id); assert.deepEqual(e.saved().lineup, c.lineup);
-  await button(e.root, 'Recruter un joueur').click(); assert.match(classNode(e.root, 'rb-management-dialog').textContent, /10\/10 places/);
-  assert.ok(descendants(classNode(e.root, 'rb-management-dialog')).filter(n => n.dataset.focusKey?.startsWith('recruit-')).every(n => n.disabled));
+  await button(e.root, 'Recruter un joueur').click(); assert.match(classNode(e.root, 'rb-career-management-dialog').textContent, /10\/10 places/);
+  assert.ok(descendants(classNode(e.root, 'rb-career-management-dialog')).filter(n => n.dataset.focusKey?.startsWith('recruit-')).every(n => n.disabled));
 });
 
 test('Ligue : club cliquable, effectif et rotation en modale, fermeture sans mutation', async () => {
@@ -272,7 +272,7 @@ test('Ligue : club cliquable, effectif et rotation en modale, fermeture sans mut
   const e = environment(exportCareer(c)); mountCareer(e.root, (await import('./ui.mjs')).mountMatch); await button(e.root, 'Ligue').click();
   assert.equal(descendants(e.root).some(n => n.dataset.sectionKey === 'league-opponents'), false);
   const trigger = button(e.root, `Voir le club ${opponent.name}`), before = e.storage.getItem(CAREER_KEY); trigger.focus(); await trigger.click();
-  const dialog = classNode(e.root, 'rb-management-dialog'); assert.equal(dialog.open, true); assert.match(dialog.textContent, /Clubs adverses et rotation/);
+  const dialog = classNode(e.root, 'rb-career-management-dialog'); assert.equal(dialog.open, true); assert.match(dialog.textContent, /Clubs adverses et rotation/);
   assert.match(dialog.textContent, /Titulaire/); assert.match(dialog.textContent, /Banc/); assert.match(dialog.textContent, /Équipement/);
   for (const player of opponent.players) assert.ok(dialog.textContent.includes(player.name));
   await dialog.emit('cancel'); assert.equal(dialog.hidden, true); assert.equal(document.activeElement, trigger); assert.equal(e.storage.getItem(CAREER_KEY), before);
@@ -294,7 +294,7 @@ test('recrutement solo : modale depuis la liste, arrivée sur le banc et fermetu
   const e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
   const offer = c.market[0], lineup = [...c.lineup], balance = c.balance;
   await button(e.root, 'Recruter un joueur').click();
-  const dialog = classNode(e.root, 'rb-management-dialog'); assert.equal(dialog.hidden, false); assert.equal(dialog.open, true);
+  const dialog = classNode(e.root, 'rb-career-management-dialog'); assert.equal(dialog.hidden, false); assert.equal(dialog.open, true);
   await descendants(dialog).find(n => n.dataset.focusKey === `recruit-${offer.id}`).click();
   assert.equal(e.saved().clubs[0].players.length, 6); assert.equal(e.saved().balance, balance - 300); assert.deepEqual(e.saved().lineup, lineup);
   const bench = classNode(e.root, 'rb-bench'); assert.ok(classNode(e.root, 'rb-preparation-rail').contains(bench)); assert.match(bench.textContent, new RegExp(offer.name));
@@ -321,8 +321,8 @@ test('journées : bilan dédié, résumé compact et nouvelle préparation sans 
     await button(e.root, day === 1 ? 'Club' : 'Préparer la prochaine rencontre').click(); await button(e.root, 'Lancer la rencontre').click();
     await button(e.root, 'Voir le résultat').click(); await button(e.root, 'Voir le bilan de la journée').click();
     assert.equal(e.saved().day, day); assert.ok(classNode(e.root, 'rb-career-summary'));
-    const balance = e.saved().balance; assert.equal(classNode(e.root, 'rb-management-dialog').hidden, false); await button(e.root, 'Fermer').click();
-    assert.equal(classNode(e.root, 'rb-management-dialog').hidden, true); assert.ok(classNode(e.root, 'rb-lineup-form'));
+    const balance = e.saved().balance, dialog = classNode(e.root, 'rb-career-management-dialog'); assert.equal(dialog.hidden, false); await button(dialog, 'Fermer').click();
+    assert.equal(dialog.hidden, true); assert.ok(classNode(e.root, 'rb-lineup-form'));
     await button(e.root, 'Voir le bilan').click(); assert.equal(e.saved().balance, balance);
   }
   assert.equal(e.saved().transactions.filter((t) => t.label === 'Salaires de la journée').length, 2);

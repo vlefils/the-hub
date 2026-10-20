@@ -44,8 +44,9 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
     copy.append(el('small', 'rb-muted', EQUIPMENT_TIERS[equipmentTier(item)]), el('h3', '', item.name), el('p', '', item.effect));
     heading.append(equipmentArtwork(entry.itemId, ''), copy);
     const inventory = structuredClone(club.inventory);
-    if (entry.inventoryId) equipMutable(inventory, entry.inventoryId, player.id, location);
-    preview.replaceChildren(heading, el('p', 'rb-muted', entry.owner), comparison(compilePlayer(player, club.inventory, club), compilePlayer(player, inventory, club)));
+    const after = structuredClone(player);
+    if (entry.inventoryId) equipMutable(inventory, entry.inventoryId, player.id, location, after);
+    preview.replaceChildren(heading, el('p', 'rb-muted', entry.owner), comparison(compilePlayer(player, club.inventory, club), compilePlayer(after, inventory, club)));
     if (item.description) preview.append(el('p', 'rb-muted', item.description));
     if (options.locked) { preview.append(el('p', 'rb-muted', 'Équipe verrouillée · consultation uniquement.')); return; }
     if (!entry.inventoryId) { preview.append(el('p', 'rb-muted', 'Implant déjà installé. Choisissez un modèle du magasin pour le remplacer.')); return; }
@@ -75,16 +76,16 @@ export function equipmentDialog(host, club, player, location, options, trigger) 
   }
   const owned = location === 'implant'
     ? player.implant ? [{ source: 'owned', itemId: player.implant, owner: 'Implant installé' }] : []
-    : club.inventory.filter(item => compatibleLocation(item.itemId, location)).map(item => ({ source: 'owned', itemId: item.itemId, inventoryId: item.id, playerId: item.playerId,
+    : club.inventory.filter(item => CATALOGUE[item.itemId].price > 0 && compatibleLocation(item.itemId, location)).map(item => ({ source: 'owned', itemId: item.itemId, inventoryId: item.id, playerId: item.playerId,
       owner: carried?.id === item.id ? 'Équipé ici' : item.playerId === player.id ? 'Porté dans l’autre main' : item.playerId ? `Porté par ${club.players.find(p => p.id === item.playerId)?.name ?? 'un coéquipier'}` : 'Réserve du club' }));
   const catalogue = Object.entries(CATALOGUE).filter(([id]) => equipmentAvailable(id, club.mode) && compatibleLocation(id, location)).sort(([, a], [, b]) => equipmentTier(a) - equipmentTier(b) || a.price - b.price)
-    .map(([itemId, item]) => ({ source: 'catalogue', itemId, owner: item.price === 0 ? 'Gratuit' : `${EQUIPMENT_TIERS[equipmentTier(item)]} · ${money(item.price)}` }));
+    .map(([itemId, item]) => ({ source: 'catalogue', itemId, owner: item.price === 0 ? carried?.itemId === itemId ? 'Équipé · gratuit et illimité' : 'Gratuit · disponible à volonté' : `${EQUIPMENT_TIERS[equipmentTier(item)]} · ${money(item.price)}` }));
   section(location === 'implant' ? 'Implant actuel' : 'Matériel du club', owned, location === 'implant' ? 'Aucun implant installé.' : 'Aucune pièce du club pour cet emplacement.');
   const free = catalogue.filter(entry => CATALOGUE[entry.itemId].price === 0);
-  if (free.length) section('Dotation gratuite', free);
+  if (free.length) section('Dotation gratuite · illimitée', free);
   section('Magasin', catalogue.filter(entry => CATALOGUE[entry.itemId].price > 0), 'Aucun modèle payant pour cet emplacement.');
   layout.append(collection, preview); modal.body.append(budget, layout);
-  choose(entries.find(entry => entry.itemId === options.selectedItem) ?? entries.find(entry => entry.inventoryId === carried?.id && entry.inventoryId) ?? entries[0]);
+  choose(entries.find(entry => entry.itemId === options.selectedItem) ?? entries.find(entry => entry.inventoryId === carried?.id && entry.inventoryId || entry.source === 'catalogue' && carried?.issued && entry.itemId === carried.itemId) ?? entries[0]);
   modal.show(`${EQUIPMENT_SLOTS[location]} · équipement`, trigger);
   return modal;
 }

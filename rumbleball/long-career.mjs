@@ -3,7 +3,7 @@ import { XP_THRESHOLDS, ensurePlayerDevelopment, automaticAbilityIncreases } fro
 import { identifyClub, cosmeticHash } from './identity.mjs';
 import { KIT_COLORS } from './appearance.mjs';
 import { openingDeployment } from './openings.mjs';
-import { CATALOGUE, equipMutable } from './equipment.mjs';
+import { CATALOGUE, equipMutable, ensureClubEquipment } from './equipment.mjs';
 import { DIVISIONS, injured, injuryChance, isLongCareer } from './career-rules.mjs';
 
 const CLUB_NAMES = [
@@ -48,7 +48,7 @@ export function createLongOpponents(seed, division) {
         role: PROFILES[profile].role, instruction: index === 1 ? 'aggressive' : 'normal', implant: null }, `${seed}:${id}`);
       automaticAbilityIncreases(p); equipmentFor(club, p, ranged(`${seed}:${id}:gear`, rules.gear)); return p;
     });
-    return identifyClub(club, `${seed}:${club.id}`);
+    return ensureClubEquipment(identifyClub(club, `${seed}:${club.id}`));
   });
 }
 export function applyInjury(career, player, fixtureId, fatigue) {

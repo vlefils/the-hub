@@ -25,7 +25,7 @@ test('création : choix du mode longue carrière, recrutement initial et divisio
   await button(e.root, 'Valider les contrats').click();
   assert.equal(e.saved().mode, 'long'); assert.match(e.root.textContent, /Ligue 1\/6/); assert.match(e.root.textContent, /Fatigue 0\/10/);
   await button(e.root, 'Ligue').click(); assert.match(e.root.textContent, /Les deux finalistes montent/);
-  await button(e.root, 'Les six ligues').click(); assert.match(e.root.querySelector('.rb-management-dialog').textContent, /Ligue Singularité/);
+  await button(e.root, 'Les six ligues').click(); assert.match(e.root.querySelector('.rb-career-management-dialog').textContent, /Ligue Singularité/);
   assert.equal(view.loads, 0); mounted.stop();
 });
 test('blessé sur le banc : fiche et magasin accessibles, entrée dans la composition désactivée', async () => {

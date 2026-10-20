@@ -10,6 +10,7 @@ import { clubDeployment } from '../deployment.mjs';
 import { clubOpening } from '../openings.mjs';
 import { ensureClubDevelopment, automaticAbilityIncreases, XP_THRESHOLDS, MAX_LEVEL } from '../player-development.mjs';
 import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture, playoffWinner } from '../playoffs.mjs';
+import { ensureClubEquipment } from '../equipment.mjs';
 
 export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: 3500 });
 export const MAX_LEAGUE_CLUBS = 128;
@@ -180,11 +181,7 @@ function prepareBot(s, bot) {
       for (const p of c.players) automaticAbilityIncreases(p);
     }
   }
-  // Free club-issued blunt weapons follow the same inventory rules as human purchases.
-  for (const p of c.players) if (!c.inventory.some(item => item.playerId === p.id && ['rightHand', 'leftHand'].includes(item.location))) {
-    const issued = buyItem(careerView(c, s.completedDays % 10), PROFILES[p.profile].archetype === 'belier' ? 'maul' : 'tonfa', p.id, false, 'rightHand');
-    c.inventory = issued.inventory; c.transactions = issued.transactions;
-  }
+  ensureClubEquipment(c, c.market);
   equipAiClub(c, s.completedDays + 1, (amount, label) => transaction(c, amount, label, `bot-gear-${s.completedDays}-${c.transactions.length}`));
   c.lineup = aiLineup(c); bot.club = c;
 }
@@ -289,6 +286,7 @@ export function replayProjection(s, userId, matchId, archive, now) {
 export function leagueProjection(s, userId, now) {
   const member = s.members.find((m) => m.userId === userId); need(member, 'Accès réservé aux participants.');
   const ownClub = copy(member.draft ?? member.club);
+  ensureClubEquipment(ownClub, ownClub.market);
   identifyClub(ownClub, `${s.id}:${userId}`, ownClub.market);
   ensureClubDevelopment(ownClub, `${s.id}:${userId}`);
   const t = instant(now), night = s.night;

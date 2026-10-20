@@ -47,7 +47,7 @@ test('progression du livre : douze niveaux, maîtrise aux niveaux 4/7/10 et amé
 test('compilation : caractéristiques, maîtrise entraînée, PV de classe, CA et réserves', () => {
   const p = player(1, 90), compiled = compilePlayer(p);
   assert.equal(compiled.maxHp, 41); assert.equal(compiled.armor, 11);
-  assert.deepEqual(compiled.attack, { bonus: 5, die: 8, flat: 2 });
+  assert.deepEqual(compiled.attack, { bonus: 5, die: 6, count: 2, flat: 2 });
   assert.deepEqual(compiled.skills, { wrestling: 5, athletics: 5, acrobatics: 1 });
   assert.equal(compiled.chargeDC, 13); assert.equal(compiled.caps.adrenaline, 8);
   assert.equal(compiled.proficiencyBonus, 3); assert.equal(compiled.recovery, 5);

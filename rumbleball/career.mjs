@@ -8,7 +8,7 @@ import { identifyCareer, identifyClub, playerGender, validCrest } from './identi
 import { clubDeployment, validDeployment } from './deployment.mjs';
 import { DEFAULT_OPENING, clubOpening, openingDeployment, validOpening } from './openings.mjs';
 import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture } from './playoffs.mjs';
-import { equipMutable, compatibleLocation, equipmentDefinition, equipmentAvailable, itemLocation } from './equipment.mjs';
+import { equipMutable, compatibleLocation, equipmentDefinition, equipmentAvailable, itemLocation, isIssuedWeapon, ensureCareerEquipment, ensureClubEquipment, defaultIssuedWeapons, equipIssuedWeapon, issuedEquipment, removeIssuedWeapon } from './equipment.mjs';
 import { isLongCareer, LONG_RULES, injured, matchReward } from './career-rules.mjs';
 import { createLongOpponents, longRecruitLevel, applyInjury, availablePlayers, repairLongLineup, longSeasonOutcome } from './long-career.mjs';
 
@@ -29,7 +29,7 @@ function shuffle(values, seed) {
 }
 const need = (condition, message) => { if (!condition) throw new Error(message); };
 const team = (career) => career.clubs[0];
-const identifiedCopy = (career) => ensureCareerPlayoffs(ensureCareerDevelopment(identifyCareer(clone(career))));
+const identifiedCopy = (career) => ensureCareerEquipment(ensureCareerPlayoffs(ensureCareerDevelopment(identifyCareer(clone(career)))));
 export const ownedPlayers = (career) => team(career).players;
 export const payroll = (career) => ownedPlayers(career).reduce((sum, p) => sum + salary(p), 0);
 export const managementLocked = (career) => Boolean(career.current && !career.current.settled);
@@ -53,7 +53,7 @@ function transact(career, amount, label, fixtureId = null) {
   career.transactions.push({ id: `t${career.transactions.length + 1}`, season: career.season, day: Math.min(10, career.day + 1), amount, label, fixtureId, balance: career.balance });
 }
 function player(id, name, profile, level = 1, seed = id) {
-  return ensurePlayerDevelopment({ id, name, profile, xp: XP_THRESHOLDS[level - 1], fatigue: 0, role: PROFILES[profile].role, instruction: 'normal', implant: null }, `${seed}:${id}`);
+  return ensurePlayerDevelopment({ id, name, profile, xp: XP_THRESHOLDS[level - 1], fatigue: 0, role: PROFILES[profile].role, instruction: 'normal', implant: null, issuedWeapons: defaultIssuedWeapons({ profile }) }, `${seed}:${id}`);
 }
 function generateMarket(career, initial = false) {
   const profiles = initial ? [0, 1, 2, 3, 4, 0, 0, 1, 2, 2, 4, 4] : [0, 1, 2, 4, ...shuffle([0, 1, 2, 3, 4], `${career.seed}:market:${career.completedDays}`).slice(0, 2)];
@@ -103,7 +103,7 @@ export function createCareer(name, seed = 'career-01', kitColor = KIT_COLORS[0],
   career.market = generateMarket(career, true);
   career.tieOrder = shuffle(career.clubs.map((c) => c.id), `${career.seed}:ties:1`);
   career.schedule = seasonSchedule(career); career.table = standings(career);
-  return identifyCareer(career);
+  return ensureCareerEquipment(identifyCareer(career));
 }
 export function confirmDraft(input, ids) {
   const c = identifiedCopy(input); need(c.status === 'draft', 'Club déjà créé.');
@@ -157,10 +157,7 @@ export function buyItem(input, itemId, playerId = null, replaceConfirmed = false
   need(playerId === null || p, 'Joueur inconnu.');
   if (item.price === 0) {
     need(p, 'Sélectionnez un joueur pour cette dotation gratuite.');
-    const current = c.inventory.find(q => q.itemId === itemId && q.playerId === p.id && (item.hands === 2 || itemLocation(q) === (location ?? 'rightHand')));
-    if (current) return c;
-    const reserve = c.inventory.find(q => q.itemId === itemId && q.playerId === null);
-    if (reserve) { assignProtectionMutable(c, reserve.id, p.id, location); return c; }
+    equipIssuedWeapon(p, c.inventory, itemId, location); return c;
   }
   if (item.slot === 'implant') { need(p, 'Sélectionnez un joueur.'); need(!p.implant || replaceConfirmed, 'Le remplacement détruit l’ancien implant. Confirmez ce remplacement.'); }
   spend(c, item.price, `${item.name}${p ? ` : ${p.name}` : ''}`);
@@ -170,10 +167,21 @@ export function buyItem(input, itemId, playerId = null, replaceConfirmed = false
 }
 function assignProtectionMutable(c, id, playerId, location) {
   need(playerId === null || ownedPlayers(c).some((p) => p.id === playerId), 'Joueur inconnu.');
-  equipMutable(c.inventory, id, playerId, location);
+  equipMutable(c.inventory, id, playerId, location, ownedPlayers(c).find(p => p.id === playerId));
 }
-export function assignProtection(input, id, playerId, location) { const c = identifiedCopy(input); editable(c); assignProtectionMutable(c, id, playerId, location); return c; }
+function personalItem(input, id) {
+  return input.inventory.find(item => item.id === id && isIssuedWeapon(item.itemId)) ?? input.clubs[0].players.flatMap(p => issuedEquipment(p, input.inventory)).find(item => item.id === id);
+}
+export function assignProtection(input, id, playerId, location) {
+  const issued = personalItem(input, id), c = identifiedCopy(input); editable(c);
+  if (!issued) { assignProtectionMutable(c, id, playerId, location); return c; }
+  need(location === undefined || compatibleLocation(issued.itemId, location), 'Emplacement incompatible.');
+  if (playerId === null) { const owner = ownedPlayers(c).find(p => p.id === issued.playerId); if (owner) removeIssuedWeapon(owner, c.inventory, location ?? itemLocation(issued)); }
+  else { const p = ownedPlayers(c).find(p => p.id === playerId); need(p, 'Joueur inconnu.'); equipIssuedWeapon(p, c.inventory, issued.itemId, location ?? itemLocation(issued)); }
+  return c;
+}
 export function sellProtection(input, id) {
+  if (personalItem(input, id)) return assignProtection(input, id, null);
   const c = identifiedCopy(input); editable(c); const item = c.inventory.find((q) => q.id === id); need(item, 'Équipement inconnu.');
   transact(c, CATALOGUE[item.itemId].price / 2, `Vente : ${CATALOGUE[item.itemId].name}`); c.inventory = c.inventory.filter((q) => q.id !== id); return c;
 }
@@ -209,6 +217,7 @@ function manageAiClub(c, club, fixture, wages, winnerId) {
 }
 // Shared by campaign opponents and online bots. Reserve the next full payroll.
 export function equipAiClub(club, turn, transaction) {
+  ensureClubEquipment(club, club.market);
   const budget = () => Math.max(0, club.balance - club.players.reduce((sum, p) => sum + salary(p), 0));
   const order = aiLineup(club).map(id => club.players.find(p => p.id === id));
   order.push(...club.players.filter(p => !order.includes(p)));
@@ -217,13 +226,11 @@ export function equipAiClub(club, turn, transaction) {
   const armable = order.find(p => !club.inventory.some(item => item.playerId === p.id && (CATALOGUE[item.itemId]?.enhancement ?? 0) > 0));
   if (armable && club.players.some(p => p.implant) && turn % 2 === 0) {
     const heavy = PROFILES[armable.profile].archetype === 'belier', upgrade = heavy ? 'gravity_maul' : 'arc_tonfa';
-    const armed = club.inventory.some(item => item.playerId === armable.id && CATALOGUE[item.itemId]?.die);
-    const itemId = budget() >= CATALOGUE[upgrade].price ? upgrade : !armed ? heavy ? 'maul' : 'tonfa' : null;
+    const itemId = budget() >= CATALOGUE[upgrade].price ? upgrade : null;
     if (itemId) {
-      transaction(CATALOGUE[itemId].price === 0 ? 0 : -CATALOGUE[itemId].price, `${CATALOGUE[itemId].name} : ${armable.name}`);
-      const reserve = CATALOGUE[itemId].price === 0 && club.inventory.find(item => item.itemId === itemId && item.playerId === null);
-      const id = reserve?.id ?? `${club.id}-gear-${club.transactions.length}`;
-      if (!reserve) club.inventory.push({ id, itemId, playerId: null }); equipMutable(club.inventory, id, armable.id, 'rightHand'); return;
+      transaction(-CATALOGUE[itemId].price, `${CATALOGUE[itemId].name} : ${armable.name}`);
+      const id = `${club.id}-gear-${club.transactions.length}`;
+      club.inventory.push({ id, itemId, playerId: null }); equipMutable(club.inventory, id, armable.id, 'rightHand', armable); return;
     }
   }
   const firstImplant = implant && club.inventory.filter(item => CATALOGUE[item.itemId]?.slot === 'protection').length >= 3 && !club.players.some(p => p.implant);

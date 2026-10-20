@@ -1,0 +1,118 @@
+/* Live matches share the same three-column workspace in solo, online and replay. */
+.rb-match .rb-journal-text { min-height: 0; max-height: 26rem; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #426178 #071925; padding-right: .5rem; }
+.rb-app .rb-match .rb-journal { max-height: none; overflow: visible; padding: 0; }
+.rb-match .rb-journal-head { flex-direction: row; flex-wrap: wrap; align-items: center; gap: .35rem .75rem; }
+.rb-match .rb-journal-head h3 { margin: 0; color: var(--text); }
+.rb-match .rb-journal-head > .rb-muted { margin-right: auto; }
+.rb-match .rb-journal-head .rb-button { min-height: 2rem; padding: .3rem .6rem; font-size: .85rem; }
+.rb-match .rb-opportunity-note { margin: 0 0 .75rem; }
+.rb-match .rb-toolbar { margin-bottom: .5rem; }
+.rb-match-player-dialog { width: min(42rem, calc(100vw - 2rem)); }
+.rb-match-result-dialog { width: min(50rem, calc(100vw - 2rem)); }
+.rb-match .rb-selected { border: 0; padding: 0; min-height: 0; }
+.rb-match .rb-result { margin: 0; padding: 0; border: 0; }
+.rb-match-help-dialog .rb-rules { margin-top: 1rem; }
+.rb-match .rb-roster-row { position: relative; }
+.rb-match .rb-player-name::after { content: ''; position: absolute; inset: 0; }
+.rb-match .rb-roster-row:focus-within { outline: 2px solid var(--rb-ball); outline-offset: 2px; }
+.rb-match .rb-conditions { overflow-wrap: anywhere; }
+.rb-match .rb-replay-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(8rem, .5fr); gap: .25rem .75rem; }
+.rb-replay-toolbar > .rb-form-status { grid-column: 1 / -1; margin: 0; font-size: .8rem; }
+.rb-replay-toolbar .rb-field { font-size: .8rem; gap: .1rem; }
+.rb-replay-toolbar input[type='range'] { width: 100%; min-width: 0; padding: 0; }
+.rb-match .rb-grid { stroke: #a4b8c3; opacity: .23; }
+.rb-match .rb-wet { opacity: .55; }
+
+@media screen and (min-width: 1100px) {
+  /* Each ancestor passes down remaining height. The court has no viewport offset. */
+  body.rb-app:has(.rb-match-area:not([hidden]) > [data-match-screen='playing'], .rb-online-content:not([hidden]) .rb-online-live:not([hidden]), .rb-replay-area:not([hidden]) [data-match-screen='playing']) {
+    height: 100svh; display: flex; flex-direction: column;
+
+    & .rb-app-header { flex: none; min-height: 3.5rem; grid-template-columns: 9rem minmax(0, 1fr) auto; gap: .5rem 1rem; padding-block: .35rem; }
+    & .rb-app-brand { grid-column: 1; grid-row: 1; padding: .15rem 0; }
+    & .rb-app-brand h1 { font-size: 1.8rem; }
+    & .rb-app-brand h1 span { font-size: 1rem; margin: .25rem 0 0 1.5rem; }
+    & .rb-app-brand h1 span::before { display: none; }
+    & .rb-shell-context { display: none; }
+    & :is(.rb-shell-navigation, .rb-shell-tools) { grid-column: 2; grid-row: 1; justify-self: start; }
+    & :is(.rb-account-tools, .rb-app-header > .rb-hub-link) { grid-column: 3; grid-row: 1; }
+    & .rb-account-tools { display: flex; gap: .5rem; align-items: center; }
+    & .rb-shell-tools .rb-career-top { display: flex; align-items: center; gap: 1rem; padding: 0; border: 0; }
+    & .rb-shell-tools .rb-save-status { display: none; }
+    & .rb-shell-navigation .rb-button { min-height: 2rem; padding: .35rem .75rem; font-size: 1rem; }
+    & .rb-app-main { flex: 1; min-height: 0; display: flex; flex-direction: column; max-width: none; padding-block: .35rem .5rem; }
+    & :is([data-rumbleball], [data-online], .rb-session-pane, .rb-match-area, .rb-online-content, .rb-online-body, .rb-replay-area, .rb-replay-player):not([hidden]):has([data-match-screen='playing']) { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: .35rem; }
+    & .rb-match-back { flex: none; margin: 0; }
+    & .rb-match-back .rb-button { min-height: 1.75rem; padding-block: .15rem; font-size: .85rem; }
+    & .rb-replay-area > .rb-section-heading { display: none; }
+    & .rb-online-content:has(.rb-online-live:not([hidden])) > .rb-competition-status { display: none; }
+    & .rb-live-overview { flex: none; align-self: flex-start; min-height: 1.75rem; padding: .2rem .5rem; font-size: .85rem; }
+  }
+
+  .rb-app .rb-match[data-match-screen='playing'] { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .rb-app .rb-online-live[data-match-screen='playing'] { margin-top: 0; }
+  .rb-app .rb-match-stage { flex: 1; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: .5rem; }
+  .rb-app .rb-match .rb-scoreboard { margin: 0; padding: .35rem .75rem; grid-template-columns: minmax(0, 1fr) minmax(12rem, .8fr) minmax(0, 1fr); gap: .75rem; }
+  .rb-app .rb-match .rb-scoreboard .rb-crest { width: 2.4rem; flex-basis: 2.4rem; }
+  .rb-match .rb-team-name { gap: .6rem; }
+  .rb-match .rb-team-name strong { font-size: 1.35rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .rb-match .rb-team-name small { display: none; }
+  .rb-match .rb-team-count { margin-top: .2rem; }
+  .rb-match .rb-timebox { display: grid; grid-template-columns: auto auto; gap: .1rem .6rem; justify-content: center; align-items: center; }
+  .rb-match .rb-clock { grid-column: 1; grid-row: 1; font-size: 2rem; }
+  .rb-match .rb-phase { grid-column: 2; grid-row: 1; }
+  .rb-match .rb-possession { grid-column: 1 / -1; max-width: 38ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
+  .rb-app .rb-match .rb-match-layout { min-height: 0; grid-template-columns: clamp(13rem, 17vw, 19rem) minmax(0, 1fr) clamp(13rem, 17vw, 19rem); grid-template-rows: minmax(0, 2.4fr) minmax(12rem, 1fr); grid-template-areas: 'home field away' 'home journal away'; gap: .5rem 1rem; align-items: stretch; }
+  .rb-match .rb-field-column { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+  .rb-app .rb-match .rb-court-stage { flex: 1; min-height: 0; container-type: size; display: grid; place-items: center; }
+  .rb-app .rb-match .rb-court { width: min(100cqw, calc(100cqh * 780 / 544)); height: auto; max-height: 100%; aspect-ratio: 780 / 544; }
+  .rb-match .rb-initiative { flex: none; margin: 0; padding: .25rem 0 0; justify-content: center; gap: .25rem; }
+  .rb-match .rb-order-token { width: 1.65rem; min-width: 0; height: 1.65rem; min-height: 0; padding: 0; font-size: .8rem; }
+  .rb-app .rb-match .rb-journal-panel { min-height: 0; display: flex; flex-direction: column; padding: .5rem 0 0; border-left: 0; border-top: 1px solid var(--rb-line); }
+  .rb-match .rb-journal-text { flex: 1; min-height: 0; max-height: none; }
+  .rb-match .rb-journal-head { flex: none; margin-bottom: .3rem; padding: 0 0 .3rem; border: 0; }
+  .rb-match .rb-journal-head h3 { font-size: 1rem; margin-right: auto; }
+  .rb-match .rb-journal-head > .rb-muted { display: none; }
+  .rb-match .rb-journal-head > .rb-button:first-of-type { margin-left: auto; }
+  .rb-match .rb-toolbar { flex: none; gap: .25rem; margin: 0 0 .25rem; }
+  .rb-match .rb-toolbar > .rb-controls { gap: .3rem; }
+  .rb-match :is(.rb-toolbar, .rb-replay-toolbar) .rb-button { min-height: 2rem; padding: .3rem .55rem; font-size: .85rem; }
+  .rb-match :is(.rb-toolbar, .rb-replay-toolbar) select { min-height: 2rem; padding-block: .2rem; font-size: .85rem; }
+  .rb-match .rb-reading select { max-width: 12rem; }
+  .rb-match .rb-speed { gap: .25rem; }
+  .rb-match .rb-playback-status { margin: 0; font-size: .8rem; }
+  .rb-match .rb-turn { padding-block: .5rem; }
+  .rb-match .rb-turn-heading { margin-bottom: .25rem; }
+  .rb-match .rb-narrative { margin-block: .25rem; }
+  .rb-app .rb-match .rb-rosters { display: contents; }
+  .rb-app .rb-match .rb-roster { display: grid; grid-template-rows: auto repeat(5, minmax(0, 1fr)); min-height: 0; padding: 0; background: none; }
+  .rb-match .rb-roster-home { grid-area: home; }
+  .rb-match .rb-roster-away { grid-area: away; }
+  .rb-app .rb-match .rb-roster-heading { flex-wrap: nowrap; gap: .35rem; margin: 0; padding: .35rem 0 .5rem; }
+  .rb-match .rb-roster-title .rb-crest { display: none; }
+  .rb-app .rb-match .rb-roster-title h3 { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 1.15rem; }
+  .rb-app .rb-match .rb-roster-heading > .rb-muted { font-size: .8rem; }
+  .rb-app .rb-match .rb-roster-row { min-height: 0; grid-template-columns: 2.5rem minmax(0, 1fr); align-content: center; align-items: center; gap: .2rem .5rem; padding: .4rem 0; }
+  .rb-match .rb-roster-row:hover { background: #15374a55; }
+  .rb-match .rb-roster-row > .rb-athlete-portrait { grid-column: 1; grid-row: 1; width: 2.5rem; }
+  .rb-match .rb-roster-copy { grid-column: 2; min-width: 0; }
+  .rb-match .rb-player-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; padding: 0; font-size: .95rem; line-height: 1.2; text-align: left; }
+  .rb-app .rb-match .rb-roster-row .rb-archetype { font-size: .8rem; line-height: 1.25; }
+  .rb-match .rb-roster-row :is(.rb-roster-tactics, .rb-resource, .rb-class-resource) { display: none; }
+  .rb-match .rb-roster-row .rb-health { grid-column: 1 / -1; display: flex; align-items: center; gap: .5rem; font-size: .85rem; }
+  .rb-match .rb-health > span { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .rb-match .rb-health meter { flex: 1; min-width: 0; width: auto; }
+  .rb-match .rb-conditions { grid-column: 1 / -1; font-size: .8rem; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+@media screen and (min-width: 1100px) and (max-height: 760px) {
+  .rb-app .rb-match .rb-match-layout { gap: .35rem .75rem; }
+  .rb-app .rb-match .rb-roster-row { grid-template-columns: 2rem minmax(0, 1fr); padding-block: .25rem; gap: .1rem .4rem; }
+  .rb-match .rb-roster-row > .rb-athlete-portrait { width: 2rem; }
+  .rb-match .rb-roster-copy .rb-archetype { display: none; }
+  .rb-match .rb-player-name { -webkit-line-clamp: 1; }
+}
+
+@media (max-width: 700px) {
+  .rb-match .rb-replay-toolbar { grid-template-columns: minmax(0, 1fr); }
+}

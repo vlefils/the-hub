@@ -12,6 +12,9 @@ export const ROLE_DESCRIPTIONS = {
   relay: 'Se démarque quand une passe est préparée et garde sa réaction pour la relancer.',
   defender: 'Marque les adversaires dangereux et coupe les lignes de passe.',
 };
+// Class movement is shared by new players. Legacy profiles remain frozen below
+// so recorded matches can still be reconstructed under their original rules.
+export const CLASS_SPEEDS = Object.freeze({ belier: 9, capitaine: 9, escamoteur: 12, passeur: 9 });
 export const PROFILES = [
   { name: 'Suze « Clou »', trainingName: 'Nora', archetype: 'capitaine', role: 'relay', armor: 14, maxHp: 23, speed: 9,
     abilities: { strength: 12, dexterity: 14, constitution: 14, mind: 13, charisma: 14 },

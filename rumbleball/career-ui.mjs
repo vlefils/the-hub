@@ -66,6 +66,7 @@ export function mountCareer(root, mountMatch, options = {}) {
   root.append(top, notice, importPreview, manager, matchArea);
   let modalKind = null, modalClubId = null;
   const modal = managementDialog(root, () => { modalKind = null; });
+  modal.root.classList.add('rb-career-management-dialog');
   const saveDialog = managementDialog(root); saveDialog.root.classList.add('rb-save-dialog');
   saveDialog.body.append(el('p', 'rb-muted', options.sync ? 'Cette partie est sauvegardée automatiquement sur votre compte. Une copie locale conserve les modifications en attente de synchronisation.' : 'Cette carrière est conservée dans ce navigateur. Exportez une copie pour la garder sur un autre appareil.'), saveActions, importInput);
   workspaceHeader({ tools: top });

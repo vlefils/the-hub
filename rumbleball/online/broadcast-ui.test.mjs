@@ -20,7 +20,7 @@ async function online(t, lobby = false, capacity = 2) {
   await button(e.root, `Ligue · ${capacity} clubs`).click();
   const strategy = () => descendants(e.root.querySelector('.rb-online-body')).find(n => n.tagName === 'select' && n.children.some(o => o.value === 'possession'));
   const poll = async () => { const [id, fn] = [...pending][0]; pending.delete(id); await fn(); };
-  return { ...e, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); }, async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
+  return { ...e, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); }, async startBroadcast() { clock = state.nextLockAt; state = advanceLeague(state, clock, { maxRounds: 1 }); revision++; await poll(); }, async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
 }
 
 test('broadcast : une saisie survit aux onglets, à un achat et à une erreur réseau ; annulation complète', async t => {
@@ -41,6 +41,17 @@ test('classement : quatre places signalées sur six et légende sous la table da
   await button(e.root, 'Ligue').click(); assert.equal(e.root.querySelectorAll('.rb-playoff-qualifier').length, 4);
   const legend = e.root.querySelector('.rb-qualification-legend'); assert.equal(legend.textContent, 'Les 4 premières équipes se qualifient pour les playoffs.');
   const siblings = legend.parentNode.children; assert.equal(siblings[siblings.indexOf(legend) - 1].classList.contains('rb-table-scroll'), true); e.mounted.stop();
+});
+
+test('direct : terrain seul, classement en modale et fiches consultables même pendant le verrouillage', async t => {
+  const e = await online(t); await e.startBroadcast(); await button(e.root, 'Ligue').click();
+  const live = e.root.querySelector('.rb-online-live'), body = e.root.querySelector('.rb-online-body');
+  assert.equal(live.hidden, false); assert.equal(body.querySelector('.rb-league-layout'), null);
+  const player = live.querySelector('.rb-player-name'); assert.equal(Boolean(player.disabled), false); await player.click();
+  assert.equal(live.querySelector('.rb-match-player-dialog').open, true); await button(live.querySelector('.rb-match-player-dialog'), 'Fermer').click();
+  await button(e.root, 'Classement, programme et replays').click();
+  const overview = e.root.querySelector('.rb-league-layout'); assert.ok(overview.closest('dialog')); assert.match(overview.textContent, /Classement/);
+  e.mounted.stop();
 });
 
 test('playoffs UI : finale après le groupe puis champion et arbre conservés à la nouvelle saison', async t => {
@@ -151,7 +162,7 @@ test('body en ligne : armer les deux mains du remplaçant préserve les tactique
   assert.equal(slot('leftHand').getAttribute('aria-pressed'), 'true'); assert.match(slot('leftHand').textContent, /Tonfa/);
   await slot('rightHand').click(); choice = e.root.querySelector('.rb-player-shop').querySelector('select'); choice.value = 'knuckles'; await choice.emit('change'); await button(e.root, 'Équiper gratuitement').click();
   const draft = e.state().members[0].draft;
-  assert.deepEqual(draft.inventory.map(item => [item.itemId, item.location, item.playerId]), [['tonfa', 'leftHand', reserve.id], ['knuckles', 'rightHand', reserve.id]]);
+  assert.deepEqual(draft.players.find(p => p.id === reserve.id).issuedWeapons, { rightHand: 'knuckles', leftHand: 'tonfa' }); assert.deepEqual(draft.inventory, []);
   assert.equal(draft.balance, club.balance);
   assert.equal(e.strategy().value, 'possession'); assert.deepEqual(draft.lineup, club.lineup); assert.match(e.root.querySelector('.rb-player-inspector').textContent, /Seconde arme/);
   await button(e.root, 'Annuler la préparation').click(); assert.equal(e.state().members[0].draft, null); assert.equal(e.state().members[0].club.balance, club.balance); assert.equal(e.state().members[0].club.inventory.length, 0);

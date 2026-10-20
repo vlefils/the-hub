@@ -47,15 +47,15 @@ test('armes : main gauche ou droite, finesse et Force, dés propres et polyvalen
   assert.deepEqual(compilePlayer(p), base);
 });
 
-test('dotation : cinq armes gratuites, réutilisation des réserves et aucune création de chromas', () => {
+test('dotation : cinq armes gratuites à volonté, sans réserve ni écriture comptable', () => {
   let c = club(); const p = c.clubs[0].players[0], before = structuredClone(c), balance = c.balance;
   for (const id of ['knuckles', 'tonfa', 'bat', 'maul', 'shield']) { c = buyItem(c, id, p.id); assert.equal(c.balance, balance); }
   for (let i = 0; i < 8; i++) for (const id of ['tonfa', 'maul', 'shield']) c = buyItem(c, id, p.id);
-  assert.equal(c.inventory.length, 5); assert.deepEqual(before.inventory, []);
+  assert.deepEqual(c.inventory, []); assert.deepEqual(c.transactions, before.transactions);
   c = buyItem(c, 'tonfa', p.id, false, 'leftHand');
   const count = c.inventory.length; c = buyItem(c, 'tonfa', p.id, false, 'leftHand'); assert.equal(c.inventory.length, count);
   c = buyItem(c, 'tonfa', p.id, false, 'rightHand');
-  assert.equal(c.inventory.filter(item => item.playerId === p.id && item.itemId === 'tonfa').length, 2);
+  assert.deepEqual(c.clubs[0].players[0].issuedWeapons, { rightHand: 'tonfa', leftHand: 'tonfa' });
   for (const item of [...c.inventory]) c = sellProtection(c, item.id);
   assert.equal(c.balance, balance); assert.deepEqual(importCareer(exportCareer(c)), c);
   const debt = { ...c, balance: -25 }, free = buyItem(debt, 'tonfa', p.id);
@@ -159,23 +159,27 @@ test('deux armes : attaque secondaire uniquement avec deux armes légères, sans
 });
 
 test('deux mains : remplacement et retrait libèrent les deux mains sans détruire le matériel', () => {
-  let c = club(); const p = c.clubs[0].players[0]; c = buyItem(c, 'tonfa', p.id, false, 'rightHand'); c = buyItem(c, 'shield', p.id, false, 'leftHand');
-  const first = structuredClone(c); c = buyItem(c, 'maul', p.id, false, 'leftHand');
+  let c = club(); const id = c.clubs[0].players[0].id, current = () => c.clubs[0].players.find(p => p.id === id);
+  c = buyItem(c, 'arc_tonfa', id, false, 'rightHand'); c = buyItem(c, 'aegis_shield', id, false, 'leftHand');
+  const first = structuredClone(c); c = buyItem(c, 'maul', id, false, 'leftHand');
   assert.equal(c.inventory[0].playerId, null); assert.equal(c.inventory[1].playerId, null);
-  assert.equal(equipmentAt(p, c.inventory, 'rightHand').itemId, 'maul'); assert.equal(equipmentAt(p, c.inventory, 'leftHand').itemId, 'maul');
-  assert.equal(damageText(compilePlayer(p, c.inventory).attack).split(' ')[0], '2d6'); assert.equal(c.inventory.filter(item => item.playerId === p.id).length, 1);
-  c = assignProtection(c, c.inventory[0].id, p.id, 'rightHand'); assert.equal(c.inventory[2].playerId, null);
-  assert.equal(equipmentAt(p, c.inventory, 'leftHand'), null); assert.equal(equipmentAt(p, c.inventory, 'rightHand').itemId, 'tonfa');
-  assert.equal(first.inventory[0].playerId, p.id); assert.equal(first.inventory[1].playerId, p.id); validateCareer(c);
+  assert.equal(equipmentAt(current(), c.inventory, 'rightHand').itemId, 'maul'); assert.equal(equipmentAt(current(), c.inventory, 'leftHand').itemId, 'maul');
+  assert.equal(damageText(compilePlayer(current(), c.inventory).attack).split(' ')[0], '2d6'); assert.equal(c.inventory.filter(item => item.playerId === id).length, 0);
+  const maul = equipmentAt(current(), c.inventory, 'rightHand'); c = assignProtection(c, maul.id, null, 'rightHand');
+  assert.equal(equipmentAt(current(), c.inventory, 'leftHand'), null); assert.equal(equipmentAt(current(), c.inventory, 'rightHand'), null);
+  c = assignProtection(c, c.inventory[0].id, id, 'rightHand');
+  assert.equal(equipmentAt(current(), c.inventory, 'rightHand').itemId, 'arc_tonfa');
+  assert.equal(first.inventory[0].playerId, id); assert.equal(first.inventory[1].playerId, id); validateCareer(c);
 });
 
 test('transferts : déplacer une arme entre mains ou joueurs ne duplique pas ses bonus ; bouclier unique', () => {
-  let c = club(); const [a, b] = c.clubs[0].players; c = buyItem(c, 'tonfa', a.id, false, 'rightHand'); const id = c.inventory[0].id, balance = c.balance;
-  c = assignProtection(c, id, a.id, 'leftHand'); assert.equal(equipmentAt(a, c.inventory, 'rightHand'), null); assert.equal(equipmentAt(a, c.inventory, 'leftHand').id, id);
-  c = assignProtection(c, id, b.id, 'rightHand'); assert.equal(equipmentAt(a, c.inventory, 'leftHand'), null); assert.equal(equipmentAt(b, c.inventory, 'rightHand').id, id); assert.equal(c.balance, balance);
+  let c = club(); const [a, b] = c.clubs[0].players, current = id => c.clubs[0].players.find(p => p.id === id);
+  c = buyItem(c, 'arc_tonfa', a.id, false, 'rightHand'); const id = c.inventory[0].id, balance = c.balance;
+  c = assignProtection(c, id, a.id, 'leftHand'); assert.equal(equipmentAt(current(a.id), c.inventory, 'rightHand'), null); assert.equal(equipmentAt(current(a.id), c.inventory, 'leftHand').id, id);
+  c = assignProtection(c, id, b.id, 'rightHand'); assert.equal(equipmentAt(current(a.id), c.inventory, 'leftHand'), null); assert.equal(equipmentAt(current(b.id), c.inventory, 'rightHand').id, id); assert.equal(c.balance, balance);
   c = buyItem(c, 'shield', b.id, false, 'leftHand'); c = buyItem(c, 'shield', b.id, false, 'rightHand');
-  assert.equal(c.inventory.filter(item => item.playerId === b.id && item.itemId === 'shield').length, 1);
-  const equipped = c.inventory.find(item => item.playerId === b.id), before = c.balance;
+  assert.equal(Object.values(current(b.id).issuedWeapons).filter(item => item === 'shield').length, 1);
+  const equipped = c.inventory.find(item => item.id === id), before = c.balance;
   c = sellProtection(c, equipped.id); assert.equal(c.balance, before + CATALOGUE[equipped.itemId].price / 2);
   c = sellPlayer(c, b.id); assert.ok(c.inventory.every(item => item.playerId !== b.id)); validateCareer(c);
 });
@@ -242,7 +246,7 @@ test('UI solo : armer un remplaçant à gauche conserve la sélection, les titul
   const c = club(), reserve = c.clubs[0].players[5], e = environment(exportCareer(c)), { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch);
   await button(e.root, reserve.name).click(); await slotButton(e.root, 'leftHand').click();
   const choice = e.root.querySelector('.rb-player-shop').querySelector('select'); choice.value = 'tonfa'; await choice.emit('change'); await button(e.root, 'Équiper gratuitement').click();
-  assert.equal(slotButton(e.root, 'leftHand').getAttribute('aria-pressed'), 'true'); assert.equal(e.saved().inventory[0].location, 'leftHand'); assert.equal(e.saved().inventory[0].playerId, reserve.id);
+  assert.equal(slotButton(e.root, 'leftHand').getAttribute('aria-pressed'), 'true'); assert.equal(e.saved().clubs[0].players.find(p => p.id === reserve.id).issuedWeapons.leftHand, 'tonfa'); assert.deepEqual(e.saved().inventory, []);
   assert.deepEqual(e.saved().lineup, c.lineup); assert.match(e.root.querySelector('.rb-player-inspector').textContent, new RegExp(reserve.name));
   const restored = environment(e.storage.getItem('the-hub.rumbleball.career.v1')); mountCareer(restored.root, mountMatch); await button(restored.root, reserve.name).click(); assert.match(slotButton(restored.root, 'leftHand').textContent, /Tonfa/);
 });

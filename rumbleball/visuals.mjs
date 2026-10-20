@@ -78,25 +78,21 @@ export function archetypeIcon(id) {
 export function arenaBackdrop(wetCells) {
   const background = svg('g', { 'aria-hidden': 'true' });
   const definitions = svg('defs');
-  const floor = svg('pattern', { id: 'rb-floor', width: 60, height: 60, patternUnits: 'userSpaceOnUse' });
-  floor.append(svg('rect', { width: 60, height: 60, fill: '#202b3f' }),
-    svg('path', { d: 'M3 3H57V57H3ZM6 53 25 34M37 21 53 5', stroke: '#bac2b1', 'stroke-width': 1, fill: 'none', opacity: .045 }));
   const stripes = svg('pattern', { id: 'rb-hazard', width: 14, height: 14, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
   stripes.append(svg('rect', { width: 7, height: 14, fill: '#c8cc78' }));
   const wet = svg('pattern', { id: 'rb-wet-floor', width: 12, height: 12, patternUnits: 'userSpaceOnUse' });
   wet.append(svg('rect', { width: 12, height: 12, fill: '#3e5c66' }), svg('path', { d: 'M0 10 10 0M8 14 14 8', stroke: '#a1c2c5', 'stroke-width': 1, opacity: .18 }));
-  definitions.append(floor, stripes, wet); background.append(definitions);
+  definitions.append(stripes, wet); background.append(definitions);
   background.append(svg('rect', { x: -28, y: -36, width: 776, height: 540, fill: '#111b2e', stroke: '#465570', 'stroke-width': 1 }));
   for (const x of [60, 560]) background.append(svg('rect', { x, y: -33, width: 100, height: 6, fill: 'url(#rb-hazard)', opacity: .6 }));
   for (const [x, y] of [[-21, -29], [741, -29], [-21, 497], [741, 497]]) background.append(svg('circle', { cx: x, cy: y, r: 2, fill: '#68716a' }));
-  background.append(svg('rect', { width: 720, height: 480, fill: 'url(#rb-floor)' }));
+  background.append(svg('image', { href: new URL('./assets/broadcast/arena-floor.svg', import.meta.url).href, x: 0, y: 0, width: 720, height: 480, preserveAspectRatio: 'none', class: 'rb-arena-floor' }));
   background.append(svg('rect', { width: 7, height: 480, class: 'rb-pitch-home' }), svg('rect', { x: 713, width: 7, height: 480, class: 'rb-pitch-away' }));
   for (const [x, y] of wetCells) background.append(svg('rect', { x: x * 60, y: y * 60, width: 60, height: 60, class: 'rb-wet' }));
   for (let x = 0; x <= 12; x++) background.append(svg('line', { x1: x * 60, y1: 0, x2: x * 60, y2: 480, class: 'rb-grid' }));
   for (let y = 0; y <= 8; y++) background.append(svg('line', { x1: 0, y1: y * 60, x2: 720, y2: y * 60, class: 'rb-grid' }));
   background.append(svg('path', { d: 'M24 96V24H120M600 24H696V96M696 384V456H600M120 456H24V384', class: 'rb-pitch-marking' }));
   background.append(svg('line', { x1: 360, y1: 0, x2: 360, y2: 480, class: 'rb-center-line' }), svg('circle', { cx: 360, cy: 240, r: 58, class: 'rb-center-circle' }));
-  background.append(svg('text', { x: 360, y: 243, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-pitch-stamp' }, 'RB'));
   for (let x = 0; x < 12; x++) background.append(svg('text', { x: x * 60 + 30, y: -14, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-axis' }, String.fromCharCode(65 + x)));
   for (let y = 0; y < 8; y++) background.append(svg('text', { x: -14, y: y * 60 + 30, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'rb-axis' }, String(y + 1)));
   return background;

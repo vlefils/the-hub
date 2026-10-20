@@ -1,4 +1,4 @@
-import { PROFILES as IDENTITY_PROFILES } from './data.mjs';
+import { PROFILES as IDENTITY_PROFILES, CLASS_SPEEDS } from './data.mjs';
 import { PORTRAITS } from './identity.mjs';
 import { signed, damageText } from './formatters.mjs';
 import { crestPicker } from './broadcast-components.mjs';
@@ -18,6 +18,7 @@ import { defaultDeployment, isCenterBall } from './deployment.mjs';
 import { createKickoff } from './kickoff.mjs';
 import { DEFAULT_OPENING, OPENINGS, OPENING_IDS, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
+import { managementDialog } from './management-dialog.mjs';
 
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
@@ -31,7 +32,11 @@ const options = (values, selected) => Object.entries(values).map(([value, label]
 const button = (text, cls = 'rb-button') => { const el = element('button', cls, text); el.type = 'button'; return el; };
 
 function exhibitionIdentity(config = {}) {
-  return { ...config, crestIds: config.crestIds ?? { home: 'hound', away: 'skull' }, rosters: config.rosters ?? Object.fromEntries(['home', 'away'].map((side, n) => [side, IDENTITY_PROFILES.map((p, i) => ({ ...structuredClone(p), name: side === 'home' ? p.trainingName : p.name, playerId: 'exhibition-' + side + '-' + i, portraitId: PORTRAITS[n * 5 + i].id }))])) };
+  const rosters = config.rosters ?? Object.fromEntries(['home', 'away'].map((side, n) => [side, IDENTITY_PROFILES.map((p, i) => ({
+    ...structuredClone(p), speed: (config.rulesVersion ?? CURRENT_RULES) >= 8 ? CLASS_SPEEDS[p.archetype] : p.speed,
+    name: side === 'home' ? p.trainingName : p.name, playerId: 'exhibition-' + side + '-' + i, portraitId: PORTRAITS[n * 5 + i].id,
+  }))]));
+  return { ...config, crestIds: config.crestIds ?? { home: 'hound', away: 'skull' }, rosters };
 }
 
 export function mountMatch(root, callbacks = {}) {
@@ -123,7 +128,7 @@ export function mountMatch(root, callbacks = {}) {
   speedSelect.setAttribute('aria-label', 'Vitesse de lecture'); speedSelect.append(...options({ 1: '×1', 2: '×2', 4: '×4', 8: '×8' }, '1')); speedLabel.append(speedSelect);
   controls.append(pause, next, modeLabel, speedLabel, finish);
   const status = element('p', 'rb-playback-status'); status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
-  toolbar.append(controls, status); stage.append(toolbar);
+  toolbar.append(controls, status);
 
   const matchLayout = element('div', 'rb-match-layout');
   const fieldColumn = element('div', 'rb-field-column');
@@ -163,17 +168,26 @@ export function mountMatch(root, callbacks = {}) {
   const initiative = element('div', 'rb-initiative'); initiative.setAttribute('aria-label', 'Ordre d’initiative');
   const opportunityNote = element('p', 'rb-opportunity-note'); opportunityNote.hidden = true;
   const selected = element('div', 'rb-selected');
-  fieldColumn.append(courtStage, legend, opportunityNote, initiative, selected);
+  fieldColumn.append(courtStage, initiative);
   const journalPanel = element('section', 'rb-journal-panel');
   const journalHead = element('div', 'rb-journal-head');
   journalHead.append(element('h3', '', 'Le fil du match'));
-  const journalCaption = element('span', 'rb-muted', 'Le match raconté · détails dépliables'); journalHead.append(journalCaption);
-  const journal = element('ol', 'rb-journal'); journal.setAttribute('aria-label', 'Journal chronologique du match'); journal.tabIndex = 0;
+  const journalCaption = element('span', 'rb-muted', 'Actions et jets détaillés'); journalHead.append(journalCaption);
+  const resultButton = button('Bilan du match', 'rb-button rb-button-primary'); resultButton.hidden = true;
+  const helpButton = button('Repères et règles', 'rb-button rb-button-quiet'); helpButton.setAttribute('aria-haspopup', 'dialog');
+  resultButton.setAttribute('aria-haspopup', 'dialog'); journalHead.append(resultButton, helpButton);
+  const journalText = element('div', 'rb-journal-text'); journalText.tabIndex = 0; journalText.setAttribute('role', 'region'); journalText.setAttribute('aria-label', 'Actions du match');
+  const journal = element('ol', 'rb-journal'); journal.setAttribute('aria-label', 'Journal chronologique du match');
   const emptyJournal = element('li', 'rb-journal-empty', 'Le coup d’envoi approche. Préparez vos cinq joueurs, puis lancez le match.'); journal.append(emptyJournal);
   const rosters = element('div', 'rb-rosters'); rosters.tabIndex = 0; rosters.setAttribute('role', 'region'); rosters.setAttribute('aria-label', 'Effectifs sur le terrain');
-  journalPanel.append(journalHead, journal); matchLayout.append(fieldColumn, journalPanel, rosters); stage.append(matchLayout);
+  const externalControls = element('div', 'rb-match-external-controls'); externalControls.hidden = true;
+  journalText.append(opportunityNote, journal);
+  journalPanel.append(toolbar, externalControls, journalHead, journalText); matchLayout.append(fieldColumn, journalPanel, rosters); stage.append(matchLayout);
 
-  const resultPanel = element('section', 'rb-result'); resultPanel.hidden = true; root.append(resultPanel);
+  const playerDialog = managementDialog(root); playerDialog.root.classList.add('rb-match-player-dialog'); playerDialog.body.append(selected);
+  const resultDialog = managementDialog(root); resultDialog.root.classList.add('rb-match-result-dialog');
+  const resultPanel = element('section', 'rb-result'); resultPanel.hidden = true; resultDialog.body.append(resultPanel);
+  resultButton.addEventListener('click', () => resultDialog.show('Bilan de la rencontre', resultButton));
   const rules = element('details', 'rb-rules'); rules.append(element('summary', '', 'Règles et conventions de ce prototype'));
   const rulesCopy = element('div', 'rb-rules-copy');
   for (const text of [
@@ -189,7 +203,9 @@ export function mountMatch(root, callbacks = {}) {
     'Diagonales : 1,5 m. Cases occupées bloquantes, sol humide difficile. Agripper immobilise la cible ; le lutteur peut l’entraîner à demi-vitesse en maintenant la prise. Les deux joueurs doivent avoir un passage libre. Pas de rebonds.',
     'Trois classes, quatre archétypes : Brute Bélier, Runner Escamoteur, Runner Capitaine et Gâchette Passeur de précision. Une action bonus par tour ; les ressources de classe ne reviennent pas pendant le match. Aucun soin ni retour en jeu après un KO. Rôles et consignes orientent les décisions des bots.',
   ]) rulesCopy.append(element('p', '', text));
-  rules.append(rulesCopy); root.append(rules);
+  rules.append(rulesCopy); rules.open = true;
+  const helpDialog = managementDialog(root); helpDialog.root.classList.add('rb-match-help-dialog'); helpDialog.body.append(legend, rules);
+  helpButton.addEventListener('click', () => helpDialog.show('Comprendre la rencontre', helpButton));
   const errorBox = element('p', 'rb-error'); errorBox.setAttribute('role', 'alert'); errorBox.hidden = true; root.prepend(errorBox);
 
   function config() {
@@ -237,7 +253,7 @@ export function mountMatch(root, callbacks = {}) {
   function appendEvents(events) {
     if (!events.length) return;
     if (journalCount === 0) journal.replaceChildren();
-    const follow = journal.scrollHeight - journal.scrollTop - journal.clientHeight < 70;
+    const follow = journalText.scrollHeight - journalText.scrollTop - journalText.clientHeight < 70;
     const decision = events.find((e) => e.type === 'decision');
     const first = decision ?? events[0];
     const item = element('li', 'rb-turn');
@@ -259,7 +275,7 @@ export function mountMatch(root, callbacks = {}) {
     }
     item.append(details);
     journal.append(item);
-    if (follow) journal.scrollTop = journal.scrollHeight;
+    if (follow) journalText.scrollTop = journalText.scrollHeight;
   }
   function renderCourt(events = lastTurnEvents) {
     // Reuse pawn nodes: preserve keyboard focus and keep SVG updates inexpensive.
@@ -345,12 +361,15 @@ export function mountMatch(root, callbacks = {}) {
     const seconds = Math.ceil(remaining);
     phaseText.textContent = !ballReady ? 'Avant le coup d’envoi' : frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
     timeText.textContent = frame.finished ? '00:00' : frame.round > 10 ? `+${String(Math.ceil(roundSeconds * (1 - (frame.roundProgress ?? 0)))).padStart(2, '0')}` : `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
-    possessionText.textContent = !ballReady ? 'Ballon attendu au centre' : frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : isCenterBall(frame) ? 'Engagement · ballon à l’intersection centrale' : 'Balle libre';
+    const winner = state.teams.find(team => team.id === state.result?.winnerId);
+    possessionText.textContent = frame.finished ? winner ? `Victoire · ${winner.name}` : 'Match nul' : !ballReady ? 'Ballon attendu au centre' : frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : isCenterBall(frame) ? 'Engagement · ballon à l’intersection centrale' : 'Balle libre';
+    possessionText.title = possessionText.textContent;
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) score.querySelector('.rb-team-count').textContent = `${frame.players.filter((p) => p.teamId === teamId && p.hp > 0).length} / 5 en jeu`;
     toolbar.hidden = !started || state.finished && !frame.animating;
     if (context === 'broadcast') toolbar.hidden = true;
     resultPanel.hidden = !state.finished || Boolean(frame.animating);
+    resultButton.hidden = resultPanel.hidden;
     pause.disabled = state.finished && !frame.animating;
     pause.textContent = frame.animating || running ? 'Pause' : 'Reprendre';
     const signature = JSON.stringify([frame.ball.carrierId, frame.players.map((p) => [p.id, p.hp, p.prone, p.grappledBy, p.grappling, p.readiedPass, p.reaction])]);
@@ -362,11 +381,13 @@ export function mountMatch(root, callbacks = {}) {
   }
   const visiblePlayers = () => state.players.map((p) => ({ ...p, ...displayFrame?.players.find((q) => q.id === p.id) }));
   function selectPlayer(id) {
-    selectedId = selectedId === id ? null : id;
+    selectedId = selectedId === id && playerDialog.visible ? null : id;
     for (const [playerId, node] of pawnNodes) {
       node.classList.toggle('is-selected', playerId === selectedId); node.setAttribute('aria-pressed', String(playerId === selectedId));
     }
     renderSelected(); renderRosters();
+    if (selectedId) playerDialog.show(state.players.find(p => p.id === selectedId).name);
+    else playerDialog.close();
   }
   function renderSelected() {
     selected.replaceChildren();
@@ -394,6 +415,7 @@ export function mountMatch(root, callbacks = {}) {
     if (call) classCopy.append(element('p', 'rb-ball-text', `Appel de ${state.players.find((q) => q.id === call.sourceId).name} : prochaine passe avec avantage.`));
     if (p.readiedPass) classCopy.append(element('p', 'rb-ball-text', 'Passe prête : attend un partenaire démarqué pour passer en réaction.'));
     selected.append(classCopy);
+    selected.append(element('p', 'rb-muted', p.hp === 0 ? 'KO · hors jeu' : p.reaction ? 'Réaction disponible' : 'Réaction dépensée'));
   }
   function renderRosters() {
     const focusedId = rosters.contains(document.activeElement) ? document.activeElement.dataset.rbPlayer : null;
@@ -405,13 +427,14 @@ export function mountMatch(root, callbacks = {}) {
       for (const p of visiblePlayers().filter((p) => p.teamId === team.id)) {
         const row = element('div', `rb-roster-row${p.hp === 0 ? ' is-ko' : ''}${selectedId === p.id ? ' is-selected' : ''}`);
         const playerButton = button(`${p.number} · ${p.name}`, 'rb-player-name'); playerButton.setAttribute('aria-pressed', String(selectedId === p.id)); playerButton.addEventListener('click', () => selectPlayer(p.id));
-        playerButton.dataset.rbPlayer = p.id;
-        const copy = element('div'); copy.append(playerButton, element('small', 'rb-archetype', archetypeLabel(p)), element('small', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
+        playerButton.dataset.rbPlayer = p.id; playerButton.dataset.focusKey = `match-player-${p.id}`; playerButton.title = p.name;
+        const copy = element('div', 'rb-roster-copy'); copy.append(playerButton, element('small', 'rb-archetype', archetypeLabel(p)), element('small', 'rb-muted rb-roster-tactics', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
         const health = element('div', 'rb-health'); health.append(element('span', '', `${p.hp}/${p.maxHp} PV`));
         const meter = element('meter'); meter.min = 0; meter.max = p.maxHp; meter.value = p.hp; meter.setAttribute('aria-label', `Points de vie de ${p.name}`); health.append(meter);
         const conditions = p.hp === 0 ? 'KO' : [p.grappledBy ? 'Agrippé' : '', p.grappling ? `Tient ${state.players.find((q) => q.id === p.grappling).name}` : '', p.prone ? 'À terre' : '', p.dodging ? 'Esquive' : '', p.readiedPass ? 'Passe prête' : '', (displayFrame?.ball ?? state.ball).carrierId === p.id ? 'Ballon' : ''].filter(Boolean).join(' · ');
         const resource = element('small', 'rb-resource', p.hp === 0 ? 'Hors jeu' : p.reaction ? 'Réaction disponible' : 'Réaction dépensée');
-        row.append(athletePortrait(p, state.teams.find(t => t.id === p.teamId)?.kitColor), copy, health, element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions || '—'), resource,
+        const condition = element('span', conditions.includes('Ballon') ? 'rb-conditions rb-ball-text' : 'rb-conditions', conditions); condition.hidden = !conditions; condition.title = conditions;
+        row.append(athletePortrait(p, state.teams.find(t => t.id === p.teamId)?.kitColor), copy, health, condition, resource,
           element('small', 'rb-class-resource', classResources(p, state.players))); block.append(row);
       }
       rosters.append(block);
@@ -441,7 +464,7 @@ export function mountMatch(root, callbacks = {}) {
     const actions = element('div', 'rb-controls');
     if (context === 'broadcast') return;
     if (context === 'career') {
-      const back = button('Voir le bilan de la journée', 'rb-button rb-button-primary'); back.addEventListener('click', () => { setRunning(false); callbacks.onReturn?.(); });
+      const back = button('Voir le bilan de la journée', 'rb-button rb-button-primary'); back.addEventListener('click', () => { resultDialog.close(); setRunning(false); callbacks.onReturn?.(); });
       actions.append(back); resultPanel.append(actions); return;
     }
     const replay = button('Rejouer ce match', 'rb-button rb-button-primary'); replay.addEventListener('click', () => launch(lastConfig));
@@ -465,6 +488,7 @@ export function mountMatch(root, callbacks = {}) {
     }
     for (const [index, id] of ['home', 'away'].entries()) legend.children[index].lastChild.textContent = teamLabel(id);
     setup.hidden = started;
+    root.dataset.matchScreen = started ? 'playing' : 'setup';
     stage.hidden = !started;
     toolbar.hidden = !started || state.finished;
     if (context === 'broadcast') toolbar.hidden = true;
@@ -480,6 +504,7 @@ export function mountMatch(root, callbacks = {}) {
       chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${active ? ', action en cours' : ''}`); chip.title = `${p.name} · initiative ${p.initiative}`;
       chip.setAttribute('aria-current', String(active));
       chip.dataset.rbOrder = p.id;
+      chip.dataset.focusKey = `match-initiative-${p.id}`;
       chip.addEventListener('click', () => selectPlayer(p.id)); initiative.append(chip);
     }
     if (focusedOrder) initiative.querySelector(`[data-rb-order="${focusedOrder}"]`)?.focus({ preventScroll: true });
@@ -513,6 +538,7 @@ export function mountMatch(root, callbacks = {}) {
   }
   function tick() { timer = null; if (!visible()) { setRunning(false); return; } advance(); if (running) scheduleNextTurn(); }
   function launch(configuration) {
+    closeDialogs();
     context = 'exhibition';
     setRunning(false); resetKickoff(); lastConfig = structuredClone(configuration); state = createMatch(exhibitionIdentity(lastConfig));
     started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;
@@ -520,6 +546,7 @@ export function mountMatch(root, callbacks = {}) {
     pause.focus({ preventScroll: true }); scoreboard.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   function prepareAgain() {
+    closeDialogs();
     setRunning(false); resetKickoff(); started = false; selectedId = null; journalCount = 0; resultPanel.hidden = true; errorBox.hidden = true;
     journal.replaceChildren(element('li', 'rb-journal-empty', 'Ajustez les consignes. Conservez le code pour comparer vos choix sur le même tirage.'));
     updatePreview(); strategySelect.focus(); setup.scrollIntoView({ block: 'start', behavior: 'instant' });
@@ -538,14 +565,16 @@ export function mountMatch(root, callbacks = {}) {
     if (context === 'broadcast') return;
     setRunning(false);
     while (!state.finished && errorBox.hidden) advance({ animate: false });
-    if (state.finished) resultPanel.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+    if (state.finished) resultDialog.show('Bilan de la rencontre', resultButton);
   });
+  function closeDialogs() { playerDialog.close(); resultDialog.close(); helpDialog.close(); }
   const onVisibility = () => { if (document.hidden) setRunning(false); }, onPageHide = () => setRunning(false);
   document.addEventListener('visibilitychange', onVisibility);
   window.addEventListener?.('pagehide', onPageHide);
   updatePreview(); setRunning(false);
   return {
-    stop() { setRunning(false); resetKickoff(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', onPageHide); },
+    setPlaybackControls(node) { externalControls.replaceChildren(...(node ? [node] : [])); externalControls.hidden = !node; },
+    stop() { closeDialogs(); setRunning(false); resetKickoff(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', onPageHide); },
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
     broadcast(frame, elapsed = 0, { speed = 1, animate = true } = {}) {
@@ -560,6 +589,7 @@ export function mountMatch(root, callbacks = {}) {
       toolbar.hidden = true;
     },
     load(current, autoplay = false, { kickoff: freshKickoff = false } = {}) {
+      closeDialogs();
       setRunning(false); resetKickoff(); context = 'career'; lastConfig = structuredClone(current.config); state = structuredClone(current.state);
       ballReady = state.turns > 0 || state.finished;
       started = true; selectedId = null; journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true;

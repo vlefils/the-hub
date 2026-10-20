@@ -36,7 +36,7 @@ export function playerShop(club, player, { locked = false, onBuy, selectedItem, 
     if (item.slot === 'weapon') preview.append(el('p', 'rb-muted', ARENA_WEAPON_RULE));
     if (previewOnly) { preview.append(el('p', 'rb-muted', 'Cliquez sur cet objet pour le sélectionner.')); return; }
     if (replacing) preview.append(field(`Détruire ${CATALOGUE[player.implant].name} pour le remplacer`, replace));
-    preview.append(el('p', reason ? 'rb-loss' : 'rb-muted', reason || (item.price === 0 ? 'Dotation du club · aucun chroma débité. Le matériel remplacé reste en réserve.' : `Après achat : ${money(club.balance - item.price)}`)), buy);
+    preview.append(el('p', reason ? 'rb-loss' : 'rb-muted', reason || (item.price === 0 ? 'Dotation gratuite et illimitée pour chaque joueur. Aucun transfert nécessaire. Les objets achetés remplacés retournent en réserve.' : `Après achat : ${money(club.balance - item.price)}`)), buy);
   }
   hand.addEventListener('change', draw); choice.addEventListener('change', () => { onItem?.(choice.value); draw(); }); draw(); return root;
 }

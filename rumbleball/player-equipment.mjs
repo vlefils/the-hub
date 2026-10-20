@@ -40,7 +40,7 @@ export function playerEquipment(club, player, options = {}) {
     context.append(el('h5', '', EQUIPMENT_SLOTS[location]), el('p', 'rb-muted', id ? `${CATALOGUE[id].name} · ${CATALOGUE[id].effect}` : 'Sélectionnez une pièce du club ou achetez un équipement pour cet emplacement.'));
     context.append(playerInventory(club, player, { ...options, location, inline: true }), playerShop(club, player, { ...options, location, selectedItem, onItem: id => { selectedItem = id; options.onItem?.(id); } }));
     const workbench = el('div', 'rb-equipment-workbench'); workbench.append(diagram, context);
-    root.replaceChildren(el('h4', '', 'Équipement'), workbench, el('p', 'rb-muted rb-equipment-help', 'Cliquez un emplacement pour gérer son équipement. Les armes de dotation sont gratuites ; les modèles avancés et d’élite s’achètent en chromas. Sans arme équipée, le joueur conserve son matériel d’entraînement.'));
+    root.replaceChildren(el('h4', '', 'Équipement'), workbench, el('p', 'rb-muted rb-equipment-help', 'Une arme de dotation est équipée dès le recrutement. Les modèles de base sont gratuits et disponibles à volonté pour chaque joueur. Cliquez sur une main pour en changer ; les modèles améliorés s’achètent en chromas.'));
     if (focus) [...root.querySelectorAll('.rb-body-slot')].find(button => button.dataset.slot === location)?.focus({ preventScroll: true });
   }
   draw(); return root;

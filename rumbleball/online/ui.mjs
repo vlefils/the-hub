@@ -184,7 +184,8 @@ export async function mountOnline(root, config, connect, options = {}) {
       const overview = el('div', 'rb-league-layout'), ranking = el('section'), programme = el('section');
       const title = pageHeading('La ligue', `Saison ${league.season} · ${stage}`);
       const replays = btn(`Replays des rencontres · ${league.history.length}`, () => { modal.body.replaceChildren(); renderReplays(modal.body); modal.show('Replays des rencontres', replays); });
-      replays.classList.add('rb-quiet-action'); replays.dataset.focusKey = 'league-replays'; replays.setAttribute('aria-haspopup', 'dialog'); replays.setAttribute('data-readonly-control', 'true'); title.append(replays); body.append(title);
+      replays.classList.add('rb-quiet-action'); replays.dataset.focusKey = 'league-replays'; replays.setAttribute('aria-haspopup', 'dialog'); replays.setAttribute('data-readonly-control', 'true'); title.append(replays);
+      if (!league.broadcast) body.append(title);
       ranking.append(el('h3', '', 'Classement · phase de groupe'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id), qualifying: league.capacity ? playoffPlaces(league.capacity) : 0 }));
       if (league.capacity) ranking.append(qualificationLegend(playoffPlaces(league.capacity)));
       programme.append(el('h3', '', 'Programme de la soirée'));
@@ -192,7 +193,11 @@ export async function mountOnline(root, config, connect, options = {}) {
         const row = el('div', 'rb-fixture-row'); row.append(clubIdentity(league.members.find(m => m.userId === f.homeId), { compact: true }), clubIdentity(league.members.find(m => m.userId === f.awayId), { compact: true })); programme.append(row);
       }
       if (league.status === 'lobby') programme.append(el('p', 'rb-muted', 'Le calendrier sera établi au lancement de la saison.'));
-      overview.append(ranking, programme); body.append(overview);
+      overview.append(ranking, programme);
+      if (league.broadcast) {
+        const standings = btn('Classement, programme et replays', () => { modal.body.replaceChildren(title, overview); modal.show('La ligue', standings); });
+        standings.classList.add('rb-live-overview'); standings.dataset.focusKey = 'live-overview'; standings.setAttribute('aria-haspopup', 'dialog'); standings.setAttribute('data-readonly-control', 'true'); body.append(standings);
+      } else body.append(overview);
       const clubs = league.members.map(member => ({ id: member.userId, name: member.name }));
       if (league.playoffs || lastChampion) { overview.classList.add('has-playoffs'); overview.append(playoffBracket(league.playoffs ?? lastChampion.bracket, clubs, c.id)); }
     }
@@ -206,7 +211,7 @@ export async function mountOnline(root, config, connect, options = {}) {
       (body.querySelector('.rb-broadcast-save') ?? body).append(cancel);
     }
     // Read-only applies to forms as well as mutation buttons.
-    if (league.locked) for (const tag of ['input', 'select', 'button']) for (const control of body.querySelectorAll(tag)) if (control.getAttribute('data-readonly-control') !== 'true') control.disabled = true;
+    if (league.locked) for (const tag of ['input', 'select', 'button']) for (const control of body.querySelectorAll(tag)) if (!control.closest('.rb-online-live') && control.getAttribute('data-readonly-control') !== 'true') control.disabled = true;
   }
   function renderReplays(body) {
     body.append(el('p', 'rb-muted', 'Revoir les matchs terminés de la ligue, sans modifier les résultats ni la progression.'));
@@ -258,14 +263,13 @@ export async function mountOnline(root, config, connect, options = {}) {
     }
   }
   function renderLive(body) {
-    body.append(el('h3', '', 'La soirée en direct'));
-    body.append(live);
     const frame = league.broadcast;
+    if (!frame) body.append(el('h3', '', 'La soirée en direct'));
+    body.append(live);
     if (!frame) { view?.pause(); body.append(el('p', 'rb-muted', league.waitingForServer ? 'Diffusion retardée : attente du serveur. Reconnexion automatique en cours.' : league.status === 'broadcast' ? 'Pause entre deux rencontres. Prochain coup d’envoi indiqué ci-dessus.' : `Prochaine soirée : ${date(league.nextLockAt)}.`)); return; }
     live.hidden = false; if (!view) view = mountMatch(live);
     const key = `${frame.id}:${frame.roundStartsAt}:${frame.turns.length}`;
     if (key !== frameKey) { frameKey = key; view.broadcast(frame, Math.max(0, Date.now() + offset - Date.parse(frame.roundStartsAt))); }
-    if (!frame.turns.length) body.append(el('p', 'rb-online-lock', 'Coup d’envoi imminent…'));
   }
   async function poll() {
     if (inactive() || polling) return;

@@ -1,4 +1,4 @@
-import { clone, PROFILES, STARTS, ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
+import { clone, PROFILES, CLASS_SPEEDS, STARTS, ROLES, INSTRUCTIONS, STRATEGIES } from './data.mjs';
 import { decideClassAction, decideGroundPickup, decideMovement, decideTurn } from './ai.mjs';
 import { ARCHETYPES, initialClassState } from './classes.mjs';
 import { matchKits } from './appearance.mjs';
@@ -9,7 +9,7 @@ import { LONG_RULES, fatigueDisadvantage } from './career-rules.mjs';
 import { assertInvariants, beginTurn, cancelReadiedPass, carrier, emit, endTurn, legalAction, moveAlong, randomInt, readiedPasser, resolveAction, resolveClassAction, resolveCenterEngagement, resolveReadiedPass, stat, performAttack, distance } from './rules.mjs';
 
 export const DEFAULT_SEED = 'arche-01';
-export const CURRENT_RULES = 7;
+export const CURRENT_RULES = 8;
 export function seedHash(seed) {
   let n = 2166136261;
   for (const char of String(seed)) n = Math.imul(n ^ char.charCodeAt(0), 16777619);
@@ -26,7 +26,7 @@ export function createMatch(config = {}) {
   if (config.careerRules !== undefined && config.careerRules !== LONG_RULES) throw new Error('Règles de carrière inconnues.');
   const seed = String(config.seed ?? DEFAULT_SEED).slice(0, 80);
   const kits = matchKits(config.kitColors?.home, config.kitColors?.away);
-  const version = [2, 3, 4, 5, 6].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
+  const version = [2, 3, 4, 5, 6, 7].includes(config.rulesVersion) ? config.rulesVersion : CURRENT_RULES;
   const deployments = {}, openings = {};
   if (version >= 3) for (const side of ['home', 'away']) {
     openings[side] = config.openings?.[side] ?? defaultOpening(side === 'home' ? config.strategy : config.awayStrategy);
@@ -46,14 +46,16 @@ export function createMatch(config = {}) {
       const profiles = config.rosters?.[teamId] ?? PROFILES;
       if (!Array.isArray(profiles) || profiles.length !== 5) throw new Error('Cinq titulaires sont nécessaires.');
       return profiles.map((profile, index) => {
+        // Recorded rosters already include gear/fatigue; their speed is immutable.
+        const speed = config.rosters?.[teamId] || version < 8 ? profile.speed : CLASS_SPEEDS[profile.archetype];
         const assigned = (teamId === 'home' ? config.players : config.awayPlayers)?.[index] ?? (config.rosters?.[teamId] ? profile : undefined);
         const archetype = config.classes === false ? null : Object.hasOwn(ARCHETYPES, assigned?.archetype) ? assigned.archetype : profile.archetype;
-        return { ...clone(profile), id: `${teamId}-${index}`, teamId, number: index + 1,
+        return { ...clone(profile), speed, id: `${teamId}-${index}`, teamId, number: index + 1,
           archetype, classState: initialClassState(archetype, profile.level, profile), bonusAction: true, chargeRun: null, feintTargetId: null,
           name: config.rosters?.[teamId] ? profile.name : teamId === 'home' ? profile.trainingName : profile.name,
           role: Object.hasOwn(ROLES, assigned?.role) ? assigned.role : profile.role,
           instruction: Object.hasOwn(INSTRUCTIONS, assigned?.instruction) ? assigned.instruction : 'normal',
-          hp: profile.maxHp, position: version >= 3 ? { ...deployments[teamId][index] } : startPosition(teamId, index), movement: profile.speed,
+          hp: profile.maxHp, position: version >= 3 ? { ...deployments[teamId][index] } : startPosition(teamId, index), movement: speed,
           ...(version >= 3 ? { startPosition: { ...deployments[teamId][index] } } : {}),
           reaction: true, action: true, interaction: true, pickedUp: false, prone: false,
           ...(version >= 5 ? { readiedPass: null } : {}),
