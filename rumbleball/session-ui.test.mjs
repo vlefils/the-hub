@@ -7,6 +7,7 @@ import { createCareer, confirmDraft } from './career.mjs';
 import { exportCareer, CAREER_KEY } from './career-storage.mjs';
 import { environment, button, descendants } from './test-support/dom.mjs';
 import { MemoryStorage, soloTestService } from './test-support/solo.mjs';
+import { readNavigation, saveNavigation } from './navigation.mjs';
 
 const account = id => ({ id, email: `${id}@example.invalid` });
 const career = () => { const c = createCareer('Club à retrouver', 'session-test'); return confirmDraft(c, c.market.slice(0, 6).map(p => p.id)); };
@@ -21,7 +22,7 @@ function setup(initialUser = null) {
     async signInWithPassword() { emit('SIGNED_IN', account('owner')); return { data: { user: current } }; },
     async signOut() { emit('SIGNED_OUT', null); return {}; },
     async updateUser() { return { data: { user: current } }; },
-  }, request: (action, leagueId, payload) => backend.service.command(current?.id, { action, payload }) };
+  }, request: (action, leagueId, payload) => action === 'list' ? Promise.resolve({ leagues: [] }) : backend.service.command(current?.id, { action, payload }) };
   return { ...e, backend, storage, api, emit, options: { config: { enabled: true }, storage, connect: async () => api } };
 }
 
@@ -118,16 +119,80 @@ test('la réponse d’un ancien formulaire ne remonte pas une session déjà fer
   e.emit('SIGNED_OUT', null); complete({ data: { user: account('owner') } }); await pending;
   assert.equal(app.user, null); assert.match(e.root.textContent, /Se connecter/);
 });
-test('retour navigateur : la session est revérifiée et les vues arrêtées sont remontées proprement', async t => {
-  const e = setup(account('owner')), events = new Map(); let stops = 0;
+test('retour navigateur : la session est revérifiée et la même partie est remontée proprement', async t => {
+  const e = setup(account('owner')), events = new Map(); let stops = 0, mounts = 0;
   window.addEventListener = (type, callback) => { const list = events.get(type) ?? new Set(); list.add(callback); events.set(type, list); };
   window.removeEventListener = (type, callback) => events.get(type)?.delete(callback);
   await e.backend.command('owner', 'solo_import', { json: exportCareer(career()) });
-  const app = await mountApp(e.root, { ...e.options, careerView() { return { stop() { stops++; } }; } }); t.after(app.stop);
+  const app = await mountApp(e.root, { ...e.options, careerView(root) { mounts++; root.replaceChildren(); return { stop() { stops++; } }; } }); t.after(app.stop);
   await button(e.root, 'Ouvrir la partie Club à retrouver').click();
   for (const callback of events.get('pagehide')) callback(); assert.equal(stops, 1);
   for (const callback of events.get('pageshow')) await callback({ persisted: true });
-  assert.ok(button(e.root, 'Ouvrir la partie Club à retrouver'));
+  assert.equal(mounts, 2); assert.equal(readNavigation(e.storage, 'owner').mode, 'solo');
   e.emit('SIGNED_OUT', null); for (const callback of events.get('pageshow')) await callback({ persisted: true });
   assert.match(e.root.textContent, /Se connecter/); assert.doesNotMatch(e.root.textContent, /Club à retrouver/);
+});
+
+test('accueil : les ligues sont visibles à côté du solo et ouvrent directement la bonne ligue', async t => {
+  const e = setup(account('owner')); await e.backend.command('owner', 'solo_import', { json: exportCareer(career()) });
+  const request = e.api.request; let target;
+  e.api.request = (action, id, payload) => {
+    assert.equal(payload.accountId, 'owner');
+    return action === 'list' ? { leagues: [{ id: 'joined', name: 'Ligue des amis', status: 'recruitment', members: 3 }] } : request(action, id, payload);
+  };
+  const app = await mountSession(e.root, { ...e.options, onlineView(root, config, connect, options) { target = options.initialView; root.replaceChildren(); return { stop() {} }; } }); t.after(app.stop);
+  assert.ok(button(e.root, 'Ouvrir la partie Club à retrouver'));
+  assert.match(e.root.textContent, /Recrutement initial · 3 clubs/);
+  await button(e.root, 'Ouvrir la ligue Ligue des amis').click();
+  assert.deepEqual(target, { id: 'joined', screen: 'Club' });
+});
+
+test('accueil : une erreur multi laisse les carrières accessibles', async t => {
+  const e = setup(account('owner')); await e.backend.command('owner', 'solo_import', { json: exportCareer(career()) });
+  const request = e.api.request;
+  e.api.request = (action, id, payload) => action === 'list' ? Promise.reject(Error('Multi indisponible')) : request(action, id, payload);
+  const app = await mountSession(e.root, e.options); t.after(app.stop);
+  assert.ok(button(e.root, 'Ouvrir la partie Club à retrouver')); assert.match(e.root.textContent, /Impossible de charger vos ligues/);
+});
+
+test('refresh solo : reprend Ligue et Mes parties devient une destination explicite', async t => {
+  const e = setup(account('owner')); await e.backend.command('owner', 'solo_import', { json: exportCareer(career()) });
+  const first = await mountSession(e.root, e.options);
+  await button(e.root, 'Ouvrir la partie Club à retrouver').click(); await button(e.root, 'Ligue').click();
+  const previous = readNavigation(e.storage, 'owner'); assert.equal(previous.screen, 'Ligue'); first.stop();
+  const resumed = await mountSession(e.root, e.options); t.after(resumed.stop);
+  assert.equal(e.root.querySelector('.rb-career').dataset.workspaceScreen, 'Ligue');
+  await button(e.root, 'Mes parties').click(); assert.deepEqual(readNavigation(e.storage, 'owner'), { mode: 'home' }); resumed.stop();
+  const home = await mountSession(e.root, e.options); t.after(home.stop); assert.ok(button(e.root, 'Ouvrir la partie Club à retrouver'));
+});
+
+test('refresh multi : ligue et onglet conservés, sans restaurer la navigation d’un autre compte', async t => {
+  const e = setup(account('owner')); saveNavigation(e.storage, 'owner', { mode: 'multi', id: 'friends', screen: 'Ligue' });
+  let target, navigated;
+  const app = await mountSession(e.root, { ...e.options, onlineView(root, config, connect, options) { target = options.initialView; navigated = options.onNavigate; return { stop() {} }; } }); t.after(app.stop);
+  assert.deepEqual(target, { mode: 'multi', id: 'friends', screen: 'Ligue' });
+  navigated({ id: 'friends', screen: 'Club' }); assert.equal(readNavigation(e.storage, 'owner').screen, 'Club');
+  e.emit('SIGNED_OUT', null); navigated({ id: 'late', screen: 'Ligue' }); assert.equal(readNavigation(e.storage, 'owner').id, 'friends');
+  e.api.auth.signInWithPassword = async () => { e.emit('SIGNED_IN', account('other')); return { data: { user: account('other') } }; };
+  target = null; await e.root.querySelector('form').emit('submit'); assert.equal(target, null); assert.match(e.root.textContent, /Mes parties/);
+});
+
+test('refresh : une ancienne partie inaccessible ramène à la liste et explique l’erreur', async t => {
+  const e = setup(account('owner')); saveNavigation(e.storage, 'owner', { mode: 'solo', id: 'removed', screen: 'match' });
+  const app = await mountSession(e.root, e.options); t.after(app.stop);
+  assert.ok(button(e.root, 'Nouvelle partie solo')); assert.match(e.root.textContent, /Impossible de reprendre cet écran/);
+  assert.deepEqual(readNavigation(e.storage, 'owner'), { mode: 'home' });
+});
+
+test('deux onglets : le refresh conserve la navigation de chacun indépendamment', async t => {
+  const e = setup(account('owner')), tabA = new MemoryStorage(), tabB = new MemoryStorage();
+  await e.backend.command('owner', 'solo_import', { json: exportCareer(career()) });
+  window.sessionStorage = tabA;
+  const first = await mountSession(e.root, e.options); await button(e.root, 'Ouvrir la partie Club à retrouver').click(); await button(e.root, 'Ligue').click(); first.stop();
+  window.sessionStorage = tabB;
+  const second = await mountSession(e.root, e.options); assert.ok(button(e.root, 'Ouvrir la partie Club à retrouver')); second.stop();
+  window.sessionStorage = tabA;
+  const resumed = await mountSession(e.root, e.options); t.after(resumed.stop);
+  assert.equal(e.root.querySelector('.rb-career').dataset.workspaceScreen, 'Ligue');
+  assert.deepEqual(readNavigation(tabB, 'owner'), { mode: 'home' });
 });

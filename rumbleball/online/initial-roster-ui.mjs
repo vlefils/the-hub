@@ -3,7 +3,7 @@ import { compilePlayer, recruitmentPrice, salary, MAX_SQUAD_SIZE } from '../prog
 import { abilitySummary } from '../player-development-ui.mjs';
 import { archetypeLabel } from '../classes.mjs';
 
-export function initialRoster(club, selected, { onSelect, onConfirm }) {
+export function initialRoster(club, selected, { onSelect, onConfirm, locked = false }) {
   const root = el('section', 'rb-initial-roster'), list = el('div', 'rb-initial-candidates'), footer = el('div', 'rb-initial-total');
   root.append(el('p', 'rb-eyebrow', 'Journée 1 · Recrutement'), el('h2', '', 'Choisissez vos premières recrues'),
     el('p', 'rb-muted', 'Comparez leurs caractéristiques. Les cinq premières recrues sélectionnées seront titulaires, les suivantes rejoindront le banc. Les contrats sont payés ensemble à la validation.'), list, footer);
@@ -20,8 +20,8 @@ export function initialRoster(club, selected, { onSelect, onConfirm }) {
   function refresh() {
     const cost = club.market.filter(p => selected.has(p.id)).reduce((sum, p) => sum + recruitmentPrice(p), 0);
     summary.textContent = `${selected.size}/${MAX_SQUAD_SIZE} joueurs · Contrats : ${money(cost)} · Reste : ${money(club.balance - cost)} · 5 joueurs minimum`;
-    confirm.disabled = selected.size < 5 || selected.size > MAX_SQUAD_SIZE || cost > club.balance;
-    for (const [p, checkbox] of checks) checkbox.disabled = !selected.has(p.id) && (selected.size >= MAX_SQUAD_SIZE || cost + recruitmentPrice(p) > club.balance);
+    confirm.disabled = locked || selected.size < 5 || selected.size > MAX_SQUAD_SIZE || cost > club.balance;
+    for (const [p, checkbox] of checks) checkbox.disabled = locked || !selected.has(p.id) && (selected.size >= MAX_SQUAD_SIZE || cost + recruitmentPrice(p) > club.balance);
   }
   refresh(); return root;
 }

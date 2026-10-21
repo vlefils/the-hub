@@ -102,6 +102,7 @@ export async function mountOnline(root, config, connect, options = {}) {
   }
   async function renderLobby() {
     if (inactive()) return;
+    options.onNavigate?.({ id: null });
     modal.close();
     workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
@@ -138,6 +139,7 @@ export async function mountOnline(root, config, connect, options = {}) {
   }
   function renderLeague() {
     if (replayOpen || inactive()) return;
+    options.onNavigate?.({ id: league.id, screen: tab });
     content.className = 'rb-online-content';
     delete content.dataset.workspaceScreen;
     content.replaceChildren(); live.hidden = true;
@@ -149,9 +151,11 @@ export async function mountOnline(root, config, connect, options = {}) {
     }
     if (league.needsRecruitment) {
       workspaceHeader({ context: null, navigation: null });
-      content.append(pageHeading(league.name, `Premier rendez-vous : ${date(league.firstMatchAt)} · heure de Paris`), initialRoster(c, initialIds, {
+      content.append(pageHeading(league.name, `Premier rendez-vous : ${date(league.firstMatchAt)} · heure de Paris`),
+        el('p', 'rb-online-lock', league.locked ? 'Échéance atteinte : recrutement automatique en cours sur le serveur. Votre équipe apparaîtra ici automatiquement.' : 'Validez votre sélection avant le premier match. Sans validation à cette heure, le serveur recrutera six joueurs aux profils complémentaires avec votre budget initial. La ligue démarrera sans attendre.'), initialRoster(c, initialIds, {
+        locked: league.locked,
         onSelect() { formDirty = true; }, onConfirm: playerIds => attempt(() => send('initialRecruit', { playerIds })),
-      })); return;
+      }), btn('Changer de ligue', () => attempt(renderLobby))); return;
     }
     content.dataset.workspaceScreen = tab;
     const stage = league.status === 'lobby' ? 'Salle d’attente' : league.phase === 'playoffs' ? currentPlayoffRound(league.playoffs)?.name ?? 'Playoffs' : `Phase de groupe · journée ${league.day + 1}`;
@@ -162,7 +166,8 @@ export async function mountOnline(root, config, connect, options = {}) {
     heading.replaceChildren(copy, summary, actions);
     workspaceHeader({ context: heading });
     const pending = league.members.filter(m => !m.ready);
-    const lockMessage = league.status === 'recruitment' ? `Recrutement en cours : ${pending.map(m => m.name).join(', ')}. Le premier match attend la validation de tous les effectifs.` : league.locked ? 'Équipes verrouillées pour la soirée.' : league.nextLockAt ? `Modifiable jusqu’au ${date(league.nextLockAt)} · heure de Paris.` : 'Préparation libre jusqu’au lancement de la saison.';
+    const lockMessage = league.status === 'recruitment' ? `Recrutement en cours : ${pending.map(m => m.name).join(', ')}. À ${date(league.firstMatchAt)} (Paris), les effectifs non validés seront recrutés automatiquement pour lancer les matchs.` : league.locked ? 'Équipes verrouillées pour la soirée.' : league.nextLockAt ? `Modifiable jusqu’au ${date(league.nextLockAt)} · heure de Paris.` : 'Préparation libre jusqu’au lancement de la saison.';
+    if (league.autoRecruitedAt && league.season === 1 && league.day === 0) content.append(el('p', 'rb-muted', 'Votre effectif a été recruté automatiquement à l’échéance du premier match. Retrouvez vos joueurs dans Club.'));
     summary.setAttribute('aria-label', 'Finances en chromas');
     if (league.status === 'lobby') {
       waitingSlot = el('div'); content.append(waitingSlot); renderWaitingRoom();
@@ -229,15 +234,16 @@ export async function mountOnline(root, config, connect, options = {}) {
   async function openReplay(matchId, control) {
     if (busy) return;
     const leagueId = league.id;
-    control.disabled = true; control.textContent = 'Chargement du replay…';
+    if (control) { control.disabled = true; control.textContent = 'Chargement du replay…'; }
     try { return await attempt(async () => {
       const { replay } = await client.request('replay', leagueId, { matchId });
-      if (league?.id !== leagueId || tab !== 'Ligue' || stopped) return;
+      if (league?.id !== leagueId || tab !== 'Ligue' || inactive()) return;
       modal.close(); replayView?.stop(); view?.pause(); replayOpen = true; content.hidden = true; live.hidden = true; replayArea.hidden = false;
+      options.onNavigate?.({ id: leagueId, screen: 'Ligue', replayId: matchId });
       const back = btn('Retour aux replays', () => { replayView?.stop(); replayView = null; replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = 'Ligue'; renderLeague(); });
       const player = el('div'); replayArea.replaceChildren(back, pageHeading(`Replay · saison ${replay.season}, journée ${replay.day + 1}`), player);
       replayView = mountReplay(player, replay, mountMatch); replayArea.scrollIntoView({ block: 'start' }); back.focus();
-    }); } finally { control.disabled = false; control.textContent = 'Voir le replay'; }
+    }); } finally { if (control) { control.disabled = false; control.textContent = 'Voir le replay'; } }
   }
   function renderTeam(body, c) {
     teamDraft ??= preparationDraft(c);
@@ -292,9 +298,19 @@ export async function mountOnline(root, config, connect, options = {}) {
     if (inactive()) return { stop() {} };
     if (options.managedSession && !user) throw new Error('Session expirée. Reconnectez-vous au jeu.');
     if (new URLSearchParams(location.search).has('recovery') && user) renderAuth(true);
-    else if (user) await renderLobby(); else renderAuth();
+    else if (user) {
+      if (options.initialView?.id) {
+        try {
+          await send('get', {}, options.initialView.id);
+          if (!inactive()) {
+            tab = options.initialView.screen === 'Ligue' ? 'Ligue' : 'Club'; renderLeague();
+            if (options.initialView.replayId && !league.needsRecruitment && league.status !== 'lobby') await openReplay(options.initialView.replayId);
+          }
+        } catch (error) { if (!inactive()) { await renderLobby(); message(`Impossible de reprendre cette ligue : ${error.message}`); } }
+      } else await renderLobby();
+    } else renderAuth();
     timer = setTimeout(poll, 4000);
-  } catch (error) { message(error.message); content.append(el('p', 'rb-muted', 'La carrière solo reste disponible.')); }
+  } catch (error) { if (!inactive()) { message(error.message); content.append(el('p', 'rb-muted', 'La carrière solo reste disponible.')); } }
   const stop = () => { stopped = true; clearTimeout(timer); if (view?.stop) view.stop(); else view?.pause(); replayView?.stop(); modal.close(); authSubscription?.unsubscribe?.(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', stop); };
   const onVisibility = () => { if (!document.hidden && !inactive()) { frameKey = null; clearTimeout(timer); poll(); } };
   document.addEventListener('visibilitychange', onVisibility);

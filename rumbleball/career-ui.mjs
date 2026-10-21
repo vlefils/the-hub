@@ -30,7 +30,7 @@ export function mountCareer(root, mountMatch, options = {}) {
   const storage = options.sync?.storage ?? options.storage ?? { getItem: (key) => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value), removeItem: (key) => window.localStorage.removeItem(key) };
   let active = true;
   const loaded = loadCareer(storage);
-  let career = loaded.career, tab = 'Club', mode = 'career', unsaved = false, selectedPlayer = null, draftIds = new Set(), pendingImport = null;
+  let career = loaded.career, tab = options.initialView?.screen === 'Ligue' ? 'Ligue' : 'Club', mode = 'career', unsaved = false, selectedPlayer = null, draftIds = new Set(), pendingImport = null;
   const compilePlayer = (player, inventory = []) => compileProfile(player, inventory, career ?? {});
   const fatigue = player => playerFatigue(player, career ?? {});
   let marketFilter = '', comparePlayer = null, calendarDay = null, formationUndo = null;
@@ -114,6 +114,7 @@ export function mountCareer(root, mountMatch, options = {}) {
     if (mode === 'exhibition') { workspaceHeader({ context: null, navigation: null }); manager.hidden = true; matchArea.hidden = false; matchActions.hidden = true; view.exhibition(); }
     else { matchArea.hidden = true; manager.hidden = false; matchActions.hidden = false; renderManagement(); }
     careerMode.setAttribute('aria-pressed', String(mode === 'career')); exhibitionMode.setAttribute('aria-pressed', String(mode === 'exhibition'));
+    if (mode === 'exhibition') options.onNavigate?.({ screen: 'exhibition' });
   }
   importInput.addEventListener('change', async () => {
     const file = importInput.files[0]; importInput.value = ''; if (!file) return;
@@ -133,6 +134,7 @@ export function mountCareer(root, mountMatch, options = {}) {
   });
   function renderManagement(preserve = true) {
     if (tab === 'Bilan') { tab = 'Club'; modalKind = 'summary'; }
+    options.onNavigate?.({ screen: tab });
     const focusRoot = modal.visible ? modal.body : manager;
     const focusKey = preserve && focusRoot.contains(document.activeElement) ? document.activeElement.dataset.focusKey : null;
     const scroll = window.scrollY ?? 0, openKeys = new Set([...manager.querySelectorAll('details')].filter((n) => n.open).map((n) => n.dataset.sectionKey));
@@ -446,8 +448,10 @@ export function mountCareer(root, mountMatch, options = {}) {
     if (unsaved && !save()) return;
     modal.close();
     workspaceHeader({ navigation: null }); manager.hidden = true; matchArea.hidden = false; matchActions.hidden = false; view.load(career.current, autoplay, { kickoff: autoplay });
+    options.onNavigate?.({ screen: 'match' });
     matchArea.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
-  showMode('career');
+  showMode(options.initialView?.screen === 'exhibition' ? 'exhibition' : 'career');
+  if (options.initialView?.screen === 'match' && career?.current?.state) openMatch();
   return { stop() { active = false; unsubscribeSync?.(); modal.close(); saveDialog.close(); if (view.stop) view.stop(); else view.pause(); top.remove(); } };
 }

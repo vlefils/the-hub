@@ -17,6 +17,29 @@ async function foundClub(root) {
   await button(root, 'Valider les contrats').click();
 }
 
+test('reprise : retrouve Ligue puis une rencontre sauvegardée en pause sans nouveau salaire', () => {
+  const e = environment(); let c = createCareer('Reprise', 'restore-screen'); c = confirmDraft(c, c.market.slice(0, 6).map(p => p.id));
+  const store = { getItem: () => exportCareer(c), setItem() { throw Error('La reprise ne doit pas réécrire la partie'); } };
+  let loaded, autoplay, routed;
+  const match = () => ({ pause() {}, stop() {}, load(current, play) { loaded = current; autoplay = play; } });
+  const first = mountCareer(e.root, match, { storage: store, initialView: { screen: 'Ligue' }, onNavigate: view => { routed = view; } });
+  assert.equal(e.root.querySelector('.rb-career').dataset.workspaceScreen, 'Ligue'); assert.equal(routed.screen, 'Ligue'); first.stop();
+  c = launchCareerMatch(c); const before = structuredClone(c);
+  const second = mountCareer(e.root, match, { storage: store, initialView: { screen: 'match' }, onNavigate: view => { routed = view; } });
+  assert.equal(e.root.querySelector('.rb-match-area').hidden, false); assert.equal(routed.screen, 'match');
+  assert.equal(autoplay, false); assert.deepEqual(loaded, c.current); assert.deepEqual(c, before);
+  button(e.root, 'Retour au club · mettre en pause').click(); assert.equal(routed.screen, 'Club'); second.stop();
+});
+
+test('reprise : ancien écran de match sans rencontre revient au club ; Exhibition retrouve sa préparation', () => {
+  const e = environment(); let routed, exhibition = 0;
+  const match = () => ({ pause() {}, stop() {}, exhibition() { exhibition++; } });
+  const first = mountCareer(e.root, match, { initialView: { screen: 'match' }, onNavigate: view => { routed = view; } });
+  assert.equal(e.root.querySelector('.rb-match-area').hidden, true); assert.equal(routed.screen, 'Club'); first.stop();
+  const second = mountCareer(e.root, match, { initialView: { screen: 'exhibition' }, onNavigate: view => { routed = view; } });
+  assert.equal(exhibition, 1); assert.equal(e.root.querySelector('.rb-match-area').hidden, false); assert.equal(routed.screen, 'exhibition'); second.stop();
+});
+
 test('parcours UI : création, échange de titulaires, consignes, équipement et lecture seule en match', async () => {
   const e = environment(); const { mountMatch } = await import('./ui.mjs'); mountCareer(e.root, mountMatch); await foundClub(e.root);
   let c = e.saved(); assert.equal(c.balance, 900); assert.equal(c.lineup.length, 5);

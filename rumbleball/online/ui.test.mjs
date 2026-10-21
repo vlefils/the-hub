@@ -10,6 +10,7 @@ import { mountOnline } from './ui.mjs';
 import { mountMatch } from '../ui.mjs';
 import { createMatch, stepMatch } from '../engine.mjs';
 import { createCourtPlayback } from '../playback.mjs';
+import { startLeague as launchLeague } from './league.mjs';
 
 function setup(t) {
   const e = environment(); globalThis.location = new URL('http://127.0.0.1:8765/rumbleball/multi.html');
@@ -17,6 +18,47 @@ function setup(t) {
   t.mock.method(globalThis, 'setTimeout', (callback) => { e.pending.push(callback); return e.pending.length; }); t.mock.method(globalThis, 'clearTimeout', () => {});
   return e;
 }
+
+test('reprise multi : ouvre directement la ligue dans Ligue, puis mémorise Club et la liste', async t => {
+  const e = setup(t), now = '2026-10-18T10:00:00Z';
+  const state = startLeague(addBot(createLeague({ id: 'league', userId: 'u', name: 'Ligue à reprendre', clubName: 'Club', seed: 'restore', inviteCode: 'a'.repeat(32) }, now), 'u'), 'u', now);
+  const calls = [], routes = [];
+  const service = createLeagueService({ async get() { return { id: 'league', state, revision: 1 }; }, async list() { return []; } }, { now: () => now });
+  const app = await mountOnline(e.root, { enabled: true }, async () => ({ auth: { async getSession() { return { data: { session: { user: { id: 'u' } } } }; } },
+    request(action, leagueId, payload) { calls.push(action); return service.command('u', { action, leagueId, payload }); },
+  }), { managedSession: true, initialView: { id: 'league', screen: 'Ligue' }, onNavigate: route => routes.push(route) }); t.after(app.stop);
+  assert.deepEqual(calls, ['get']); assert.equal(e.root.querySelector('.rb-online-content').dataset.workspaceScreen, 'Ligue');
+  assert.deepEqual(routes.at(-1), { id: 'league', screen: 'Ligue' });
+  await button(e.root, 'Club').click(); assert.deepEqual(routes.at(-1), { id: 'league', screen: 'Club' });
+  await button(e.root, 'Changer de ligue').click(); assert.deepEqual(routes.at(-1), { id: null });
+});
+
+test('reprise multi : une ligue inaccessible revient à la liste sans exposer de club', async t => {
+  const e = setup(t), routes = [];
+  const app = await mountOnline(e.root, { enabled: true }, async () => ({ auth: { async getSession() { return { data: { session: { user: { id: 'u' } } } }; } },
+    async request(action) { if (action === 'get') throw Error('Accès réservé aux participants'); return { leagues: [] }; },
+  }), { managedSession: true, initialView: { id: 'foreign', screen: 'Club' }, onNavigate: route => routes.push(route) }); t.after(app.stop);
+  assert.match(e.root.textContent, /Vos ligues/); assert.match(e.root.textContent, /Impossible de reprendre cette ligue/);
+  assert.equal(e.root.querySelector('.rb-player-inspector'), null); assert.deepEqual(routes.at(-1), { id: null });
+});
+
+test('recrutement UI : explique l’équipe automatique à l’échéance, puis bloque les choix en attendant le worker', async t => {
+  const e = setup(t); let clock = '2026-10-18T10:00:00Z';
+  const kickoff = '2026-10-18T18:00:00Z', base = createLeague({ id: 'league', userId: 'u', name: 'Ligue', clubName: 'Club', seed: 'deadline-ui', inviteCode: 'a'.repeat(32) }, clock);
+  const state = launchLeague(addBot(base, 'u'), 'u', clock, { firstMatchAt: kickoff });
+  const service = createLeagueService({ async get() { return { id: 'league', state, revision: 1 }; } }, { now: () => clock });
+  const app = await mountOnline(e.root, { enabled: true }, async () => ({ auth: { async getSession() { return { data: { session: { user: { id: 'u' } } } }; } },
+    request: (action, leagueId, payload) => service.command('u', { action, leagueId, payload }),
+  }), { managedSession: true, initialView: { id: 'league' } }); t.after(app.stop);
+  assert.match(e.root.textContent, /six joueurs aux profils complémentaires/);
+  const checks = e.root.querySelectorAll('input').filter(n => n.type === 'checkbox');
+  for (const check of checks.slice(0, 5)) { check.checked = true; await check.emit('change'); }
+  assert.equal(button(e.root, 'Valider mon effectif').disabled, false);
+  clock = kickoff; const poll = e.pending.at(-1); await poll();
+  assert.match(e.root.textContent, /recrutement automatique en cours sur le serveur/);
+  assert.equal(button(e.root, 'Valider mon effectif').disabled, true);
+  assert.ok(e.root.querySelectorAll('input').every(n => n.disabled));
+});
 test('multi désactivé : parcours lisible, retour au solo et aucune création de compte ni requête', async (t) => {
   const e = setup(t); let calls = 0;
   await mountOnline(e.root, { enabled: false }, () => { calls++; });

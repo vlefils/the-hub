@@ -117,7 +117,25 @@ export function removeBot(input, userId, botId) {
   need(s.bots?.some(bot => bot.userId === botId), 'Bot introuvable.');
   s.bots = s.bots.filter(bot => bot.userId !== botId); s.capacity = null; return s;
 }
-export function isLocked(s, now) { return s.status === 'broadcast' || s.status === 'preparation' && instant(now) >= instant(s.nextLockAt); }
+export function isLocked(s, now) { return s.status === 'broadcast' || ['recruitment', 'preparation'].includes(s.status) && instant(now) >= instant(s.nextLockAt); }
+function recruitInitial(member, ids) {
+  const c = confirmDraft({ ...careerView(member.club, 0), status: 'draft' }, ids);
+  member.club = { ...c.clubs[0], lineup: c.lineup, inventory: c.inventory, market: c.market, balance: c.balance, transactions: c.transactions };
+  member.initialRecruitment = false; member.draft = null;
+}
+function recruitAtDeadline(member, now) {
+  const offers = [...member.club.market].sort((a, b) => recruitmentPrice(a) - recruitmentPrice(b)), ids = [];
+  let budget = member.club.balance;
+  // A captain, every specialist and two replacements; no equipment purchases.
+  for (const archetype of ['capitaine', 'belier', 'escamoteur', 'passeur', 'belier', 'escamoteur']) {
+    const available = offers.filter(p => !ids.includes(p.id) && recruitmentPrice(p) <= budget);
+    const player = available.find(p => PROFILES[p.profile].archetype === archetype) ?? available[0];
+    if (!player) break;
+    ids.push(player.id); budget -= recruitmentPrice(player);
+  }
+  recruitInitial(member, ids);
+  member.autoRecruitedAt = iso(instant(now));
+}
 export function editPreparation(input, userId, command, payload, now) {
   const s = copy(input), member = s.members.find((m) => m.userId === userId);
   need(member, 'Vous ne participez pas à cette ligue.'); need(!isLocked(s, now), 'Équipes verrouillées pour la soirée.');
@@ -125,9 +143,7 @@ export function editPreparation(input, userId, command, payload, now) {
   if (command === 'initialRecruit') {
     need(member.initialRecruitment === true && s.status === 'recruitment', 'Votre effectif initial est déjà recruté.');
     need(Array.isArray(payload.playerIds) && payload.playerIds.length <= MAX_SQUAD_SIZE, 'Sélectionnez de cinq à dix joueurs différents.');
-    const c = confirmDraft({ ...careerView(member.club, 0), status: 'draft' }, payload.playerIds);
-    member.club = { ...c.clubs[0], lineup: c.lineup, inventory: c.inventory, market: c.market, balance: c.balance, transactions: c.transactions };
-    member.initialRecruitment = false; member.draft = null;
+    recruitInitial(member, payload.playerIds);
     if (s.members.every(m => !m.initialRecruitment)) s.status = 'preparation';
     return s;
   }
@@ -234,6 +250,10 @@ function settle(s, game) {
 }
 export function advanceLeague(input, now, { maxRounds = Infinity } = {}) {
   const s = copy(input), t = instant(now);
+  if (s.status === 'recruitment' && t >= instant(s.nextLockAt)) {
+    for (const member of s.members) if (member.initialRecruitment) recruitAtDeadline(member, now);
+    s.status = 'preparation';
+  }
   if (s.status === 'preparation' && t >= instant(s.nextLockAt)) freezeNight(s, now);
   if (s.status !== 'broadcast') return s;
   for (const [index, game] of s.night.games.entries()) {
@@ -310,6 +330,6 @@ export function leagueProjection(s, userId, now) {
     phase: s.phase ?? 'groups', playoffs: copy(s.playoffs ?? null), playoffHistory: copy(s.playoffHistory ?? []),
     members: leagueParticipants(s).map((m) => ({ userId: m.userId, name: m.club.name, ready: !m.initialRecruitment, isBot: (s.bots ?? []).some(bot => bot.userId === m.userId), kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
     serverTime: iso(t), suggestedFirstMatchAt: s.status === 'lobby' ? nextLock(now) : null, nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
-    club: ownClub, needsRecruitment: Boolean(member.initialRecruitment), firstMatchAt: s.firstMatchAt ?? null, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
+    club: ownClub, needsRecruitment: Boolean(member.initialRecruitment), autoRecruitedAt: member.autoRecruitedAt ?? null, firstMatchAt: s.firstMatchAt ?? null, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
     history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: s.status === 'lobby' ? [] : s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

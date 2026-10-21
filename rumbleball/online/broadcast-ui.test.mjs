@@ -7,7 +7,7 @@ import { createLeague, joinLeague, editPreparation, advanceLeague } from './leag
 import { createLeagueService } from './server.mjs';
 import { PLAYER_DRAG_TYPE } from '../deployment-ui.mjs';
 
-async function online(t, lobby = false, capacity = 2) {
+async function online(t, lobby = false, capacity = 2, options = {}) {
   const e = environment(); globalThis.location = new URL('http://127.0.0.1:8767/rumbleball/multi.html');
   let clock = '2026-10-18T10:00:00Z', revision = 1, serial = 0, fail = false;
   const pending = new Map(); t.mock.method(Date, 'now', () => Date.parse(clock));
@@ -16,12 +16,25 @@ async function online(t, lobby = false, capacity = 2) {
   for (let i = 1; i < capacity; i++) state = joinLeague(state, String.fromCharCode(97 + i), { clubName: `Adversaires ${i}` }, clock); if (!lobby) state = startLeague(state, 'a', clock);
   const store = { async get() { return { id: state.id, revision, state: structuredClone(state) }; }, async list() { return [{ id: state.id, name: state.name, members: capacity, capacity }]; }, async commit(id, expected, next) { assert.equal(expected, revision); state = next; return ++revision; } };
   const service = createLeagueService(store, { now: () => clock });
-  const mounted = await mountOnline(e.root, { enabled: true }, async () => ({ auth: { async getSession() { return { data: { session: { user: { id: 'a', email: 'test@example.invalid' } } } }; }, onAuthStateChange() {} }, request(action, leagueId, payload) { if (fail && action === 'configure') { fail = false; throw Error('Connexion interrompue'); } return service.command('a', { action, leagueId, payload }); } }));
+  const api = { auth: { async getSession() { return { data: { session: { user: { id: 'a', email: 'test@example.invalid' } } } }; }, onAuthStateChange() {} }, request(action, leagueId, payload) { if (fail && action === 'configure') { fail = false; throw Error('Connexion interrompue'); } return service.command('a', { action, leagueId, payload }); } };
+  const mounted = await mountOnline(e.root, { enabled: true }, async () => api, options);
   await button(e.root, `Ligue · ${capacity} clubs`).click();
   const strategy = () => descendants(e.root.querySelector('.rb-online-body')).find(n => n.tagName === 'select' && n.children.some(o => o.value === 'possession'));
   const poll = async () => { const [id, fn] = [...pending][0]; pending.delete(id); await fn(); };
-  return { ...e, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); }, async startBroadcast() { clock = state.nextLockAt; state = advanceLeague(state, clock, { maxRounds: 1 }); revision++; await poll(); }, async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
+  return { ...e, api, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); }, async startBroadcast() { clock = state.nextLockAt; state = advanceLeague(state, clock, { maxRounds: 1 }); revision++; await poll(); }, async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
 }
+
+test('reprise replay : même rencontre après refresh, retour Ligue et état serveur intact', async t => {
+  const routes = [], e = await online(t, false, 2, { onNavigate: route => routes.push(route) });
+  await e.finishNight(); await button(e.root, 'Ligue').click();
+  await descendants(e.root).find(n => n.tagName === 'button' && n.textContent.startsWith('Replays des rencontres ·')).click();
+  await button(e.root, 'Voir le replay').click(); const route = routes.at(-1), before = structuredClone(e.state());
+  assert.equal(route.replayId, e.state().history[0].id); e.mounted.stop();
+  const resumed = await mountOnline(e.root, { enabled: true }, async () => e.api, { initialView: route, onNavigate: route => routes.push(route) }); t.after(resumed.stop);
+  assert.equal(e.root.querySelector('.rb-replay-area').hidden, false); assert.deepEqual(routes.at(-1), route);
+  assert.deepEqual(e.state(), before);
+  await button(e.root, 'Retour aux replays').click(); assert.deepEqual(routes.at(-1), { id: route.id, screen: 'Ligue' });
+});
 
 test('broadcast : une saisie survit aux onglets, à un achat et à une erreur réseau ; annulation complète', async t => {
   const e = await online(t), base = e.state().members[0].club;
