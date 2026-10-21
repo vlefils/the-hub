@@ -577,7 +577,7 @@ export function mountMatch(root, callbacks = {}) {
     stop() { closeDialogs(); setRunning(false); resetKickoff(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', onPageHide); },
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
-    broadcast(frame, elapsed = 0, { speed = 1, animate = true } = {}) {
+    broadcast(frame, elapsed = 0, { speed = 1, animate = true, entrance = null } = {}) {
       setRunning(false); resetKickoff(); context = 'broadcast'; started = true; ballReady = Boolean(frame.turns.length);
       state = structuredClone(frame.turns.at(-1)?.after ?? frame.initial);
       selectedId = state.players.some((p) => p.id === selectedId) ? selectedId : null;
@@ -585,6 +585,7 @@ export function mountMatch(root, callbacks = {}) {
       for (const events of frame.previousEvents ?? []) appendEvents(events);
       for (const turn of frame.turns) appendEvents(turn.events);
       render(frame.turns.at(-1)?.events ?? []);
+      if (entrance && !frame.turns.length && animate) courtPlayback.entrance(frame.initial, entrance);
       if (frame.turns.length && animate) courtPlayback.playRound(frame.turns, { speed, elapsed });
       toolbar.hidden = true;
     },

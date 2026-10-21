@@ -42,6 +42,19 @@ test('reprise multi : une ligue inaccessible revient à la liste sans exposer de
   assert.equal(e.root.querySelector('.rb-player-inspector'), null); assert.deepEqual(routes.at(-1), { id: null });
 });
 
+test('direct : reprise de l’onglet avant le recrutement, programme et navigation vers le choix des recrues', async t => {
+  const e = setup(t), now = '2026-10-18T10:00:00Z', routes = [];
+  const state = launchLeague(addBot(createLeague({ id: 'league', userId: 'u', name: 'Avant le direct', clubName: 'Club', seed: 'before-direct', inviteCode: 'a'.repeat(32) }, now), 'u'), 'u', now, { firstMatchAt: '2026-10-18T18:00:00Z' });
+  t.mock.method(Date, 'now', () => Date.parse(now));
+  const service = createLeagueService({ async get() { return { id: 'league', state, revision: 1 }; } }, { now: () => now });
+  const app = await mountOnline(e.root, { enabled: true }, async () => ({ auth: { async getSession() { return { data: { session: { user: { id: 'u' } } } }; } },
+    request: (action, leagueId, payload) => service.command('u', { action, leagueId, payload }),
+  }), { managedSession: true, initialView: { id: 'league', screen: 'Direct' }, onNavigate: route => routes.push(route) }); t.after(app.stop);
+  assert.equal(e.root.querySelector('.rb-online-content').dataset.workspaceScreen, 'Direct'); assert.equal(e.root.querySelector('.rb-direct').dataset.phase, 'before');
+  assert.deepEqual(routes.at(-1), { id: 'league', screen: 'Direct' }); assert.equal(e.root.querySelector('.rb-initial-roster'), null);
+  await button(e.root, 'Club').click(); assert.ok(e.root.querySelector('.rb-initial-roster')); assert.ok(button(e.root, 'Direct'));
+});
+
 test('recrutement UI : explique l’équipe automatique à l’échéance, puis bloque les choix en attendant le worker', async t => {
   const e = setup(t); let clock = '2026-10-18T10:00:00Z';
   const kickoff = '2026-10-18T18:00:00Z', base = createLeague({ id: 'league', userId: 'u', name: 'Ligue', clubName: 'Club', seed: 'deadline-ui', inviteCode: 'a'.repeat(32) }, clock);

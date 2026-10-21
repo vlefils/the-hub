@@ -46,8 +46,20 @@ export function createLeagueService(store, { now = () => new Date().toISOString(
   async function tick(leagueId) {
     const due = leagueId ? [{ id: leagueId }] : await store.due(now()), results = [];
     for (const row of due) {
-      try { await update(row.id, (s, time) => advanceLeague(s, time, { maxRounds: 1 }), false); results.push({ id: row.id, ok: true }); }
-      catch (error) { results.push({ id: row.id, ok: false, error: error.message }); }
+      try {
+        if (store.claim) {
+          const claimed = await store.claim(row.id);
+          if (!claimed) { results.push({ id: row.id, ok: true, skipped: true }); continue; }
+          const state = advanceLeague(claimed.state, now(), { maxRounds: 1 });
+          await (store.commitTick ?? store.commit)(row.id, claimed.revision, state, false);
+        } else await update(row.id, (s, time) => advanceLeague(s, time, { maxRounds: 1 }), false);
+        results.push({ id: row.id, ok: true });
+      } catch (error) {
+        // Another committed revision already won. Do not recalculate the same
+        // round four times while the database is under pressure.
+        if (store.claim && error.message.includes('RB_CONFLICT')) results.push({ id: row.id, ok: true, skipped: true });
+        else results.push({ id: row.id, ok: false, error: error.message });
+      }
     }
     return results;
   }

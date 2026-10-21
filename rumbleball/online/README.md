@@ -77,6 +77,23 @@ L’onglet **Replays** affiche les rencontres terminées de la ligue, par soiré
 
 La table privée `rb_replays` archive les images au moment où le résultat est réglé, dans la même transaction PostgreSQL. Les archives résistent au remplacement de la soirée courante et ne sont pas réécrites par un nouvel appel du worker. L’action API `replay` vérifie l’appartenance à la ligue et la fin de la rencontre avant de lire l’archive ; elle filtre les graines et l’état du hasard comme la diffusion en direct. Aucun accès navigateur direct n’est accordé à cette table.
 
+### Stockage compact des rencontres
+
+Depuis le 21 octobre 2026, les nouvelles rondes utilisent `rb-round-delta-v1` : un état de départ indépendant par ronde, un dictionnaire de chemins référencés par nombres et les seules modifications de chaque action. Le moteur conserve son dernier état complet pour reprendre le calcul. Le direct décode uniquement la ronde publique courante ; le contrat envoyé au navigateur reste identique. Les rondes historiques avec `before`/`after` complets restent lisibles et peuvent coexister avec de nouvelles rondes compactes dans un match repris.
+
+À la clôture, le serveur compacte et compresse le replay en gzip, dans une enveloppe JSON `rb-replay-gzip-v1` avec identifiant de rencontre, nombre de rondes, taille décompressée et empreinte SHA-256. La taille est bornée à 8 Mio compressés et 32 Mio décompressés ; la lecture contrôle l’empreinte et borne la décompression. L’enveloppe est enregistrée dans `rb_replays` par le trigger, puis retirée de l’état actif dans la même transaction. Un conflit avec une archive différente annule la transaction. Le trigger continue de prendre en charge un ancien worker déjà en cours d’exécution.
+
+Déploiement : appliquer `../../supabase/migrations/20261021220000_rumbleball_compressed_replays.sql`, déployer `rumbleball-api` et `rumbleball-worker`, puis seulement convertir les anciennes archives. La migration ne modifie aucune partie ni archive existante. Une version d’API capable de lire le nouveau format doit rester déployée tant que des archives compressées sont présentes.
+
+L’outil `../../tools/compact-rumbleball-replays.mjs` prépare une sauvegarde dans un nouveau dossier dédié, vérifie tous les états reconstruits, puis permet une conversion séquentielle avec comparaison atomique de chaque original. Il ne modifie ni les ligues ni les sauvegardes solo. Fournir `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` uniquement dans l’environnement serveur local ; le dossier de sauvegarde et les fichiers de clés restent ignorés par Git.
+
+```sh
+node --max-old-space-size=128 --env-file=.local/rumbleball-supabase.env tools/compact-rumbleball-replays.mjs --project-ref=PROJECT_REF --backup-dir=.local/replay-backup
+node --max-old-space-size=128 --env-file=.local/rumbleball-supabase.env tools/compact-rumbleball-replays.mjs --project-ref=PROJECT_REF --backup-dir=.local/replay-backup --apply
+```
+
+La première commande ne fait aucune écriture en base. La seconde conserve les originaux et le manifeste de migration, relit chaque archive convertie et vérifie le résultat complet. Elle peut être relancée avec le même dossier après une réponse perdue. Le nombre de résultats est contrôlé pour refuser une réponse tronquée. Voir le [contrôle du déploiement](../playtests/compressed-replays-2026-10-21.md).
+
 La migration récupère aussi les matchs terminés de la dernière soirée encore stockée. Les soirées plus anciennes dont les images ont déjà été remplacées restent dans l’historique, avec une indication d’indisponibilité. Les replays deviennent durables à partir de l’installation de la migration.
 
 Les tables `rb_leagues` et `rb_memberships` sont isolées par leur préfixe. Leur RLS est active et les rôles navigateur n’ont aucun accès direct. Les états internes contiennent les futurs résultats ; seule la projection filtrée de l’API est consultable. La clé publique ne permet pas de lire ou d’écrire ces états. L’unique fonction d’écriture atomique est réservée au rôle serveur.

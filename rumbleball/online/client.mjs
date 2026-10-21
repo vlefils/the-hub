@@ -5,7 +5,16 @@ export async function connectOnline(config, load = () => import('https://esm.sh/
   return {
     auth: supabase.auth,
     async request(action, leagueId, payload = {}) {
-      const { data, error } = await supabase.functions.invoke('rumbleball-api', { body: { action, leagueId, payload } });
+      // Bound a stalled backend request; late save acknowledgements remain safe
+      // because the solo outbox retries the same writeId and revision.
+      const controller = new AbortController(); let timer;
+      const timeout = new Promise((_, reject) => { timer = setTimeout(() => {
+        controller.abort(); reject(Object.assign(new Error('Supabase ne répond pas à temps. Réessayez dans quelques instants ; votre progression locale est conservée.'), { code: 'BACKEND_TIMEOUT' }));
+      }, 15000); });
+      let result;
+      try { result = await Promise.race([supabase.functions.invoke('rumbleball-api', { body: { action, leagueId, payload }, signal: controller.signal }), timeout]); }
+      finally { clearTimeout(timer); }
+      const { data, error } = result;
       if (error) {
         let message = error.message, code;
         try { const details = await error.context.json(); message = details.error ?? message; code = details.code; } catch {}

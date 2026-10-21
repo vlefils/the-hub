@@ -12,6 +12,7 @@ import { qualificationLegend, playoffBracket } from '../playoffs-ui.mjs';
 import { waitingRoom } from './lobby-ui.mjs';
 import { initialRoster } from './initial-roster-ui.mjs';
 import { scheduledInstant } from './schedule.mjs';
+import { createDirectDesk } from './direct-ui.mjs';
 
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
@@ -28,9 +29,9 @@ export async function mountOnline(root, config, connect, options = {}) {
   const replayArea = el('section', 'rb-replay-area'); replayArea.hidden = true;
   root.append(top, notice, content, live, replayArea);
   let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30, waitingSlot;
-  let firstMatchChoice = '', initialIds = new Set();
+  let firstMatchChoice = '', initialIds = new Set(), directDesk;
   const modal = managementDialog(root, () => { marketOpen = false; });
-  let client, user, league, tab = 'Club', busy = false, polling = false, stopped = false, timer, view, frameKey, offset = 0, revision = null, formDirty = false, authSubscription;
+  let client, user, league, tab = 'Club', busy = false, polling = false, pollFailures = 0, stopped = false, timer, view, offset = 0, revision = null, formDirty = false, authSubscription;
   const inactive = () => stopped || options.isActive?.() === false;
   function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; if (error && modal.visible) modal.message(text); }
   async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; if (modal.visible) modal.message(''); try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
@@ -50,7 +51,8 @@ export async function mountOnline(root, config, connect, options = {}) {
       }
       league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
       if (roomOnly) { if (changed) renderWaitingRoom(); }
-      else if (action !== 'get' || changed || tab === 'Ligue') renderLeague();
+      else if (action === 'get' && tab === 'Direct' && directDesk && next.status !== 'lobby') directDesk.update(league);
+      else if (action !== 'get' || changed || tab === 'Ligue' || tab === 'Direct') renderLeague();
       if (discarded) message('Coup d’envoi : les modifications non enregistrées n’ont pas été retenues. La dernière préparation enregistrée est utilisée.', false);
     }
     return result;
@@ -72,6 +74,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     return { stop() {} };
   }
   function renderAuth(recovery = false) {
+    directDesk?.stop(); directDesk = null;
     modal.close();
     workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
@@ -103,11 +106,12 @@ export async function mountOnline(root, config, connect, options = {}) {
   async function renderLobby() {
     if (inactive()) return;
     options.onNavigate?.({ id: null });
+    directDesk?.stop(); directDesk = null;
     modal.close();
     workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
     content.className = 'rb-online-lobby';
-    league = null; teamDraft = null; revision = null; frameKey = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'));
+    league = null; teamDraft = null; revision = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'));
     if (!options.managedSession) identity.append(btn('Déconnexion', () => attempt(async () => { await client.auth.signOut(); user = null; renderAuth(); })));
     const { leagues } = await client.request('list');
     if (inactive()) return;
@@ -139,6 +143,7 @@ export async function mountOnline(root, config, connect, options = {}) {
   }
   function renderLeague() {
     if (replayOpen || inactive()) return;
+    directDesk?.stop(); directDesk = null;
     options.onNavigate?.({ id: league.id, screen: tab });
     content.className = 'rb-online-content';
     delete content.dataset.workspaceScreen;
@@ -149,13 +154,15 @@ export async function mountOnline(root, config, connect, options = {}) {
       content.append(pageHeading(league.name, 'Invitez les managers avant de lancer la saison.'), btn('Changer de ligue', () => attempt(renderLobby)));
       waitingSlot = el('div'); content.append(waitingSlot); renderWaitingRoom(); return;
     }
-    if (league.needsRecruitment) {
+    if (league.needsRecruitment && tab === 'Club') {
       workspaceHeader({ context: null, navigation: null });
+      const nav = navigation();
       content.append(pageHeading(league.name, `Premier rendez-vous : ${date(league.firstMatchAt)} · heure de Paris`),
+        nav,
         el('p', 'rb-online-lock', league.locked ? 'Échéance atteinte : recrutement automatique en cours sur le serveur. Votre équipe apparaîtra ici automatiquement.' : 'Validez votre sélection avant le premier match. Sans validation à cette heure, le serveur recrutera six joueurs aux profils complémentaires avec votre budget initial. La ligue démarrera sans attendre.'), initialRoster(c, initialIds, {
         locked: league.locked,
         onSelect() { formDirty = true; }, onConfirm: playerIds => attempt(() => send('initialRecruit', { playerIds })),
-      }), btn('Changer de ligue', () => attempt(renderLobby))); return;
+      }), btn('Changer de ligue', () => attempt(renderLobby))); workspaceHeader({ navigation: nav }); return;
     }
     content.dataset.workspaceScreen = tab;
     const stage = league.status === 'lobby' ? 'Salle d’attente' : league.phase === 'playoffs' ? currentPlayoffRound(league.playoffs)?.name ?? 'Playoffs' : `Phase de groupe · journée ${league.day + 1}`;
@@ -181,8 +188,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     if (league.phase === 'playoffs') content.append(el('p', 'rb-competition-status', fixture ? `${stage} · élimination directe` : 'Votre club ne dispute plus les playoffs. Suivez les rencontres et le tableau dans Ligue.'));
     const lastChampion = league.playoffHistory?.at(-1);
     if (lastChampion) content.append(el('p', 'rb-competition-status', `Champion de la saison ${lastChampion.season} : ${league.members.find(member => member.userId === lastChampion.bracket.championId)?.name}`));
-    const nav = workspaceNavigation(tab, label => { modal.close(); replayView?.stop(); view?.pause(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; frameKey = null; renderLeague(); });
-    content.append(nav); workspaceHeader({ navigation: nav });
+    const nav = navigation(); content.append(nav); workspaceHeader({ navigation: nav });
     const body = el('section', 'rb-online-body'); content.append(body);
     if (tab === 'Club') renderTeam(body, c);
     if (tab === 'Ligue') {
@@ -190,7 +196,7 @@ export async function mountOnline(root, config, connect, options = {}) {
       const title = pageHeading('La ligue', `Saison ${league.season} · ${stage}`);
       const replays = btn(`Replays des rencontres · ${league.history.length}`, () => { modal.body.replaceChildren(); renderReplays(modal.body); modal.show('Replays des rencontres', replays); });
       replays.classList.add('rb-quiet-action'); replays.dataset.focusKey = 'league-replays'; replays.setAttribute('aria-haspopup', 'dialog'); replays.setAttribute('data-readonly-control', 'true'); title.append(replays);
-      if (!league.broadcast) body.append(title);
+      body.append(title);
       ranking.append(el('h3', '', 'Classement · phase de groupe'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id), qualifying: league.capacity ? playoffPlaces(league.capacity) : 0 }));
       if (league.capacity) ranking.append(qualificationLegend(playoffPlaces(league.capacity)));
       programme.append(el('h3', '', 'Programme de la soirée'));
@@ -199,16 +205,20 @@ export async function mountOnline(root, config, connect, options = {}) {
       }
       if (league.status === 'lobby') programme.append(el('p', 'rb-muted', 'Le calendrier sera établi au lancement de la saison.'));
       overview.append(ranking, programme);
-      if (league.broadcast) {
-        const standings = btn('Classement, programme et replays', () => { modal.body.replaceChildren(title, overview); modal.show('La ligue', standings); });
-        standings.classList.add('rb-live-overview'); standings.dataset.focusKey = 'live-overview'; standings.setAttribute('aria-haspopup', 'dialog'); standings.setAttribute('data-readonly-control', 'true'); body.append(standings);
-      } else body.append(overview);
+      body.append(overview);
       const clubs = league.members.map(member => ({ id: member.userId, name: member.name }));
       if (league.playoffs || lastChampion) { overview.classList.add('has-playoffs'); overview.append(playoffBracket(league.playoffs ?? lastChampion.bracket, clubs, c.id)); }
     }
-    if (tab === 'Ligue') renderLive(body);
+    if (tab === 'Direct') {
+      directDesk = createDirectDesk(live, { clock: () => Date.now() + offset, onFrame(frame, elapsed, entrance) {
+        if (!frame) { view?.pause(); return; }
+        if (!view) view = mountMatch(live);
+        view.broadcast(frame, elapsed, { entrance });
+      } });
+      body.append(directDesk.root); directDesk.update(league);
+    }
     if (marketOpen) { modal.body.replaceChildren(); renderMarket(modal.body, c); modal.show('Recrutement'); }
-    if (league.hasDraft) {
+    if (league.hasDraft && tab === 'Club') {
       const cancel = el('div', 'rb-preparation-cancel');
       const undo = action('Annuler la préparation', 'cancel', {}), description = el('p', 'rb-sr-only', 'Rétablit la composition, les recrutements, les achats et le blason précédents, avant le verrouillage.');
       description.id = 'rb-cancel-preparation-note'; undo.setAttribute('aria-describedby', description.id); undo.title = description.textContent;
@@ -217,6 +227,11 @@ export async function mountOnline(root, config, connect, options = {}) {
     }
     // Read-only applies to forms as well as mutation buttons.
     if (league.locked) for (const tag of ['input', 'select', 'button']) for (const control of body.querySelectorAll(tag)) if (!control.closest('.rb-online-live') && control.getAttribute('data-readonly-control') !== 'true') control.disabled = true;
+  }
+  function navigation() {
+    const nav = workspaceNavigation(tab, label => { modal.close(); replayView?.stop(); view?.pause(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; renderLeague(); }, ['Club', 'Ligue', 'Direct']);
+    nav.classList.add('rb-online-navigation');
+    return nav;
   }
   function renderReplays(body) {
     body.append(el('p', 'rb-muted', 'Revoir les matchs terminés de la ligue, sans modifier les résultats ni la progression.'));
@@ -268,24 +283,16 @@ export async function mountOnline(root, config, connect, options = {}) {
       if (blocked) { buy.disabled = true; row.append(el('small', 'rb-muted', blocked)); } row.append(buy); list.append(row);
     }
   }
-  function renderLive(body) {
-    const frame = league.broadcast;
-    if (!frame) body.append(el('h3', '', 'La soirée en direct'));
-    body.append(live);
-    if (!frame) { view?.pause(); body.append(el('p', 'rb-muted', league.waitingForServer ? 'Diffusion retardée : attente du serveur. Reconnexion automatique en cours.' : league.status === 'broadcast' ? 'Pause entre deux rencontres. Prochain coup d’envoi indiqué ci-dessus.' : `Prochaine soirée : ${date(league.nextLockAt)}.`)); return; }
-    live.hidden = false; if (!view) view = mountMatch(live);
-    const key = `${frame.id}:${frame.roundStartsAt}:${frame.turns.length}`;
-    if (key !== frameKey) { frameKey = key; view.broadcast(frame, Math.max(0, Date.now() + offset - Date.parse(frame.roundStartsAt))); }
-  }
   async function poll() {
     if (inactive() || polling) return;
     polling = true;
     try {
-      if (!document.hidden && user && league && !busy && (['lobby', 'recruitment'].includes(league.status) || tab === 'Ligue' || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
+      if (!document.hidden && user && league && !busy && (['lobby', 'recruitment'].includes(league.status) || ['Ligue', 'Direct'].includes(tab) || league.status === 'broadcast' || league.nextLockAt && Date.now() + offset >= Date.parse(league.nextLockAt))) {
         await send('get');
+        pollFailures = 0;
       }
-    } catch (error) { message(`Connexion interrompue. Nouvelle tentative automatique : ${error.message}`); }
-    finally { polling = false; if (!stopped) timer = setTimeout(poll, 4000); }
+    } catch (error) { pollFailures = Math.min(pollFailures + 1, 3); message(`Connexion interrompue. Nouvelle tentative automatique dans ${Math.min(30, 4 * 2 ** pollFailures)} secondes : ${error.message}`); }
+    finally { polling = false; if (!stopped) timer = setTimeout(poll, Math.min(30000, 4000 * 2 ** pollFailures)); }
   }
   try {
     client = await connect(config);
@@ -303,7 +310,7 @@ export async function mountOnline(root, config, connect, options = {}) {
         try {
           await send('get', {}, options.initialView.id);
           if (!inactive()) {
-            tab = options.initialView.screen === 'Ligue' ? 'Ligue' : 'Club'; renderLeague();
+            tab = ['Ligue', 'Direct'].includes(options.initialView.screen) ? options.initialView.screen : 'Club'; renderLeague();
             if (options.initialView.replayId && !league.needsRecruitment && league.status !== 'lobby') await openReplay(options.initialView.replayId);
           }
         } catch (error) { if (!inactive()) { await renderLobby(); message(`Impossible de reprendre cette ligue : ${error.message}`); } }
@@ -311,8 +318,8 @@ export async function mountOnline(root, config, connect, options = {}) {
     } else renderAuth();
     timer = setTimeout(poll, 4000);
   } catch (error) { if (!inactive()) { message(error.message); content.append(el('p', 'rb-muted', 'La carrière solo reste disponible.')); } }
-  const stop = () => { stopped = true; clearTimeout(timer); if (view?.stop) view.stop(); else view?.pause(); replayView?.stop(); modal.close(); authSubscription?.unsubscribe?.(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', stop); };
-  const onVisibility = () => { if (!document.hidden && !inactive()) { frameKey = null; clearTimeout(timer); poll(); } };
+  const stop = () => { stopped = true; clearTimeout(timer); directDesk?.stop(); if (view?.stop) view.stop(); else view?.pause(); replayView?.stop(); modal.close(); authSubscription?.unsubscribe?.(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', stop); };
+  const onVisibility = () => { if (!document.hidden && !inactive()) { directDesk?.resume(); clearTimeout(timer); poll(); } };
   document.addEventListener('visibilitychange', onVisibility);
   window.addEventListener?.('pagehide', stop);
   return { stop };

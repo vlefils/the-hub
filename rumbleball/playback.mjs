@@ -272,6 +272,18 @@ export function sampleRoundPlayback(plan, elapsed) {
     ballPoint: flight ?? ballPoint(view), flying: Boolean(flight) };
 }
 
+export function entranceFrame(state, elapsed, duration) {
+  const frame = snapshot(state), walkDuration = Math.max(1, duration - Math.min(3000, duration / 2));
+  for (const [index, p] of frame.players.entries()) {
+    const delay = (index % 5) * Math.min(100, walkDuration / 10), progress = Math.max(0, Math.min(1, (elapsed - delay) / (walkDuration - delay)));
+    const x = p.teamId === 'home' ? -1.2 : 12.2, y = 3.5 + (index % 5 - 2) * .12, target = p.position;
+    p.position = { x: x + (target.x - x) * progress, y: y + (target.y - y) * progress };
+    p.walking = progress > 0 && progress < 1; p.walkPhase = elapsed / 65 + index;
+    if (p.walking) p.facing = Math.atan2(target.x - x, -(target.y - y)) * 180 / Math.PI;
+  }
+  return { ...frame, ballPoint: ballPoint(frame), effects: [], activeIds: [], animating: elapsed < duration };
+}
+
 export function createCourtPlayback(draw, {
   now = () => performance.now(), request = (callback) => requestAnimationFrame(callback),
   cancel = (id) => cancelAnimationFrame(id), reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
@@ -312,5 +324,6 @@ export function createCourtPlayback(draw, {
   };
   const play = (before, after, events, options) => run(buildCourtPlayback(before, after, events, { ...options, facings }), sampleCourtPlayback);
   const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, facings }), sampleRoundPlayback, options?.elapsed ?? 0);
-  return { show, play, playRound, settle, remaining: () => Math.max(0, endsAt - now()) };
+  const entrance = (state, { duration, elapsed = 0 }) => run({ final: snapshot(state), state, duration }, (plan, at) => entranceFrame(plan.state, at, plan.duration), elapsed);
+  return { show, play, playRound, entrance, settle, remaining: () => Math.max(0, endsAt - now()) };
 }

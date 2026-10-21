@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMatch, simulateMatch } from './engine.mjs';
 import { moveAlong, resolveAction } from './rules.mjs';
-import { buildCourtPlayback, courtPoint, createCourtPlayback, nextCourtTurnDelay, sampleCourtPlayback } from './playback.mjs';
+import { buildCourtPlayback, courtPoint, createCourtPlayback, nextCourtTurnDelay, sampleCourtPlayback, entranceFrame } from './playback.mjs';
 
 const p = (frame, id) => frame.players.find((p) => p.id === id);
 const event = (type, data = {}) => ({ type, ...data });
@@ -166,6 +166,19 @@ function clock() {
     request: (callback) => { pending.set(++id, callback); return id; }, cancel: (id) => pending.delete(id),
     step: (value) => { time = value; const callbacks = [...pending.values()]; pending.clear(); callbacks.forEach((cb) => cb(time)); } };
 }
+
+test('entrée des équipes : marche depuis les tunnels, horloge absolue, état moteur préservé et mouvement réduit', () => {
+  const { before } = fixture(), original = structuredClone(before), c = clock(), frames = [];
+  const start = entranceFrame(before, 0, 8000), middle = entranceFrame(before, 2000, 8000), end = entranceFrame(before, 8000, 8000);
+  assert.ok(start.players.filter(p => p.teamId === 'home').every(p => p.position.x < 0));
+  assert.ok(start.players.filter(p => p.teamId === 'away').every(p => p.position.x > 12));
+  assert.ok(middle.players.some(p => p.walking)); assert.deepEqual(end.players.map(p => p.position), before.players.map(p => p.position)); assert.deepEqual(before, original);
+  const playback = createCourtPlayback(frame => frames.push(frame), { ...c, reducedMotion: () => false });
+  playback.entrance(before, { duration: 8000, elapsed: 2000 }); assert.deepEqual(frames.at(-1).players.map(p => p.position), middle.players.map(p => p.position));
+  c.step(6000); assert.equal(c.pending.size, 0); assert.deepEqual(frames.at(-1).players.map(p => p.position), before.players.map(p => p.position));
+  const reduced = createCourtPlayback(frame => frames.push(frame), { ...c, reducedMotion: () => true }); reduced.entrance(before, { duration: 8000 });
+  assert.equal(c.pending.size, 0); assert.deepEqual(frames.at(-1).players.map(p => p.position), before.players.map(p => p.position));
+});
 test('pause : termine le glissement à la bonne case et retire tous les effets', () => {
   const { before, after, a } = fixture(); p(after, a.id).position = { x: 2, y: 3 };
   const c = clock(), frames = [], playback = createCourtPlayback((f) => frames.push(f), { ...c, reducedMotion: () => false });

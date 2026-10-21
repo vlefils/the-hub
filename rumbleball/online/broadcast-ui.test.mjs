@@ -38,7 +38,7 @@ test('reprise replay : même rencontre après refresh, retour Ligue et état ser
 
 test('broadcast : une saisie survit aux onglets, à un achat et à une erreur réseau ; annulation complète', async t => {
   const e = await online(t), base = e.state().members[0].club;
-  assert.deepEqual(e.root.querySelector('.rb-workspace-navigation').children.map(n => n.textContent), ['Club', 'Ligue']);
+  assert.deepEqual(e.root.querySelector('.rb-workspace-navigation').children.map(n => n.textContent), ['Club', 'Ligue', 'Direct']);
   e.strategy().value = 'possession'; await e.strategy().emit('input');
   assert.equal(button(e.root, 'Enregistrer la préparation').disabled, false);
   await button(e.root, 'Ligue').click(); await button(e.root, 'Club').click();
@@ -56,14 +56,16 @@ test('classement : quatre places signalées sur six et légende sous la table da
   const siblings = legend.parentNode.children; assert.equal(siblings[siblings.indexOf(legend) - 1].classList.contains('rb-table-scroll'), true); e.mounted.stop();
 });
 
-test('direct : terrain seul, classement en modale et fiches consultables même pendant le verrouillage', async t => {
-  const e = await online(t); await e.startBroadcast(); await button(e.root, 'Ligue').click();
+test('direct : onglet dédié, entrée des équipes et fiches consultables pendant le verrouillage', async t => {
+  const e = await online(t); await e.startBroadcast(); await button(e.root, 'Direct').click();
   const live = e.root.querySelector('.rb-online-live'), body = e.root.querySelector('.rb-online-body');
   assert.equal(live.hidden, false); assert.equal(body.querySelector('.rb-league-layout'), null);
   const player = live.querySelector('.rb-player-name'); assert.equal(Boolean(player.disabled), false); await player.click();
   assert.equal(live.querySelector('.rb-match-player-dialog').open, true); await button(live.querySelector('.rb-match-player-dialog'), 'Fermer').click();
-  await button(e.root, 'Classement, programme et replays').click();
-  const overview = e.root.querySelector('.rb-league-layout'); assert.ok(overview.closest('dialog')); assert.match(overview.textContent, /Classement/);
+  assert.equal(e.root.querySelector('.rb-direct').dataset.phase, 'entrance');
+  assert.match(e.root.querySelector('.rb-direct-clock').textContent, /00:08/);
+  await button(e.root, 'Ligue').click();
+  const overview = e.root.querySelector('.rb-league-layout'); assert.ok(overview); assert.match(overview.textContent, /Classement/);
   e.mounted.stop();
 });
 

@@ -1,16 +1,24 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8';
+import { prepareLeagueCommit, decodeReplayArchive } from '../../../rumbleball/online/replay-codec.mjs';
 
 export const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false, autoRefreshToken: false } });
 const checked = ({ data, error }: any) => { if (error) throw new Error(error.message); return data; };
+const commitLeague = async (id: string, revision: number, state: unknown, preparation: boolean, signal?: AbortSignal) => {
+  const prepared = await prepareLeagueCommit(state);
+  const query = admin.rpc('rb_commit_league', { p_id: id, p_expected_revision: revision, p_state: prepared, p_preparation: preparation });
+  return checked(await (signal ? query.abortSignal(signal) : query));
+};
 export const store = {
+  async claim(id: string) { return checked(await admin.rpc('rb_claim_tick', { p_id: id }).abortSignal(AbortSignal.timeout(10000))); },
+  async commitTick(id: string, revision: number, state: unknown) { return commitLeague(id, revision, state, false, AbortSignal.timeout(10000)); },
   async get(id: string) { return checked(await admin.from('rb_leagues').select('*').eq('id', id).maybeSingle()); },
   async invite(code: string) { return checked(await admin.from('rb_leagues').select('*').eq('invite_code', code).maybeSingle()); },
   async replay(leagueId: string, matchId: string) {
     const row = checked(await admin.from('rb_replays').select('replay').eq('league_id', leagueId).eq('match_id', matchId).maybeSingle());
-    return row?.replay ?? null;
+    return await decodeReplayArchive(row?.replay ?? null, matchId);
   },
   async commit(id: string, revision: number, state: unknown, preparation: boolean) {
-    return checked(await admin.rpc('rb_commit_league', { p_id: id, p_expected_revision: revision, p_state: state, p_preparation: preparation }));
+    return commitLeague(id, revision, state, preparation);
   },
   async list(userId: string) {
     const memberships = checked(await admin.from('rb_memberships').select('league_id').eq('user_id', userId));

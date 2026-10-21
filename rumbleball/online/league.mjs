@@ -11,8 +11,9 @@ import { clubOpening } from '../openings.mjs';
 import { ensureClubDevelopment, automaticAbilityIncreases, XP_THRESHOLDS, MAX_LEVEL } from '../player-development.mjs';
 import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture, playoffWinner } from '../playoffs.mjs';
 import { ensureClubEquipment } from '../equipment.mjs';
+import { encodeRound, decodeRound } from './replay-codec.mjs';
 
-export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: 3500 });
+export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: 8000 });
 export const MAX_LEAGUE_CLUBS = 128;
 export const leagueParticipants = s => [...s.members, ...(s.bots ?? [])];
 export const groupDays = count => 2 * (count + count % 2 - 1);
@@ -177,7 +178,7 @@ function computeRound(game) {
   let state = game.broadcast.final; const round = state.round, turns = [];
   do { const before = state, step = stepMatch(state, { stopAtRoundEnd: true }); state = step.state; turns.push({ before, after: state, events: step.events }); }
   while (!state.finished && state.round === round);
-  game.broadcast.rounds.push({ round, turns }); game.broadcast.final = state;
+  game.broadcast.rounds.push(encodeRound({ round, turns })); game.broadcast.final = state;
   if (state.finished) game.endsAt = iso(instant(game.playsAt) + game.broadcast.rounds.length * ONLINE_RULES.roundMs);
 }
 function transaction(club, amount, label, id) {
@@ -300,8 +301,10 @@ export function replayProjection(s, userId, matchId, archive, now) {
   const data = archive ?? (recent ? { initial: recent.broadcast.initial, rounds: recent.broadcast.rounds } : null);
   need(data?.initial && Array.isArray(data.rounds) && data.rounds.length, 'Les images de cette ancienne rencontre ne sont plus disponibles.');
   return { id: matchId, season: result.season, day: result.day, phase: result.phase ?? 'groups', endsAt: result.endsAt,
-    initial: publicState(data.initial, matchId), rounds: data.rounds.map(round => ({ round: round.round,
-      turns: round.turns.map(turn => ({ before: publicState(turn.before, matchId), after: publicState(turn.after, matchId), events: copy(turn.events) })) })) };
+    initial: publicState(data.initial, matchId), rounds: data.rounds.map(stored => {
+      const round = decodeRound(stored);
+      return { round: round.round, turns: round.turns.map(turn => ({ before: publicState(turn.before, matchId), after: publicState(turn.after, matchId), events: copy(turn.events) })) };
+    }) };
 }
 export function leagueProjection(s, userId, now) {
   const member = s.members.find((m) => m.userId === userId); need(member, 'Accès réservé aux participants.');
@@ -320,9 +323,9 @@ export function leagueProjection(s, userId, now) {
   let broadcast = null, waitingForServer = false;
   if (active) {
     const elapsed = Math.max(0, t - instant(active.playsAt)), index = Math.floor(elapsed / ONLINE_RULES.roundMs);
-    const round = active.broadcast.rounds[index];
+    const storedRound = active.broadcast.rounds[index], round = storedRound ? decodeRound(storedRound) : null;
     waitingForServer = t >= instant(active.playsAt) && !round;
-    if (!waitingForServer) broadcast = { id: active.id, initial: publicState(active.broadcast.initial, active.id), playsAt: active.playsAt,
+    if (!waitingForServer) broadcast = { id: active.id, initial: publicState(active.broadcast.initial, active.id), startsAt: active.startsAt, playsAt: active.playsAt,
       roundStartsAt: iso(instant(active.playsAt) + index * ONLINE_RULES.roundMs),
       turns: t < instant(active.playsAt) ? [] : round.turns.map((turn) => ({ before: publicState(turn.before, active.id), after: publicState(turn.after, active.id), events: copy(turn.events) })) };
   }

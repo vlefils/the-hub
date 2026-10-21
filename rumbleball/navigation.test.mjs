@@ -12,6 +12,8 @@ test('navigation : état réduit, valeurs validées et comptes séparés', () =>
   assert.equal(readNavigation(storage, 'c'), null);
   assert.equal(navigation({ mode: 'solo' }), null);
   assert.equal(navigation({ mode: 'unknown' }), null);
+  assert.equal(navigation({ mode: 'multi', id: 'l', screen: 'Direct' }).screen, 'Direct');
+  assert.equal(navigation({ mode: 'solo', id: 's', screen: 'Direct' }).screen, 'Club');
   assert.deepEqual(navigation({ mode: 'multi', id: 'l', screen: 'unknown', replayId: 'game' }), { mode: 'multi', id: 'l', screen: 'Ligue', replayId: 'game' });
 });
 

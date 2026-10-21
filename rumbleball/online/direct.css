@@ -1,0 +1,44 @@
+.rb-direct { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+.rb-direct-heading { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 1rem; }
+.rb-direct-heading h2 { margin: .15rem 0 0; font: 700 clamp(1.25rem, 2vw, 1.8rem)/1.2 'Rajdhani', sans-serif; overflow-wrap: anywhere; }
+.rb-direct-heading p { margin: 0; }
+.rb-direct-clock { flex: none; font: 700 clamp(1.75rem, 3vw, 2.75rem)/1 'Rajdhani', sans-serif; font-variant-numeric: tabular-nums; color: var(--rb-accent); }
+.rb-direct-stage { min-height: 0; display: flex; flex-direction: column; }
+.rb-direct-poster { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 2rem; padding: clamp(1.5rem, 5vw, 4rem); min-height: 20rem; background: linear-gradient(#071521c9, #071521e8), url('../assets/broadcast/arena-floor.svg') center / cover; }
+.rb-direct-versus { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); }
+.rb-direct-versus > .rb-club-identity { display: flex; flex-direction: column; text-align: center; gap: 1rem; font: 700 clamp(1.5rem, 3vw, 3rem)/1.1 'Rajdhani', sans-serif; overflow-wrap: anywhere; }
+.rb-direct-versus .rb-crest { width: clamp(4rem, 8vw, 8rem); flex-basis: auto; }
+.rb-direct-versus > span:not(.rb-club-identity) { color: var(--muted); font: 700 1.5rem 'Rajdhani', sans-serif; }
+.rb-direct-poster > p { max-width: 60ch; margin: 0 auto; text-align: center; }
+.rb-direct-recap { flex: none; margin: 0; color: var(--muted); overflow-wrap: anywhere; font-size: .9rem; }
+.rb-direct-programme { display: flex; flex: none; gap: 1.5rem; list-style: none; margin: 0; padding: .65rem 0; overflow-x: auto; overscroll-behavior: contain; border-top: 1px solid var(--rb-line); scrollbar-width: thin; }
+.rb-direct-programme > li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr); flex: 0 0 min(26rem, 85vw); align-items: center; gap: .25rem .5rem; }
+.rb-direct-order { grid-row: 1 / span 2; color: var(--muted); font-weight: 700; }
+.rb-direct-programme small { grid-column: 2 / -1; }
+.rb-direct-programme .rb-club-identity { min-width: 0; }
+.rb-direct-programme .rb-club-identity strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .85rem; }
+.rb-direct-programme .rb-crest { width: 1.6rem; flex-basis: 1.6rem; }
+.rb-direct-programme [data-status='live'] { color: var(--rb-accent); }
+.rb-direct .rb-online-live { margin: 0; }
+@media screen and (min-width: 1100px) {
+  body.rb-app:has([data-workspace-screen='Direct']) { height: 100svh; display: flex; flex-direction: column; }
+  body.rb-app:has([data-workspace-screen='Direct']) .rb-app-header { flex: none; grid-template-columns: 9rem minmax(0, 1fr) auto; min-height: 3.5rem; gap: .5rem 1rem; padding-block: .35rem; }
+  body.rb-app:has([data-workspace-screen='Direct']) .rb-app-brand { grid-column: 1; grid-row: 1; }
+  body.rb-app:has([data-workspace-screen='Direct']) .rb-shell-context { display: none; }
+  body.rb-app:has([data-workspace-screen='Direct']) .rb-shell-navigation { grid-column: 2; grid-row: 1; }
+  body.rb-app:has([data-workspace-screen='Direct']) .rb-account-tools { grid-column: 3; grid-row: 1; display: flex; align-items: center; }
+  .rb-app-main:has([data-workspace-screen='Direct']) { flex: 1; min-height: 0; display: flex; flex-direction: column; max-width: none; padding-block: .5rem; }
+  :is([data-rumbleball], [data-online], .rb-session-pane, .rb-online-content, .rb-online-body):not([hidden]):has(.rb-direct) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .rb-direct { flex: 1; min-height: 0; gap: .5rem; }
+  .rb-direct-stage { flex: 1; }
+  .rb-direct-poster { min-height: 0; }
+  .rb-direct .rb-online-live:not([hidden]) { flex: 1; min-height: 0; }
+  .rb-online-content[data-workspace-screen='Direct'] > .rb-competition-status { display: none; }
+}
+@media (max-width: 650px) {
+  .rb-online-navigation { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; gap: .35rem; }
+  .rb-app .rb-online-navigation > .rb-button { min-width: 0; padding-inline: .5rem; font-size: 1.1rem; }
+  .rb-direct-heading { flex-wrap: wrap; }
+  .rb-direct-poster { min-height: 16rem; padding: 1.5rem 1rem; }
+  .rb-direct-versus { gap: .75rem; }
+}

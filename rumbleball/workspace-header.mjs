@@ -2,9 +2,9 @@
 // Embedded instances and the test DOM keep their ordinary inline navigation.
 import { el, btn } from './career-components.mjs';
 
-export function workspaceNavigation(active, onChange) {
+export function workspaceNavigation(active, onChange, labels = ['Club', 'Ligue']) {
   const nav = el('nav', 'rb-workspace-navigation'); nav.setAttribute('aria-label', 'Navigation principale');
-  for (const label of ['Club', 'Ligue']) {
+  for (const label of labels) {
     const button = btn(label, () => onChange(label)); button.setAttribute('aria-current', active === label ? 'page' : 'false'); nav.append(button);
   }
   return nav;
