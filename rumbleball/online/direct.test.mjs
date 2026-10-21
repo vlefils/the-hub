@@ -15,11 +15,35 @@ test('direct : avant-match, entrée, match, pause exacte de deux minutes et renc
   assert.equal(directState(before, at('00:00') - 1).phase, 'before');
   assert.equal(directState(before, at('00:00')).phase, 'delayed');
   assert.equal(directState(l, at('00:00')).phase, 'entrance');
-  assert.equal(directState(l, at('00:08')).phase, 'live');
+  assert.equal(directState(l, at('00:04.500')).phase, 'countdown');
+  assert.equal(directState(l, at('00:08')).phase, 'delayed');
+  l.broadcast.turns = [{}]; assert.equal(directState(l, at('00:08')).phase, 'live');
   assert.equal(directState(l, at('05:00')).phase, 'break');
   assert.equal(countdown(directState(l, at('05:00')).deadline, at('05:00')), '02:00');
   assert.equal(directState(l, at('07:00')).match.id, 'two'); assert.equal(directState(l, at('07:00')).phase, 'entrance');
   l.waitingForServer = true; assert.equal(directState(l, at('07:08')).phase, 'delayed');
+});
+
+test('direct : sortie publiée après la fin, reprise tardive et terrain vide pendant la pause', () => {
+  const l = { ...league(), broadcast: null, closing: { id: 'one', endsAt: game.endsAt, duration: 7000, state: {} } };
+  assert.equal(directState(l, at('05:00')).phase, 'exit');
+  assert.equal(directState(l, at('05:06.999')).phase, 'exit');
+  assert.equal(directState(l, at('05:07')).phase, 'break');
+  assert.equal(directState(l, at('07:00')).phase, 'entrance');
+});
+
+test('direct serveur : état final réservé à la sortie, privé avant le résultat et absent après sept secondes', () => {
+  const now = '2026-10-21T10:00:00Z';
+  const lobby = addBot(createLeague({ id: 'l', userId: 'a', name: 'Sortie', clubName: 'Club', seed: 'compacted', inviteCode: 'a'.repeat(32) }, now), 'a');
+  let state = advanceLeague(startLeague(lobby, 'a', now, { firstMatchAt: game.startsAt }), game.startsAt);
+  const end = state.night.endsAt;
+  assert.equal(leagueProjection(state, 'a', new Date(Date.parse(end) - 1)).closing, null);
+  state = advanceLeague(state, end);
+  const final = structuredClone(state.night.games[0].broadcast.final), view = leagueProjection(state, 'a', end);
+  assert.ok(view.closing); assert.equal(view.closing.state.finished, true); assert.equal(view.closing.state.rng, 0);
+  assert.equal(view.closing.state.seed, state.night.games[0].id);
+  assert.deepEqual(state.night.games[0].broadcast.final, final);
+  assert.equal(leagueProjection(state, 'a', new Date(Date.parse(end) + 7000)).closing, null);
 });
 
 test('direct : ancienne soirée ne remplace pas le programme suivant, compte à rebours sans valeur négative', () => {

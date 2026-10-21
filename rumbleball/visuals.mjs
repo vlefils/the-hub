@@ -207,9 +207,34 @@ export function poseCharacter(node, player, { carrying = false } = {}) {
   if (gesture?.kind === 'brace') lean = 2 * wave;
   if (gesture?.kind === 'dodge') lean = -3 * wave;
   facing.setAttribute('transform', `rotate(${player.facing ?? 0})`);
-  node.querySelector('.rb-person-body').setAttribute('transform', `translate(0 ${lean - Math.abs(walk) * 1.2}) rotate(${fallen ? 65 : 0}) scale(1 ${fallen ? .65 : 1})`);
+  node.querySelector('.rb-person-body').setAttribute('transform', `translate(0 ${lean - Math.abs(walk) * 1.2}) rotate(${player.transported ? 90 : fallen ? 65 : 0}) scale(1 ${fallen ? .65 : 1})`);
   node.querySelector('.rb-person-left-arm').setAttribute('transform', `translate(${-shoulder} 0) rotate(${left + walk * 9})`);
   node.querySelector('.rb-person-right-arm').setAttribute('transform', `translate(${shoulder} 0) rotate(${right - walk * 9})`);
   node.querySelector('.rb-person-left-leg').setAttribute('transform', `translate(-6 ${10 + walk * 2})`);
   node.querySelector('.rb-person-right-leg').setAttribute('transform', `translate(6 ${10 - walk * 2})`);
+}
+
+export function medicalCrewArtwork() {
+  const crew = svg('g', { class: 'rb-medical-crew', 'aria-hidden': 'true' });
+  crew.append(svg('ellipse', { cy: 15, rx: 55, ry: 9, fill: '#000', opacity: .25 }),
+    svg('path', { d: 'M-37-12H37M-37 12H37', stroke: '#a8c0ca', 'stroke-width': 3, 'stroke-linecap': 'round' }),
+    svg('rect', { x: -26, y: -11, width: 52, height: 22, rx: 3, fill: '#de7741', stroke: '#f2b879', 'stroke-width': 2 }),
+    svg('path', { d: 'M-14-11V11M14-11V11', stroke: '#253c47', 'stroke-width': 3 }));
+  for (const [i, x] of [-43, 43].entries()) {
+    const helper = svg('g', { class: 'rb-medic', transform: `translate(${x} 0)` });
+    helper.append(svg('rect', { class: 'rb-medic-step', x: -7, y: 6, width: 5, height: 12, rx: 2, fill: '#344c5d' }),
+      svg('rect', { class: 'rb-medic-step', x: 2, y: 6, width: 5, height: 12, rx: 2, fill: '#344c5d' }),
+      svg('rect', { x: -12, y: -10, width: 24, height: 20, rx: 5, fill: '#e0edf0', stroke: '#3f697b', 'stroke-width': 2 }),
+      svg('path', { d: 'M-4-1H4M0-5V3', stroke: '#20b5ba', 'stroke-width': 3 }),
+      svg('circle', { cy: -17, r: 7, fill: i ? '#ad7657' : '#dfb69b', stroke: '#203342', 'stroke-width': 1.5 }));
+    crew.append(helper);
+  }
+  return crew;
+}
+
+export function poseMedicalCrew(node, frame) {
+  for (const [index, step] of [...node.querySelectorAll('.rb-medic-step')].entries()) {
+    const wave = frame.walking ? Math.sin(frame.walkPhase + index % 2 * Math.PI) * 2 : 0;
+    step.setAttribute('transform', `translate(0 ${wave})`);
+  }
 }

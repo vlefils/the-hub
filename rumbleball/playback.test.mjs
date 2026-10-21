@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMatch, simulateMatch } from './engine.mjs';
 import { moveAlong, resolveAction } from './rules.mjs';
-import { buildCourtPlayback, courtPoint, createCourtPlayback, nextCourtTurnDelay, sampleCourtPlayback, entranceFrame } from './playback.mjs';
+import { buildCourtPlayback, courtPoint, createCourtPlayback, nextCourtTurnDelay, sampleCourtPlayback, entranceFrame, exitFrame, openingFrame } from './playback.mjs';
 
 const p = (frame, id) => frame.players.find((p) => p.id === id);
 const event = (type, data = {}) => ({ type, ...data });
@@ -166,6 +166,34 @@ function clock() {
     request: (callback) => { pending.set(++id, callback); return id; }, cancel: (id) => pending.delete(id),
     step: (value) => { time = value; const callbacks = [...pending.values()]; pending.clear(); callbacks.forEach((cb) => cb(time)); } };
 }
+
+test('cérémonie : entrée puis 3–2–1, ballon au START et horloge absolue sans RAF en mouvement réduit', () => {
+  const { before } = fixture(), original = structuredClone(before), c = clock(), frames = [];
+  assert.equal(openingFrame(before, 4499, 8000).cue, null);
+  for (const [elapsed, cue] of [[4500, '3'], [5500, '2'], [6500, '1'], [7500, 'START']]) {
+    const frame = openingFrame(before, elapsed, 8000); assert.equal(frame.cue, cue); assert.equal(frame.ballVisible, cue === 'START');
+    assert.deepEqual(frame.players.map(p => p.position), before.players.map(p => p.position));
+  }
+  const reduced = createCourtPlayback(frame => frames.push(frame), { ...c, reducedMotion: () => true });
+  reduced.opening(before, { duration: 8000, elapsed: 5500 });
+  assert.equal(frames.at(-1).cue, '2'); assert.equal(frames.at(-1).ballVisible, false); assert.equal(c.pending.size, 0);
+  assert.deepEqual(before, original);
+});
+
+test('sortie : survivants autonomes, deux soigneurs et brancard par KO, évacuation complète sans mutation', () => {
+  const { before } = fixture(); for (const p of before.players) p.hp = p.maxHp;
+  before.players[1].hp = 0; before.finished = true;
+  const original = structuredClone(before), early = exitFrame(before, 0), middle = exitFrame(before, 4000), final = exitFrame(before, 7000);
+  assert.equal(early.medics.length, 1); assert.equal(early.medics[0].carrying, false);
+  assert.ok(middle.players.filter(p => p.hp > 0).every(p => p.walking));
+  assert.equal(middle.medics[0].carrying, true); assert.equal(middle.players[1].transported, true);
+  assert.deepEqual(middle.medics[0].position, middle.players[1].position);
+  assert.ok(final.players.every(p => p.visible === false)); assert.deepEqual(final.medics, []); assert.equal(final.ballVisible, false);
+  const c = clock(), frames = [], playback = createCourtPlayback(frame => frames.push(frame), { ...c, reducedMotion: () => false });
+  playback.exit(before, { elapsed: 4000 }); assert.deepEqual(frames.at(-1).players.map(p => p.position), middle.players.map(p => p.position));
+  c.step(3000); assert.equal(c.pending.size, 0); assert.ok(frames.at(-1).players.every(p => p.visible === false));
+  assert.deepEqual(before, original);
+});
 
 test('entrée des équipes : marche depuis les tunnels, horloge absolue, état moteur préservé et mouvement réduit', () => {
   const { before } = fixture(), original = structuredClone(before), c = clock(), frames = [];

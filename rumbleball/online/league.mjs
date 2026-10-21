@@ -12,8 +12,9 @@ import { ensureClubDevelopment, automaticAbilityIncreases, XP_THRESHOLDS, MAX_LE
 import { createPlayoffs, currentPlayoffRound, playoffFixtures, settlePlayoffFixture, playoffWinner } from '../playoffs.mjs';
 import { ensureClubEquipment } from '../equipment.mjs';
 import { encodeRound, decodeRound } from './replay-codec.mjs';
+import { OPENING_DURATION, EXIT_DURATION } from '../match-ceremony.mjs';
 
-export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: 8000 });
+export const ONLINE_RULES = Object.freeze({ timezone: 'Europe/Paris', hour: 20, dailyIncome: 210, victoryBonus: 100, breakMs: 120000, roundMs: 12000, kickoffMs: OPENING_DURATION, exitMs: EXIT_DURATION });
 export const MAX_LEAGUE_CLUBS = 128;
 export const leagueParticipants = s => [...s.members, ...(s.bots ?? [])];
 export const groupDays = count => 2 * (count + count % 2 - 1);
@@ -320,6 +321,8 @@ export function leagueProjection(s, userId, now) {
       phase: g.phase ?? 'groups', result: ended ? { winnerId: g.broadcast.final.result.winnerId === 'home' ? g.homeId : g.broadcast.final.result.winnerId === 'away' ? g.awayId : null } : null };
   }) ?? [];
   const active = night?.games.find((g) => g.startsAt && t >= instant(g.startsAt) && (!g.endsAt || t < instant(g.endsAt)));
+  const departing = night?.games.find(g => g.broadcast.final.finished && g.endsAt && t >= instant(g.endsAt) && t < instant(g.endsAt) + EXIT_DURATION);
+  const closing = departing ? { id: departing.id, endsAt: departing.endsAt, duration: EXIT_DURATION, state: publicState(departing.broadcast.final, departing.id) } : null;
   let broadcast = null, waitingForServer = false;
   if (active) {
     const elapsed = Math.max(0, t - instant(active.playsAt)), index = Math.floor(elapsed / ONLINE_RULES.roundMs);
@@ -333,6 +336,6 @@ export function leagueProjection(s, userId, now) {
     phase: s.phase ?? 'groups', playoffs: copy(s.playoffs ?? null), playoffHistory: copy(s.playoffHistory ?? []),
     members: leagueParticipants(s).map((m) => ({ userId: m.userId, name: m.club.name, ready: !m.initialRecruitment, isBot: (s.bots ?? []).some(bot => bot.userId === m.userId), kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
     serverTime: iso(t), suggestedFirstMatchAt: s.status === 'lobby' ? nextLock(now) : null, nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
-    club: ownClub, needsRecruitment: Boolean(member.initialRecruitment), autoRecruitedAt: member.autoRecruitedAt ?? null, firstMatchAt: s.firstMatchAt ?? null, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, waitingForServer,
+    club: ownClub, needsRecruitment: Boolean(member.initialRecruitment), autoRecruitedAt: member.autoRecruitedAt ?? null, firstMatchAt: s.firstMatchAt ?? null, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, closing, waitingForServer,
     history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: s.status === 'lobby' ? [] : s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

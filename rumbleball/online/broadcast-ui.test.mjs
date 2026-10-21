@@ -21,7 +21,12 @@ async function online(t, lobby = false, capacity = 2, options = {}) {
   await button(e.root, `Ligue · ${capacity} clubs`).click();
   const strategy = () => descendants(e.root.querySelector('.rb-online-body')).find(n => n.tagName === 'select' && n.children.some(o => o.value === 'possession'));
   const poll = async () => { const [id, fn] = [...pending][0]; pending.delete(id); await fn(); };
-  return { ...e, api, mounted, strategy, state: () => state, poll, remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; }, async lock() { clock = state.nextLockAt; await poll(); }, async startBroadcast() { clock = state.nextLockAt; state = advanceLeague(state, clock, { maxRounds: 1 }); revision++; await poll(); }, async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
+  return { ...e, api, mounted, strategy, state: () => state, poll,
+    elapse(ms) { clock = new Date(Date.parse(clock) + ms).toISOString(); },
+    remoteChange() { state = editPreparation(state, 'b', 'color', { color: '#aabbcc' }, clock); revision++; }, failNext() { fail = true; },
+    async lock() { clock = state.nextLockAt; await poll(); },
+    async startBroadcast() { clock = state.nextLockAt; state = advanceLeague(state, clock, { maxRounds: 1 }); revision++; await poll(); },
+    async finishNight() { state = advanceLeague(state, state.nextLockAt); clock = state.night.endsAt; state = advanceLeague(state, clock); revision++; await poll(); } };
 }
 
 test('reprise replay : même rencontre après refresh, retour Ligue et état serveur intact', async t => {
@@ -34,6 +39,18 @@ test('reprise replay : même rencontre après refresh, retour Ligue et état ser
   assert.equal(e.root.querySelector('.rb-replay-area').hidden, false); assert.deepEqual(routes.at(-1), route);
   assert.deepEqual(e.state(), before);
   await button(e.root, 'Retour aux replays').click(); assert.deepEqual(routes.at(-1), { id: route.id, screen: 'Ligue' });
+});
+
+test('direct : même arène vide avant et après, sortie à la fin puis prochain programme sans progression locale', async t => {
+  const e = await online(t); await button(e.root, 'Direct').click();
+  assert.ok(e.root.querySelector('.rb-court')); assert.equal(e.root.querySelector('.rb-online-live').dataset.presentation, 'idle');
+  await e.finishNight(); assert.equal(e.root.querySelector('.rb-direct').dataset.phase, 'exit');
+  const before = structuredClone(e.state());
+  e.elapse(7000); await e.poll();
+  assert.equal(e.root.querySelector('.rb-direct').dataset.phase, 'before');
+  assert.equal(e.root.querySelector('.rb-online-live').dataset.presentation, 'idle');
+  assert.ok(e.root.querySelectorAll('.rb-pawn').every(p => p.getAttribute('visibility') === 'hidden'));
+  assert.deepEqual(e.state(), before); e.mounted.stop();
 });
 
 test('broadcast : une saisie survit aux onglets, à un achat et à une erreur réseau ; annulation complète', async t => {

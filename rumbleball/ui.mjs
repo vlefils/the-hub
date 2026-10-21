@@ -5,12 +5,13 @@ import { crestPicker } from './broadcast-components.mjs';
 import { INSTRUCTIONS, ROLES, ROLE_DESCRIPTIONS, STRATEGIES, WET_CELLS, modifier } from './data.mjs';
 import { createMatch, CURRENT_RULES, DEFAULT_SEED, seedHash, stepMatch } from './engine.mjs';
 import { cellLabel } from './rules.mjs';
-import { arenaBackdrop, ballArtwork, pawnArtwork, playerPortrait, athletePortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork } from './visuals.mjs';
+import { arenaBackdrop, ballArtwork, pawnArtwork, playerPortrait, athletePortrait, poseCharacter, svg, teamCrest, turnMarkerArtwork, medicalCrewArtwork, poseMedicalCrew } from './visuals.mjs';
 import { KIT_COLORS, characterKey, readableKit, sportingWeapon, visibleGear } from './appearance.mjs';
 import { CATALOGUE } from './progression.mjs';
 import { LONG_RULES, fatigueEffect } from './career-rules.mjs';
 import { narrateTurn } from './narration.mjs';
-import { courtPoint, createCourtPlayback, nextCourtTurnDelay, ROUND_DURATION } from './playback.mjs';
+import { courtPoint, createCourtPlayback, entranceFrame, nextCourtTurnDelay, ROUND_DURATION } from './playback.mjs';
+import { ENTRY_DURATION, EXIT_DURATION } from './match-ceremony.mjs';
 import { drawCourtEffects, drawCourtLinks } from './court-effects.mjs';
 import { ARCHETYPES, archetypeLabel, classResources, classAbilities } from './classes.mjs';
 import { deploymentEditor } from './deployment-ui.mjs';
@@ -141,18 +142,26 @@ export function mountMatch(root, callbacks = {}) {
   const centerZone = svg('rect', { x: 300, y: 180, width: 120, height: 120, class: 'rb-center-zone', 'aria-hidden': 'true', visibility: 'hidden' });
   const links = svg('g', { class: 'rb-court-links', 'aria-hidden': 'true' });
   const effects = svg('g', { class: 'rb-court-effects', 'aria-hidden': 'true' });
+  const medicalLayer = svg('g', { class: 'rb-medical-layer', 'aria-hidden': 'true' }), medicalNodes = new Map();
   const turnMarkers = svg('g', { 'aria-hidden': 'true' });
   const pawnNodes = new Map(), markerNodes = new Map();
   const ballSprite = ballArtwork(); const ballHalo = ballSprite.querySelector('.rb-ball-halo');
   const ballBody = ballSprite.querySelector('.rb-ball');
   const ballDrop = svg('g', { class: 'rb-ball-drop' });
   ballDrop.append(ballSprite); ballLayer.append(ballDrop);
-  court.append(trace, centerZone, links, pawns, turnMarkers, ballLayer, effects);
+  court.append(trace, centerZone, links, medicalLayer, pawns, turnMarkers, ballLayer, effects);
   const courtPlayback = createCourtPlayback(renderCourtFrame);
   const courtStage = element('div', 'rb-court-stage'), kickoffOverlay = element('div', 'rb-kickoff'), kickoffCopy = element('div', 'rb-kickoff-copy'), kickoffValue = element('div');
   kickoffOverlay.hidden = true; kickoffOverlay.setAttribute('aria-hidden', 'true');
   kickoffCopy.append(element('p', 'rb-eyebrow', 'Coup d’envoi'), kickoffValue); kickoffOverlay.append(kickoffCopy); courtStage.append(court, kickoffOverlay);
-  const kickoff = createKickoff((cue) => {
+  const kickoff = createKickoff((cue, elapsed = 0) => {
+    if (cue.entrance) {
+      kickoffOverlay.hidden = true;
+      if (running) courtPlayback.entrance(state, { duration: ENTRY_DURATION, elapsed });
+      else renderCourtFrame({ ...entranceFrame(state, elapsed, ENTRY_DURATION), animating: false });
+      return;
+    }
+    courtPlayback.show(state);
     kickoffOverlay.hidden = false; kickoffOverlay.dataset.cue = cue.label;
     kickoffValue.replaceChildren(element('strong', 'rb-kickoff-number', cue.label));
     if (cue.ball) { ballReady = true; ballDrop.classList.add('is-arriving'); }
@@ -221,13 +230,17 @@ export function mountMatch(root, callbacks = {}) {
   function setRunning(value) {
     running = value && started && !state.finished && visible();
     clearTimeout(timer); timer = null;
-    if (!running) { nextRoundAt = 0; kickoff.pause(); courtPlayback.settle(); ballDrop.classList.toggle('is-arriving', false); }
+    if (!running) {
+      nextRoundAt = 0; kickoff.pause(); courtPlayback.settle(); ballDrop.classList.toggle('is-arriving', false);
+      if (kickoff.cue?.entrance) renderCourtFrame({ ...entranceFrame(state, kickoff.elapsed, ENTRY_DURATION), animating: false });
+    }
     pause.textContent = running ? 'Pause' : 'Reprendre';
     renderPlaybackStatus();
     if (running) { if (kickoff.active) kickoff.resume(); else scheduleNextTurn(); }
   }
   function renderPlaybackStatus() {
     if (kickoff.active) {
+      if (kickoff.cue.entrance) { status.textContent = `${running ? '' : 'Pause · '}Entrée des équipes`; return; }
       status.textContent = `${running ? 'Coup d’envoi' : 'Pause · coup d’envoi'}${kickoff.cue.ball ? ' · START' : ` dans ${kickoff.cue.label}…`}`;
       return;
     }
@@ -325,14 +338,25 @@ export function mountMatch(root, callbacks = {}) {
   }
   function renderCourtFrame(frame) {
     displayFrame = frame;
-    centerZone.setAttribute('visibility', ballReady && isCenterBall(frame) ? 'visible' : 'hidden');
-    ballLayer.setAttribute('display', ballReady ? 'inline' : 'none');
+    const presentation = frame.ceremony ?? (kickoff?.active ? kickoff.cue.entrance ? 'entrance' : 'countdown' : 'playing');
+    root.dataset.presentation = presentation === 'idle' && state.finished && context !== 'broadcast' ? 'finished' : presentation;
+    if (frame.cue !== undefined) {
+      kickoffOverlay.hidden = !frame.cue;
+      if (frame.cue && kickoffOverlay.dataset.cue !== frame.cue) {
+        kickoffOverlay.dataset.cue = frame.cue; kickoffValue.replaceChildren(element('strong', 'rb-kickoff-number', frame.cue));
+      }
+    }
+    const showBall = frame.ballVisible ?? ballReady;
+    centerZone.setAttribute('visibility', showBall && isCenterBall(frame) ? 'visible' : 'hidden');
+    ballLayer.setAttribute('display', showBall ? 'inline' : 'none');
     const activeIds = new Set(started ? playbackMode === 'round' ? frame.activeIds ?? [] : [state.activeId] : []);
+    for (const [id, node] of pawnNodes) { node.setAttribute('visibility', 'hidden'); markerNodes.get(id).setAttribute('visibility', 'hidden'); }
     for (const p of frame.players) {
       const node = pawnNodes.get(p.id);
       if (!node) continue;
       const point = courtPoint(p.position);
-      const active = activeIds.has(p.id), marker = markerNodes.get(p.id);
+      node.setAttribute('visibility', p.visible === false ? 'hidden' : 'visible'); node.setAttribute('tabindex', p.visible === false ? '-1' : '0');
+      const active = p.visible !== false && activeIds.has(p.id), marker = markerNodes.get(p.id);
       marker.setAttribute('visibility', active ? 'visible' : 'hidden'); marker.setAttribute('transform', `translate(${point.x} ${point.y})`);
       node.setAttribute('transform', `translate(${point.x} ${point.y})`);
       node.classList.toggle('is-ko', p.hp === 0); node.classList.toggle('is-prone', p.prone);
@@ -344,13 +368,23 @@ export function mountMatch(root, callbacks = {}) {
       node.querySelector('.rb-pawn-health').setAttribute('width', String(32 * p.hp / p.maxHp));
       poseCharacter(node, p, { carrying: frame.ball.carrierId === p.id });
     }
+    for (const node of medicalNodes.values()) node.setAttribute('visibility', 'hidden');
+    for (const crew of frame.medics ?? []) {
+      let node = medicalNodes.get(crew.id);
+      if (!node) { node = medicalCrewArtwork(); medicalLayer.append(node); medicalNodes.set(crew.id, node); }
+      const point = courtPoint(crew.position);
+      node.setAttribute('visibility', 'visible'); node.setAttribute('transform', `translate(${point.x} ${point.y})`);
+      poseMedicalCrew(node, crew);
+    }
     ballSprite.setAttribute('transform', `translate(${frame.ballPoint.x} ${frame.ballPoint.y})`);
     const carried = Boolean(frame.ball.carrierId);
     ballHalo.setAttribute('visibility', carried || frame.flying ? 'hidden' : 'visible');
     ballBody.setAttribute('transform', carried && !frame.flying ? 'scale(.76)' : 'scale(1)');
     drawCourtLinks(links, frame.players); drawCourtEffects(effects, frame.effects);
     for (const chip of initiative.children) if (chip.dataset.rbOrder) {
-      const p = state.players.find((p) => p.id === chip.dataset.rbOrder), active = activeIds.has(p.id);
+      const p = state.players.find((p) => p.id === chip.dataset.rbOrder);
+      if (!p) { chip.hidden = true; continue; }
+      const active = activeIds.has(p.id);
       chip.classList.toggle('is-active', active); chip.setAttribute('aria-current', String(active));
       chip.classList.toggle('is-ko', frame.players.find((q) => q.id === p.id).hp === 0);
       chip.setAttribute('aria-label', `${p.name} : initiative ${p.initiative}${active ? ', action en cours' : ''}`);
@@ -359,10 +393,10 @@ export function mountMatch(root, callbacks = {}) {
     const roundSeconds = ROUND_DURATION / 1000;
     const remaining = Math.max(0, (11 - frame.round) * roundSeconds - (frame.roundProgress ?? 0) * roundSeconds);
     const seconds = Math.ceil(remaining);
-    phaseText.textContent = !ballReady ? 'Avant le coup d’envoi' : frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
+    phaseText.textContent = presentation === 'exit' ? 'Sortie des équipes' : presentation === 'idle' ? 'Terrain libre' : !showBall ? 'Avant le coup d’envoi' : frame.finished ? 'Coup de sifflet final' : frame.phase === 'final' ? 'Dernier engagement' : frame.phase === 'overtime' ? `Prolongation ${frame.round - 10}/2` : `Round ${frame.round}/10`;
     timeText.textContent = frame.finished ? '00:00' : frame.round > 10 ? `+${String(Math.ceil(roundSeconds * (1 - (frame.roundProgress ?? 0)))).padStart(2, '0')}` : `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
     const winner = state.teams.find(team => team.id === state.result?.winnerId);
-    possessionText.textContent = frame.finished ? winner ? `Victoire · ${winner.name}` : 'Match nul' : !ballReady ? 'Ballon attendu au centre' : frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : isCenterBall(frame) ? 'Engagement · ballon à l’intersection centrale' : 'Balle libre';
+    possessionText.textContent = frame.finished ? winner ? `Victoire · ${winner.name}` : 'Match nul' : !showBall ? 'Ballon attendu au centre' : frame.flying ? 'Ballon en vol' : holder ? `${name(holder.id)} · ${teamLabel(holder.teamId)}` : isCenterBall(frame) ? 'Engagement · ballon à l’intersection centrale' : 'Balle libre';
     possessionText.title = possessionText.textContent;
     possessionText.className = `rb-possession${holder ? ` rb-${holder.teamId}` : ''}`;
     for (const [teamId, score] of [['home', homeScore], ['away', awayScore]]) score.querySelector('.rb-team-count').textContent = `${frame.players.filter((p) => p.teamId === teamId && p.hp > 0).length} / 5 en jeu`;
@@ -374,7 +408,8 @@ export function mountMatch(root, callbacks = {}) {
     pause.textContent = frame.animating || running ? 'Pause' : 'Reprendre';
     const signature = JSON.stringify([frame.ball.carrierId, frame.players.map((p) => [p.id, p.hp, p.prone, p.grappledBy, p.grappling, p.readiedPass, p.reaction])]);
     if (signature !== healthSignature) { healthSignature = signature; renderSelected(); renderRosters(); }
-    if (frame.animating) {
+    if (presentation === 'exit') status.textContent = 'Sortie des équipes · prise en charge des joueurs KO';
+    else if (frame.animating && !['entrance', 'countdown'].includes(presentation)) {
       const text = `Round ${frame.round} · actions simultanées`;
       if (status.textContent !== text) status.textContent = text;
     } else renderPlaybackStatus();
@@ -529,8 +564,9 @@ export function mountMatch(root, callbacks = {}) {
       if (!saved) { setRunning(false); errorBox.hidden = false; errorBox.textContent = 'Progression non enregistrée. Revenez au club pour réessayer la sauvegarde ou exporter votre carrière.'; }
       if (state.finished) { setRunning(false); status.textContent = 'Match terminé'; }
       if (saved && animate && visible()) {
-        if (playbackMode === 'round') courtPlayback.playRound(turns, { speed });
-        else courtPlayback.play(turns[0].before, state, turns[0].events, { speed });
+        const onComplete = state.finished ? () => courtPlayback.exit(state) : undefined;
+        if (playbackMode === 'round') courtPlayback.playRound(turns, { speed, onComplete });
+        else courtPlayback.play(turns[0].before, state, turns[0].events, { speed, onComplete });
       }
     } catch (error) {
       setRunning(false); errorBox.hidden = false; errorBox.textContent = `La simulation a été interrompue. Code du match : ${state.seed}. ${error.message}`;
@@ -577,6 +613,16 @@ export function mountMatch(root, callbacks = {}) {
     stop() { closeDialogs(); setRunning(false); resetKickoff(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', onPageHide); },
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
+    idle(teams = []) {
+      closeDialogs(); setRunning(false); resetKickoff(); context = 'broadcast'; started = true; selectedId = null;
+      state = { ...state, teams: state.teams.map((team, index) => ({ ...team, ...teams[index] })), players: [], initiative: [], calls: [], round: 1, turns: 0, finished: false, result: null, ball: { carrierId: null, position: { x: 5.5, y: 3.5 } } };
+      journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true; render(); courtPlayback.empty(state);
+      for (const score of [homeScore, awayScore]) score.querySelector('.rb-team-count').textContent = 'À suivre';
+    },
+    closeMatch(finalState, { elapsed = 0, duration = EXIT_DURATION } = {}) {
+      setRunning(false); resetKickoff(); context = 'broadcast'; started = true; ballReady = false; state = structuredClone(finalState);
+      selectedId = null; errorBox.hidden = true; render(); courtPlayback.exit(state, { duration, elapsed });
+    },
     broadcast(frame, elapsed = 0, { speed = 1, animate = true, entrance = null } = {}) {
       setRunning(false); resetKickoff(); context = 'broadcast'; started = true; ballReady = Boolean(frame.turns.length);
       state = structuredClone(frame.turns.at(-1)?.after ?? frame.initial);
@@ -585,7 +631,7 @@ export function mountMatch(root, callbacks = {}) {
       for (const events of frame.previousEvents ?? []) appendEvents(events);
       for (const turn of frame.turns) appendEvents(turn.events);
       render(frame.turns.at(-1)?.events ?? []);
-      if (entrance && !frame.turns.length && animate) courtPlayback.entrance(frame.initial, entrance);
+      if (entrance && !frame.turns.length && animate) courtPlayback.opening(frame.initial, entrance);
       if (frame.turns.length && animate) courtPlayback.playRound(frame.turns, { speed, elapsed });
       toolbar.hidden = true;
     },

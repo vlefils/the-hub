@@ -1,14 +1,15 @@
 import { el } from '../career-components.mjs';
 import { clubIdentity } from '../broadcast-components.mjs';
 import { directState, countdown } from './direct.mjs';
+import { openingCue } from '../match-ceremony.mjs';
 
 const date = value => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'À suivre';
-const titles = { before: 'Avant-match', entrance: 'Entrée des équipes', live: 'En direct', break: 'Pause entre les rencontres', delayed: 'En attente du serveur', ended: 'Soirée terminée' };
+const titles = { before: 'Avant-match', entrance: 'Entrée des équipes', countdown: 'Coup d’envoi', exit: 'Sortie des équipes et soins', live: 'En direct', break: 'Pause entre les rencontres', delayed: 'En attente du serveur', ended: 'Soirée terminée' };
 export function createDirectDesk(live, { clock, onFrame }) {
   const root = el('section', 'rb-direct'), header = el('header', 'rb-direct-heading'), identity = el('div'), status = el('p', 'rb-eyebrow'), title = el('h2'), timer = el('time', 'rb-direct-clock');
-  const stage = el('div', 'rb-direct-stage'), poster = el('div', 'rb-direct-poster'), recap = el('p', 'rb-direct-recap'), programme = el('ol', 'rb-direct-programme');
+  const stage = el('div', 'rb-direct-stage'), recap = el('p', 'rb-direct-recap'), programme = el('ol', 'rb-direct-programme');
   status.setAttribute('role', 'status'); timer.setAttribute('aria-live', 'off'); programme.setAttribute('aria-label', 'Programme du direct'); programme.setAttribute('tabindex', '0');
-  identity.append(status, title); header.append(identity, timer); stage.append(poster, live); root.append(header, stage, recap, programme);
+  identity.append(status, title); header.append(identity, timer); stage.append(live); root.append(header, stage, recap, programme);
   let league, interval, stopped = false, signature = '', frameKey = '', programmeKey = '';
   const member = id => league.members.find(member => member.userId === id) ?? { name: 'Club', id };
   function result(game) {
@@ -29,29 +30,33 @@ export function createDirectDesk(live, { clock, onFrame }) {
     if (key !== signature) {
       signature = key;
       title.textContent = state.phase === 'break' ? 'Prochaine rencontre' : state.phase === 'before' ? `Rendez-vous le ${date(state.deadline)} · Paris` : titles[state.phase];
-      const hasCourt = ['entrance', 'live', 'delayed'].includes(state.phase) && league.status === 'broadcast';
-      live.hidden = !hasCourt; poster.hidden = hasCourt;
-      poster.replaceChildren();
-      if (match) {
-        const versus = el('div', 'rb-direct-versus'); versus.append(clubIdentity(member(match.homeId)), el('span', '', 'VS'), clubIdentity(member(match.awayId))); poster.append(versus);
-      }
-      poster.append(el('p', 'rb-muted', state.phase === 'break' ? 'Deux minutes pour souffler. Les prochaines équipes vont entrer en piste.' : state.phase === 'ended' ? 'Les résultats et les replays sont disponibles dans Ligue.' : state.phase === 'delayed' ? 'Le serveur prépare le coup d’envoi. La diffusion reprendra automatiquement.' : 'Les équipes entreront sur le terrain au coup d’envoi. Vous pouvez laisser cet écran ouvert.'));
+      live.hidden = false;
       recap.textContent = result(state.previous); recap.hidden = !state.previous;
     }
-    const frame = league.broadcast;
-    const keyFrame = frame ? `${frame.id}:${frame.roundStartsAt}:${frame.turns.length}` : '';
+    const frame = league.broadcast?.id === match?.id && state.phase !== 'delayed' ? league.broadcast : null;
+    const opening = frame && ['entrance', 'countdown'].includes(state.phase) ? {
+      duration: Date.parse(frame.playsAt) - Date.parse(frame.startsAt ?? match.startsAt), elapsed: Math.max(0, now - Date.parse(frame.startsAt ?? match.startsAt)),
+    } : null;
+    const keyFrame = frame ? `${frame.id}:${frame.roundStartsAt}:${frame.turns.length}:${opening ? openingCue(opening.elapsed, opening.duration).label ?? 'entry' : ''}` : '';
     if (frame && keyFrame !== frameKey) {
       frameKey = keyFrame;
-      onFrame(frame, Math.max(0, now - Date.parse(frame.roundStartsAt)), state.phase === 'entrance' ? {
-        duration: Date.parse(frame.playsAt) - Date.parse(frame.startsAt ?? match.startsAt), elapsed: Math.max(0, now - Date.parse(frame.startsAt ?? match.startsAt)),
-      } : null);
+      onFrame(frame, Math.max(0, now - Date.parse(frame.roundStartsAt)), opening);
+    } else if (state.phase === 'exit') {
+      const closing = league.closing, exitKey = `exit:${closing.id}`;
+      if (frameKey !== exitKey) {
+        frameKey = exitKey;
+        onFrame({ id: closing.id, initial: closing.state, turns: [] }, 0, { kind: 'exit', duration: closing.duration, elapsed: Math.max(0, now - Date.parse(closing.endsAt)) });
+      }
+    } else if (!frame && !['live', 'entrance', 'countdown'].includes(state.phase)) {
+      const teams = [match?.homeId, match?.awayId].map((id, index) => ({ ...member(id), id: index ? 'away' : 'home', name: id ? member(id).name : 'Prochaine équipe' }));
+      const kind = state.phase === 'delayed' && league.status === 'broadcast' ? 'waiting' : 'idle', idleKey = `${kind}:${JSON.stringify(teams)}`;
+      if (frameKey !== idleKey) { frameKey = idleKey; onFrame(null, 0, { kind, teams }); }
     }
-    if (league.status === 'broadcast' && !frame) onFrame(null);
   }
   function schedule() {
     clearTimeout(interval);
     if (stopped) return;
-    render(); interval = setTimeout(schedule, 1000);
+    render(); interval = setTimeout(schedule, ['entrance', 'countdown'].includes(root.dataset.phase) ? 250 : 1000);
   }
   return { root, update(next) {
     league = next;

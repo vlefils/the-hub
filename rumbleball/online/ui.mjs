@@ -211,6 +211,9 @@ export async function mountOnline(root, config, connect, options = {}) {
     }
     if (tab === 'Direct') {
       directDesk = createDirectDesk(live, { clock: () => Date.now() + offset, onFrame(frame, elapsed, entrance) {
+        if (entrance?.kind === 'waiting') { if (!view) { view = mountMatch(live); view.idle(entrance.teams); } else view.pause(); return; }
+        if (entrance?.kind === 'idle') { if (!view) view = mountMatch(live); view.idle(entrance.teams); return; }
+        if (entrance?.kind === 'exit') { if (!view) view = mountMatch(live); view.closeMatch(frame.initial, entrance); return; }
         if (!frame) { view?.pause(); return; }
         if (!view) view = mountMatch(live);
         view.broadcast(frame, elapsed, { entrance });

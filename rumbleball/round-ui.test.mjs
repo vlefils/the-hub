@@ -5,6 +5,7 @@ import { createCareer, confirmDraft } from './career.mjs';
 import { CAREER_KEY, exportCareer } from './career-storage.mjs';
 import { mountCareer } from './career-ui.mjs';
 import { environment, descendants, button, classNode } from './test-support/dom.mjs';
+import { ENTRY_DURATION, EXIT_DURATION } from './match-ceremony.mjs';
 
 function endOfRound(initial) {
   let state = initial;
@@ -77,7 +78,8 @@ test('UI : ×8 attend 1 500 ms par round et le résultat reste caché jusqu’à
   for (let round = 3; round <= 10; round++) c.elapse(1500);
   assert.equal(saved.at(-1).finished, true); assert.equal(classNode(e.root, 'rb-result').hidden, true);
   assert.equal(classNode(e.root, 'rb-toolbar').hidden, false);
-  c.elapse(1500); assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:00');
+  c.elapse(1500); assert.equal(e.root.dataset.presentation, 'exit'); assert.equal(classNode(e.root, 'rb-result').hidden, true);
+  c.elapse(EXIT_DURATION); assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.equal(classNode(e.root, 'rb-clock').textContent, '00:00');
   assert.equal(c.frames.size, 0); assert.equal(c.timers.size, 0); view.pause();
 });
 
@@ -95,7 +97,11 @@ test('UI v6 : le dernier KO reste animé avant l’affichage de la victoire anti
   assert.equal(saved.at(-1).result.reason, 'elimination'); assert.equal(saved.at(-1).round, 1);
   assert.equal(classNode(e.root, 'rb-result').hidden, true); assert.equal(classNode(e.root, 'rb-toolbar').hidden, false);
   c.elapse(1499); assert.equal(classNode(e.root, 'rb-result').hidden, true);
-  c.elapse(1); assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.match(classNode(e.root, 'rb-result').textContent, /Victoire immédiate/);
+  c.elapse(1); assert.equal(e.root.dataset.presentation, 'exit'); assert.equal(classNode(e.root, 'rb-result').hidden, true);
+  assert.equal(e.root.querySelectorAll('.rb-medical-crew').length, 5);
+  const turns = saved.length; c.elapse(EXIT_DURATION);
+  assert.equal(saved.length, turns); assert.ok(e.root.querySelectorAll('.rb-pawn').every(p => p.getAttribute('visibility') === 'hidden'));
+  assert.equal(classNode(e.root, 'rb-result').hidden, false); assert.match(classNode(e.root, 'rb-result').textContent, /Victoire immédiate/);
   view.pause();
 });
 
@@ -127,6 +133,8 @@ test('coup d’envoi : 3, 2, 1, START puis arrivée au centre sans consommer de 
   const speed = descendants(e.root).find((n) => n.getAttribute('aria-label') === 'Vitesse de lecture'); speed.value = '8'; await speed.emit('change');
   view.load({ config: {}, state: initial, turns: [] }, true, { kickoff: true });
   const cue = () => classNode(e.root, 'rb-kickoff-number').textContent;
+  assert.equal(e.root.dataset.presentation, 'entrance'); assert.equal(classNode(e.root, 'rb-kickoff').hidden, true);
+  c.elapse(ENTRY_DURATION - 1); assert.equal(saved.length, 0); c.elapse(1);
   assert.equal(cue(), '3'); assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
   for (const label of ['2', '1']) {
     c.elapse(1000); assert.equal(cue(), label); assert.equal(saved.length, 0);
@@ -148,10 +156,25 @@ test('coup d’envoi : 3, 2, 1, START puis arrivée au centre sans consommer de 
   c.elapse(1500); assert.equal(saved.at(-1).round, 3); view.pause();
 });
 
+test('entrée : pause fige les joueurs et reprise conserve le temps restant sans jet ni sauvegarde', async t => {
+  const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
+  globalThis.matchMedia = () => ({ matches: false });
+  const view = mountMatch(e.root, { onTurn: state => { saved.push(state); return true; } });
+  view.load({ config: {}, state: createMatch(), turns: [] }, true, { kickoff: true });
+  c.elapse(400); const position = e.root.querySelector('.rb-pawn').getAttribute('transform');
+  await button(e.root, 'Pause').click(); c.elapse(1000);
+  assert.equal(e.root.querySelector('.rb-pawn').getAttribute('transform'), position);
+  assert.equal(c.frames.size, 0); assert.equal(saved.length, 0);
+  await button(e.root, 'Reprendre').click(); c.elapse(ENTRY_DURATION - 401);
+  assert.equal(classNode(e.root, 'rb-kickoff').hidden, true); c.elapse(1);
+  assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3'); assert.equal(saved.length, 0); view.stop();
+});
+
 test('coup d’envoi : pause exacte, changement de vitesse et reprise du décompte restant', async (t) => {
   const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t), saved = [];
   const view = mountMatch(e.root, { onTurn(state) { saved.push(state); return true; } });
   view.load({ config: {}, state: createMatch(), turns: [] }, true, { kickoff: true });
+  c.elapse(ENTRY_DURATION);
   c.elapse(400); await button(e.root, 'Pause').click(); c.elapse(2000);
   assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3'); assert.equal(c.timers.size, 0);
   assert.match(classNode(e.root, 'rb-playback-status').textContent, /Pause · coup d’envoi/);
@@ -169,14 +192,14 @@ test('coup d’envoi : pause exacte, changement de vitesse et reprise du décomp
 test('coup d’envoi : étape manuelle, résultat immédiat et retour au vestiaire annulent les anciens rappels', async (t) => {
   const e = environment(), { mountMatch } = await import('./ui.mjs'), c = clock(t);
   const view = mountMatch(e.root); await classNode(e.root, 'rb-setup').emit('submit');
-  assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3');
+  assert.equal(e.root.dataset.presentation, 'entrance');
   await button(e.root, 'Round suivant').click(); assert.equal(classNode(e.root, 'rb-kickoff').hidden, true);
   assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'inline'); assert.equal(c.timers.size, 0);
   view.exhibition(); assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
   await classNode(e.root, 'rb-setup').emit('submit'); await button(e.root, 'Voir le résultat').click();
   assert.equal(classNode(e.root, 'rb-kickoff').hidden, true); assert.equal(classNode(e.root, 'rb-result').hidden, false);
   assert.equal(c.timers.size, 0);
-  await button(e.root, 'Rejouer ce match').click(); c.elapse(1000); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '2');
+  await button(e.root, 'Rejouer ce match').click(); c.elapse(ENTRY_DURATION); c.elapse(1000); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '2');
   view.exhibition(); c.elapse(5000); assert.equal(c.timers.size, 0);
   assert.equal(classNode(e.root, 'rb-kickoff').hidden, true); assert.equal(classNode(e.root, 'rb-setup').hidden, false);
 });
@@ -185,7 +208,8 @@ test('carrière : intro seulement au lancement, animations réduites et reprise 
   let career = createCareer('Les Engagés'); career = confirmDraft(career, career.market.slice(0, 5).map((p) => p.id));
   const e = environment(exportCareer(career)), { mountMatch } = await import('./ui.mjs'), c = clock(t); mountCareer(e.root, mountMatch);
   await button(e.root, 'Club').click(); await button(e.root, 'Lancer la rencontre').click();
-  assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3'); assert.equal(e.saved().current.state.turns, 0);
+  assert.equal(classNode(e.root, 'rb-kickoff').hidden, true); assert.equal(e.saved().current.state.turns, 0);
+  c.elapse(ENTRY_DURATION); assert.equal(classNode(e.root, 'rb-kickoff-number').textContent, '3');
   c.elapse(1000); c.elapse(1000); c.elapse(1000); assert.equal(c.frames.size, 0);
   assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'inline');
   await button(e.root, 'Retour au club · mettre en pause').click(); assert.equal(c.timers.size, 0);

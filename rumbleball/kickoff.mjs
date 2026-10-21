@@ -1,5 +1,7 @@
 // Presentation only: the countdown never advances the engine or its random state.
+import { ENTRY_DURATION } from './match-ceremony.mjs';
 const cues = [
+  { label: 'Entrée des équipes', duration: ENTRY_DURATION, entrance: true },
   { label: '3', duration: 1000 },
   { label: '2', duration: 1000 },
   { label: '1', duration: 1000 },
@@ -9,6 +11,7 @@ const cues = [
 export function createKickoff(onCue, onComplete) {
   let index = -1, timer = null, generation = 0, playing = false, remaining = 0, due = 0;
   const active = () => index >= 0;
+  const elapsed = () => active() ? Math.max(0, cues[index].duration - (playing ? Math.max(0, due - performance.now()) : remaining)) : 0;
   function clear() { generation++; clearTimeout(timer); timer = null; }
   function schedule() {
     clear(); due = performance.now() + remaining;
@@ -24,9 +27,10 @@ export function createKickoff(onCue, onComplete) {
   return {
     get active() { return active(); },
     get cue() { return cues[index]; },
+    get elapsed() { return elapsed(); },
     start() { cancel(); index = 0; remaining = cues[0].duration; onCue(cues[0]); },
     pause() { if (playing) remaining = Math.max(0, due - performance.now()); playing = false; clear(); },
-    resume() { if (active() && !playing) { playing = true; schedule(); } },
+    resume() { if (active() && !playing) { onCue(cues[index], elapsed()); playing = true; schedule(); } },
     cancel,
   };
 }

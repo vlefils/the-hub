@@ -51,6 +51,9 @@ test('direct : reprise de l’onglet avant le recrutement, programme et navigati
     request: (action, leagueId, payload) => service.command('u', { action, leagueId, payload }),
   }), { managedSession: true, initialView: { id: 'league', screen: 'Direct' }, onNavigate: route => routes.push(route) }); t.after(app.stop);
   assert.equal(e.root.querySelector('.rb-online-content').dataset.workspaceScreen, 'Direct'); assert.equal(e.root.querySelector('.rb-direct').dataset.phase, 'before');
+  assert.ok(e.root.querySelector('.rb-court')); assert.equal(e.root.querySelector('.rb-online-live').dataset.presentation, 'idle');
+  assert.equal(e.root.querySelector('.rb-direct-poster'), null);
+  assert.ok(e.root.querySelectorAll('.rb-pawn').every(p => p.getAttribute('visibility') === 'hidden'));
   assert.deepEqual(routes.at(-1), { id: 'league', screen: 'Direct' }); assert.equal(e.root.querySelector('.rb-initial-roster'), null);
   await button(e.root, 'Club').click(); assert.ok(e.root.querySelector('.rb-initial-roster')); assert.ok(button(e.root, 'Direct'));
 });

@@ -1,4 +1,5 @@
 import { trajectory } from './rules.mjs';
+import { openingCue, EXIT_DURATION } from './match-ceremony.mjs';
 
 // Presentation timeline only: never advances the engine or consumes random numbers.
 export const courtPoint = ({ x, y }) => ({ x: x * 60 + 30, y: y * 60 + 30 });
@@ -284,6 +285,36 @@ export function entranceFrame(state, elapsed, duration) {
   return { ...frame, ballPoint: ballPoint(frame), effects: [], activeIds: [], animating: elapsed < duration };
 }
 
+export function openingFrame(state, elapsed, duration) {
+  const cue = openingCue(elapsed, duration), frame = entranceFrame(state, elapsed, Math.max(1, cue.entryDuration));
+  return { ...frame, ceremony: cue.phase, cue: cue.label, ballVisible: cue.ball, animating: elapsed < duration };
+}
+
+export function emptyCourtFrame(state) {
+  const frame = snapshot(state);
+  return { ...frame, players: frame.players.map(p => ({ ...p, visible: false })), medics: [], ballPoint: ballPoint(frame), ballVisible: false, effects: [], activeIds: [], ceremony: 'idle', animating: false };
+}
+
+export function exitFrame(state, elapsed, duration = EXIT_DURATION) {
+  const frame = snapshot(state), medics = [], progress = Math.min(1, Math.max(0, elapsed / duration));
+  for (const [index, p] of frame.players.entries()) {
+    const gate = { x: p.teamId === 'home' ? -1.3 : 12.3, y: 3.5 }, initial = p.position;
+    const local = Math.min(1, Math.max(0, (progress - index % 5 * .018) / (1 - index % 5 * .018)));
+    p.grappling = p.grappledBy = null; p.readiedPass = null;
+    if (p.hp <= 0) {
+      const carrying = local >= .4, travel = carrying ? Math.min(1, (local - .4) / .6) : 0;
+      const position = carrying ? mix(initial, gate, travel) : mix(gate, initial, local / .4);
+      if (progress < 1) medics.push({ id: p.id, position, walking: local > 0 && local < 1, walkPhase: elapsed / 80 + index, carrying });
+      p.position = carrying ? position : initial; p.transported = carrying; p.facing = 0;
+    } else {
+      p.position = mix(initial, gate, local); p.walking = local > 0 && local < 1; p.walkPhase = elapsed / 65 + index;
+      p.prone = false; p.facing = Math.atan2(gate.x - initial.x, -(gate.y - initial.y)) * 180 / Math.PI;
+    }
+    p.visible = progress < 1;
+  }
+  return { ...frame, medics, ballPoint: ballPoint(frame), ballVisible: false, effects: [], activeIds: [], ceremony: progress < 1 ? 'exit' : 'idle', animating: progress < 1 };
+}
+
 export function createCourtPlayback(draw, {
   now = () => performance.now(), request = (callback) => requestAnimationFrame(callback),
   cancel = (id) => cancelAnimationFrame(id), reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
@@ -306,24 +337,34 @@ export function createCourtPlayback(draw, {
     matchKey = key; lastTurns = state.turns;
     stop(); final = snapshot(state, facings); render({ ...final, ballPoint: ballPoint(final), effects: [] });
   };
-  const run = (plan, sample, elapsed = 0) => {
+  const run = (plan, sample, elapsed = 0, onComplete) => {
     stop();
     const offset = Math.max(0, Math.min(plan.duration, elapsed));
     const started = now() - offset, token = generation;
     final = plan.final;
-    if (reducedMotion()) { settle(); return 0; }
+    if (reducedMotion()) { settle(); onComplete?.(); return 0; }
     endsAt = started + plan.duration;
     const tick = (time) => {
       if (token !== generation) return;
-      if (time - started >= plan.duration || reducedMotion()) { settle(); return; }
+      if (time - started >= plan.duration || reducedMotion()) { settle(); onComplete?.(); return; }
       render(sample(plan, time - started));
       requestId = request(tick);
     };
     tick(now());
     return Math.max(0, plan.duration - offset);
   };
-  const play = (before, after, events, options) => run(buildCourtPlayback(before, after, events, { ...options, facings }), sampleCourtPlayback);
-  const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, facings }), sampleRoundPlayback, options?.elapsed ?? 0);
+  const play = (before, after, events, options) => run(buildCourtPlayback(before, after, events, { ...options, facings }), sampleCourtPlayback, 0, options?.onComplete);
+  const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, facings }), sampleRoundPlayback, options?.elapsed ?? 0, options?.onComplete);
   const entrance = (state, { duration, elapsed = 0 }) => run({ final: snapshot(state), state, duration }, (plan, at) => entranceFrame(plan.state, at, plan.duration), elapsed);
-  return { show, play, playRound, entrance, settle, remaining: () => Math.max(0, endsAt - now()) };
+  const opening = (state, { duration, elapsed = 0 }) => {
+    if (reducedMotion()) {
+      stop(); const cue = openingCue(elapsed, duration);
+      final = { ...snapshot(state), ceremony: cue.phase, cue: cue.label, ballVisible: cue.ball };
+      render({ ...final, ballPoint: ballPoint(final), effects: [] }); return 0;
+    }
+    return run({ final: { ...snapshot(state), ceremony: 'playing', cue: null, ballVisible: true }, state, duration }, (plan, at) => openingFrame(plan.state, at, plan.duration), elapsed);
+  };
+  const exit = (state, { duration = EXIT_DURATION, elapsed = 0 } = {}) => run({ final: emptyCourtFrame(state), state, duration }, (plan, at) => exitFrame(plan.state, at, plan.duration), elapsed);
+  const empty = state => { stop(); final = emptyCourtFrame(state); render(final); };
+  return { show, play, playRound, entrance, opening, exit, empty, settle, remaining: () => Math.max(0, endsAt - now()) };
 }
