@@ -28,19 +28,11 @@
   body.rb-app:has(.rb-match-area:not([hidden]) > [data-match-screen='playing'], .rb-online-content:not([hidden]) .rb-online-live:not([hidden]), .rb-replay-area:not([hidden]) [data-match-screen='playing'], [data-workspace-screen='Direct']) {
     height: 100svh; display: flex; flex-direction: column;
 
-    & .rb-app-header { flex: none; min-height: 3.5rem; grid-template-columns: max-content minmax(0, 1fr) auto; gap: .5rem 1.25rem; padding-block: .35rem; }
-    & .rb-app-brand { grid-column: 1; grid-row: 1; padding: .15rem 0; }
-    & .rb-app-brand h1 { font-size: 1.8rem; }
-    & .rb-app-brand h1 span { font-size: 1rem; margin: .25rem 0 0 1.5rem; }
-    & .rb-app-brand h1 span::before { display: none; }
-    & .rb-shell-context { display: none; }
-    & :is(.rb-shell-navigation, .rb-shell-tools) { grid-column: 2; grid-row: 1; justify-self: start; }
-    & :is(.rb-account-tools, .rb-app-header > .rb-hub-link) { grid-column: 3; grid-row: 1; }
-    & .rb-account-tools { display: flex; align-items: center; gap: .75rem; }
+    & .rb-app-header { flex: none; }
+    & .rb-shell-context { visibility: hidden; }
     & .rb-account-tools { display: flex; gap: .5rem; align-items: center; }
     & .rb-shell-tools .rb-career-top { display: flex; align-items: center; gap: 1rem; padding: 0; border: 0; }
     & .rb-shell-tools .rb-save-status { display: none; }
-    & .rb-shell-navigation .rb-button { min-height: 2rem; padding: .35rem .75rem; font-size: 1rem; }
     & .rb-app-main { flex: 1; min-height: 0; display: flex; flex-direction: column; max-width: none; padding-block: .35rem .5rem; }
     & :is([data-rumbleball], [data-online], .rb-session-pane, .rb-match-area, .rb-online-content, .rb-online-body, .rb-replay-area, .rb-replay-player):not([hidden]):has([data-match-screen='playing']) { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: .35rem; }
     & .rb-match-back { flex: none; margin: 0; }

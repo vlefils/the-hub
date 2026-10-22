@@ -126,9 +126,9 @@
 .rb-kickoff { position: absolute; inset: 0; display: grid; place-items: center; background: #08130f65; pointer-events: none; }
 .rb-kickoff-copy { text-align: center; color: var(--rb-accent); }
 .rb-kickoff .rb-eyebrow { color: #f0eee2; }
-.rb-kickoff-number { display: block; font: 700 clamp(4rem, 13vw, 9rem)/1 'Rajdhani', 'Arial Narrow', sans-serif; text-shadow: 0 3px 0 #102016; animation: rb-kickoff-cue .22s ease-out; }
+.rb-kickoff-number { display: block; font: 700 clamp(4rem, 13vw, 9rem)/1 'Rajdhani', 'Arial Narrow', sans-serif; text-shadow: 0 3px 0 #102016; animation: rb-kickoff-cue calc(.22s / var(--rb-playback-speed, 1)) ease-out; }
 .rb-kickoff[data-cue='START'] .rb-kickoff-number { font-size: clamp(3rem, 8vw, 6rem); }
-.rb-ball-drop.is-arriving { animation: rb-ball-arrive .45s ease-out; }
+.rb-ball-drop.is-arriving { animation: rb-ball-arrive calc(.45s / var(--rb-playback-speed, 1)) ease-out; }
 @keyframes rb-kickoff-cue { from { opacity: 0; transform: scale(1.15); } to { opacity: 1; transform: scale(1); } }
 @keyframes rb-ball-arrive { from { opacity: 0; transform: translateY(-110px); } 75% { opacity: 1; transform: translateY(5px); } to { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .rb-kickoff-number, .rb-ball-drop.is-arriving { animation: none; } }

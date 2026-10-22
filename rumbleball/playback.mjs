@@ -319,13 +319,13 @@ export function createCourtPlayback(draw, {
   now = () => performance.now(), request = (callback) => requestAnimationFrame(callback),
   cancel = (id) => cancelAnimationFrame(id), reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
 } = {}) {
-  let requestId = null, generation = 0, final = null, endsAt = 0, matchKey = null, lastTurns = 0;
+  let requestId = null, generation = 0, final = null, endsAt = 0, matchKey = null, lastTurns = 0, clock = null;
   const facings = {};
   const render = (frame) => { for (const p of frame.players) facings[p.id] = p.facing; draw(frame); };
   const stop = () => {
     generation++;
     if (requestId !== null) cancel(requestId);
-    requestId = null; endsAt = 0;
+    requestId = null; endsAt = 0; clock = null;
   };
   const settle = () => {
     stop();
@@ -337,34 +337,42 @@ export function createCourtPlayback(draw, {
     matchKey = key; lastTurns = state.turns;
     stop(); final = snapshot(state, facings); render({ ...final, ballPoint: ballPoint(final), effects: [] });
   };
-  const run = (plan, sample, elapsed = 0, onComplete) => {
+  const run = (plan, sample, elapsed = 0, onComplete, speed = 1) => {
     stop();
-    const offset = Math.max(0, Math.min(plan.duration, elapsed));
-    const started = now() - offset, token = generation;
+    const offset = Math.max(0, Math.min(plan.duration, elapsed * speed)), token = generation;
     final = plan.final;
     if (reducedMotion()) { settle(); onComplete?.(); return 0; }
-    endsAt = started + plan.duration;
+    clock = { started: now(), offset, speed, duration: plan.duration };
+    endsAt = clock.started + (plan.duration - offset) / speed;
     const tick = (time) => {
       if (token !== generation) return;
-      if (time - started >= plan.duration || reducedMotion()) { settle(); onComplete?.(); return; }
-      render(sample(plan, time - started));
+      const at = clock.offset + (time - clock.started) * clock.speed;
+      if (at >= plan.duration || reducedMotion()) { settle(); onComplete?.(); return; }
+      render(sample(plan, at));
       requestId = request(tick);
     };
     tick(now());
-    return Math.max(0, plan.duration - offset);
+    return Math.max(0, plan.duration - offset) / speed;
   };
-  const play = (before, after, events, options) => run(buildCourtPlayback(before, after, events, { ...options, facings }), sampleCourtPlayback, 0, options?.onComplete);
-  const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, facings }), sampleRoundPlayback, options?.elapsed ?? 0, options?.onComplete);
+  const setSpeed = speed => {
+    if (!clock || !(speed > 0)) return;
+    const time = now();
+    clock.offset = Math.min(clock.duration, clock.offset + (time - clock.started) * clock.speed);
+    clock.started = time; clock.speed = speed;
+    endsAt = time + (clock.duration - clock.offset) / speed;
+  };
+  const play = (before, after, events, options) => run(buildCourtPlayback(before, after, events, { ...options, speed: 1, facings }), sampleCourtPlayback, 0, options?.onComplete, options?.speed);
+  const playRound = (turns, options) => run(buildRoundPlayback(turns, { ...options, speed: 1, facings }), sampleRoundPlayback, options?.elapsed ?? 0, options?.onComplete, options?.speed);
   const entrance = (state, { duration, elapsed = 0 }) => run({ final: snapshot(state), state, duration }, (plan, at) => entranceFrame(plan.state, at, plan.duration), elapsed);
-  const opening = (state, { duration, elapsed = 0 }) => {
+  const opening = (state, { duration, elapsed = 0, speed = 1 }) => {
     if (reducedMotion()) {
-      stop(); const cue = openingCue(elapsed, duration);
+      stop(); const cue = openingCue(elapsed * speed, duration);
       final = { ...snapshot(state), ceremony: cue.phase, cue: cue.label, ballVisible: cue.ball };
       render({ ...final, ballPoint: ballPoint(final), effects: [] }); return 0;
     }
-    return run({ final: { ...snapshot(state), ceremony: 'playing', cue: null, ballVisible: true }, state, duration }, (plan, at) => openingFrame(plan.state, at, plan.duration), elapsed);
+    return run({ final: { ...snapshot(state), ceremony: 'playing', cue: null, ballVisible: true }, state, duration }, (plan, at) => openingFrame(plan.state, at, plan.duration), elapsed, undefined, speed);
   };
-  const exit = (state, { duration = EXIT_DURATION, elapsed = 0 } = {}) => run({ final: emptyCourtFrame(state), state, duration }, (plan, at) => exitFrame(plan.state, at, plan.duration), elapsed);
+  const exit = (state, { duration = EXIT_DURATION, elapsed = 0, speed = 1 } = {}) => run({ final: emptyCourtFrame(state), state, duration }, (plan, at) => exitFrame(plan.state, at, plan.duration), elapsed, undefined, speed);
   const empty = state => { stop(); final = emptyCourtFrame(state); render(final); };
-  return { show, play, playRound, entrance, opening, exit, empty, settle, remaining: () => Math.max(0, endsAt - now()) };
+  return { show, play, playRound, entrance, opening, exit, empty, settle, freeze: stop, setSpeed, remaining: () => Math.max(0, endsAt - now()) };
 }
