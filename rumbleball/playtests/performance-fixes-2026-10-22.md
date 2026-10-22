@@ -33,7 +33,7 @@ La soirée SQL utilise 16 clubs, huit rencontres et 33 invocations, avec les ré
 - **527 tests réussis, aucun échec, 49 fichiers**, avec le lanceur séquentiel borné à 256 Mo et 60 secondes par fichier.
 - **Dix contrôles PostgreSQL locaux** avec PGlite 0.5.11 : toutes les migrations, soirée complète, checkpoints et projections, replays identiques, conflit de révision, refus d’altération d’une ronde, rollback atomique, permissions, suppression en cascade et conversion de données anciennes actives ou déjà archivées.
 - Tests du vrai module worker via un pont `worker_threads`, de l’annulation, de la réponse tardive, du règlement unique et de la conservation du dernier checkpoint après fermeture.
-- Vérification syntaxique des quatre fichiers TypeScript des Edge Functions. Pas de déploiement Deno ou de requête à la base de production pendant cette passe.
+- Vérification syntaxique des quatre fichiers TypeScript des Edge Functions. Cette validation locale a été suivie d’un [déploiement et de contrôles en production](performance-deployment-2026-10-22.md).
 
 La campagne statistique de 500 matchs reste exclue de cette exécution bornée ; la comparaison complète avant/après de douze matchs est séparée. Cinq anciens scénarios de test ont été actualisés : lancement avec recrutement explicite, adversaire lent défini explicitement depuis la hausse de vitesse v8, création directe d’un match v4, attente de la fin de l’entrée avant comparaison des positions et prise en compte des armes gratuites. Leurs échecs avaient été reproduits sur le commit d’origine ; les règles de production n’ont pas été modifiées pour les faire passer.
 
@@ -51,7 +51,9 @@ node --max-old-space-size=256 supabase/tests/match-storage.mjs output/rumbleball
 
 `tools/rumbleball-performance-check.mjs` prend le dossier `rumbleball` d’une archive Git du commit de référence, puis un chemin JSON de sortie facultatif. Il compare intégralement les événements et l’état final, alterne l’ordre des mesures et borne son travail à 55 secondes.
 
-## Activation du backend après le push
+## Activation du backend
+
+**Effectuée le 22 octobre 2026 à 12 h 30, heure de Paris.** La migration est appliquée, l’API et le worker sont déployés, le flag est actif et la ligue existante utilise `matchStorage: 2`. Le [rapport de mise en service](performance-deployment-2026-10-22.md) décrit les contrôles réalisés et leurs limites. La procédure ci-dessous est conservée pour les prochains environnements.
 
 Le push publie le code ; il n’applique pas le SQL et ne redéploie pas les Edge Functions. L’activation du stockage séparé est volontairement distincte, afin que les deux lecteurs soient disponibles avant la première conversion.
 

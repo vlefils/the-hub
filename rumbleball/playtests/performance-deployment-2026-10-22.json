@@ -1,0 +1,75 @@
+{
+  "format": "rb-performance-deployment-v1",
+  "deployedAt": "2026-10-22T10:30:24.219Z",
+  "sourceCommit": "1ae701d",
+  "migration": "20261022110000_rumbleball_match_storage.sql",
+  "splitMatchStorage": true,
+  "functions": [
+    {
+      "name": "rumbleball-api",
+      "version": 24,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "sha256": "366c57754049b1e01e219cdabb095e34c02108b5b81b1b57d98a0fc2ed99d52e"
+    },
+    {
+      "name": "rumbleball-worker",
+      "version": 23,
+      "status": "ACTIVE",
+      "verifyJwt": false,
+      "sha256": "c142d60e289a96594f2ad49d3fa3b308ec853db0ee41d417c506d52b920c5dda"
+    }
+  ],
+  "otherFunctionCodeAndSecretsUnchanged": true,
+  "backup": {
+    "counts": {
+      "leagues": 1,
+      "memberships": 3,
+      "replays": 4,
+      "solo": 9
+    },
+    "bytes": 1597532,
+    "sha256": "391191f87fc7daead292fd829c9fe6f1686007c36477a5bd06dc611b08e7d013",
+    "storedLocally": true
+  },
+  "checks": {
+    "migrationPreservesBusinessData": true,
+    "authenticatedApiAndSoloListings": true,
+    "privateTablesAndRpcPermissions": true,
+    "liveClubs": 4,
+    "liveMatches": 2,
+    "workerInvocations": 9,
+    "liveResultsFinancesAndProgressMatchReference": true,
+    "liveReplayFramesMatchReference": true,
+    "repeatedWorkerDoesNotWrite": true,
+    "temporaryDataRemoved": {
+      "checkpoints": 0,
+      "leagues": 0,
+      "rounds": 0,
+      "validation_users": 0
+    },
+    "existingLeagueStorageVersion": 2,
+    "existingLeagueRevision": 93,
+    "existingProjectionsCompared": 6,
+    "oldArchivesUnchanged": 4,
+    "oldReplayPublicFramesCompared": 300,
+    "soloSavesUnchanged": 9,
+    "existingMembershipsUnchanged": 3,
+    "existingLeagueWakeupUnchanged": true,
+    "convertedPreparationWorkerSkippedWithoutWrite": true,
+    "recentCronRunsSucceeded": 5,
+    "overdueLeagues": 0,
+    "staleRumbleballTransactions": 0
+  },
+  "httpWorkerMs": {
+    "samples": 9,
+    "min": 300,
+    "median": 415,
+    "max": 1106
+  },
+  "limits": [
+    "Accelerated test evening with four clubs; not a capacity or load test.",
+    "HTTP timings include network and cold starts; no production baseline comparison.",
+    "Per-stage Edge console metrics are instrumented but were not exported during this validation."
+  ]
+}

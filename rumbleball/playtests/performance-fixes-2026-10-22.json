@@ -42,6 +42,7 @@
     "failed": 0,
     "excluded": "500-match statistical campaign; twelve full-match baseline comparisons run separately"
   },
-  "productionDatabaseAccessed": false,
-  "backendDeploymentPerformed": false
+  "productionDatabaseAccessed": true,
+  "backendDeploymentPerformed": true,
+  "deploymentReport": "performance-deployment-2026-10-22.json"
 }
