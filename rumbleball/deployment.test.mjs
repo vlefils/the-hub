@@ -7,6 +7,7 @@ import { createCareer, configureTeam, confirmDraft, launchCareerMatch, saveCaree
 import { exportCareer, importCareer } from './career-storage.mjs';
 import { narrateTurn } from './narration.mjs';
 import { buildRoundPlayback, courtPoint, sampleRoundPlayback } from './playback.mjs';
+import { ENTRY_DURATION } from './match-ceremony.mjs';
 import { mountCareer } from './career-ui.mjs';
 import { deploymentEditor, PLAYER_DRAG_TYPE } from './deployment-ui.mjs';
 import { environment, descendants, button, classNode } from './test-support/dom.mjs';
@@ -156,7 +157,8 @@ test('UI de carrière : placement et titulaires s’enregistrent ensemble ; le t
   assert.deepEqual(restored.saved().current.state.players[1].position, { x: 0, y: 0 }); assert.match(classNode(restored.root, 'rb-playback-status').textContent, /Pause/);
 });
 
-test('exhibition : déploiement libre dans le vestiaire ; ballon masqué avant le coup d’envoi', async () => {
+test('exhibition : déploiement libre conservé après l’entrée ; ballon masqué avant le coup d’envoi', async t => {
+  let now = performance.now(); t.mock.method(performance, 'now', () => now);
   const e = environment(), { mountMatch } = await import('./ui.mjs'), view = mountMatch(e.root);
   assert.equal(classNode(e.root, 'rb-match-stage').hidden, true);
   assert.equal(classNode(e.root, 'rb-setup').querySelectorAll('.rb-deployment-portrait').length, 5);
@@ -164,7 +166,7 @@ test('exhibition : déploiement libre dans le vestiaire ; ballon masqué avant l
   const pawn = descendants(e.root).find((n) => n.getAttribute('data-player') === 'home-0'); assert.equal(pawn.getAttribute('transform'), 'translate(30 450)');
   assert.equal(classNode(classNode(e.root, 'rb-ball-layer'), 'rb-ball').parentNode.getAttribute('transform'), 'translate(360 240)');
   assert.equal(classNode(e.root, 'rb-ball-layer').getAttribute('display'), 'none');
-  await classNode(e.root, 'rb-setup').emit('submit'); view.pause();
+  await classNode(e.root, 'rb-setup').emit('submit'); now += ENTRY_DURATION; view.pause();
   assert.equal(pawn.getAttribute('transform'), 'translate(30 450)'); assert.equal(classNode(e.root, 'rb-setup').hidden, true);
   assert.equal(classNode(e.root, 'rb-match-stage').hidden, false); assert.ok(pawn.querySelector('.rb-person-body'));
 });

@@ -2,6 +2,8 @@
 
 ## État de livraison
 
+Le lot de performance du 22 octobre prépare des lectures légères, le stockage des matchs et rondes hors de la ligue et des délais serveur partagés. Voir [les corrections, les tests et l’ordre d’activation](../playtests/performance-fixes-2026-10-22.md). Le push seul n’applique pas sa migration et ne redéploie pas les fonctions ; déployer les deux lecteurs avant d’activer `RB_SPLIT_MATCH_STORAGE`.
+
 Le multijoueur est ouvert sur `../multi.html`, également accessible par **Multijoueur** dans le jeu. Les tables privées, l’API, le worker et le déclencheur périodique sont installés sur le projet Supabase de Riftbound Tracker. `config.mjs` active maintenant le service.
 
 L’activation du 18 octobre 2026 a été vérifiée avec une vraie soirée de quatre clubs temporaires : deux matchs, deux minutes de pause, verrouillage, salaires, revenus, bonus et progression. Les comptes et la ligue de validation ont ensuite été supprimés. Le [compte rendu](../playtests/online-activation-2026-10-18.md) détaille les contrôles et leurs limites.

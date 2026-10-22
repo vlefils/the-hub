@@ -180,7 +180,7 @@ function computeRound(game) {
   do { const before = state, step = stepMatch(state, { stopAtRoundEnd: true }); state = step.state; turns.push({ before, after: state, events: step.events }); }
   while (!state.finished && state.round === round);
   game.broadcast.rounds.push(encodeRound({ round, turns })); game.broadcast.final = state;
-  if (state.finished) game.endsAt = iso(instant(game.playsAt) + game.broadcast.rounds.length * ONLINE_RULES.roundMs);
+  if (state.finished) game.endsAt = iso(instant(game.playsAt) + ((game.broadcast.roundsOffset ?? 0) + game.broadcast.rounds.length) * ONLINE_RULES.roundMs);
 }
 function transaction(club, amount, label, id) {
   if (club.transactions.some((t) => t.id === id)) return;
@@ -307,7 +307,17 @@ export function replayProjection(s, userId, matchId, archive, now) {
       return { round: round.round, turns: round.turns.map(turn => ({ before: publicState(turn.before, matchId), after: publicState(turn.after, matchId), events: copy(turn.events) })) };
     }) };
 }
-export function leagueProjection(s, userId, now) {
+export function historyProjection(s, userId, { before, limit = 30 } = {}, now) {
+  need(s.members.some(m => m.userId === userId), 'Accès réservé aux participants.');
+  need(Number.isSafeInteger(limit) && limit >= 1 && limit <= 100, 'Taille de page invalide.');
+  const visible = s.history.filter(g => instant(g.endsAt) <= instant(now));
+  const end = before === undefined ? visible.length : visible.findIndex(g => g.id === before);
+  need(end >= 0, 'Page d’historique introuvable.');
+  const start = Math.max(0, end - limit);
+  return { history: visible.slice(start, end).map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })),
+    total: visible.length, nextCursor: start > 0 ? visible[start].id : null };
+}
+export function leagueProjection(s, userId, now, { broadcast: includeBroadcast = true, historyLimit = null } = {}) {
   const member = s.members.find((m) => m.userId === userId); need(member, 'Accès réservé aux participants.');
   const ownClub = copy(member.draft ?? member.club);
   ensureClubEquipment(ownClub, ownClub.market);
@@ -321,21 +331,22 @@ export function leagueProjection(s, userId, now) {
       phase: g.phase ?? 'groups', result: ended ? { winnerId: g.broadcast.final.result.winnerId === 'home' ? g.homeId : g.broadcast.final.result.winnerId === 'away' ? g.awayId : null } : null };
   }) ?? [];
   const active = night?.games.find((g) => g.startsAt && t >= instant(g.startsAt) && (!g.endsAt || t < instant(g.endsAt)));
-  const departing = night?.games.find(g => g.broadcast.final.finished && g.endsAt && t >= instant(g.endsAt) && t < instant(g.endsAt) + EXIT_DURATION);
+  const departing = includeBroadcast && night?.games.find(g => g.broadcast.final.finished && g.endsAt && t >= instant(g.endsAt) && t < instant(g.endsAt) + EXIT_DURATION);
   const closing = departing ? { id: departing.id, endsAt: departing.endsAt, duration: EXIT_DURATION, state: publicState(departing.broadcast.final, departing.id) } : null;
   let broadcast = null, waitingForServer = false;
-  if (active) {
+  if (active && includeBroadcast) {
     const elapsed = Math.max(0, t - instant(active.playsAt)), index = Math.floor(elapsed / ONLINE_RULES.roundMs);
-    const storedRound = active.broadcast.rounds[index], round = storedRound ? decodeRound(storedRound) : null;
+    const storedRound = active.broadcast.rounds[index - (active.broadcast.roundsOffset ?? 0)], round = storedRound ? decodeRound(storedRound) : null;
     waitingForServer = t >= instant(active.playsAt) && !round;
     if (!waitingForServer) broadcast = { id: active.id, initial: publicState(active.broadcast.initial, active.id), startsAt: active.startsAt, playsAt: active.playsAt,
       roundStartsAt: iso(instant(active.playsAt) + index * ONLINE_RULES.roundMs),
       turns: t < instant(active.playsAt) ? [] : round.turns.map((turn) => ({ before: publicState(turn.before, active.id), after: publicState(turn.after, active.id), events: copy(turn.events) })) };
   }
   return { id: s.id, name: s.name, ownerId: s.ownerId, capacity: s.status === 'lobby' ? null : s.capacity, maxClubs: MAX_LEAGUE_CLUBS, status: s.status, season: s.season, day: s.day,
-    phase: s.phase ?? 'groups', playoffs: copy(s.playoffs ?? null), playoffHistory: copy(s.playoffHistory ?? []),
+    phase: s.phase ?? 'groups', playoffs: copy(s.playoffs ?? null), playoffHistory: copy(historyLimit === null ? s.playoffHistory ?? [] : s.playoffHistory?.slice(-1) ?? []),
     members: leagueParticipants(s).map((m) => ({ userId: m.userId, name: m.club.name, ready: !m.initialRecruitment, isBot: (s.bots ?? []).some(bot => bot.userId === m.userId), kitColor: m.club.kitColor, crestId: m.club.crestId ?? CRESTS[cosmeticHash(`${s.id}:${m.userId}:crest`) % CRESTS.length].id })), inviteCode: s.status === 'lobby' ? s.inviteCode : null,
     serverTime: iso(t), suggestedFirstMatchAt: s.status === 'lobby' ? nextLock(now) : null, nextLockAt: s.nextLockAt, locked: isLocked(s, now), rules: ONLINE_RULES,
     club: ownClub, needsRecruitment: Boolean(member.initialRecruitment), autoRecruitedAt: member.autoRecruitedAt ?? null, firstMatchAt: s.firstMatchAt ?? null, hasDraft: Boolean(member.draft), table: leagueTable(s), games, broadcast, closing, waitingForServer,
-    history: s.history.map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })), upcoming: s.status === 'lobby' ? [] : s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
+    history: (historyLimit === null ? s.history : s.history.slice(-historyLimit)).map(g => ({ ...copy(g), replayAvailable: Boolean(g.replayAvailable || s.night?.games.some(game => game.id === g.id && game.settled)) })),
+    historyCount: s.history.length, upcoming: s.status === 'lobby' ? [] : s.status === 'broadcast' ? s.night.games.map(({ homeId, awayId }) => ({ homeId, awayId })) : fixturesFor(s).map(([homeId, awayId]) => ({ homeId, awayId })) };
 }

@@ -1,9 +1,6 @@
 import { el, btn } from './career-components.mjs';
 import { workspaceHeader } from './workspace-header.mjs';
 import { mountLogin } from './auth-ui.mjs';
-import { mountCareer } from './career-ui.mjs';
-import { mountMatch } from './ui.mjs';
-import { mountOnline } from './online/ui.mjs';
 import { connectOnline } from './online/client.mjs';
 import { ONLINE_CONFIG } from './online/config.mjs';
 import { accountRequest, createSoloSync, recoverSoloGames, localSoloGames, cacheSoloGame } from './solo-sync.mjs';
@@ -18,7 +15,7 @@ const tabStorageProxy = fallback => {
 const date = value => value ? new Date(value).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : 'À l’instant';
 
 export async function mountSession(root, { connect = connectOnline, config = ONLINE_CONFIG, storage = localStorageProxy(), initialMode = 'home',
-  careerView = mountCareer, matchView = mountMatch, onlineView = mountOnline } = {}) {
+  careerView, matchView, onlineView } = {}) {
   root.replaceChildren(); root.classList.add('rb');
   const notice = el('p', 'rb-session-notice'), pane = el('div', 'rb-session-pane'); notice.hidden = true;
   const accountSlot = document.querySelector('[data-account-tools]') ?? el('div', 'rb-account-tools rb-account-inline');
@@ -137,19 +134,23 @@ export async function mountSession(root, { connect = connectOnline, config = ONL
       catch (error) { if (!active(ticket, owner)) return; if (!local) throw error; game = local.game; message('Partie ouverte depuis la copie de cet appareil. La synchronisation reprendra au retour de la connexion.', false); }
     }
     if (!active(ticket, owner)) return;
+    const [careerModule, matchModule] = await Promise.all([careerView ? null : import('./career-ui.mjs'), matchView ? null : import('./ui.mjs')]);
+    if (!active(ticket, owner)) return;
     try { if (!game.pending) cacheSoloGame(storage, owner, game); } catch { /* Saving will report any unavailable local outbox. */ }
     sync = createSoloSync(client, owner, storage, game, { record: local?.record.pending ? local.record : undefined });
     saveNavigation(navigationStorage, owner, { mode: 'solo', id, screen: initialView?.screen });
-    child = careerView(pane, matchView, { sync, initialView, onOnline: () => attempt(() => showOnline()),
+    child = (careerView ?? careerModule.mountCareer)(pane, matchView ?? matchModule.mountMatch, { sync, initialView, onOnline: () => attempt(() => showOnline()),
       onNavigate: view => { if (active(ticket, owner)) saveNavigation(navigationStorage, owner, { ...view, mode: 'solo', id }); } });
   }
   async function showOnline(initialView) {
     const owner = user?.id; if (!owner) return;
     const ticket = ++generation; clearView(); account();
     pane.replaceChildren(el('p', 'rb-loading', 'Ouverture des ligues…'));
+    const renderOnline = onlineView ?? (await import('./online/ui.mjs')).mountOnline;
+    if (!active(ticket, owner)) return;
     const guardedClient = { ...client, request: (action, id, payload = {}) => client.request(action, id, { ...payload, accountId: owner }) };
     saveNavigation(navigationStorage, owner, { mode: 'multi', ...initialView });
-    const instance = await onlineView(pane, config, async () => guardedClient, { managedSession: true, initialView, isActive: () => active(ticket, owner),
+    const instance = await renderOnline(pane, config, async () => guardedClient, { managedSession: true, initialView, isActive: () => active(ticket, owner),
       onNavigate: view => { if (active(ticket, owner)) saveNavigation(navigationStorage, owner, { ...view, mode: 'multi' }); } });
     if (active(ticket, owner)) child = instance; else instance?.stop();
   }

@@ -1,33 +1,52 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.110.8';
 import { prepareLeagueCommit, decodeReplayArchive } from '../../../rumbleball/online/replay-codec.mjs';
 
-export const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false, autoRefreshToken: false } });
-const checked = ({ data, error }: any) => { if (error) throw new Error(error.message); return data; };
-const commitLeague = async (id: string, revision: number, state: unknown, preparation: boolean, signal?: AbortSignal) => {
-  const prepared = await prepareLeagueCommit(state);
-  const query = admin.rpc('rb_commit_league', { p_id: id, p_expected_revision: revision, p_state: prepared, p_preparation: preparation });
-  return checked(await (signal ? query.abortSignal(signal) : query));
+export const createAdmin = (signal?: AbortSignal) => createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+  auth: { persistSession: false, autoRefreshToken: false },
+  global: { fetch: (url: RequestInfo | URL, init?: RequestInit) => fetch(url, { ...init,
+    signal: AbortSignal.any([AbortSignal.timeout(10000), ...(signal ? [signal] : []), ...(init?.signal ? [init.signal] : [])]) }) },
+});
+export const admin = createAdmin();
+export const metric = (stage: string, ms: number) => console.info(JSON.stringify({ service: 'rumbleball', stage, ms: Math.round(ms) }));
+export const measured = async (stage: string, query: PromiseLike<any>) => {
+  const start = performance.now(); let ok = false;
+  try { const { data, error } = await query; if (error) throw new Error(error.message); ok = true; return data; }
+  finally { console.info(JSON.stringify({ service: 'rumbleball', stage, ok, ms: Math.round(performance.now() - start) })); }
 };
-export const store = {
-  async claim(id: string) { return checked(await admin.rpc('rb_claim_tick', { p_id: id }).abortSignal(AbortSignal.timeout(10000))); },
-  async commitTick(id: string, revision: number, state: unknown) { return commitLeague(id, revision, state, false, AbortSignal.timeout(10000)); },
-  async get(id: string) { return checked(await admin.from('rb_leagues').select('*').eq('id', id).maybeSingle()); },
-  async invite(code: string) { return checked(await admin.from('rb_leagues').select('*').eq('invite_code', code).maybeSingle()); },
+export function createStore(client = admin) {
+  const commitLeague = async (id: string, revision: number, state: any, preparation: boolean) => {
+    const split = revision > 0 && (state.matchStorage === 2 || Deno.env.get('RB_SPLIT_MATCH_STORAGE') === 'true');
+    // Split storage keeps immutable rounds in their own table; its completed
+    // games need no full replay compression during a league commit.
+    const prepared = state.matchStorage === 2 ? state : await prepareLeagueCommit(state);
+    return measured('league.commit', client.rpc(split ? 'rb_commit_league_v2' : 'rb_commit_league', {
+      p_id: id, p_expected_revision: revision, p_state: prepared, p_preparation: preparation }));
+  };
+  return {
+  async claim(id: string) { return measured('league.claim', client.rpc('rb_claim_tick_v2', { p_id: id })); },
+  async commitTick(id: string, revision: number, state: unknown) { return commitLeague(id, revision, state, false); },
+  async get(id: string, { now = new Date().toISOString(), broadcast = false } = {}) {
+    return measured('league.read', client.rpc('rb_read_league', { p_id: id, p_now: now, p_frames: broadcast }));
+  },
+  async invite(code: string) { return measured('league.invite', client.from('rb_leagues').select('id,revision,state').eq('invite_code', code).maybeSingle()); },
   async replay(leagueId: string, matchId: string) {
-    const row = checked(await admin.from('rb_replays').select('replay').eq('league_id', leagueId).eq('match_id', matchId).maybeSingle());
-    return await decodeReplayArchive(row?.replay ?? null, matchId);
+    const row = await measured('replay.read', client.from('rb_replays').select('replay').eq('league_id', leagueId).eq('match_id', matchId).maybeSingle());
+    return row ? await decodeReplayArchive(row.replay, matchId)
+      : measured('replay.rounds', client.rpc('rb_read_match_replay', { p_league_id: leagueId, p_match_id: matchId }));
   },
   async commit(id: string, revision: number, state: unknown, preparation: boolean) {
     return commitLeague(id, revision, state, preparation);
   },
   async list(userId: string) {
-    const memberships = checked(await admin.from('rb_memberships').select('league_id').eq('user_id', userId));
+    const memberships = await measured('league.memberships', client.from('rb_memberships').select('league_id').eq('user_id', userId));
     if (!memberships.length) return [];
-    const rows = checked(await admin.from('rb_leagues').select('id,name,status,capacity,member_count,bots:state->bots').in('id', memberships.map((m: any) => m.league_id)));
-    return rows.map((r: any) => ({ id: r.id, name: r.name, status: r.status, members: r.member_count + (r.bots?.length ?? 0), capacity: r.status === 'lobby' ? null : r.capacity }));
+    const rows = await measured('league.list', client.from('rb_leagues').select('id,name,status,capacity,member_count,bot_count').in('id', memberships.map((m: any) => m.league_id)));
+    return rows.map((r: any) => ({ id: r.id, name: r.name, status: r.status, members: r.member_count + r.bot_count, capacity: r.status === 'lobby' ? null : r.capacity }));
   },
-  async due(now: string) { return checked(await admin.from('rb_leagues').select('id').lte('next_tick_at', now).order('next_tick_at').limit(1)); },
-};
+  async due(now: string) { return measured('league.due', client.from('rb_leagues').select('id').lte('next_tick_at', now).order('next_tick_at').limit(1)); },
+  };
+}
+export const store = createStore();
 export function cors(request: Request) {
   const origins = (Deno.env.get('RB_ALLOWED_ORIGINS') ?? 'https://vlefils.github.io,http://127.0.0.1:8765,http://localhost:8765').split(',');
   const origin = request.headers.get('Origin') ?? '';

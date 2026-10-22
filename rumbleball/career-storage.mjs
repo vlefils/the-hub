@@ -158,6 +158,7 @@ export function validateCareer(c) {
   return c;
 }
 export function exportCareer(career) { validateCareer(career); return JSON.stringify({ format: 'the-hub-rumbleball', version: 1, career }, null, 2); }
+export function serializeCareer(career) { validateCareer(career); return JSON.stringify({ format: 'the-hub-rumbleball', version: 1, career }); }
 export function importCareer(json) {
   if (typeof json !== 'string' || json.length > 8_000_000) throw new Error('Fichier JSON trop volumineux.');
   let data; try { data = JSON.parse(json); } catch { throw new Error('Ce fichier ne contient pas un JSON lisible.'); }
@@ -170,5 +171,5 @@ export function loadCareer(storage) {
 }
 export function persistCareer(storage, career) {
   // A single setItem is atomic: quota/security failures leave the previous value intact.
-  const json = exportCareer(career); storage.setItem(CAREER_KEY, json);
+  const json = serializeCareer(career); storage.setItem(CAREER_KEY, json);
 }

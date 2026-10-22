@@ -5,7 +5,8 @@ import { createCareer, confirmDraft, launchCareerMatch } from './career.mjs';
 import { exportCareer, importCareer } from './career-storage.mjs';
 import { PORTRAITS, playerGender } from './identity.mjs';
 import { readFile } from 'node:fs/promises';
-import { createLeague, joinLeague, startLeague, advanceLeague, leagueProjection } from './online/league.mjs';
+import { createLeague, joinLeague, advanceLeague, leagueProjection } from './online/league.mjs';
+import { startReadyLeague as startLeague } from './test-support/online.mjs';
 import { ARCHETYPES } from './classes.mjs';
 
 test('noms : prénom "pseudo" nom et accords par classe dans 393216 combinaisons cyberpunk', () => {

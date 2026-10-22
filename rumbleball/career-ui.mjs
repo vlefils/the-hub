@@ -20,6 +20,7 @@ import { openingPicker } from './opening-ui.mjs';
 import { el, btn, field, select, money, signed, keyed, kitPicker, portraitIdentity, pageHeading, squadHeading, metric, table, stats, statList, xpProgress, fatigue as playerFatigue, comparison, disclosure } from './career-components.mjs';
 import { isLongCareer, divisionOf, DIVISIONS, fatigueLimit, injured, injuryChance } from './career-rules.mjs';
 import { availablePlayers, longSeasonOutcome } from './long-career.mjs';
+import { createBackgroundSimulation } from './background-simulation.mjs';
 function download(text, filename) {
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' })), a = el('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -29,6 +30,8 @@ export function mountCareer(root, mountMatch, options = {}) {
   // Access localStorage lazily, including browsers that reject the property getter.
   const storage = options.sync?.storage ?? options.storage ?? { getItem: (key) => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value), removeItem: (key) => window.localStorage.removeItem(key) };
   let active = true;
+  const background = options.background ?? createBackgroundSimulation();
+  let computing = false;
   const loaded = loadCareer(storage);
   let career = loaded.career, tab = options.initialView?.screen === 'Ligue' ? 'Ligue' : 'Club', mode = 'career', unsaved = false, selectedPlayer = null, draftIds = new Set(), pendingImport = null;
   const compilePlayer = (player, inventory = []) => compileProfile(player, inventory, career ?? {});
@@ -73,13 +76,30 @@ export function mountCareer(root, mountMatch, options = {}) {
   const view = mountMatch(matchRoot, {
     onTurn(state, events) {
       if (!active) return false;
+      if (state.finished && background.available) return calculate('save-turn', { career, state, events }).then(() => !unsaved);
       career = saveCareerTurn(career, state, events);
       if (career.current?.settled) { calendarDay = null; formationUndo = null; }
       return save();
     },
+    async onFinish() { await calculate('finish-career', { career }); if (unsaved) throw new Error('Progression non enregistrée. Revenez au club pour réessayer.'); return career.current; },
     onReturn() { matchArea.hidden = true; manager.hidden = false; if (career.current?.settled) tab = 'Bilan'; renderManagement(); manager.scrollIntoView({ block: 'start', behavior: 'instant' }); },
   });
-  function attempt(action) { if (!active) return; if (modal.visible) modal.message(''); try { action(); } catch (error) { notice.hidden = false; notice.textContent = error.message; if (modal.visible) modal.message(error.message); } }
+  function report(error) { if (!active) return; notice.hidden = false; notice.textContent = error.message; if (modal.visible) modal.message(error.message); }
+  function attempt(action) { if (!active || computing) return; if (modal.visible) modal.message(''); try { const result = action(); return result?.catch ? result.catch(report) : result; } catch (error) { report(error); } }
+  function simulatePlayoffs() { return background.available ? attempt(() => calculate('playoffs', { career })) : update(() => advanceCareerPlayoffs(career)); }
+  async function calculate(type, payload) {
+    if (computing || !active) throw new Error('Un calcul est déjà en cours.');
+    computing = true; saveStatus.textContent = 'Calcul de la journée en cours…';
+    try {
+      const next = await background.run(type, payload);
+      if (!active) return;
+      career = next; calendarDay = null; formationUndo = null; save();
+      if (!manager.hidden) renderManagement();
+    } catch (error) {
+      if (active) { notice.hidden = false; notice.textContent = error.message; saveStatus.textContent = 'Calcul interrompu · dernière sauvegarde conservée'; }
+      throw error;
+    } finally { computing = false; }
+  }
   function save() {
     try { persistCareer(storage, career); unsaved = false; retry.hidden = true; notice.hidden = true; saveStatus.textContent = options.sync ? options.sync.status().message : 'Enregistré dans ce navigateur'; return true; }
     catch (error) { unsaved = true; retry.hidden = false; if (saveStatus.textContent !== 'Progression non enregistrée') saveStatus.textContent = 'Progression non enregistrée'; notice.hidden = false; notice.textContent = `Progression non enregistrée : ${error.message} La dernière sauvegarde valide est conservée. Réessayez ou exportez votre progression avant de fermer cette page.`; return false; }
@@ -324,7 +344,7 @@ export function mountCareer(root, mountMatch, options = {}) {
     copy.append(el('strong', '', locked ? 'Composition figée pour cette rencontre' : finished ? 'La saison est terminée' : spectating ? `${currentPlayoffRound(career.playoffs).name} · autres clubs` : `Après salaires : ${money(career.balance - payroll(career))}`), el('p', 'rb-muted', locked ? 'Terminez le match pour modifier votre équipe.' : finished ? 'Vous pouvez commencer la saison suivante.' : spectating ? 'Votre club ne joue pas ce tour. Aucun salaire prélevé.' : 'Primes versées après le match.'));
     if (forfeit) copy.replaceChildren(el('strong', 'rb-injury-label', ownForfeit ? `${availablePlayers(own).length}/5 joueurs disponibles` : 'Adversaire indisponible'), el('p', 'rb-muted', ownForfeit ? 'Recrutez ou avancez par forfait pour laisser récupérer les blessés. Salaires maintenus.' : 'La victoire sera enregistrée sans jouer. Salaires maintenus, aucun gain d’XP.'));
     if (finished && isLongCareer(career)) { const outcome = longSeasonOutcome(career); copy.replaceChildren(el('strong', '', outcome.movement === 'promotion' ? `Montée en ligue ${outcome.nextDivision}` : outcome.movement === 'relegation' ? `Descente en ligue ${outcome.nextDivision}` : `Maintien en ligue ${outcome.division}`), el('p', 'rb-muted', 'Intersaison : fatigue et blessures retirées.')); }
-    launch.append(copy, finished ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : spectating ? btn(`Simuler · ${currentPlayoffRound(career.playoffs).name}`, () => update(() => advanceCareerPlayoffs(career)), true) : blocked(btn(forfeit ? ownForfeit ? 'Déclarer forfait et avancer' : 'Enregistrer le forfait adverse' : 'Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); rail.append(launch);
+    launch.append(copy, finished ? btn('Commencer la saison suivante', () => { calendarDay = null; formationUndo = null; update(() => nextSeason(career)); }, true) : spectating ? btn(`Simuler · ${currentPlayoffRound(career.playoffs).name}`, simulatePlayoffs, true) : blocked(btn(forfeit ? ownForfeit ? 'Déclarer forfait et avancer' : 'Enregistrer le forfait adverse' : 'Lancer la rencontre', () => updateAndPlay(), true), locked ? 'Rencontre déjà en cours.' : '')); rail.append(launch);
     formNotice.classList.add('rb-sr-only'); rail.append(formNotice);
     if (career.current?.settled) { const summary = btn('Voir le bilan', () => go('Bilan')); summary.classList.add('rb-quiet-action'); launch.append(summary); }
     form.addEventListener('submit', (event) => event.preventDefault()); manager.append(form); renderActive();
@@ -437,6 +457,11 @@ export function mountCareer(root, mountMatch, options = {}) {
     dialog.addEventListener('cancel', (event) => { event.preventDefault(); close(); }); root.append(dialog); dialog.showModal(); cancel.focus();
   }
   function updateAndPlay() {
+    if (background.available && careerForfeit(career)) return attempt(async () => {
+      if (unsaved && !save()) return;
+      await calculate('launch', { career }); if (!active) return;
+      modalKind = 'summary'; renderManagement();
+    });
     attempt(() => {
       // Save the charged, frozen match before allowing the first simulated turn.
       if (unsaved && !save()) return;
@@ -453,5 +478,5 @@ export function mountCareer(root, mountMatch, options = {}) {
   }
   showMode(options.initialView?.screen === 'exhibition' ? 'exhibition' : 'career');
   if (options.initialView?.screen === 'match' && career?.current?.state) openMatch();
-  return { stop() { active = false; unsubscribeSync?.(); modal.close(); saveDialog.close(); if (view.stop) view.stop(); else view.pause(); top.remove(); } };
+  return { stop() { active = false; background.stop(); unsubscribeSync?.(); modal.close(); saveDialog.close(); if (view.stop) view.stop(); else view.pause(); top.remove(); } };
 }

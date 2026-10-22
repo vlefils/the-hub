@@ -246,7 +246,7 @@ test('bots : achats réels au tarif commun, rotation, recrutement et niveaux sur
     const c = s.bots[0].club, purchases = c.transactions.filter(t => t.id.startsWith('bot-gear-'));
     const spent = c.transactions.slice(transactionCount).some(t => t.amount < 0 && t.label !== 'Salaires de la journée');
     if (spent) assert.ok(c.balance >= c.players.reduce((sum, p) => sum + salary(p), 0), 'Les achats réservent les prochains salaires ; les salaires seuls peuvent réduire cette réserve.');
-    assert.ok(c.inventory.some(item => item.location === 'rightHand'));
+    assert.ok(c.inventory.some(item => item.location === 'rightHand') || c.players.some(p => p.issuedWeapons?.rightHand), 'Les armes peuvent provenir de la dotation gratuite ou des achats du club.');
     assert.equal(new Set(c.inventory.map(item => item.id)).size, c.inventory.length);
     assert.deepEqual(advanceLeague(s, s.nextLockAt, { maxRounds: 0 }), s, 'Un nouvel appel du worker ne rachète pas d’équipement.');
     if (!i) { assert.equal(c.players.length, 7); assert.ok(purchases.some(t => t.amount < 0)); }

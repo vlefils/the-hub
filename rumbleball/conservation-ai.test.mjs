@@ -4,8 +4,8 @@ import { createMatch, stepMatch } from './engine.mjs';
 import { decideTurn, teamPlan } from './ai.mjs';
 import { assertInvariants, distance, giveBall, resolveAction } from './rules.mjs';
 
-function circulationFixture(strategy = 'possession') {
-  const state = createMatch({ strategy, openings: { home: 'none', away: 'none' } });
+function circulationFixture(strategy = 'possession', rulesVersion) {
+  const state = createMatch({ strategy, rulesVersion, openings: { home: 'none', away: 'none' } });
   const holder = state.players[0], receiver = state.players[4], enemy = state.players[6];
   state.players.forEach((p) => { p.hp = [holder, receiver, enemy].includes(p) ? p.maxHp : 0; p.reaction = p.hp > 0; });
   holder.position = { x: 1, y: 0 }; receiver.position = { x: 4, y: 0 }; enemy.position = { x: 5, y: 7 };
@@ -32,10 +32,12 @@ test('Conservation : ne récompense pas un retour vers un joueur déjà passé q
   state.turnIndex = 1; assert.notEqual(decideTurn(state, holder).action.type, 'pass');
 });
 
-test('Conservation : peut confier le ballon au relais qui jouera en sécurité au début du round suivant', () => {
+test('Conservation : peut confier le ballon au prochain round face à un adversaire distant et lent', () => {
   const { state, holder, receiver, enemy } = circulationFixture();
   state.initiative = [receiver.id, holder.id, enemy.id, ...state.initiative.filter((id) => ![holder.id, receiver.id, enemy.id].includes(id))];
   state.turnIndex = 1;
+  // Explicit threat budget: v8 increased the default belier speed to 9 m.
+  enemy.speed = 3;
   assert.equal(decideTurn(state, holder).action.targetId, receiver.id);
   assert.equal(decideTurn(state, holder).action.type, 'pass');
 });
@@ -111,6 +113,6 @@ test('Conservation : la sortie de pression garde un partenaire à portée de pas
 });
 
 test('Conservation : les anciennes versions gardent leur décision de circulation', () => {
-  const { state, holder } = circulationFixture(); state.version = 4;
+  const { state, holder } = circulationFixture('possession', 4);
   assert.notEqual(decideTurn(state, holder).action.type, 'pass');
 });

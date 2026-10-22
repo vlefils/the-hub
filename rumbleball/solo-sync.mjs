@@ -1,11 +1,11 @@
-import { CAREER_KEY, exportCareer, importCareer } from './career-storage.mjs';
+import { CAREER_KEY, serializeCareer, importCareer } from './career-storage.mjs';
 
 const CACHE = 'the-hub.rumbleball.solo-cache.v1:', PENDING = 'the-hub.rumbleball.solo-pending.v1:';
 const CLAIM = 'the-hub.rumbleball.legacy-owner.v1';
 const keys = storage => Array.from({ length: storage.length }, (_, i) => storage.key(i)).filter(Boolean);
 const cacheKey = (owner, id) => `${CACHE}${owner}:${id}`;
 const pendingKey = record => `${PENDING}${record.ownerId}:${record.workspaceId}`;
-const jsonOf = game => game.state ? exportCareer(game.state) : null;
+const jsonOf = game => game.state ? serializeCareer(game.state) : null;
 const gameOf = record => {
   const state = record.json ? importCareer(record.json) : null;
   return { id: record.id, revision: record.revision, state, clubName: state?.clubs[0].name ?? 'Nouvelle partie', season: state?.season ?? null,

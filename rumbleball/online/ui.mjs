@@ -15,6 +15,12 @@ import { scheduledInstant } from './schedule.mjs';
 import { createDirectDesk } from './direct-ui.mjs';
 
 const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
+function screenSignature(league) {
+  // Simulation revisions and the clock change independently of Club/Ligue.
+  // The direct desk and replay dialog update their own content separately.
+  const { serverTime, broadcast, closing, waitingForServer, history, ...visible } = league;
+  return JSON.stringify(visible);
+}
 function input(type, label, value = '') { const node = el('input'); if (type === 'text') node.maxLength = 80; node.type = type; node.value = value; node.required = true; node.setAttribute('aria-label', label); return node; }
 
 export async function mountOnline(root, config, connect, options = {}) {
@@ -28,18 +34,18 @@ export async function mountOnline(root, config, connect, options = {}) {
   const content = el('div'), live = el('div', 'rb-online-live'); live.hidden = true;
   const replayArea = el('section', 'rb-replay-area'); replayArea.hidden = true;
   root.append(top, notice, content, live, replayArea);
-  let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30, waitingSlot;
+  let teamDraft = null, marketOpen = false, replayView = null, replayOpen = false, replayLimit = 30, replayHistory = null, waitingSlot;
   let firstMatchChoice = '', initialIds = new Set(), directDesk;
-  const modal = managementDialog(root, () => { marketOpen = false; });
-  let client, user, league, tab = 'Club', busy = false, polling = false, pollFailures = 0, stopped = false, timer, view, offset = 0, revision = null, formDirty = false, authSubscription;
+  const modal = managementDialog(root, () => { marketOpen = false; replayHistory = null; });
+  let client, user, league, tab = 'Club', busy = false, polling = false, pollFailures = 0, stopped = false, timer, view, offset = 0, formDirty = false, authSubscription;
   const inactive = () => stopped || options.isActive?.() === false;
   function message(text, error = true) { notice.textContent = text; notice.className = error ? 'rb-error rb-online-notice' : 'rb-muted rb-online-notice'; notice.hidden = false; if (error && modal.visible) modal.message(text); }
   async function attempt(action) { if (busy) return; busy = true; notice.hidden = true; if (modal.visible) modal.message(''); try { return await action(); } catch (error) { message(error.message); } finally { busy = false; } }
   async function send(action, payload = {}, id = league?.id) {
-    const result = await client.request(action, id, payload);
+    const result = await client.request(action, id, { ...payload, view: payload.view ?? tab });
     if (inactive()) return result;
     if (result.league) {
-      const next = result.league, changed = !league || league.id !== next.id || revision !== result.revision || league.locked !== next.locked || league.status !== next.status;
+      const next = result.league, changed = !league || screenSignature(league) !== screenSignature(next);
       const entered = !league || league.id !== next.id, justLocked = next.locked && !league?.locked;
       const roomOnly = !entered && tab === 'Club' && league.status === 'lobby' && next.status === 'lobby' &&
         (['addBot', 'removeBot'].includes(action) || action === 'get' && (formDirty || JSON.stringify(league.club) === JSON.stringify(next.club)));
@@ -49,10 +55,10 @@ export async function mountOnline(root, config, connect, options = {}) {
         const context = !entered && teamDraft ? { selected: teamDraft.selected, slotSelected: teamDraft.slotSelected, shopItem: teamDraft.shopItem, equipmentSlot: teamDraft.equipmentSlot, inspectorTab: teamDraft.inspectorTab } : null;
         teamDraft = context ? { ...preparationDraft(next.club), ...context } : null; formDirty = false;
       }
-      league = next; revision = result.revision; offset = Date.parse(league.serverTime) - Date.now();
+      league = next; offset = Date.parse(league.serverTime) - Date.now();
       if (roomOnly) { if (changed) renderWaitingRoom(); }
       else if (action === 'get' && tab === 'Direct' && directDesk && next.status !== 'lobby') directDesk.update(league);
-      else if (action !== 'get' || changed || tab === 'Ligue' || tab === 'Direct') renderLeague();
+      else if (action !== 'get' || changed || tab === 'Direct') renderLeague();
       if (discarded) message('Coup d’envoi : les modifications non enregistrées n’ont pas été retenues. La dernière préparation enregistrée est utilisée.', false);
     }
     return result;
@@ -111,7 +117,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     workspaceHeader({ context: null, navigation: null });
     replayView?.stop(); replayOpen = false; replayArea.hidden = true; content.hidden = false;
     content.className = 'rb-online-lobby';
-    league = null; teamDraft = null; revision = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'));
+    league = null; teamDraft = null; formDirty = false; live.hidden = true; view?.pause(); content.replaceChildren(); identity.replaceChildren(el('span', '', user.email ?? 'Connecté'));
     if (!options.managedSession) identity.append(btn('Déconnexion', () => attempt(async () => { await client.auth.signOut(); user = null; renderAuth(); })));
     const { leagues } = await client.request('list');
     if (inactive()) return;
@@ -194,7 +200,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     if (tab === 'Ligue') {
       const overview = el('div', 'rb-league-layout'), ranking = el('section'), programme = el('section');
       const title = pageHeading('La ligue', `Saison ${league.season} · ${stage}`);
-      const replays = btn(`Replays des rencontres · ${league.history.length}`, () => { modal.body.replaceChildren(); renderReplays(modal.body); modal.show('Replays des rencontres', replays); });
+      const replays = btn(`Replays des rencontres · ${league.historyCount ?? league.history.length}`, () => { replayHistory = [...league.history]; replayLimit = 30; modal.body.replaceChildren(); renderReplays(modal.body); modal.show('Replays des rencontres', replays); });
       replays.classList.add('rb-quiet-action'); replays.dataset.focusKey = 'league-replays'; replays.setAttribute('aria-haspopup', 'dialog'); replays.setAttribute('data-readonly-control', 'true'); title.append(replays);
       body.append(title);
       ranking.append(el('h3', '', 'Classement · phase de groupe'), table(['Club', 'J', 'V', 'N', 'D', 'Points'], league.table.map((r) => [clubIdentity(league.members.find(m => m.userId === r.id), { compact: true }), r.played, r.wins, r.draws, r.losses, r.points]), { highlight: league.table.findIndex(r => r.id === c.id), qualifying: league.capacity ? playoffPlaces(league.capacity) : 0 }));
@@ -232,14 +238,17 @@ export async function mountOnline(root, config, connect, options = {}) {
     if (league.locked) for (const tag of ['input', 'select', 'button']) for (const control of body.querySelectorAll(tag)) if (!control.closest('.rb-online-live') && control.getAttribute('data-readonly-control') !== 'true') control.disabled = true;
   }
   function navigation() {
-    const nav = workspaceNavigation(tab, label => { modal.close(); replayView?.stop(); view?.pause(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; renderLeague(); }, ['Club', 'Ligue', 'Direct']);
+    const nav = workspaceNavigation(tab, async label => { modal.close(); replayView?.stop(); view?.pause(); replayOpen = false; replayArea.hidden = true; content.hidden = false; tab = label; renderLeague();
+      if (label === 'Direct') await attempt(() => send('get'));
+    }, ['Club', 'Ligue', 'Direct']);
     nav.classList.add('rb-online-navigation');
     return nav;
   }
   function renderReplays(body) {
+    const history = replayHistory ?? league.history;
     body.append(el('p', 'rb-muted', 'Revoir les matchs terminés de la ligue, sans modifier les résultats ni la progression.'));
-    if (!league.history.length) { body.append(el('p', 'rb-empty-state', 'Les replays apparaîtront après la première rencontre terminée.')); return; }
-    for (const game of league.history.slice(-replayLimit).reverse()) {
+    if (!history.length) { body.append(el('p', 'rb-empty-state', 'Les replays apparaîtront après la première rencontre terminée.')); return; }
+    for (const game of history.slice(-replayLimit).reverse()) {
       const row = el('section', 'rb-replay-entry'), home = league.members.find(m => m.userId === game.homeId), away = league.members.find(m => m.userId === game.awayId);
       row.append(el('p', 'rb-eyebrow', `Saison ${game.season} · ${game.phase === 'playoffs' ? 'Playoffs' : 'journée ' + (game.day + 1)}`), clubIdentity(home, { compact: true }), clubIdentity(away, { compact: true }), el('p', 'rb-muted', `${date(game.endsAt)} · ${game.winnerId ? 'Victoire : ' + league.members.find(m => m.userId === game.winnerId)?.name : 'Match nul'}${game.decision === 'ranking' ? ' · qualifié au classement : ' + league.members.find(m => m.userId === game.qualifiedId)?.name : ''}`));
       if (game.replayAvailable) {
@@ -247,7 +256,20 @@ export async function mountOnline(root, config, connect, options = {}) {
       } else row.append(el('p', 'rb-muted', 'Images non conservées pour cette ancienne rencontre.'));
       body.append(row);
     }
-    if (league.history.length > replayLimit) { const more = btn('Afficher les rencontres précédentes', () => { replayLimit += 30; body.replaceChildren(); renderReplays(body); }); more.setAttribute('data-readonly-control', 'true'); body.append(more); }
+    if (history.length > replayLimit || (league.historyCount ?? history.length) > history.length) {
+      const more = btn('Afficher les rencontres précédentes', () => attempt(async () => {
+        if (history.length <= replayLimit) {
+          const leagueId = league.id; more.disabled = true;
+          let page;
+          try { page = await client.request('history', leagueId, { before: history[0].id, limit: 30 }); }
+          finally { more.disabled = false; }
+          if (inactive() || league?.id !== leagueId || !modal.visible || !replayHistory) return;
+          const known = new Set(replayHistory.map(game => game.id));
+          replayHistory = [...page.history.filter(game => !known.has(game.id)), ...replayHistory];
+        }
+        replayLimit += 30; body.replaceChildren(); renderReplays(body);
+      })); more.setAttribute('data-readonly-control', 'true'); body.append(more);
+    }
   }
   async function openReplay(matchId, control) {
     if (busy) return;
@@ -311,7 +333,7 @@ export async function mountOnline(root, config, connect, options = {}) {
     else if (user) {
       if (options.initialView?.id) {
         try {
-          await send('get', {}, options.initialView.id);
+          await send('get', { view: options.initialView.screen ?? 'Club' }, options.initialView.id);
           if (!inactive()) {
             tab = ['Ligue', 'Direct'].includes(options.initialView.screen) ? options.initialView.screen : 'Club'; renderLeague();
             if (options.initialView.replayId && !league.needsRecruitment && league.status !== 'lobby') await openReplay(options.initialView.replayId);

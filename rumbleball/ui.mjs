@@ -20,6 +20,7 @@ import { createKickoff } from './kickoff.mjs';
 import { DEFAULT_OPENING, OPENINGS, OPENING_IDS, openingDeployment } from './openings.mjs';
 import { openingPicker } from './opening-ui.mjs';
 import { managementDialog } from './management-dialog.mjs';
+import { createBackgroundSimulation } from './background-simulation.mjs';
 
 const element = (tag, cls, text) => {
   const el = document.createElement(tag);
@@ -41,6 +42,8 @@ function exhibitionIdentity(config = {}) {
 }
 
 export function mountMatch(root, callbacks = {}) {
+  const background = callbacks.background ?? createBackgroundSimulation();
+  let computing = false, generation = 0;
   const section = root.closest('[data-section]');
   let state = createMatch(exhibitionIdentity()), lastConfig = null, started = false, running = false, timer = null, nextRoundAt = 0;
   let context = 'exhibition', ballReady = false;
@@ -228,7 +231,7 @@ export function mountMatch(root, callbacks = {}) {
     deployment.update({ players: state.players.filter((p) => p.teamId === 'home'), color: colorInput.value });
   }
   function setRunning(value) {
-    running = value && started && !state.finished && visible();
+    running = value && started && !state.finished && !computing && visible();
     clearTimeout(timer); timer = null;
     if (!running) {
       nextRoundAt = 0; kickoff.pause(); courtPlayback.settle(); ballDrop.classList.toggle('is-arriving', false);
@@ -239,6 +242,7 @@ export function mountMatch(root, callbacks = {}) {
     if (running) { if (kickoff.active) kickoff.resume(); else scheduleNextTurn(); }
   }
   function renderPlaybackStatus() {
+    if (computing) { status.textContent = 'Calcul de la journée en cours…'; return; }
     if (kickoff.active) {
       if (kickoff.cue.entrance) { status.textContent = `${running ? '' : 'Pause · '}Entrée des équipes`; return; }
       status.textContent = `${running ? 'Coup d’envoi' : 'Pause · coup d’envoi'}${kickoff.cue.ball ? ' · START' : ` dans ${kickoff.cue.label}…`}`;
@@ -546,27 +550,38 @@ export function mountMatch(root, callbacks = {}) {
     if (state.finished) renderResult();
   }
   function advance({ animate = true } = {}) {
-    if (context === 'broadcast') return;
+    if (context === 'broadcast' || computing) return;
     if (!errorBox.hidden) return;
     try {
       if (kickoff.active) resetKickoff();
       ballReady = true;
       courtPlayback.settle();
-      const round = state.round, turns = []; let saved = true;
+      const round = state.round, turns = []; let saved = true, pending;
       do {
         const before = state, turn = stepMatch(state, { stopAtRoundEnd: playbackMode === 'round' }); state = turn.state;
         turns.push({ before, after: state, events: turn.events });
-        saved = context !== 'career' || callbacks.onTurn?.(state, turn.events) !== false;
+        const result = context === 'career' ? callbacks.onTurn?.(state, turn.events) : true;
+        if (result?.then) pending = result;
+        saved = result !== false;
         appendEvents(turn.events);
-      } while (saved && playbackMode === 'round' && !state.finished && state.round === round);
-      render(turns.at(-1).events);
-      nextRoundAt = performance.now() + ROUND_DURATION / speed;
-      if (!saved) { setRunning(false); errorBox.hidden = false; errorBox.textContent = 'Progression non enregistrée. Revenez au club pour réessayer la sauvegarde ou exporter votre carrière.'; }
-      if (state.finished) { setRunning(false); status.textContent = 'Match terminé'; }
-      if (saved && animate && visible()) {
-        const onComplete = state.finished ? () => courtPlayback.exit(state) : undefined;
-        if (playbackMode === 'round') courtPlayback.playRound(turns, { speed, onComplete });
-        else courtPlayback.play(turns[0].before, state, turns[0].events, { speed, onComplete });
+      } while (!pending && saved && playbackMode === 'round' && !state.finished && state.round === round);
+      if (pending) {
+        const ticket = generation; computing = true; setRunning(false); status.textContent = 'Calcul de la journée en cours…';
+        return pending.then(value => { if (ticket === generation) { computing = false; complete(value !== false); } }).catch(error => {
+          if (ticket === generation) { computing = false; errorBox.hidden = false; errorBox.textContent = error.message; }
+        });
+      }
+      complete(saved);
+      function complete(saved) {
+        render(turns.at(-1).events);
+        nextRoundAt = performance.now() + ROUND_DURATION / speed;
+        if (!saved) { setRunning(false); errorBox.hidden = false; errorBox.textContent = 'Progression non enregistrée. Revenez au club pour réessayer la sauvegarde ou exporter votre carrière.'; }
+        if (state.finished) { setRunning(false); status.textContent = 'Match terminé'; }
+        if (saved && animate && visible()) {
+          const onComplete = state.finished ? () => courtPlayback.exit(state) : undefined;
+          if (playbackMode === 'round') courtPlayback.playRound(turns, { speed, onComplete });
+          else courtPlayback.play(turns[0].before, state, turns[0].events, { speed, onComplete });
+        }
       }
     } catch (error) {
       setRunning(false); errorBox.hidden = false; errorBox.textContent = `La simulation a été interrompue. Code du match : ${state.seed}. ${error.message}`;
@@ -574,6 +589,7 @@ export function mountMatch(root, callbacks = {}) {
   }
   function tick() { timer = null; if (!visible()) { setRunning(false); return; } advance(); if (running) scheduleNextTurn(); }
   function launch(configuration) {
+    generation++; computing = false;
     closeDialogs();
     context = 'exhibition';
     setRunning(false); resetKickoff(); lastConfig = structuredClone(configuration); state = createMatch(exhibitionIdentity(lastConfig));
@@ -582,6 +598,7 @@ export function mountMatch(root, callbacks = {}) {
     pause.focus({ preventScroll: true }); scoreboard.scrollIntoView({ block: 'start', behavior: 'instant' });
   }
   function prepareAgain() {
+    generation++; computing = false;
     closeDialogs();
     setRunning(false); resetKickoff(); started = false; selectedId = null; journalCount = 0; resultPanel.hidden = true; errorBox.hidden = true;
     journal.replaceChildren(element('li', 'rb-journal-empty', 'Ajustez les consignes. Conservez le code pour comparer vos choix sur le même tirage.'));
@@ -597,9 +614,21 @@ export function mountMatch(root, callbacks = {}) {
   next.addEventListener('click', () => { setRunning(false); if (started && !state.finished) advance(); });
   speedSelect.addEventListener('change', () => { courtPlayback.settle(); nextRoundAt = 0; speed = Number(speedSelect.value); if (running) setRunning(true); });
   modeSelect.addEventListener('change', () => { courtPlayback.settle(); nextRoundAt = 0; playbackMode = modeSelect.value; render(lastTurnEvents); setRunning(running); });
-  finish.addEventListener('click', () => {
-    if (context === 'broadcast') return;
+  finish.addEventListener('click', async () => {
+    if (context === 'broadcast' || computing) return;
     setRunning(false);
+    if (background.available) {
+      const ticket = generation; computing = true; status.textContent = 'Calcul de la rencontre en cours…';
+      try {
+        const result = context === 'career' && callbacks.onFinish ? await callbacks.onFinish() : await background.run('finish-match', { state });
+        if (ticket !== generation) return;
+        state = result.state; journalCount = 0; journal.replaceChildren();
+        for (const events of result.turns) appendEvents(events);
+        render(result.turns.at(-1) ?? []); resultDialog.show('Bilan de la rencontre', resultButton);
+      } catch (error) { if (ticket === generation) { errorBox.hidden = false; errorBox.textContent = error.message; } }
+      finally { if (ticket === generation) computing = false; }
+      return;
+    }
     while (!state.finished && errorBox.hidden) advance({ animate: false });
     if (state.finished) resultDialog.show('Bilan de la rencontre', resultButton);
   });
@@ -610,20 +639,23 @@ export function mountMatch(root, callbacks = {}) {
   updatePreview(); setRunning(false);
   return {
     setPlaybackControls(node) { externalControls.replaceChildren(...(node ? [node] : [])); externalControls.hidden = !node; },
-    stop() { closeDialogs(); setRunning(false); resetKickoff(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', onPageHide); },
+    stop() { generation++; background.stop(); closeDialogs(); setRunning(false); resetKickoff(); document.removeEventListener?.('visibilitychange', onVisibility); window.removeEventListener?.('pagehide', onPageHide); },
     pause: () => setRunning(false),
     exhibition() { context = 'exhibition'; prepareAgain(); },
     idle(teams = []) {
+      generation++; computing = false;
       closeDialogs(); setRunning(false); resetKickoff(); context = 'broadcast'; started = true; selectedId = null;
       state = { ...state, teams: state.teams.map((team, index) => ({ ...team, ...teams[index] })), players: [], initiative: [], calls: [], round: 1, turns: 0, finished: false, result: null, ball: { carrierId: null, position: { x: 5.5, y: 3.5 } } };
       journalCount = 0; journal.replaceChildren(); errorBox.hidden = true; resultPanel.hidden = true; render(); courtPlayback.empty(state);
       for (const score of [homeScore, awayScore]) score.querySelector('.rb-team-count').textContent = 'À suivre';
     },
     closeMatch(finalState, { elapsed = 0, duration = EXIT_DURATION } = {}) {
+      generation++; computing = false;
       setRunning(false); resetKickoff(); context = 'broadcast'; started = true; ballReady = false; state = structuredClone(finalState);
       selectedId = null; errorBox.hidden = true; render(); courtPlayback.exit(state, { duration, elapsed });
     },
     broadcast(frame, elapsed = 0, { speed = 1, animate = true, entrance = null } = {}) {
+      generation++; computing = false;
       setRunning(false); resetKickoff(); context = 'broadcast'; started = true; ballReady = Boolean(frame.turns.length);
       state = structuredClone(frame.turns.at(-1)?.after ?? frame.initial);
       selectedId = state.players.some((p) => p.id === selectedId) ? selectedId : null;
@@ -636,6 +668,7 @@ export function mountMatch(root, callbacks = {}) {
       toolbar.hidden = true;
     },
     load(current, autoplay = false, { kickoff: freshKickoff = false } = {}) {
+      generation++; computing = false;
       closeDialogs();
       setRunning(false); resetKickoff(); context = 'career'; lastConfig = structuredClone(current.config); state = structuredClone(current.state);
       ballReady = state.turns > 0 || state.finished;

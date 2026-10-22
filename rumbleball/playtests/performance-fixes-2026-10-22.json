@@ -1,0 +1,47 @@
+{
+  "format": "rb-performance-validation-v1",
+  "date": "2026-10-22",
+  "baseRevision": "b0665ff9de7fbfea832dfe749cf77b740ba28abe",
+  "node": "v24.12.0",
+  "engine": {
+    "matches": 12,
+    "identicalEventsAndFinalStates": true,
+    "beforeMs": 5135.716600000003,
+    "afterMs": 2748.243400000001,
+    "speedup": 1.8687269839345384
+  },
+  "storage": {
+    "checks": 10,
+    "ticks": 33,
+    "clubs": 16,
+    "maxStoredBytes": 90134,
+    "readBytes": 3948021,
+    "writeBytes": 5033725,
+    "legacyReadBytes": 21992408,
+    "legacyWriteBytes": 22419147,
+    "database": "local PGlite PostgreSQL; no remote access",
+    "runtime": "@electric-sql/pglite 0.5.11",
+    "commitReductionPercent": 77.54720552035276,
+    "readReductionPercent": 82.04825501600371
+  },
+  "web": {
+    "staticEntryBefore": {
+      "modules": 57,
+      "bytes": 563764
+    },
+    "staticEntryAfter": {
+      "modules": 31,
+      "bytes": 298247
+    },
+    "fullProjectionBytes": 291106,
+    "lightProjectionBytes": 7898
+  },
+  "tests": {
+    "files": 49,
+    "passed": 527,
+    "failed": 0,
+    "excluded": "500-match statistical campaign; twelve full-match baseline comparisons run separately"
+  },
+  "productionDatabaseAccessed": false,
+  "backendDeploymentPerformed": false
+}

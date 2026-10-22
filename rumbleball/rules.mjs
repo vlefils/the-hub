@@ -198,25 +198,60 @@ function releaseSeparatedGrapples(state, events) {
   }
 }
 
-// Dijkstra on 96 cells, with occupied cells and terrain costs in the same graph used by execution.
+// Preserve neighbor order and cost/y/x tie-breaking: changing either can change
+// a bot's chosen path, and consequently the deterministic match and replay.
+const cellIndex = p => p.y * COURT.width + p.x;
+const courtNeighbors = Array.from({ length: COURT.width * COURT.height }, (_, index) =>
+  neighbors({ x: index % COURT.width, y: Math.floor(index / COURT.width) }));
+const precedes = (a, b) => a.cost < b.cost || a.cost === b.cost && cellIndex(a.position) < cellIndex(b.position);
+function enqueue(open, entry) {
+  let at = open.length; open.push(entry);
+  while (at > 0) {
+    const parent = (at - 1) >> 1;
+    if (!precedes(entry, open[parent])) break;
+    open[at] = open[parent]; at = parent;
+  }
+  open[at] = entry;
+}
+function dequeue(open) {
+  const first = open[0], last = open.pop();
+  if (open.length) {
+    let at = 0;
+    while (at * 2 + 1 < open.length) {
+      let child = at * 2 + 1;
+      if (child + 1 < open.length && precedes(open[child + 1], open[child])) child++;
+      if (!precedes(open[child], last)) break;
+      open[at] = open[child]; at = child;
+    }
+    open[at] = last;
+  }
+  return first;
+}
+
+// Dijkstra on the same 96-cell graph as movementStep. Occupancy is local to
+// this search, never cached across moves, reactions, grapples or knockouts.
 export function reachableCells(state, actor, budget = actor.movement) {
   const start = { position: { ...actor.position }, cost: 0, path: [] };
   if (actor.hp <= 0 || actor.grappledBy) return [start];
-  const key = (p) => `${p.x},${p.y}`;
-  const best = new Map([[key(start.position), start]]);
+  const held = heldPlayer(state, actor), occupied = new Uint8Array(COURT.width * COURT.height);
+  for (const p of state.players) if (p.hp > 0 && p.id !== actor.id && p.id !== held?.id) occupied[cellIndex(p.position)] = 1;
+  const clear = (from, to) => inside(from) && inside(to) && !occupied[cellIndex(to)]
+    && !(from.x !== to.x && from.y !== to.y && occupied[from.y * COURT.width + to.x] && occupied[to.y * COURT.width + from.x]);
+  const offset = held ? { x: held.position.x - actor.position.x, y: held.position.y - actor.position.y } : null;
+  const best = new Map([[cellIndex(start.position), start]]);
   const open = [start];
   while (open.length) {
-    open.sort((a, b) => a.cost - b.cost || a.position.y - b.position.y || a.position.x - b.position.x);
-    const current = open.shift();
-    if (current !== best.get(key(current.position))) continue;
-    for (const next of neighbors(current.position)) {
-      const step = movementStep(state, actor, current.position, next);
-      if (!step) continue;
-      const cost = current.cost + step.cost;
-      if (cost > budget || (best.get(key(next))?.cost ?? Infinity) <= cost) continue;
-      const entry = { position: next, cost, path: [...current.path, next] };
-      best.set(key(next), entry);
-      open.push(entry);
+    const current = dequeue(open);
+    if (current !== best.get(cellIndex(current.position))) continue;
+    for (const next of courtNeighbors[cellIndex(current.position)]) {
+      if (!clear(current.position, next)) continue;
+      const dragged = offset ? { x: next.x + offset.x, y: next.y + offset.y } : null;
+      if (offset && !clear({ x: current.position.x + offset.x, y: current.position.y + offset.y }, dragged)) continue;
+      const cost = current.cost + movementCost(actor, next, dragged), index = cellIndex(next);
+      if (cost > budget || (best.get(index)?.cost ?? Infinity) <= cost) continue;
+      const position = { ...next }, entry = { position, cost, path: [...current.path, position] };
+      best.set(index, entry);
+      enqueue(open, entry);
     }
   }
   return [...best.values()];
