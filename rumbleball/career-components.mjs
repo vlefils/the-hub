@@ -10,7 +10,7 @@ export const el = (tag, cls = '', text) => { const node = document.createElement
 export const btn = (text, action, primary = false) => { const b = el('button', `rb-button${primary ? ' rb-button-primary' : ''}` , text); b.type = 'button'; b.addEventListener('click', action); return b; };
 export const field = (label, control) => { const node = el('label', 'rb-field', label); node.append(control); return node; };
 export const select = (values, value) => { const node = el('select'); for (const [key, text] of Object.entries(values)) { const option = el('option', '', text); option.value = key; option.selected = key === String(value); node.append(option); } node.value = String(value); return node; };
-export const money = (n) => `${n.toLocaleString('fr-FR')} chromas`;
+export const money = (n) => `${n.toLocaleString(globalThis.HubI18n?.locale || 'fr-FR')} chromas`;
 export const keyed = (node, key) => { node.dataset.focusKey = key; return node; };
 
 export function kitPicker(value, disabled = false) {
@@ -47,10 +47,10 @@ export function table(headers, rows, { highlight = -1, caption = '', qualifying 
   }
   t.append(head, body); wrap.append(t); return wrap;
 }
-export function stats(p) { return `${p.maxHp} PV · CA ${p.armor} · ${p.speed.toLocaleString('fr-FR')} m · Lutte ${signed(p.skills.wrestling)} · Acrobaties ${signed(p.skills.acrobatics)}`; }
+export function stats(p) { return `${p.maxHp} PV · CA ${p.armor} · ${p.speed.toLocaleString(globalThis.HubI18n?.locale || 'fr-FR')} m · Lutte ${signed(p.skills.wrestling)} · Acrobaties ${signed(p.skills.acrobatics)}`; }
 export function statList(p) {
   const list = el('dl', 'rb-player-stats');
-  const entries = [['PV max.', p.maxHp], ['CA', p.armor], ['Vitesse', `${p.speed.toLocaleString('fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)], ['Bonus d’attaque', signed(p.attack.bonus)], ['Dégâts', damageText(p.attack)]];
+  const entries = [['PV max.', p.maxHp], ['CA', p.armor], ['Vitesse', `${p.speed.toLocaleString(globalThis.HubI18n?.locale || 'fr-FR')} m`], ['Lutte', signed(p.skills.wrestling)], ['Athlétisme', signed(p.skills.athletics)], ['Acrobaties', signed(p.skills.acrobatics)], ['Bonus d’attaque', signed(p.attack.bonus)], ['Dégâts', damageText(p.attack)]];
   if (p.offhandAttack) entries.push(['Seconde arme', `${signed(p.offhandAttack.bonus)} au toucher · ${damageText(p.offhandAttack)} · action bonus`]);
   for (const [key, label] of [['adrenaline', 'Adrénaline'], ['focus', 'Concentration'], ['calls', 'Appels']]) if (p.caps?.[key]) entries.push([label, p.caps[key]]);
   if (p.archetype === 'belier' && p.chargeDC !== undefined) entries.push(['DD percussion', p.chargeDC]);
@@ -69,7 +69,7 @@ export function fatigue(p, policy = {}) {
   const root = el('div', `rb-fatigue${p.fatigue >= 5 ? ' is-exhausted' : p.fatigue >= 3 ? ' is-tired' : ''}`), meter = el('span', 'rb-fatigue-meter'); meter.setAttribute('aria-hidden', 'true');
   for (let i = 0; i < cap; i++) meter.append(el('i', i < p.fatigue ? 'is-filled' : ''));
   const effect = fatigueEffect(p.fatigue, long);
-  root.title = `Fatigue ${p.fatigue}/${cap} · ${effect}${long ? ` · Blessure sur KO : ${(injuryChance(p.fatigue) * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %` : ''}`;
+  root.title = `Fatigue ${p.fatigue}/${cap} · ${effect}${long ? ` · Blessure sur KO : ${(injuryChance(p.fatigue) * 100).toLocaleString(globalThis.HubI18n?.locale || 'fr-FR', { maximumFractionDigits: 1 })} %` : ''}`;
   const value = el('span', 'rb-fatigue-value'); value.append(el('span', 'rb-muted', 'Fatigue '), el('strong', '', `${p.fatigue}/${cap}`));
   if (long && injured(p)) value.append(el('span', 'rb-injury-label', `Blessé · ${p.injuryMatches} match${p.injuryMatches > 1 ? 's' : ''}`));
   root.append(value, meter, el('small', 'rb-muted', effect)); return root;
@@ -78,7 +78,7 @@ export function comparison(before, after, beforeImplant = null, afterImplant = n
   const root = el('dl', 'rb-stat-comparison');
   const entries = [...Object.entries(ABILITY_LABELS).map(([key, label]) => [label, before.abilities[key], after.abilities[key]]), ['PV max.', before.maxHp, after.maxHp], ['CA', before.armor, after.armor], ['Vitesse', before.speed, after.speed], ['Bonus d’attaque', before.attack.bonus, after.attack.bonus, signed], ['Lutte', before.skills.wrestling, after.skills.wrestling, signed], ['Athlétisme', before.skills.athletics, after.skills.athletics, signed], ['Acrobaties', before.skills.acrobatics, after.skills.acrobatics, signed], ['Récupération', before.recovery, after.recovery], ['Appels', before.caps?.calls, after.caps?.calls], ['Concentration', before.caps?.focus, after.caps?.focus], ['Adrénaline', before.caps?.adrenaline, after.caps?.adrenaline]];
   if (before.archetype === 'belier') entries.push(['DD percussion', before.chargeDC, after.chargeDC]);
-  for (const [label, a, b, format = value => value.toLocaleString('fr-FR')] of entries) if (a !== b) {
+  for (const [label, a, b, format = value => value.toLocaleString(globalThis.HubI18n?.locale || 'fr-FR')] of entries) if (a !== b) {
     const row = el('div'); row.append(el('dt', '', label), el('dd', b > a ? 'rb-gain' : 'rb-loss', `${format(a)} → ${format(b)}${label === 'Vitesse' ? ' m' : ''}`)); root.append(row);
   }
   for (const [label, a, b] of [['Dégâts', damageText(before.attack), damageText(after.attack)], ['Seconde arme', before.offhandAttack ? damageText(before.offhandAttack) : 'Aucune', after.offhandAttack ? damageText(after.offhandAttack) : 'Aucune']]) if (a !== b) {

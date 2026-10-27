@@ -3,7 +3,7 @@ import { clubIdentity } from '../broadcast-components.mjs';
 import { directState, countdown } from './direct.mjs';
 import { openingCue } from '../match-ceremony.mjs';
 
-const date = value => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'À suivre';
+const date = value => value ? new Date(value).toLocaleString(globalThis.HubI18n?.locale || 'fr-FR', { timeZone: 'Europe/Paris', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'À suivre';
 const titles = { before: 'Avant-match', entrance: 'Entrée des équipes', countdown: 'Coup d’envoi', exit: 'Sortie des équipes et soins', live: 'En direct', break: 'Pause entre les rencontres', delayed: 'En attente du serveur', ended: 'Soirée terminée' };
 export function createDirectDesk(live, { clock, onFrame }) {
   const root = el('section', 'rb-direct'), header = el('header', 'rb-direct-heading'), identity = el('div'), status = el('p', 'rb-eyebrow'), title = el('h2'), timer = el('time', 'rb-direct-clock');

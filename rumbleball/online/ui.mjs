@@ -14,7 +14,7 @@ import { initialRoster } from './initial-roster-ui.mjs';
 import { scheduledInstant } from './schedule.mjs';
 import { createDirectDesk } from './direct-ui.mjs';
 
-const date = (value) => value ? new Date(value).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
+const date = (value) => value ? new Date(value).toLocaleString(globalThis.HubI18n?.locale || 'fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'short', timeStyle: 'short' }) : 'Après le lancement de la ligue';
 function screenSignature(league) {
   // Simulation revisions and the clock change independently of Club/Ligue.
   // The direct desk and replay dialog update their own content separately.

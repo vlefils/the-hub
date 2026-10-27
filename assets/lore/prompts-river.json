@@ -1,0 +1,13 @@
+{
+  "mode": "Built-in image_gen",
+  "styleReferences": [
+    "assets/lore/paradise-bd.webp"
+  ],
+  "assets": [
+    {
+      "file": "paradise-river-bd-v2.webp",
+      "prompt": "Use case: precise-object-edit. Input image 1 is the edit target: a three-panel cyberpunk BD atlas. Produce the same horizontal 3:1 triptych with three equally wide panels. Preserve the composition and graphic style. Only the CENTER panel is being redesigned: these docks are on a real flowing RIVER that became UNDERGROUND as Paradise built successive streets, railways and whole districts over its former open-air channel. Remove all visible sky and the above-ground skyline from the center panel. Replace its background/top with a vast but credible layered built ceiling of concrete vaults, broad city-support piers, stacked decks, suspended maintenance walkways, pipes and hoist shafts. This is a navigable buried river port, not a sewer, cave, canal lock or small drain. Keep workers and cargo on quays, moored narrow river barges, flowing water continuing into the distance beneath arches, vertical freight hoists, small inhabited quayside structures, flood marks on piers. Cyan industrial light and amber dock lamps reflected on dark moving water; readable inked outlines, hatching and heavy graphic shadows matching the original. No daylight or exposed sky anywhere in the center panel. No giant warship. Keep left market panel and right street market panel as close to the original as possible; these will not replace their existing images. No titles, text, logos or watermarks. This will be saved as a sibling atlas; original remains archived."
+    }
+  ],
+  "operation": "Edit of the middle panel; only the Docks enfouis location uses this variant."
+}

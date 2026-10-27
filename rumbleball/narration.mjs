@@ -5,7 +5,7 @@ const boundary = (event) => event.resolvedAction || (event.type === 'class' && [
   || ['move', 'drag', 'opportunity', 'stand', 'hold-position', 'movement-stopped', 'round-end', 'finish', 'overtime', 'restart', 'engagement-result'].includes(event.type);
 const metres = (steps) => {
   const distance = steps * COURT.cell;
-  return `${distance.toLocaleString('fr-FR')} ${distance < 2 ? 'mètre' : 'mètres'}`;
+  return `${distance.toLocaleString(globalThis.HubI18n?.locale || 'fr-FR')} ${distance < 2 ? 'mètre' : 'mètres'}`;
 };
 
 // Pure presentation: only completed events are narrated, never a bot's intended action.

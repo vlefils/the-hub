@@ -1,12 +1,14 @@
 # The Hub - Site statique de regles JDR
 
-Base de site statique responsive en francais pour publier les regles d'un jeu de role papier avec une direction visuelle cyberpunk lisible.
+Site statique responsive bilingue français / anglais pour publier les règles et le lore d’un jeu de rôle papier, avec une direction visuelle cyberpunk lisible.
 
 ## Structure
 
 - `index.html` contient la page unique et les sections du livre de regles.
 - `styles.css` gere le theme, la mise en page responsive et les composants visuels.
 - `script.js` simule une navigation par pages via les ancres et n'affiche qu'une section a la fois.
+- `data/lore.mjs` et `data/lore-revision.mjs` contiennent huit factions, trente-six lieux, dix-sept figures majeures, onze contacts locaux et huit dossiers technologiques. `tools/build-lore.mjs` produit les dossiers de faction et les pages de lieux dans `index.html`. Les PNJ sont intégrés à leur faction ou à leur lieu.
+- `data/lore.en.mjs` contient la version anglaise éditoriale du nouvel atlas. `i18n/` et `i18n.js` assurent la traduction locale du livre, du catalogue et de Rumbleball.
 - `assets/` est prevu pour les images, PDF, feuilles de personnage ou icones supplementaires.
 - `.nojekyll` force GitHub Pages a servir le site comme contenu statique simple.
 
@@ -26,6 +28,11 @@ Base de site statique responsive en francais pour publier les regles d'un jeu de
 - Duplique une section existante dans `index.html` pour ajouter de nouveaux chapitres.
 
 ## Notes
+
+- **Lore et langues** : voir [LORE-LOCALIZATION.md](LORE-LOCALIZATION.md) pour les sources, les visuels, la maintenance et les vérifications. La langue du navigateur est détectée à la première visite ; les drapeaux FR/EN mémorisent ensuite le choix. Les liens `?lang=fr` et `?lang=en` permettent d’ouvrir une langue précise.
+
+- **Passe éditoriale du lore** : [inventaire complet](INVENTAIRE-LORE.md) et [critique, décisions et corrections](REVUE-LORE.md). `data/lore-review.mjs` porte les précisions bilingues et la page « Comprendre Paradise », notamment les trois offres de résurrection, les copies interdites, le circuit fermé du chroma et les docks du fleuve souterrain.
+- **Vie sociale de Paradise** : [analyse des manques et inventaire des ajouts intégrés](ANALYSE-MANQUES-LORE.md). `data/lore-life.mjs` ajoute les créateurs et voix publiques, trois crews, les contacts du Raccord et du Repli, des repères locaux et les présentations publiques du Rumbleball. Le tout est bilingue, accessible depuis le lore et la recherche.
 
 - **Outils → Rumbleball** présente le jeu et ouvre sa [page dédiée](rumbleball/index.html), avec gestion du club et matchs à cinq contre cinq. Lancer `node tools/serve.mjs` pour l’essayer en local ; voir [sa documentation](rumbleball/README.md) pour les règles et les tests.
 

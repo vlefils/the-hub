@@ -23,7 +23,7 @@ export function leagueContext(league) {
   if (league.status === 'broadcast') {
     for (const g of league.games) {
       const row = el('div', `rb-broadcast-fixture${[g.homeId, g.awayId].includes(league.club.id) ? ' is-own' : ''}`);
-      const time = g.startsAt ? new Date(g.startsAt).toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }) : 'Après le match précédent + 2 min';
+      const time = g.startsAt ? new Date(g.startsAt).toLocaleTimeString(globalThis.HubI18n?.locale || 'fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }) : 'Après le match précédent + 2 min';
       row.append(el('small', '', `${time} · ${g.status === 'live' ? 'En direct' : g.status === 'finished' ? 'Terminé' : 'À suivre'}`), clubIdentity(member(g.homeId), { compact: true }), clubIdentity(member(g.awayId), { compact: true })); schedule.append(row);
     }
   } else {

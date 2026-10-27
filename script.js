@@ -252,7 +252,14 @@ let pageJumpTargets = [];
 const scrollToReadingTarget = (element) => {
   element.tabIndex = -1;
   element.focus({ preventScroll: true });
-  element.scrollIntoView({ block: "start", behavior: "instant" });
+  const section = element.closest('.page-section');
+  // Section entrance transforms temporarily shift anchor geometry.
+  const layoutReady = (section?.getAnimations?.() || []).map(animation => animation.finished);
+  if (document.fonts?.ready) layoutReady.push(document.fonts.ready);
+  Promise.allSettled(layoutReady).then(() => requestAnimationFrame(() => {
+    if (section && !section.classList.contains('is-active')) return;
+    element.scrollIntoView({ block: "start", behavior: "instant" });
+  }));
 };
 
 const updateReadingNavigation = (section, currentId = section.id) => {
@@ -312,6 +319,11 @@ const updateReadingNavigation = (section, currentId = section.id) => {
   if (readerTools) readerTools.hidden = false;
 };
 
+document.addEventListener('hub:lorefilter', event => {
+  const section = document.getElementById(event.detail.id);
+  if (section?.classList.contains('is-active')) updateReadingNavigation(section);
+});
+
 pageJump?.addEventListener("change", () => {
   if (pageJump.value === "") return;
   const target = pageJumpTargets[Number(pageJump.value)]?.element;
@@ -331,24 +343,42 @@ const setupBookSearch = () => {
   if (!input || !results || !status || !clear) return;
   const normalize = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/œ/g, "oe");
   const entries = [];
-  const addEntry = (id, title, context, text) => entries.push({ id, title, context, titleKey: normalize(title), textKey: normalize(`${title} ${context} ${text}`) });
-  sections.filter((section) => section.dataset.category !== "news" && !section.hasAttribute("data-page-pending")).forEach((section) => {
-    const copy = section.cloneNode(true);
-    copy.querySelectorAll(".subtabs, .section-landmark, form, nav").forEach((element) => element.remove());
-    const title = sectionTitle(section);
-    addEntry(section.id, title, labels[section.dataset.category], copy.textContent);
-    section.querySelectorAll("[data-subtab-panel]").forEach((panel) => {
-      const tabTitle = document.getElementById(panel.getAttribute("aria-labelledby"))?.textContent.trim() || "Base";
-      addEntry(panel.id, `${title} · ${tabTitle}`, labels[section.dataset.category], panel.textContent);
+  const addEntry = (id, title, rawContext, text) => {
+    const context = window.HubI18n?.t(rawContext) || rawContext;
+    entries.push({ id, title, context, titleKey: normalize(title), textKey: normalize(`${title} ${context} ${text}`) });
+  };
+  const buildIndex = () => {
+    entries.length = 0;
+    sections.filter((section) => section.dataset.category !== "news" && !section.hasAttribute("data-page-pending")).forEach((section) => {
+      const copy = section.cloneNode(true);
+      copy.querySelectorAll(".subtabs, .section-landmark, form, nav, .lore-secret, [data-lore-card]").forEach((element) => element.remove());
+      const title = sectionTitle(section);
+      addEntry(section.id, title, labels[section.dataset.category], copy.textContent);
+      section.querySelectorAll("[data-subtab-panel]").forEach((panel) => {
+        const tabTitle = document.getElementById(panel.getAttribute("aria-labelledby"))?.textContent.trim() || "Base";
+        addEntry(panel.id, `${title} · ${tabTitle}`, labels[section.dataset.category], panel.textContent);
+      });
+      section.querySelectorAll('[data-lore-card]').forEach(card => {
+        if (card.dataset.loreTarget) return;
+        const copy = card.cloneNode(true);
+        copy.querySelectorAll('.lore-secret').forEach(node => node.remove());
+        addEntry(card.id, card.querySelector('h3').textContent.trim(), sectionTitle(section), copy.textContent);
+      });
+      section.querySelectorAll('[data-lore-person], [data-lore-entry]').forEach(person => {
+        const copy = person.cloneNode(true);
+        copy.querySelectorAll('.lore-secret').forEach(node => node.remove());
+        addEntry(person.id, person.querySelector('h3, h4').textContent.trim(), sectionTitle(section), copy.textContent);
+      });
     });
-  });
-  sidebarLinks.forEach((link) => {
-    const id = link.hash.slice(1);
-    const element = document.getElementById(id);
-    if (element && !element.matches("[data-section]") && !entries.some((entry) => entry.id === id)) {
-      addEntry(id, link.textContent.trim(), "Lore · Factions", element.querySelector("img")?.alt || element.textContent);
-    }
-  });
+    sidebarLinks.forEach((link) => {
+      const id = link.hash.slice(1);
+      const element = document.getElementById(id);
+      if (element && !element.matches("[data-section]") && !entries.some((entry) => entry.id === id)) {
+        addEntry(id, link.textContent.trim(), "Lore · Factions", element.querySelector("img")?.alt || element.textContent);
+      }
+    });
+  };
+  buildIndex();
   const reset = () => {
     input.value = "";
     results.replaceChildren();
@@ -372,8 +402,11 @@ const setupBookSearch = () => {
     const words = term.split(/\s+/);
     const score = (entry) => Number(entry.titleKey.includes(term)) * 100 + Number(entry.textKey.includes(term)) * 20;
     const matches = entries.filter((entry) => words.every((word) => entry.textKey.includes(word)))
-      .sort((a, b) => score(b) - score(a) || a.title.localeCompare(b.title, "fr"));
-    status.textContent = matches.length ? `${matches.length} résultat${matches.length > 1 ? "s" : ""}${matches.length > 8 ? " · 8 premiers affichés" : ""}` : "Aucun résultat. Essayez un autre mot ou effacez la recherche.";
+      .sort((a, b) => score(b) - score(a) || a.title.localeCompare(b.title, window.HubI18n?.locale || 'fr'));
+    const english = document.documentElement.lang === 'en';
+    status.textContent = english
+      ? matches.length ? `${matches.length} result${matches.length > 1 ? 's' : ''}${matches.length > 8 ? ' · first 8 shown' : ''}` : 'No results. Try another word or clear the search.'
+      : matches.length ? `${matches.length} résultat${matches.length > 1 ? "s" : ""}${matches.length > 8 ? " · 8 premiers affichés" : ""}` : "Aucun résultat. Essayez un autre mot ou effacez la recherche.";
     matches.slice(0, 8).forEach((entry) => {
       const item = document.createElement("li");
       const link = document.createElement("a");
@@ -388,6 +421,7 @@ const setupBookSearch = () => {
     });
   };
   input.addEventListener("input", render);
+  document.addEventListener('hub:languagechange', () => { buildIndex(); if (input.value.trim()) render(); });
   input.addEventListener("keydown", (event) => {
     if (event.key === "Escape") { event.stopPropagation(); reset(); input.focus(); }
     if (event.key === "ArrowDown") { event.preventDefault(); results.querySelector("a")?.focus(); }
@@ -561,6 +595,8 @@ const syncFromHash = () => {
   const id =
     shopFamily || legacyCatalogue
       ? 'chroma-catalogue'
+      : requestedId === "lore-pnj"
+      ? "lore-factions"
       : requestedId === "lore-overview"
       ? "lore-the-hub"
       : requestedId === "pretire-general"
@@ -683,7 +719,8 @@ if (protocolModal && protocolTriggers.length) {
 
   const stripProtocolLeadMeta = (container) => {
     while (container.firstElementChild?.matches("p")) {
-      const leadText = container.firstElementChild.textContent.trim().toLowerCase();
+      const raw = container.firstElementChild.textContent;
+      const leadText = (window.HubI18n?.toFrench(raw) || raw).trim().toLowerCase();
 
       if (
         leadText.startsWith("impulsion de rang")
@@ -1110,7 +1147,8 @@ if (characterSheet) {
 
   if (resetButton) {
     resetButton.addEventListener("click", () => {
-      const confirmed = window.confirm("Effacer la fiche et supprimer les donnees locales ?");
+      const message = "Effacer la fiche et supprimer les donnees locales ?";
+      const confirmed = window.confirm(window.HubI18n?.t(message) || message);
 
       if (!confirmed) {
         return;

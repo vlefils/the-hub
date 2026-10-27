@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <script src="../i18n-init.js"></script>
+    <link rel="stylesheet" href="../i18n.css">
+    <script src="../i18n/en.js" defer></script>
+    <script src="../i18n.js" defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#101729" />
@@ -71,8 +75,10 @@
     <div class="rb-shell-context" data-shell-context hidden></div>
     <div class="rb-shell-navigation" data-shell-nav hidden></div>
     <div class="rb-shell-tools" data-shell-tools hidden></div>
-    <div class="rb-account-tools" data-account-tools hidden></div>
-    <a class="rb-hub-link" href="../#outils-rumbleball">Retour à The Hub</a>
+    <div class="rb-header-end"><div class="language-switch" role="group" aria-label="Language / Langue" translate="no">
+          <button type="button" data-language="fr" lang="fr" aria-label="Français" aria-pressed="true"><svg class="language-flag" viewBox="0 0 60 40" aria-hidden="true"><path fill="#002395" d="M0 0h20v40H0z"/><path fill="#fff" d="M20 0h20v40H20z"/><path fill="#ed2939" d="M40 0h20v40H40z"/></svg>FR</button>
+          <button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="false"><svg class="language-flag" viewBox="0 0 60 40" aria-hidden="true"><path fill="#012169" d="M0 0h60v40H0z"/><path stroke="#fff" stroke-width="8" d="m0 0 60 40M60 0 0 40"/><path stroke="#c8102e" stroke-width="3" d="m0 0 60 40M60 0 0 40"/><path stroke="#fff" stroke-width="13" d="M30 0v40M0 20h60"/><path stroke="#c8102e" stroke-width="7" d="M30 0v40M0 20h60"/></svg>EN</button>
+        </div><div class="rb-account-tools" data-account-tools hidden></div><a class="rb-hub-link" href="../#outils-rumbleball">Retour à The Hub</a></div>
   </header>
   <main id="jeu" class="rb-app-main" tabindex="-1"><div data-online class="rb"><p role="status">Connexion au vestiaire…</p></div></main>
 </body>

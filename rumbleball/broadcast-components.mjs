@@ -31,8 +31,8 @@ export function matchBanner(home, away, title, status = '') {
 export function compositionTabs(root, onChange = () => {}, initial = 'Composition') {
   const nav = el('nav', 'rb-composition-tabs'); nav.setAttribute('aria-label', 'Vues de la préparation');
   const buttons = [];
-  function show(value) { root.dataset.teamView = value; for (const b of buttons) b.setAttribute('aria-pressed', String(b.textContent === value)); onChange(value); }
-  for (const label of ['Composition', 'Tactique']) { const b = el('button', 'rb-button', label); b.type = 'button'; b.setAttribute('data-readonly-control', 'true'); b.addEventListener('click', () => show(label)); buttons.push(b); nav.append(b); }
+  function show(value) { root.dataset.teamView = value; for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.teamView === value)); onChange(value); }
+  for (const label of ['Composition', 'Tactique']) { const b = el('button', 'rb-button', label); b.type = 'button'; b.dataset.teamView = label; b.setAttribute('data-readonly-control', 'true'); b.addEventListener('click', () => show(label)); buttons.push(b); nav.append(b); }
   show(initial); return nav;
 }
 export function careerContext(career) {

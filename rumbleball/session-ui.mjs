@@ -12,7 +12,7 @@ const tabStorageProxy = fallback => {
   const target = () => { try { return window.sessionStorage ?? fallback; } catch { return fallback; } };
   return { getItem: key => target().getItem(key), setItem: (key, value) => target().setItem(key, value) };
 };
-const date = value => value ? new Date(value).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : 'À l’instant';
+const date = value => value ? new Date(value).toLocaleString(globalThis.HubI18n?.locale || 'fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : 'À l’instant';
 
 export async function mountSession(root, { connect = connectOnline, config = ONLINE_CONFIG, storage = localStorageProxy(), initialMode = 'home',
   careerView, matchView, onlineView } = {}) {

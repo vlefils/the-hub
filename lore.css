@@ -1,0 +1,153 @@
+/* Content-first editorial atlas. The same components carry eight faction identities. */
+.lore-lead { font-size: clamp(1.15rem, 1.8vw, 1.4rem); color: #e6ecf3; line-height: 1.65; }
+.page-section[data-category="lore"], .lore-place, .lore-person, .lore-technology { scroll-margin-top: var(--lore-clearance, 12rem); }
+.lore-kicker { color: var(--faction-accent, #afc4d0); font-size: .79rem; letter-spacing: .09em; text-transform: uppercase; line-height: 1.6; margin: 0 0 .6rem; }
+.lore-art { position: relative; overflow: hidden; margin: 0; aspect-ratio: 1.35; background: #17212a; }
+.lore-art img { display: block; position: absolute; top: 50%; width: calc(var(--panels) * 100%); max-width: none; height: auto; transform: translate(calc(var(--scene) * -100% / var(--panels)), -50%); }
+.lore-directory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem 1.5rem; margin-top: 2.5rem; }
+.faction-entry { display: grid; align-content: start; color: inherit; text-decoration: none; min-width: 0; border: 0; background: transparent; }
+.faction-entry > div { border-top: 2px solid var(--faction-accent); padding-top: 1.1rem; }
+.faction-entry h3 { margin: 0 0 .7rem; font-size: 1.8rem; line-height: 1.15; color: #f5f1e9; }
+.faction-entry p:not(.lore-kicker) { font-size: .96rem; color: #bec7d3; }
+.faction-entry .lore-art { aspect-ratio: 1.8; margin-bottom: 1rem; }
+.faction-entry .lore-open { display: inline-block; color: var(--faction-accent); padding: .4rem 0; }
+.faction-entry:hover h3 { color: var(--faction-accent); }
+.faction-entry:focus-visible { outline: 2px solid var(--faction-accent); outline-offset: 6px; }
+.lore-back { display: inline-block; color: #bdc7d1; margin-bottom: 2rem; text-decoration: none; }
+.lore-dossier-head { border-top: 2px solid var(--faction-accent); padding-top: 1.5rem; margin-bottom: 1.75rem; }
+.lore-dossier-head h2 { font-size: clamp(2.4rem, 5.5vw, 5rem); line-height: 1; margin: .5rem 0 1.1rem; color: #f5f1e9; max-width: 16ch; overflow-wrap: anywhere; }
+.lore-motto { font-size: clamp(1.15rem, 2vw, 1.6rem); line-height: 1.5; color: var(--faction-accent); max-width: 40ch; margin: 0 0 1.5rem; }
+.lore-domains { display: flex; flex-wrap: wrap; list-style: none; gap: .4rem 1.3rem; margin: 0; padding: 0; color: #bdc7d1; font-size: .85rem; }
+.lore-domains li { padding: 0; }
+.lore-domains li::marker { content: ''; }
+/* Crop out gutters baked into the atlases, then use the same gap for every faction. */
+.lore-dossier-mosaic { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; aspect-ratio: 3; margin-bottom: 2rem; background: #0b1118; }
+.lore-mosaic-panel { aspect-ratio: auto; min-width: 0; }
+.lore-mosaic-panel img { width: 312%; left: -2%; }
+.lore-dossier-copy { max-width: 76ch; }
+.lore-dossier-copy article { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: .8rem; padding: 1.25rem 0; border-bottom: 1px solid #ffffff17; }
+.lore-index { color: var(--faction-accent); font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; }
+.lore-dossier-copy h3 { margin: 0 0 .6rem; font-size: 1.25rem; color: #e8edf4; }
+.lore-dossier-copy p { margin: 0; font-size: 1.03rem; line-height: 1.8; color: #cbd1da; }
+.lore-faction-facts { display: flex; flex-wrap: wrap; gap: 1rem 2.5rem; margin: 2rem 0 1rem; }
+.lore-faction-facts dt { color: #a6b3c0; font-size: .8rem; }
+.lore-faction-facts dd { margin: .2rem 0 0; color: #e1e7ef; font-size: .95rem; }
+.lore-signature { color: var(--faction-accent); font-style: italic; }
+.lore-theme--civic .lore-dossier-head h2, .lore-theme--finance .lore-dossier-head h2, .lore-theme--luxury .lore-dossier-head h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: -.035em; text-transform: none; }
+.lore-theme--military .lore-dossier-head h2, .lore-theme--labor .lore-dossier-head h2 { text-transform: uppercase; font-weight: 700; letter-spacing: .015em; }
+.lore-theme--clinical .lore-dossier-head { background: linear-gradient(100deg, #83d6e30d, transparent); padding-left: 1rem; }
+.lore-theme--biotech .lore-dossier-head { border-top-width: 4px; }
+.lore-theme--network .lore-dossier-head h2 { font-family: 'Space Grotesk', sans-serif; letter-spacing: -.05em; }
+.lore-theme--media .lore-dossier-head h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: -.045em; text-transform: none; }
+.lore-related { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--faction-accent); }
+.lore-related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+.lore-related-grid p { color: #a9b6c3; font-size: .88rem; margin: .25rem 0; }
+.lore-related a, .lore-place-links a, .lore-source a { color: var(--faction-accent, #bbd8e4); text-underline-offset: .25em; }
+.lore-separator { padding: 0 .7rem; color: #667687; }
+.lore-source { margin-top: 2rem; color: #a9b6c3; font-size: .9rem; }
+.lore-source summary, .lore-secret summary { cursor: pointer; padding: .6rem 0; }
+.lore-filter { display: grid; grid-template-columns: minmax(0, 1fr) minmax(10rem, .65fr); gap: .4rem 1rem; margin: 2rem 0 1.5rem; padding: 1.25rem 0; border-block: 1px solid #ffffff24; }
+.lore-filter label { color: #b3c0ce; font-size: .86rem; }
+.lore-filter label:first-child { grid-column: 1; grid-row: 1; }
+.lore-filter input { grid-column: 1; grid-row: 2; }
+.lore-filter label:nth-of-type(2) { grid-column: 2; grid-row: 1; }
+.lore-filter select { grid-column: 2; grid-row: 2; }
+.lore-filter input, .lore-filter select { width: 100%; min-width: 0; min-height: 2.8rem; padding: .65rem .75rem; font: inherit; font-size: .95rem; color: #eef3f9; background: #141e29; border: 1px solid #465461; border-radius: 3px; }
+.lore-result-count { grid-column: 1 / -1; margin: .35rem 0 0; font-size: .85rem; color: #b3c0ce; }
+.lore-empty { padding: 1.5rem 0; color: #d7dfe9; }
+.lore-place-grid, .lore-people-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem 1.5rem; }
+.lore-place, .lore-person { min-width: 0; }
+.lore-place-body { padding-top: 1.25rem; }
+.lore-place h3, .lore-person h3, .lore-technology h3 { font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.18; margin: .4rem 0 .75rem; color: #f0f3f7; }
+.lore-access { color: #afbccb; font-size: .84rem; border-bottom: 1px solid #ffffff24; padding-bottom: 1rem; }
+.lore-place-body > p:not(.lore-kicker):not(.lore-access), .lore-person > div > p:not(.lore-kicker):not(.lore-role) { color: #c4cdd7; font-size: .98rem; }
+.lore-play { margin: 1.25rem 0 0; }
+.lore-play > div { margin: 0 0 1rem; }
+.lore-play dt { color: #e1e7ef; font-size: .87rem; font-weight: 700; margin-bottom: .3rem; }
+.lore-play dd { margin: 0; color: #b8c4d0; font-size: .95rem; line-height: 1.7; }
+.lore-place-links { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; font-size: .85rem; margin-top: 1.5rem; }
+.lore-person { padding-bottom: 1.5rem; border-bottom: 1px solid #ffffff24; }
+.lore-portrait { aspect-ratio: 1.05; margin-bottom: 1.25rem; }
+.lore-portrait img { width: 400%; top: 0; transform: translateX(calc(var(--scene) * -100% / var(--panels))); }
+.lore-role { color: #e0d5b9; margin: -.25rem 0 1rem; font-size: 1rem; }
+.lore-person .lore-appearance { font-size: .87rem; font-style: italic; color: #9eacbb; }
+.lore-secret { border-top: 1px solid #ffffff24; margin-top: 1rem; font-size: .88rem; color: #d1c7b8; }
+.lore-secret p { margin: .4rem 0 1rem; }
+.lore-tech-grid { display: grid; gap: 3rem; }
+.lore-technology { display: grid; grid-template-columns: minmax(0, .65fr) minmax(0, 1fr); gap: 1.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid #ffffff24; }
+.lore-tech-art { aspect-ratio: 1; }
+.lore-tech-art img { width: 400%; }
+.lore-tech-lead { font-size: 1.1rem; color: #e1e7ef; }
+.lore-section-intro { color: #b8c4d0; max-width: 70ch; }
+.lore-major-people, .lore-local-people { margin-top: 3rem; }
+.lore-embedded-people { display: grid; gap: 2.5rem; margin-top: 1.5rem; }
+.lore-person--embedded { display: grid; grid-template-columns: minmax(9rem, .42fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.lore-person--embedded h4 { margin: 0 0 .6rem; font-size: clamp(1.5rem, 2.7vw, 2rem); line-height: 1.15; color: #f0f3f7; text-transform: none; }
+.lore-person--embedded .lore-person-power { margin: 0 0 1.1rem; }
+.lore-person-power dd { color: #d8e0e8; }
+.lore-person--embedded .lore-role { line-height: 1.5; }
+.lore-portrait--infrastructure { aspect-ratio: 1.25; }
+.lore-portrait--infrastructure img { width: 300%; }
+.lore-location-intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2.5rem); align-items: start; margin: 1.8rem 0; }
+.lore-location-intro > div { min-width: 0; }
+.lore-location-level { color: var(--faction-accent); font-size: 1.05rem; margin: 0 0 .75rem; }
+.lore-location-intro .lore-access { margin: 0 0 1.25rem; }
+.lore-location-hero { aspect-ratio: 4 / 5; width: 100%; }
+/* Keep the full scene height in a portrait window, away from atlas gutters. */
+.lore-location-hero img { width: calc(var(--panels) * 130%); left: -15%; }
+.lore-location-description { max-width: 76ch; margin: 0; font-size: 1.1rem; line-height: 1.8; color: #d3dbe5; }
+.lore-location-play { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.5rem; margin: 2rem 0; padding-top: 1.5rem; border-top: 1px solid #ffffff24; }
+.lore-location-play h3 { margin: 0 0 .65rem; font-size: 1.25rem; }
+.lore-location-play p { margin: 0; color: #becad7; }
+.lore-location-decision-makers { margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid #ffffff24; }
+.lore-place-link { display: block; color: inherit; text-decoration: none; }
+.lore-place-link:focus-visible { outline: 2px solid var(--faction-accent); outline-offset: 6px; }
+.lore-place-link:hover h3 { color: var(--faction-accent); }
+.lore-place--preview .lore-art { aspect-ratio: 1.65; }
+.lore-place--preview .lore-open { display: inline-block; color: var(--faction-accent); margin-top: .5rem; }
+.lore-person--embedded { scroll-margin-top: var(--lore-clearance, 12rem); }
+.lore-tone { max-width: 70ch; margin-top: 2rem; }
+.lore-tone h3 { font-size: 1.4rem; margin-top: 2rem; }
+.lore-tone p { color: #c4cdd7; }
+.lore-life { max-width: 72ch; margin-top: 2.5rem; }
+.lore-life-entry { margin: 2.5rem 0; }
+.lore-life h3 { margin: 2.5rem 0 1rem; font-size: clamp(1.5rem, 2.7vw, 2rem); line-height: 1.25; }
+.lore-life h4 { margin: 1.5rem 0 .75rem; font-size: 1.15rem; line-height: 1.4; text-transform: none; color: #e1e7ef; }
+.lore-life p { color: #c4cdd7; }
+.lore-life .lore-role { color: #e0d5b9; }
+.lore-life [id] { scroll-margin-top: var(--lore-clearance, 12rem); }
+.lore-life-members { padding-left: 1.25rem; }
+.lore-life-members li { margin: .8rem 0; }
+.lore-life-members p { margin: .25rem 0; }
+.lore-collection [data-lore-card][hidden] { display: none !important; }
+@media (max-width: 1100px) {
+  .lore-related-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .lore-technology { grid-template-columns: 1fr; }
+  .lore-tech-art { aspect-ratio: 2; }
+}
+@media (max-width: 650px) {
+  .lore-person--embedded, .lore-location-play, .lore-location-intro { grid-template-columns: 1fr; }
+  .lore-person--embedded .lore-portrait { width: min(100%, 20rem); }
+  .lore-location-hero { max-width: 26rem; }
+  .lore-directory, .lore-place-grid, .lore-people-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .lore-filter { grid-template-columns: 1fr; }
+  .lore-filter label:nth-of-type(2) { grid-column: 1; grid-row: 3; margin-top: .5rem; }
+  .lore-filter select { grid-column: 1; grid-row: 4; }
+  .lore-dossier-head h2 { font-size: clamp(2.2rem, 10vw, 3.8rem); }
+  .lore-dossier-copy article { grid-template-columns: 1.4rem minmax(0, 1fr); gap: .6rem; }
+}
+@media print {
+  body:not([data-print-target]):has(.page-section[data-category="lore"].is-active) #outils-fiche { display: none !important; }
+  body:not([data-print-target]) .page-section[data-category="lore"].is-active { display: block !important; }
+  .page-section[data-category="lore"] :is(h1,h2,h3,h4,p,dt,dd,a,li,.lore-index) { color: #17202a !important; }
+  .lore-dossier-head { background: none; }
+  .lore-filter, .lore-back, .lore-source { display: none; }
+  .lore-directory, .lore-place-grid, .lore-people-grid, .lore-technology { display: block; }
+  .lore-place, .lore-person, .lore-technology { break-inside: avoid; margin-bottom: 1.5rem; }
+  .lore-person--embedded { display: block; }
+  .lore-person--embedded .lore-portrait { width: 5cm; }
+  .lore-location-intro { grid-template-columns: minmax(0, 1fr) minmax(0, .7fr); gap: 1cm; break-inside: avoid; }
+  .lore-location-hero { max-width: 6cm; }
+  .lore-art { max-height: 8cm; }
+  .lore-play dd, .lore-place-body p, .lore-dossier-copy p { color: #222; }
+}

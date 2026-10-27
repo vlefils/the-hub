@@ -70,7 +70,7 @@ export function mountMatch(root, callbacks = {}) {
     const row = element('div', 'rb-setup-row');
     const identity = element('div', 'rb-identity');
     const portrait = element('div', 'rb-portrait-wrap'); portrait.append(athletePortrait(p, colorInput.value)); identity.append(portrait);
-    const copy = element('div'); copy.append(element('strong', '', p.name), element('span', 'rb-archetype', archetypeLabel(p)), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString('fr-FR')} m · bonus d’attaque ${signed(p.attack.bonus)}, ${damageText(p.attack)}`));
+    const copy = element('div'); copy.append(element('strong', '', p.name), element('span', 'rb-archetype', archetypeLabel(p)), element('small', '', `CA ${p.armor} · ${p.maxHp} PV · ${p.speed.toLocaleString(globalThis.HubI18n?.locale || 'fr-FR')} m · bonus d’attaque ${signed(p.attack.bonus)}, ${damageText(p.attack)}`));
     identity.append(copy);
     const roleLabel = element('label', 'rb-field', 'Rôle'); const role = element('select'); role.name = `rb-role-${index}`;
     role.setAttribute('aria-label', `Rôle de ${p.name}`); role.append(...options(ROLES, p.role)); roleLabel.append(role);
@@ -435,7 +435,7 @@ export function mountMatch(root, callbacks = {}) {
     if (!p) { selected.append(element('p', 'rb-muted', 'Sélectionnez un pion ou un nom pour consulter ses caractéristiques.')); return; }
     const heading = element('div', 'rb-selected-heading'); heading.append(element('strong', `rb-${p.teamId}`, `${p.number} · ${p.name}`), element('span', 'rb-muted', `${ROLES[p.role]} · ${INSTRUCTIONS[p.instruction]}`));
     const stats = element('dl', 'rb-player-stats');
-    const speedText = (p.grappling ? p.speed / 2 : p.speed).toLocaleString('fr-FR');
+    const speedText = (p.grappling ? p.speed / 2 : p.speed).toLocaleString(globalThis.HubI18n?.locale || 'fr-FR');
     for (const [name, value] of [['CA', p.armor], ['PV', `${p.hp}/${p.maxHp}`], ['Vitesse', p.grappledBy ? '0 m · agrippé' : `${speedText} m${p.grappling ? ' · lutte' : ''}`], ['FOR', p.abilities.strength], ['DEX', p.abilities.dexterity], ['CON', p.abilities.constitution], ['Lutte', signed(p.skills.wrestling ?? modifier(p.abilities.strength))], ['Acrobaties', signed(p.skills.acrobatics ?? modifier(p.abilities.dexterity))]]) {
       const item = element('div'); item.append(element('dt', '', name), element('dd', '', String(value))); stats.append(item);
     }

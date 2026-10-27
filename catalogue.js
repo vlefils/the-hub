@@ -28,7 +28,7 @@ const shopNormalize = (value) => String(value ?? '')
   .toLowerCase()
   .replace(/œ/g, 'oe')
   .replace(/æ/g, 'ae');
-const shopPrice = (price) => new Intl.NumberFormat('fr-FR').format(price);
+const shopPrice = (price) => new Intl.NumberFormat(window.HubI18n?.locale || 'fr-FR').format(price);
 const shopElement = (tag, className, content) => {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -145,11 +145,12 @@ const shopSheet = (item, close, direct = false) => {
 };
 
 const shopCompare = (a, b, key, direction) => {
-  const left = key === 'family' ? shopGroupNames[shopGroup(a)] : key === 'specifics' ? shopSpecifics(a) : a[key];
-  const right = key === 'family' ? shopGroupNames[shopGroup(b)] : key === 'specifics' ? shopSpecifics(b) : b[key];
+  const localize = value => typeof value === 'string' && window.HubI18n?.language === 'en' ? window.HubI18n.toEnglish(value) : value;
+  const left = localize(key === 'family' ? shopGroupNames[shopGroup(a)] : key === 'specifics' ? shopSpecifics(a) : a[key]);
+  const right = localize(key === 'family' ? shopGroupNames[shopGroup(b)] : key === 'specifics' ? shopSpecifics(b) : b[key]);
   const comparison = typeof left === 'number' && typeof right === 'number'
     ? left - right
-    : String(left ?? '').localeCompare(String(right ?? ''), 'fr', { numeric: true, sensitivity: 'base' });
+    : String(left ?? '').localeCompare(String(right ?? ''), window.HubI18n?.locale || 'fr', { numeric: true, sensitivity: 'base' });
   return (direction === 'desc' ? -comparison : comparison) || a.name.localeCompare(b.name, 'fr');
 };
 
@@ -271,10 +272,12 @@ const setupShop = (root, items) => {
       if (selectedFamily === 'armes' && hands.value !== 'all' && item.hands !== hands.value) return false;
       if (selectedFamily === 'implants' && placement.value !== 'all' && item.placement !== placement.value) return false;
       if (selectedFamily === 'implants' && charge.value !== 'all' && item.charge !== Number(charge.value)) return false;
-      return !term || shopNormalize([
+      const searchable = [
         item.name, item.summary, item.rules, item.damage, item.compatibility,
         item.placement, item.drawback,
-      ].join(' ')).includes(term);
+      ];
+      const paragraphs = searchable.flatMap(value => String(value || '').split(/\n\s*\n/));
+      return !term || shopNormalize(paragraphs.concat(paragraphs.map(value => window.HubI18n?.toEnglish(value) || value)).join(' ')).includes(term);
     });
     const [key, direction] = sort.value.split(':');
     visible.sort((a, b) => shopCompare(a, b, key, direction));
@@ -355,7 +358,9 @@ const setupShop = (root, items) => {
     }
     body.replaceChildren(fragment);
     mobileResults.replaceChildren(mobileFragment);
-    count.textContent = visible.length + ' article' + (visible.length !== 1 ? 's' : '') + ' sur ' + items.length + ' · Prix en chromas';
+    count.textContent = document.documentElement.lang === 'en'
+      ? `${visible.length} of ${items.length} items · Prices in chromas`
+      : visible.length + ' article' + (visible.length !== 1 ? 's' : '') + ' sur ' + items.length + ' · Prix en chromas';
   };
 
   const syncDirect = () => {
@@ -403,6 +408,7 @@ const setupShop = (root, items) => {
   syncDirect();
   window.addEventListener('hashchange', syncDirect);
   window.addEventListener('popstate', syncDirect);
+  document.addEventListener('hub:languagechange', () => { render(); if (!detail.hidden) syncDirect(); });
 };
 
 if (shopRoot) {
