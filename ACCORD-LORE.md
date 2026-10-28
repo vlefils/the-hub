@@ -4,6 +4,12 @@ Revue du 28 octobre 2026, à la demande de l’auteur. Les deux textes fournis f
 
 ## Autorité des sources
 
+Dernier complément du 28 octobre : la rubrique **Loisirs** regroupe Rumbleball, Médias sensoriels et La Sphère. Les équipes illustrées sont rattachées au sport ; l’Arche reste le lieu lié. La Sphère appartient à Synapse et décrit ses défenses, ses hackers et ses fraudes. Les quatre personnalités ont leurs portraits. Le Hub présente 33 membres dans huit crews de trois à six personnes, avec des variantes illustrées chromées et des mutations ciblées. Le corpus compte 37 lieux physiques et 42 fichiers d’illustration actifs. Voir [LOISIRS-DEVELOPPEMENT.md](LOISIRS-DEVELOPPEMENT.md). Les compléments ci-dessous décrivent les étapes antérieures.
+
+Complément suivant : l’accueil est renommé **Bienvenue au Hub**, sans modification de sa transmission. La page de lieu **Le Hub** est développée et absorbe l’ancienne page des crews : huit équipes illustrées, vingt-quatre membres, sept adresses et un fixeur. Les trois premières équipes portent désormais les noms Costa, Darzi Extraction et Morant Protection, avec leurs anciennes ancres conservées. Voir [HUB-DEVELOPPEMENT.md](HUB-DEVELOPPEMENT.md). Le site compte à ce stade 52 pages de lore, 38 lieux et espaces et 34 fichiers d’illustration actifs.
+
+Complément du 28 octobre, après la revue ci-dessous : à la demande de l’auteur, « Visages et rendez-vous » est remplacée par deux pages de lieu complètes. **La Sphère** accueille Nacre, Romy Saad, Miloque et Dalia Rime ; **L’Arche — stade de Rumbleball** accueille les Boyz, la Légion, les Charognards et la présentation des soirs de match. Leurs ancres sont conservées, les deux pages ont une illustration propre et les renvois sont adaptés. Le site compte désormais 53 pages de lore, dont 38 lieux et espaces, et 26 fichiers d’illustration actifs. Le détail de la revue initiale ci-dessous reste historique ; les textes de référence demeurent inchangés.
+
 1. **Dossier The Hub** : la transmission d’accueil, dans `welcomeParagraphs` de `data/lore-review.mjs`.
 2. **Comprendre Paradise** : `worldTitle`, `worldLead`, `worldIntro` et `worldSections` du même module.
 3. Les dossiers détaillés précisent cette base. Les décisions antérieures restent applicables lorsqu’elles ne la contredisent pas. Les anciens inventaires et critiques documentent l’historique, sans annuler les textes de référence.

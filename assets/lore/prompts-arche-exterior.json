@@ -1,0 +1,11 @@
+{
+  "mode": "Built-in image_gen",
+  "styleReferences": [],
+  "assets": [
+    {
+      "file": "arche-exterior-bd.webp",
+      "prompt": "Use case: illustration-story. NEW replacement illustration for L'Arche stadium in Paradise. Crucial author correction: the stadium is a NEST PERCHED ON THE ROOFTOP OF A TALL BUILDING, in the middle of MUCH TALLER skyscrapers. Square composition, architectural three-quarter elevated view FROM ANOTHER HIGH TOWER showing the stadium at center and the supporting skyscraper extending hundreds of meters downward beneath it into the urban abyss. The oval stadium bowl sits like a nest on the FLAT ROOF of ONE clearly legible vertical rectangular tower. Its curving exterior ribs resemble a woven steel nest, with TWO huge elegant structural steel arches above a partly covered roof. The whole stadium is smaller than the roof deck supporting it, with a narrow rooftop arrival terrace. Surrounding huge dense megacity towers rise far above it and partly out of frame, near and far; NO visible ground, NO distant natural horizon or mountains, NO street-level forecourt. People are tiny on rooftop terrace and on elevated narrow skybridges linking stadium roof to adjacent towers at same altitude. Glass-fronted offices and hundreds of window floors visible down the supporting tower immediately below the arena, clear dangerous sense of enormous elevation. Long vertical building faces and deep atmospheric gaps establish scale. Nest silhouette organic in curvature but constructed from weathered steel, brushed metal, concrete and glass, not literal twigs. Stadium fits about eighteen thousand people. Exterior establishing view, not interior match, no pitch visible. Nightfall, warm amber arena entrance lights and cool cyan windows. Detailed hand-inked European graphic novel, fine crosshatching, hard graphic shadows, subdued rich colors, architectural realism. No logos, no lettering, no watermark, no panel grid. Keep full stadium and upper supporting building central for square thumbnail."
+    }
+  ],
+  "note": "New exterior generation after author correction: rooftop stadium like a nest among taller buildings. The earlier ground-level proposal was rejected and is not integrated."
+}

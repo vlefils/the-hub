@@ -1,0 +1,16 @@
+{
+  "mode": "Built-in image_gen",
+  "styleReferences": [
+    "assets/lore/velvet-bd-v2.webp"
+  ],
+  "assets": [
+    {
+      "file": "arche-stadium-bd.webp",
+      "prompt": "Use case: illustration-story. Create a new single square illustration for the lore of Paradise, a vertical cyberpunk metropolis. Scene: L'Arche, a covered Rumbleball stadium with steep stands for 18,000 people around a surprisingly small rectangular hard court. View from a public concourse looking over a waist-high railing; two ordinary adult supporters with worn team scarves in foreground, vendors and families, lively but welcoming. Massive arch-shaped steel roof beams, layered stands, suspended replay screens with abstract images only. On the distant court, two small teams in cyan-and-black and ivory-and-black athletic protective kit play a possession ball sport. No goals, hoops or goalposts anywhere, no weapons, no gladiator arena. Style: richly inked European cyberpunk graphic novel, confident black contour lines, crosshatching, strong graphic shadows, realistic drawn architecture and human proportions, teal court lights and warm amber concourse light. Frame the stadium and roof in the central 75 percent so a vertical crop retains them; no text, readable signs, logos, watermark or panel borders."
+    },
+    {
+      "file": "sphere-network-bd.webp",
+      "prompt": "Use case: illustration-story. Create a new single square illustration for the lore of La Sphère, the internet and immersive shared network of Paradise, a vertical cyberpunk metropolis. Scene inside a shared virtual public meeting place experienced through an immersive interface: a luminous layered forum with suspended walkways and doorlike portals opening into a concert, a workshop tutorial, a sports viewing room; a few varied human avatars converse at a small table, one translucent stylized avatar, mature adults in ordinary clothes. The environment is visibly a designed digital place with partial wireframe edges and translucent overlapping windows but has legible spatial depth and social activity, not a physical city hologram or a floating planet. A visitor's gloved hand selecting a discreet portal in foreground hints at embodiment. Style: richly inked European cyberpunk graphic novel, confident black contour lines, crosshatching, graphic shadows, rich cyan and violet lighting with warm human faces; match a serious illustrated RPG setting, not a 3D render or generic neon code rain. Central 75 percent carries main action for a vertical crop. No readable text, logos, watermark, UI dashboard, panels, giant eye, all-seeing brain or sphere-shaped globe."
+    }
+  ]
+}

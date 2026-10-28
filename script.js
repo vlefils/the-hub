@@ -304,9 +304,7 @@ const updateReadingNavigation = (section, currentId = section.id) => {
       addJump(block, [block.querySelector(".level-banner")?.textContent, block.querySelector("strong")?.textContent].filter(Boolean).join(" — "));
     });
     section.querySelectorAll(".subtab-panel:not([hidden]) .protocol-rank-heading").forEach((heading) => addJump(heading, heading.textContent.trim()));
-  } else if (section.id === "lore-factions") {
-    sidebarLinks.filter((link) => sectionNavRoots.get(link.hash.slice(1)) === section.id).forEach((link) => addJump(document.getElementById(link.hash.slice(1)), link.textContent.trim()));
-  } else {
+  } else if (category !== "lore") {
     if (!section.hasAttribute("data-reader-app")) {
       section.querySelectorAll("h3").forEach((heading) => addJump(heading, heading.textContent.trim()));
     }
@@ -599,6 +597,10 @@ const syncFromHash = () => {
       ? "lore-factions"
       : requestedId === "lore-overview"
       ? "lore-the-hub"
+      : requestedId === "lore-vie-publique"
+      ? "zone-sphere"
+      : requestedId === "lore-crews"
+      ? "hub-crews"
       : requestedId === "pretire-general"
         ? "outils-pretires"
         : requestedId;

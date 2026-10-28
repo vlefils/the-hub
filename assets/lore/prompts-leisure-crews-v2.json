@@ -1,0 +1,87 @@
+{
+  "mode": "Built-in image_gen",
+  "styleReferences": [
+    "assets/lore/crew-costa-bd.webp",
+    "assets/lore/crew-darzi-bd.webp",
+    "assets/lore/crew-morant-bd.webp",
+    "assets/lore/crew-mastiff-bd.webp",
+    "assets/lore/crew-rook-bd.webp",
+    "assets/lore/crew-nadir-bd.webp",
+    "assets/lore/crew-sillage-bd.webp",
+    "assets/lore/crew-voss-bd.webp"
+  ],
+  "assets": [
+    {
+      "file": "crew-costa-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. Exactly THREE original members. Alma at left has a worn exposed chrome forearm and hand holding her notebook; Leon center has an obvious metal jaw inset and reinforced mechanical neck; Sana right has fine metallic tool fingers and a small temple socket. Otherwise human, no mutations. Preserve all identities, orange ties, workbench. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-costa-bd.webp"
+    },
+    {
+      "file": "crew-darzi-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. FOUR people total, preserve original three, add Yara Velten, a stocky woman with closely cropped blond hair, ambulance driver with exposed chrome calves and boots, standing beside vehicle. Ivo left has a broad metal temple interface; Inga center has visibly articulated medical chrome hand; Nils right has subtle organic keratin ridges on back of hand and thickened knuckles, not metal, plus a mechanical elbow. Preserve medical uniforms and rescue gear. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-darzi-bd.webp"
+    },
+    {
+      "file": "crew-morant-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. FIVE people total. Preserve original Eve left, Mina center, Loic right. Add Hadrien Sol, lean man brown skin, shaved head with chrome behind ear, wearing matching graphite suit by open door; add Tess Amani, tall woman with straight dark bob and exposed chrome wrist holding route tablet. Eve has elegant visible metallic neck seam; Mina polished chrome forearm below rolled sleeve; Loic obvious optical prosthetic at one eye. No organic mutations. Widen composition to give all five adult members distinct readable faces. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-morant-bd.webp"
+    },
+    {
+      "file": "crew-mastiff-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. SIX people total in industrial loading bay. Preserve original Kade bald left, Sef short curly hair and glasses, Anton young brown hair with mechanical forearm/shield. Add Branko Ves, broad man with visibly thick ORGANIC keratin plates on brow and neck, not metal; add Leda Ors, short woman shaved sides and two powerful chrome legs; add Omar Chen lean man with visible silver chest sternum and cybernetic eye. Kade has reinforced chrome jaw/neck; Sef visible articulated chrome fingers. Clearly SIX individual adult mercenaries, no background people, no duplicates, heavy ochre gear. Widen framing. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-mastiff-bd.webp"
+    },
+    {
+      "file": "crew-rook-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. Keep exactly original THREE members and café scene. Subtle but visibly cybernetic: Mara left has a slender chromed optical crescent around one eye; Bastian center has metal thumb and forefinger visible against chin; Ada right has an exposed chrome neural interface behind ear and a visible metal wrist. Their implants should be discreet in design but readable. No organic mutations; civilian clothing, identities and atmosphere unchanged. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-rook-bd.webp"
+    },
+    {
+      "file": "crew-nadir-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. Exactly original THREE industrial exploration specialists, preserve identities and slate-blue suits. All three have restrained biological adaptations: Salma left pale reflective eyes with enlarged pupils and tiny organic sensory folds behind ears; Borel center thickened pale ORGANIC dermal ridges along cheek and neck; Jace right fine organic tactile filaments along bare wrist with elongated flexible fingers. Clearly HUMAN faces, no monsters or full animal features. Add practical chrome: Salma articulated metal hand holding plan; Borel exposed metal sensor port at temple; Jace metallic forearm brace. Respirators remain essential. Keep underground gallery robot/cables, not sewer fantasy. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-nadir-bd.webp"
+    },
+    {
+      "file": "crew-sillage-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. FOUR people total aboard same boat on river ENTIRELY ROOFED by giant city structures. Preserve Ana left, Pavel center, Lio right. Add Nora Bel, athletic woman dark cropped hair, worn wetsuit open at neck revealing two small ORGANIC gill folds on neck, limited aquatic adaptation; she checks tether by rail. Ana visible chrome hand on railing; Pavel heavy mechanical forearm holding rope; Lio chrome temple sensor and one articulated metal hand repairing drone. Preserve existing human faces, raincoats, underground river no sky. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-sillage-bd.webp"
+    },
+    {
+      "file": "crew-voss-bd-v2.webp",
+      "prompt": "Use case: identity-preserve. Edit the supplied mercenary crew illustration for a cyberpunk RPG lore page. FIVE people total in briefing room. Preserve Ilse silver hair left, Malik shaved head center, Petra red hair right. Add Oren Dax older lean man with close dark beard and exposed chrome forearm, seated checking tablet; add Célia Venn woman with dark skin and braided hair, precision optical implant and small chrome neck plates, leaning over map. Ilse exposed chrome hand on map; Malik larger visible skull interface; Petra visibly cybernetic armored forearms with mechanical fingers. All organic-human faces, no biological mutations. All five distinct adults clear, retain expensive worn equipment and subdued lighting. Preserve hand-inked European graphic novel style, hatching, color mood, original faces of returning members. Square single scene, not collage, no text, no logos, no watermark. Functional augmentations integrated into anatomy, not armor mistaken for implants.",
+      "reference": "assets/lore/crew-voss-bd.webp"
+    },
+    {
+      "file": "sport-boyz-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. The Boyz Rumbleball professional team, exactly FIVE adult athletes in red and black contact-sport protective gear, standing on sidelines of indoor arena. Gaspard Piston Ravel stocky male captain with exposed powerful chrome shoulder joints; Ines Flash Caldero fast athletic woman holding single round ball; Charlie Red Thunam tall red-haired man; Djamila Verrou Ness muscular dark-skinned woman; Milo Crochet Valen wiry brown-haired man. Strong distinct faces, broad range of builds. Stadium background, no weapons, no goalposts. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    },
+    {
+      "file": "sport-legion-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. La Legion Rumbleball professional team, exactly FIVE adult athletes in ivory and black contact-sport protective gear; captain Cassian Veyr stern short dark-haired man with restrained chrome temples in foreground, two men and two women diverse skin tones and builds flanking him, disciplined formation in indoor arena entrance. Visible sports cybernetic legs and wrists on some. Single round ball held by one player, no firearms, no goalposts. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    },
+    {
+      "file": "sport-charognards-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. Charognards amateur Rumbleball team, exactly FIVE adults in patched grey sport armor with ochre strips, warm workshop team mood in small indoor sporting hall. Suze Clou confident woman captain cropped dark hair grinning; Miette petite adult woman carrying round ball; Le Frigo very large stocky man with chrome forearms; Raf Double Tour wiry man dark curly hair; Pepe 404 older man grey moustache and cybernetic calf. Distinct silhouettes and worn homologated equipment, no weapons, no goalposts. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    },
+    {
+      "file": "sphere-nacre-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. Single portrait of Nacre, androgynous adult stage artist with warm brown skin and close sculpted white hair, expressive human face, wearing luminous textile costume with one softly glowing sleeve trailing movement, standing in rehearsal studio with seamstress worktable, violet and cyan accents, fine chrome collarbone interface. Artist is a real person, not hologram. Waist-up editorial portrait, no other people. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    },
+    {
+      "file": "sphere-romy-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. Single portrait of Romy Saad, adult woman equipment reviewer with practical short black hair, lightly freckled tan skin, rolled sleeves and exposed functional chrome hand using screwdriver over dismantled sensor on YELLOW work mat. Parts neatly aligned, workshop shelf background, visible small recording camera facing workbench, expressive skeptical face. Warm lamp, cyan urban ambient. Waist-up, no other people. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    },
+    {
+      "file": "sphere-miloque-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. Single portrait of Miloque, adult male neighborhood comedian, lanky olive-skinned man with curly brown hair, animated expressive face, holding two different plain commuter caps while rehearsing by a microphone under a covered elevated transit passage in futuristic vertical city. Modest everyday jacket, subtle chrome ear interface. Local neighborhood stage mood, warm and cool contrast. Waist-up, no other people, no readable signage. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    },
+    {
+      "file": "sphere-dalia-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. Single portrait of Dalia Rime, middle-aged dark-skinned woman radio and late-night sports debate host, short silver-black curls, natural welcoming but alert expression, seated at intimate independent studio desk, microphone on arm and headphones around neck, screens abstract behind glass, handwritten notes unreadable. Small discreet chrome temple accent. Warm amber face, deep blue studio. Waist-up, no other people. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    },
+    {
+      "file": "leisure-sensory-bd.webp",
+      "prompt": "Use case: illustration-story. Asset: square standalone illustration for the Paradise cyberpunk RPG lore. Cyberpunk sensory-media lounge in Paradise, three adult friends in comfortable reclined seats choosing shared immersive concert. One wears lightweight visor with tactile wrist bands, another holds ordinary screen, third wears slim neural temple connector. Ghostlike stage visual above low central table, warm lived-in interior with plants and jackets, subtle magenta/cyan projected light, real bodies clearly remain seated in physical room. Everyday leisure, not medical pods, no text, no floating code. Detailed European graphic novel hand-inked linework, crosshatching, expressive realistic human faces, rich subdued colors and hard graphic shadows. Cohesive narrative illustration, not photograph, not 3D. One full scene, no panel grid, no typography, no logos, no watermark."
+    }
+  ]
+}

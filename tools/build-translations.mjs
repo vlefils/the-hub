@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve, relative } from 'node:path';
 import { factions, people } from '../data/lore.mjs';
 import { loreEnglish } from '../data/lore.en.mjs';
+import { factionNamesEnglish, translateFactionNames } from '../data/lore-english-names.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const publishedOnly = process.argv.includes('--published-only');
 let publishedHashes;
@@ -93,8 +94,8 @@ catch {
 for (const [fr, en] of Object.entries(cache)) cache[norm(decode(fr))] ??= en;
 const glossary = {
   'The Hub': 'The Hub', 'Paradise': 'Paradise', 'Chroma': 'Chroma',
-  'Le Cabinet': 'Le Cabinet', 'le Cabinet': 'Le Cabinet', 'Bastion': 'Bastion', 'Le Syndicat': 'Le Syndicat', 'le Syndicat': 'Le Syndicat',
-  'Seconde Chance': 'Seconde Chance', 'Helix Genomics': 'Helix Genomics', 'Synapse': 'Synapse', 'Blackridge Capital': 'Blackridge Capital', 'Velvet': 'Velvet',
+  ...factionNamesEnglish, 'Bastion': 'Bastion',
+  'Helix Genomics': 'Helix Genomics', 'Synapse': 'Synapse', 'Blackridge Capital': 'Blackridge Capital', 'Velvet': 'Velvet',
   'Gâchette': 'Gunner', 'Gachette': 'Gunner', 'Ferrailleur': 'Scrapper', 'Dopeur': 'Booster', 'Brute': 'Brute', 'Runner': 'Runner', 'Neuro': 'Neuro',
   'Le Grand Soir': 'Le Grand Soir', 'Rumbleball': 'Rumbleball',
   ...Object.fromEntries(people.map(p => [p.name, p.name])),
@@ -171,7 +172,7 @@ const polish = (fr, en) => {
 };
 // Authored lore is already edited: heuristic fixes for cached translations can
 // confuse memory backups with saving throws inside otherwise correct prose.
-const translated = s => loreEnglish[s] ?? polish(s, overrides[s] ?? cache[s] ?? s);
+const translated = s => loreEnglish[s] ?? translateFactionNames(polish(s, overrides[s] ?? cache[s] ?? s));
 const dictionary = { texts: { ...overrides, ...Object.fromEntries([...strings].map(s => [s, translated(s)])) }, templates: [...templates].map(s => [s, translated(s)]) };
 const missing = all.filter(s => cache[s] == null && overrides[s] == null);
 await writeFile(resolve(root, '.local/translation-coverage.json'), JSON.stringify({ total: all.length, missing }, null, 2));
