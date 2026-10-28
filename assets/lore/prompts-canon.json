@@ -1,0 +1,18 @@
+{
+  "mode": "Built-in image_gen",
+  "styleReferences": [
+    "assets/lore/people-3-bd.webp",
+    "assets/lore/technology-1-bd.webp"
+  ],
+  "assets": [
+    {
+      "file": "people-3-river-bd-v2.webp",
+      "prompt": "Use case: precise-object-edit / identity-preserve. Edit target: the supplied four-portrait cyberpunk BD atlas. Keep the same very wide 3:1 sheet with exactly FOUR equal-width vertical panels. Change ONLY the BACKGROUND behind the SECOND portrait from the left, Luz Calder, the woman holding a thermos. Her docks are on a river buried beneath the growing megacity. Remove all blue sky and open-air skyline in her panel and replace with massive concrete vaults, overlapping city decks, river-port gantries and dim cyan and amber quay lamps, with a small hint of dark river under the arches. This is a covered navigable river, not a sewer. Preserve Luz's identity, face, hair, expression, clothing, thermos, hands, pose and portrait scale. Preserve the first, third and fourth panels as closely as possible. Keep the exact inked comic-book linework, hatching and palette. No added text, labels or watermarks."
+    },
+    {
+      "file": "technology-1-chroma-bd-v2.webp",
+      "prompt": "Use case: precise-object-edit. Edit target: supplied four-panel cyberpunk BD technology atlas. Keep the same wide 3:1 sheet and exactly FOUR equal-width panels. Change ONLY the THIRD panel from the left: it illustrates Chroma Credit, a closed biometric digital balance for licensed mercenary equipment, never physical cash, transferable tokens or withdrawal. REMOVE every loose gold coin and stack of coins. Replace the tabletop arrangement with a rugged active transaction terminal showing a simple abstract cyan fingerprint authentication glyph, a small integrated palm/fingerprint reader, and a plain signed contract folder without coin-shaped seals. No loose coins, banknotes, credit chips or bearer tokens. No readable amounts or invented currency symbols. Preserve the rest of the panel's amber workshop lighting and perspective. Keep the first identity-card panel, second service-robot panel and fourth sealed-memory-module panel unchanged. Preserve bold ink outlines, hatching, shadows and comic-book style. No added labels or watermark."
+    }
+  ],
+  "operation": "Targeted edits after visual audit. Only Luz Calder uses the new portrait atlas; only Contracts and Chroma Credit uses the new technology atlas. Other portraits and technology panels retain their existing images."
+}

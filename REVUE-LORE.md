@@ -1,5 +1,7 @@
 # Revue critique et révision du lore
 
+> Document historique de la passe du 27 octobre. Depuis le 28 octobre 2026, les textes de l’auteur « Dossier The Hub » et « Comprendre Paradise » priment sur les analyses et décisions incompatibles de ce document. Voir [ACCORD-LORE.md](ACCORD-LORE.md) pour la revue courante des pages, personnages, technologies et illustrations.
+
 27 octobre 2026. État de départ : [INVENTAIRE-LORE.md](INVENTAIRE-LORE.md). Les modifications de canon et leurs équivalents anglais sont regroupés dans [data/lore-review.mjs](data/lore-review.mjs).
 
 ## Diagnostic global
@@ -182,3 +184,7 @@ Deux formulations ont été corrigées au passage : au Pavillon Continuité, une
 Les versions anglaises ont été rédigées en parallèle et les extraits de l’atlas régénérés. Une substitution automatique du compilateur confondait dans certains contextes « sauvegarde mémoire » et « jet de sauvegarde » ; les traductions éditoriales sont désormais conservées telles qu’écrites. Le contrôle de localisation vérifie aussi les passages bilingues du socle.
 
 Vérification de cette passe : 204 champs éditoriaux retravaillés, auxquels s’ajoutent la transmission d’accueil et les quatre conseils de tonalité ; aucune modification des contenus hors lore, des identifiants, des affiliations ou des visuels. La génération est stable, aucune traduction n’est manquante, les contrôles d’ancres et du catalogue passent, ainsi que les cinq tests de localisation. La Clinique des pluies, son contact et l’accueil ont été relus dans le navigateur en français et en anglais.
+
+La transmission d’accueil a ensuite été remplacée par la version fournie par l’auteur : 79 paragraphes conservés dans leur ordre et leur formulation, avec leurs emphases. Cette version fait désormais référence dans `welcomeParagraphs` ; son anglais a été rédigé en parallèle. L’en-tête porte « TH-01 / Accès lecture ».
+
+La page « Comprendre Paradise » a également été remplacée par le texte fourni par l’auteur, avec son introduction, ses sept parties et ses deux sous-parties. Cette version précise désormais l’origine du Cabinet, la chronologie relative et l’entrée du Syndicat parmi les fondateurs ; elle remplace donc le choix antérieur de laisser ces éléments indéterminés. Le texte et ses emphases sont conservés, accompagnés d’une traduction anglaise. Les suggestions « À explorer » deviennent des liens vers les dossiers existants, sans doublon ni lien fictif vers une fiche Biolux. Les trois groupes locaux sont conservés dans les fiches de leurs lieux et la trêve dans celle du Hub ; leurs ancres restent accessibles. Le renvoi des règles de résurrection pointe désormais vers le dossier mémoire.

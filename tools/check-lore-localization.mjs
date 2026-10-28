@@ -22,7 +22,7 @@ for (const f of factions) {
 }
 for (const person of people) assert.ok(zones.some(z => z.id === person.zone));
 const art = new Set([...zones, ...people, ...technologies].map(e => e.art));
-assert.equal(art.size, 22);
+assert.equal(art.size, 24);
 for (const name of art) await access(new URL(`assets/lore/${name}.webp`, root));
 for (const text of source.texts) assert.ok(Object.hasOwn(dictionary.texts, text), `Missing English text: ${text}`);
 for (const [fr, en] of [...Object.entries(baseEnglish), ...Object.entries(reviewEnglish), ...Object.entries(lifeEnglish)]) assert.equal(dictionary.texts[fr], en, `Editorial English drift: ${fr}`);
@@ -64,5 +64,5 @@ assert.ok(synapse.blocks.some(([title]) => title === 'Autonomes : une volonté l
 assert.ok(people.filter(p => p.faction === 'synapse').every(p => /Autonome|IA centrale/.test(p.role)), 'Synapse contacts must match the robotic canon.');
 assert.equal(people.filter(p=>p.scope==='faction').length,17);
 assert.equal(people.filter(p=>p.scope==='place').length,11);
-console.log(`Validated: 8 factions, 36 location pages, 17 faction figures, 11 local contacts, 8 technologies, 22 BD atlases; ${worldSections.length} world sections and ${streetActors.length} local groups; ${source.texts.length} texts and ${dictionary.templates.length} templates. Ownership, editorial translations, references, anchors, assets, dice and interpolation tokens are intact.`);
+console.log(`Validated: 8 factions, 36 location pages, 17 faction figures, 11 local contacts, 8 technologies, ${art.size} BD atlases; ${worldSections.length} world sections and ${streetActors.length} local groups; ${source.texts.length} texts and ${dictionary.templates.length} templates. Ownership, editorial translations, references, anchors, assets, dice and interpolation tokens are intact.`);
 console.log(`Everyday life: ${publicFigures.length} public figures, ${crews.length} crews, ${hubRegulars.length} Hub contacts, ${hubRegulars.filter(p => p.address).length} small addresses, ${localDetails.length} local details and ${sportsProfiles.length} sports teams with the Ark. All are embedded at their intended scale.`);
