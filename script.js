@@ -175,7 +175,7 @@ const injectSectionLandmarks = () => {
 injectSectionLandmarks();
 
 const setMenuBackgroundInert = (active) => {
-  document.querySelectorAll(".site-header, main, [data-skip-content]").forEach((element) => { element.inert = active; });
+  document.querySelectorAll(".site-header .brand-hero, main, [data-skip-content]").forEach((element) => { element.inert = active; });
 };
 
 const closeMenu = (restoreFocus = false) => {
@@ -187,7 +187,17 @@ const closeMenu = (restoreFocus = false) => {
 };
 
 if (menuToggle && sidebar) {
+  const siteHeader = menuToggle.closest('.site-header');
+  const updateMenuHeaderHeight = () => {
+    document.documentElement.style.setProperty('--site-header-height', `${siteHeader.getBoundingClientRect().height}px`);
+  };
+  new ResizeObserver(updateMenuHeaderHeight).observe(siteHeader);
   menuToggle.addEventListener('click', () => {
+    if (sidebar.classList.contains('sidebar-open')) {
+      closeMenu(true);
+      return;
+    }
+    updateMenuHeaderHeight();
     sidebar.classList.add('sidebar-open');
     sidebar.scrollTop = 0;
     document.body.classList.add('nav-open');
@@ -196,14 +206,15 @@ if (menuToggle && sidebar) {
     sidebarClose?.focus();
   });
   sidebarClose?.addEventListener('click', () => closeMenu(true));
-  sidebar.addEventListener('keydown', (event) => {
+  document.addEventListener('keydown', (event) => {
     if (!sidebar.classList.contains('sidebar-open')) return;
     if (event.key === 'Escape') {
       event.preventDefault();
       closeMenu(true);
     }
     if (event.key !== 'Tab') return;
-    const focusable = [...sidebar.querySelectorAll('a, button, input, select')].filter((element) => element.getClientRects().length);
+    const focusable = [...document.querySelectorAll('.site-header .language-switch button, .menu-toggle, .sidebar a, .sidebar button, .sidebar input, .sidebar select')]
+      .filter((element) => element.getClientRects().length && !element.disabled && getComputedStyle(element).visibility !== 'hidden');
     const first = focusable[0];
     const last = focusable.at(-1);
     if (event.shiftKey && document.activeElement === first) {
