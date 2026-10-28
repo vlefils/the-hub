@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hub · Music</title>
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="player.css">
+<link rel="stylesheet" href="hub.css">
+</head>
+<body>
+
+    <div id="music-player" class="player-hidden">
+        <div class="player-body">
+            <video id="audio-player" crossOrigin="anonymous" preload="none" playsinline></video>
+            <div class="player-bg-wrapper" style="position: absolute; inset: 0; z-index: -2; border-radius: inherit; overflow: hidden;">
+                <div id="player-album-bg"></div>
+            </div>
+            <div class="album-art-container">
+                <img id="album-art" src="../../assets/music/the-hub.jpeg" alt="Album Art">
+                <button id="playlist-btn" title="Playlist" aria-label="Open Playlist"><i class="fas fa-list-ol"></i></button>
+            </div>
+            <div class="player-info-and-controls">
+                <div class="song-info">
+                    <span id="song-title">Loading...</span>
+                    <span id="song-artist">Open Source Mix</span>
+                </div>
+                <div class="timeline-container">
+                    <span id="current-time" class="time-display">0:00</span>
+                    <input type="range" id="timeline-slider" min="0" max="100" value="0" aria-label="Song progress">
+                    <span id="total-duration" class="time-display">0:00</span>
+                </div>
+                <div class="player-controls">
+                    <div class="volume-controls">
+                        <button id="volume-btn" title="Volume" aria-label="Mute/Unmute Volume"><i class="fas fa-volume-down"></i></button>
+                        <input type="range" id="volume-slider-input" min="0" max="1" step="0.01" value="0.2" aria-label="Volume control">
+                    </div>
+                    <div style="display:flex; align-items:center; gap: 8px;">
+                         <button id="like-btn" title="Like Song" aria-label="Like this song"><i class="far fa-heart"></i></button>
+                        <button id="prev-btn" title="Previous" aria-label="Previous Song"><i class="fas fa-backward"></i></button>
+                        <button id="play-pause-btn" title="Play/Pause" aria-label="Play or Pause" aria-pressed="false"><i class="fas fa-play"></i></button>
+                        <button id="next-btn" title="Next" aria-label="Next Song"><i class="fas fa-forward"></i></button>
+                        <button id="sleep-timer-btn" title="Sleep Timer" aria-label="Set sleep timer"><i class="fas fa-moon"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="player-toggle-btn" title="Toggle Player" aria-label="Show or hide music player">
+            <i class="fas fa-music"></i>
+        </button>
+        <div id="song-notification-toast" role="alert" aria-live="polite">
+            <img id="toast-album-art" src="" alt="">
+            <div style="min-width: 0; flex: 1; overflow: hidden;">
+                <div style="font-size: 0.8rem; color: var(--secondary-text);">Now Playing:</div>
+                <div id="toast-song-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+            </div>
+        </div>
+        <div id="playlist-modal">
+            <div class="modal-content" role="dialog" aria-labelledby="playlist-modal-title">
+                <div class="modal-header">
+                    <div id="github-promotion">
+                        <i class="fab fa-github" aria-hidden="true"></i>
+                        <a id="github-link" href="#" target="_blank" rel="noopener noreferrer">Star on GitHub!</a>
+                        <button id="close-promo-btn" title="Dismiss" aria-label="Dismiss promotion">&times;</button>
+                    </div>
+
+                    <div class="modal-header-top">
+                        <h3 id="playlist-modal-title">Playlist</h3>
+                        <div style="display:flex; align-items:center; margin-left:auto; margin-right:15px; gap:8px;">
+                            <button id="settings-btn" title="Settings" aria-label="Settings"><i class="fas fa-cog"></i></button>
+                        </div>
+                        <button class="modal-close-btn" aria-label="Close Playlist">&times;</button>
+                    </div>
+                    <div class="search-row">
+                        <input type="text" id="playlist-search" placeholder="Search..." aria-label="Search playlist">
+                        <button id="filter-fav-btn" title="Show Favorites Only" aria-label="Show Favorites Only"><i class="fas fa-heart"></i></button>
+                    </div>
+                    <div class="modal-controls-row">
+                        <button id="shuffle-btn" class="modal-control-btn" title="Shuffle" aria-label="Shuffle"><i class="fas fa-random"></i> <span>Shuffle</span></button>
+                        <button id="repeat-btn" class="modal-control-btn" title="Repeat" aria-label="Repeat"><i class="fas fa-redo"></i> <span>Repeat</span></button>
+                        <button id="speed-btn" class="modal-control-btn" title="Speed: 1x" aria-label="Change Speed"><i class="fas fa-tachometer-alt"></i> <span>1x</span></button>
+                        <button id="reverb-btn" class="modal-control-btn" title="Reverb" aria-label="Toggle Reverb"><i class="fas fa-magic"></i> <span>Reverb</span></button>
+                    </div>
+                </div>
+                <div id="playlist-container"></div>
+            </div>
+        </div>
+        
+        <div id="settings-modal">
+            <div class="modal-content" role="dialog" aria-labelledby="settings-modal-title">
+                <div class="modal-header">
+                    <div class="modal-header-top">
+                        <h3 id="settings-modal-title">Settings</h3>
+                        <button class="settings-close-btn modal-close-btn" aria-label="Close Settings">&times;</button>
+                    </div>
+                </div>
+                <div class="settings-body">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: var(--primary-text); font-size: 1rem;">Themes</h4>
+                    <div id="theme-switcher-list"></div>
+                    
+                    <h4 style="margin-top: 25px; margin-bottom: 15px; color: var(--primary-text); font-size: 1rem;">Keyboard Shortcuts</h4>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; justify-content:space-between; color:var(--primary-text); align-items:center;"><span>Play / Pause</span><kbd style="background:var(--border-color); padding:4px 8px; border-radius:4px; font-size:0.8rem; font-family:var(--font-stack);">Space</kbd></div>
+                        <div style="display:flex; justify-content:space-between; color:var(--primary-text); align-items:center;"><span>Next Song</span><kbd style="background:var(--border-color); padding:4px 8px; border-radius:4px; font-size:0.8rem; font-family:var(--font-stack);">&rarr;</kbd></div>
+                        <div style="display:flex; justify-content:space-between; color:var(--primary-text); align-items:center;"><span>Previous Song</span><kbd style="background:var(--border-color); padding:4px 8px; border-radius:4px; font-size:0.8rem; font-family:var(--font-stack);">&larr;</kbd></div>
+                        <div style="display:flex; justify-content:space-between; color:var(--primary-text); align-items:center;"><span>Mute / Unmute</span><kbd style="background:var(--border-color); padding:4px 8px; border-radius:4px; font-size:0.8rem; font-family:var(--font-stack);">M</kbd></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="player.js"></script>
+</body>
+</html>

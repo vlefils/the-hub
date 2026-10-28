@@ -27,7 +27,7 @@
     <script src="lore.js" defer></script>
     <script src="i18n/en.js" defer></script>
     <script src="i18n.js" defer></script>
-    <script src="music.js" defer></script>
+    <script src="music.js" type="module"></script>
   </head>
   <body>
     <a class="skip-link" href="#contenu" data-skip-content>Aller au contenu</a>
@@ -4960,141 +4960,134 @@
                 <a class="overview-text-link" href="https://suno.com/s/ca20A9dNAYhk9xzp" target="_blank" rel="noopener noreferrer">Écouter la playlist sur Suno <span aria-hidden="true">↗</span></a>
               </div>
             </header>
-            <div class="music-workspace">
-              <div class="music-player" data-music-player hidden>
-                <p class="music-eyebrow">Morceau sélectionné</p>
-                <h3 class="music-current-title" data-music-current translate="no" aria-live="polite" aria-atomic="true">Welcome To The Hub</h3>
-                <div class="music-embed" data-music-embed></div>
-                <p class="music-player-help">Choisissez un titre, puis lancez la lecture dans le lecteur.</p>
-                <a class="music-song-link" href="https://suno.com/song/3a1a33c0-1acb-40d0-9c31-90b8bf7487ba" target="_blank" rel="noopener noreferrer" data-music-external>Ouvrir ce morceau sur Suno <span aria-hidden="true">↗</span></a>
-                <p class="music-player-note">Le lecteur ne s’affiche pas ? Utilisez le lien ci-dessus.</p>
-                <p class="music-player-note">La lecture s’arrête en quittant cette page. Pour écouter les morceaux à la suite ou continuer à parcourir le site, ouvrez la playlist sur Suno.</p>
-              </div>
-              <div class="music-catalogue">
-                <div class="music-list-heading"><h3>Les morceaux</h3><span>Durée</span></div>
-                <noscript><p>Ouvrez un titre pour l’écouter sur Suno.</p></noscript>
-                <ol class="music-tracks" aria-label="Morceaux de la playlist The Hub">
+            <div class="music-listen">
+              <button class="music-open" type="button" data-music-open hidden>Ouvrir le lecteur</button>
+              <p data-music-state role="status">Le lecteur reste accessible en bas à droite sur tout le site.</p>
+            </div>
+            <div class="music-catalogue">
+              <div class="music-list-heading"><h3>Les morceaux</h3><span>Durée</span></div>
+              <noscript><p>Ouvrez un titre pour l’écouter dans votre navigateur.</p></noscript>
+              <ol class="music-tracks" aria-label="Morceaux de la playlist The Hub">
                 <li>
-                  <a class="music-track" href="https://suno.com/song/3a1a33c0-1acb-40d0-9c31-90b8bf7487ba" target="_blank" rel="noopener noreferrer" data-music-track="3a1a33c0-1acb-40d0-9c31-90b8bf7487ba">
+                  <a class="music-track" href="assets/music/audio/3a1a33c0-1acb-40d0-9c31-90b8bf7487ba.mp3" data-music-track="3a1a33c0-1acb-40d0-9c31-90b8bf7487ba">
                     <span class="music-track-number" aria-hidden="true">01</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Welcome To The Hub</strong><small translate="no">cyberpunk, rap metal, punk rap</small></span>
                     <span class="music-track-duration" translate="no">3:47</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/2c976ba3-c3d1-4fd9-86a0-219a2045db27" target="_blank" rel="noopener noreferrer" data-music-track="2c976ba3-c3d1-4fd9-86a0-219a2045db27">
+                  <a class="music-track" href="assets/music/audio/2c976ba3-c3d1-4fd9-86a0-219a2045db27.mp3" data-music-track="2c976ba3-c3d1-4fd9-86a0-219a2045db27">
                     <span class="music-track-number" aria-hidden="true">02</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">First Run</strong><small translate="no">cyberpunk rap metal, rap metal, industrial punk</small></span>
                     <span class="music-track-duration" translate="no">3:27</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/1e57a5e1-3c15-450b-87e6-2d47e7f4772f" target="_blank" rel="noopener noreferrer" data-music-track="1e57a5e1-3c15-450b-87e6-2d47e7f4772f">
+                  <a class="music-track" href="assets/music/audio/1e57a5e1-3c15-450b-87e6-2d47e7f4772f.mp3" data-music-track="1e57a5e1-3c15-450b-87e6-2d47e7f4772f">
                     <span class="music-track-number" aria-hidden="true">03</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">One More Chrome</strong><small translate="no">industrial metal, hardcore rap metal, cyberpunk</small></span>
                     <span class="music-track-duration" translate="no">4:30</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/d979bda2-74d0-40b6-938e-48d923c699a7" target="_blank" rel="noopener noreferrer" data-music-track="d979bda2-74d0-40b6-938e-48d923c699a7">
+                  <a class="music-track" href="assets/music/audio/d979bda2-74d0-40b6-938e-48d923c699a7.mp3" data-music-track="d979bda2-74d0-40b6-938e-48d923c699a7">
                     <span class="music-track-number" aria-hidden="true">04</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Manage</strong><small translate="no">cyberpunk industrial metal, electro-metal, industrial techno</small></span>
                     <span class="music-track-duration" translate="no">5:02</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/05a41d53-c768-4bbc-bbfe-31d788c6c09d" target="_blank" rel="noopener noreferrer" data-music-track="05a41d53-c768-4bbc-bbfe-31d788c6c09d">
+                  <a class="music-track" href="assets/music/audio/05a41d53-c768-4bbc-bbfe-31d788c6c09d.mp3" data-music-track="05a41d53-c768-4bbc-bbfe-31d788c6c09d">
                     <span class="music-track-number" aria-hidden="true">05</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Shine</strong><small translate="no">cyberpunk, rap metal, industrial rap</small></span>
                     <span class="music-track-duration" translate="no">3:28</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/e10229e1-0eec-4dbb-825b-f038696fe61e" target="_blank" rel="noopener noreferrer" data-music-track="e10229e1-0eec-4dbb-825b-f038696fe61e">
+                  <a class="music-track" href="assets/music/audio/e10229e1-0eec-4dbb-825b-f038696fe61e.mp3" data-music-track="e10229e1-0eec-4dbb-825b-f038696fe61e">
                     <span class="music-track-number" aria-hidden="true">06</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Hold The Line</strong><small translate="no">industrial metal, industrial rock, martial/industrial, dystopian work anthem</small></span>
                     <span class="music-track-duration" translate="no">4:54</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/c173b513-95df-45ed-8b2d-c19f98bf3344" target="_blank" rel="noopener noreferrer" data-music-track="c173b513-95df-45ed-8b2d-c19f98bf3344">
+                  <a class="music-track" href="assets/music/audio/c173b513-95df-45ed-8b2d-c19f98bf3344.mp3" data-music-track="c173b513-95df-45ed-8b2d-c19f98bf3344">
                     <span class="music-track-number" aria-hidden="true">07</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">No Second Chance</strong><small translate="no">cyberpunk rap metal, industrial nu metal, dark industrial</small></span>
                     <span class="music-track-duration" translate="no">3:49</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/4fae16b0-142b-45a5-8d42-cbde775af45d" target="_blank" rel="noopener noreferrer" data-music-track="4fae16b0-142b-45a5-8d42-cbde775af45d">
+                  <a class="music-track" href="assets/music/audio/4fae16b0-142b-45a5-8d42-cbde775af45d.mp3" data-music-track="4fae16b0-142b-45a5-8d42-cbde775af45d">
                     <span class="music-track-number" aria-hidden="true">08</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Form 66-B</strong><small translate="no">industrial punk, dark rap metal, cyberpunk industrial</small></span>
                     <span class="music-track-duration" translate="no">4:38</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/060f6a4d-4fb4-4d0f-8818-b3e488d4a418" target="_blank" rel="noopener noreferrer" data-music-track="060f6a4d-4fb4-4d0f-8818-b3e488d4a418">
+                  <a class="music-track" href="assets/music/audio/060f6a4d-4fb4-4d0f-8818-b3e488d4a418.mp3" data-music-track="060f6a4d-4fb4-4d0f-8818-b3e488d4a418">
                     <span class="music-track-number" aria-hidden="true">09</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Evolve</strong><small translate="no">industrial metal, cyberpunk industrial, rap metal</small></span>
                     <span class="music-track-duration" translate="no">4:58</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/331f021a-26b2-48b3-b0cc-16a9659bbc6d" target="_blank" rel="noopener noreferrer" data-music-track="331f021a-26b2-48b3-b0cc-16a9659bbc6d">
+                  <a class="music-track" href="assets/music/audio/331f021a-26b2-48b3-b0cc-16a9659bbc6d.mp3" data-music-track="331f021a-26b2-48b3-b0cc-16a9659bbc6d">
                     <span class="music-track-number" aria-hidden="true">10</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Beautiful From Above</strong><small translate="no">rap metal, industrial, cyberpunk</small></span>
                     <span class="music-track-duration" translate="no">3:17</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/69ae83f8-22ce-4e7c-ba7e-9fc0cb9128f6" target="_blank" rel="noopener noreferrer" data-music-track="69ae83f8-22ce-4e7c-ba7e-9fc0cb9128f6">
+                  <a class="music-track" href="assets/music/audio/69ae83f8-22ce-4e7c-ba7e-9fc0cb9128f6.mp3" data-music-track="69ae83f8-22ce-4e7c-ba7e-9fc0cb9128f6">
                     <span class="music-track-number" aria-hidden="true">11</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">In the Dirt</strong><small translate="no">cyberpunk electro-industrial, sludge metal, industrial blues, synth punk cabaret</small></span>
                     <span class="music-track-duration" translate="no">5:14</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/6c379948-f942-4ff0-a476-53afdb5a0a43" target="_blank" rel="noopener noreferrer" data-music-track="6c379948-f942-4ff0-a476-53afdb5a0a43">
+                  <a class="music-track" href="assets/music/audio/6c379948-f942-4ff0-a476-53afdb5a0a43.mp3" data-music-track="6c379948-f942-4ff0-a476-53afdb5a0a43">
                     <span class="music-track-number" aria-hidden="true">12</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Drown in the Cloud</strong><small translate="no">cyberpunk darkwave, industrial metal, electro-noir</small></span>
                     <span class="music-track-duration" translate="no">4:43</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/f3ff95b1-f0ed-42b6-9422-778047fcc273" target="_blank" rel="noopener noreferrer" data-music-track="f3ff95b1-f0ed-42b6-9422-778047fcc273">
+                  <a class="music-track" href="assets/music/audio/f3ff95b1-f0ed-42b6-9422-778047fcc273.mp3" data-music-track="f3ff95b1-f0ed-42b6-9422-778047fcc273">
                     <span class="music-track-number" aria-hidden="true">13</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Velvet</strong><small translate="no">hard techno, industrial, hardcore rap-metal</small></span>
                     <span class="music-track-duration" translate="no">4:21</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/ab72eca8-4f85-4ccd-b6f1-652f69aebf00" target="_blank" rel="noopener noreferrer" data-music-track="ab72eca8-4f85-4ccd-b6f1-652f69aebf00">
+                  <a class="music-track" href="assets/music/audio/ab72eca8-4f85-4ccd-b6f1-652f69aebf00.mp3" data-music-track="ab72eca8-4f85-4ccd-b6f1-652f69aebf00">
                     <span class="music-track-number" aria-hidden="true">14</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Zero Day Smile</strong><small translate="no">glitch-pop, dark electro-rock, cyberpunk pop punk</small></span>
                     <span class="music-track-duration" translate="no">4:21</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/00a0c7d0-3c92-4e08-87cc-67ea29948b7d" target="_blank" rel="noopener noreferrer" data-music-track="00a0c7d0-3c92-4e08-87cc-67ea29948b7d">
+                  <a class="music-track" href="assets/music/audio/00a0c7d0-3c92-4e08-87cc-67ea29948b7d.mp3" data-music-track="00a0c7d0-3c92-4e08-87cc-67ea29948b7d">
                     <span class="music-track-number" aria-hidden="true">15</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">No Justice in Paradise</strong><small translate="no">cyberpunk, techno, hardcore rap metal</small></span>
                     <span class="music-track-duration" translate="no">5:15</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/a6c79575-3938-43b2-a944-6476f3a8827c" target="_blank" rel="noopener noreferrer" data-music-track="a6c79575-3938-43b2-a944-6476f3a8827c">
+                  <a class="music-track" href="assets/music/audio/a6c79575-3938-43b2-a944-6476f3a8827c.mp3" data-music-track="a6c79575-3938-43b2-a944-6476f3a8827c">
                     <span class="music-track-number" aria-hidden="true">16</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Overchrome</strong><small translate="no">hardtek, hardcore techno, industrial rave, neurobass</small></span>
                     <span class="music-track-duration" translate="no">5:50</span>
                   </a>
                 </li>
                 <li>
-                  <a class="music-track" href="https://suno.com/song/401df4b0-3691-4d8d-9df9-3488d420714e" target="_blank" rel="noopener noreferrer" data-music-track="401df4b0-3691-4d8d-9df9-3488d420714e">
+                  <a class="music-track" href="assets/music/audio/401df4b0-3691-4d8d-9df9-3488d420714e.mp3" data-music-track="401df4b0-3691-4d8d-9df9-3488d420714e">
                     <span class="music-track-number" aria-hidden="true">17</span>
                     <span class="music-track-copy"><strong data-music-title translate="no">Case Goes Live</strong><small translate="no">cyberpunk electro-pop, industrial club, dark pop</small></span>
                     <span class="music-track-duration" translate="no">4:16</span>
                   </a>
                 </li>
-                </ol>
-              </div>
+              </ol>
             </div>
           </section>
           <!-- MUSIC:END -->
@@ -6305,6 +6298,8 @@ Utilise Ruee d'acier pour coller une ligne, contourner un angle ou sortir d'un p
           </section>
         </main>
       </div>    </div>
+
+    <iframe class="music-frame" data-music-frame data-mode="collapsed" title="Lecteur de musique" allow="autoplay" hidden></iframe>
 
     <div class="protocol-modal" data-protocol-modal hidden>
       <div class="protocol-modal-backdrop" data-protocol-close></div>
