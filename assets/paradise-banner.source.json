@@ -1,0 +1,9 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "date": "2026-10-28",
+  "asset": "paradise-banner.webp",
+  "brief": "Bannière panoramique selon la première référence de l’auteur, avec Paradise en ville verticale étagée selon sa deuxième référence. L’enseigne existante est conservée séparément dans hub-sign.webp pour rester visible à toutes les résolutions.",
+  "generatedSource": "C:/Users/valentin/.codex/generated_images/01a18384-7a93-7661-b51e-fd24da31d941/exec-a406b41d-f495-44bb-b241-a506d1c28a80.png",
+  "finalPrompt": "Use case: precise-object-edit. This is a website banner BACKGROUND. Remove ONLY the entire THE HUB sign in the left quarter including all its lettering and sign frame. Fill that area naturally with the same dark industrial wall, cables and metal structure already behind the sign. Make this area dark and visually quiet so a separate foreground logo can be overlaid by website code. Keep all the rest of this image EXACTLY unchanged: same panoramic 3:1 canvas, same precise city position and skyline silhouette, same gold spire location, same sky, rail lines, lighting, purple billboards and tiny cars. No logos, no text, no new sign. Do not zoom, reframe, shift or enlarge the city.",
+  "optimization": "WebP quality 87; existing transparent logo resized to 900px and encoded as WebP quality 90, alpha quality 100. No source images overwritten."
+}

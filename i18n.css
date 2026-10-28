@@ -9,6 +9,7 @@
 .rb-app-header .rb-header-end { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: .4rem .8rem; grid-column: -2 / -1; grid-row: 1; min-width: 0; }
 .rb-app-header .rb-header-end .rb-account-tools { grid-column: auto; grid-row: auto; }
 .rb-app-header:has(.rb-account-tools:not([hidden])) .rb-header-end .rb-hub-link { display: none; }
-@media (max-width: 960px) { .site-header .language-switch { margin-right: .65rem; } }
+@media (max-width: 960px) { .site-header .language-switch { margin-right: 0; } }
 @media (max-width: 400px) { .language-switch { gap: 0; } .language-switch button { min-width: 2.75rem; padding: .35rem .4rem; gap: .3rem; } .site-header .brand-hero { width: 5.25rem; min-width: 0; } }
+@media (max-width: 400px) { .site-header .language-switch button { padding-inline: .15rem; gap: .2rem; } }
 @media print { .language-switch { display: none; } }
