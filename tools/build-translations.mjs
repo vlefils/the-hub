@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve, relative } from 'node:path';
 import { factions, people } from '../data/lore.mjs';
 import { loreEnglish } from '../data/lore.en.mjs';
+import { musicEnglish } from '../data/music.mjs';
 import { factionNamesEnglish, translateFactionNames } from '../data/lore-english-names.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const publishedOnly = process.argv.includes('--published-only');
@@ -121,6 +122,7 @@ const overrides = {
 };
 for (const term of terms) overrides[term] = glossary[term];
 Object.assign(overrides, loreEnglish);
+Object.assign(overrides, musicEnglish);
 const pending = all.filter(s => cache[s] == null && overrides[s] == null);
 const batches = []; let batch = [], length = 0;
 for (const text of pending) { if (length + text.length > 3200 && batch.length) { batches.push(batch); batch = []; length = 0; } batch.push(text); length += text.length + 30; } if (batch.length) batches.push(batch);

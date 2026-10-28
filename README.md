@@ -37,5 +37,7 @@ Site statique responsive bilingue français / anglais pour publier les règles e
 
 - **Outils → Rumbleball** présente le jeu et ouvre sa [page dédiée](rumbleball/index.html), avec gestion du club et matchs à cinq contre cinq. Lancer `node tools/serve.mjs` pour l’essayer en local ; voir [sa documentation](rumbleball/README.md) pour les règles et les tests.
 
+- **Outils → Musique** (`#outils-musique`) présente la [playlist The Hub sur Suno](https://suno.com/s/ca20A9dNAYhk9xzp), avec sa pochette, les titres, les styles et les durées. Le catalogue public du 28 octobre 2026 et les textes anglais sont dans `data/music.mjs`. Après une mise à jour, lancer `node tools/build-music.mjs`, puis `node tools/build-translations.mjs`. La zone `MUSIC:START` / `MUSIC:END` est générée. Le lecteur officiel `https://suno.com/embed/<song-id>` se charge uniquement sur la page active ; changer de titre ou quitter la page détruit le précédent lecteur. Sans JavaScript, les titres ouvrent Suno. Le catalogue est un instantané à maintenir dans le fichier source : aucun appel à une API privée, aucune synchronisation automatique, aucun fichier audio hébergé. La playlist complète bloque l’intégration en iframe ; la lecture continue passe donc par le lien Suno.
+
 - Les chemins sont relatifs, donc le site fonctionne directement sur GitHub Pages.
 - Sans JavaScript, tout reste charge dans la page mais la navigation par section visible ne sera pas active.
