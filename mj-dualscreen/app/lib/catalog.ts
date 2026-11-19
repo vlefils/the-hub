@@ -5,11 +5,11 @@ import { parseBackupManifest, prepareScenarioImport, saveScenarioBundle } from "
 export const hubScenarios = [
   { id: "la-troisieme-mi-temps", name: "La Troisième Mi-Temps" },
   { id: "sortie-de-service", name: "Sortie de service" },
-  { id: "tout-le-monde-monte", name: "Tout le monde monte" },
+  { id: "tout-le-monde-monte-voss", name: "Tout le monde monte — Voss à la rampe", file: "tout-le-monde-monte.mjscreen?edition=voss" },
 ];
 
 export async function openHubScenario(entry: typeof hubScenarios[number], existingScenarios: Scenario[]) {
-  const response = await fetch(`./scenarios/${entry.id}.mjscreen`);
+  const response = await fetch(`./scenarios/${entry.file ?? entry.id + ".mjscreen"}`);
   if (!response.ok) throw new Error(`Impossible de charger « ${entry.name} ». Sélectionnez-le de nouveau pour réessayer.`);
   const manifest = parseBackupManifest(await response.text());
   const bundle = prepareScenarioImport(manifest, entry.name, existingScenarios, entry.id);
