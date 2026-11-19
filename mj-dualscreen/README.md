@@ -10,4 +10,4 @@ Les sources de la console, adaptées du projet Écran du MJ sous licence MIT, so
 
 Le catalogue est défini dans `app/lib/catalog.ts`. Les fichiers de `scenarios/` sont des sauvegardes autonomes au format v1 du lecteur. Pour préparer une édition web, exécuter `python pack_scenario.py original.mjscreen scenarios/identifiant.mjscreen` avec Pillow. Le script conserve les chapitres et les plans et compresse les illustrations à leurs dimensions d’origine.
 
-L’édition **Tout le monde monte — Voss à la rampe** possède son propre identifiant de bibliothèque. Les tables qui avaient déjà ouvert l’ancienne édition retrouvent leur copie dans **Mes scénarios**. Les [fiches MJ imprimables](scenarios/tout-le-monde-monte-fiches.pdf) accompagnent les quatre rencontres.
+L’édition **Tout le monde monte — Le siège de Méridien** possède son propre identifiant de bibliothèque. Les tables qui avaient déjà ouvert une édition précédente retrouvent leur copie dans **Mes scénarios**. Les [fiches MJ imprimables](scenarios/tout-le-monde-monte-fiches.pdf) accompagnent les quatre rencontres.

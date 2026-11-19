@@ -5,7 +5,7 @@ import { parseBackupManifest, prepareScenarioImport, saveScenarioBundle } from "
 export const hubScenarios = [
   { id: "la-troisieme-mi-temps", name: "La Troisième Mi-Temps" },
   { id: "sortie-de-service", name: "Sortie de service" },
-  { id: "tout-le-monde-monte-voss", name: "Tout le monde monte — Voss à la rampe", file: "tout-le-monde-monte.mjscreen?edition=voss" },
+  { id: "tout-le-monde-monte-meridien", name: "Tout le monde monte — Le siège de Méridien", file: "tout-le-monde-monte.mjscreen?edition=meridien" },
 ];
 
 export async function openHubScenario(entry: typeof hubScenarios[number], existingScenarios: Scenario[]) {
