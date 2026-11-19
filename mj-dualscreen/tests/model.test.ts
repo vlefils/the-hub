@@ -1,0 +1,364 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  DEFAULT_PANEL_WIDTH,
+  DEFAULT_SCENARIO_THEME,
+  clampPanelWidth,
+  collectAssetIds,
+  createScene,
+  findZoneAtPoint,
+  getImageViewport,
+  isPointInZone,
+  isScenarioTheme,
+  isUsableRect,
+  mergePolygonBoundaries,
+  mergePolygonDraftBoundaries,
+  movePolygonVertex,
+  normalizeSceneMaps,
+  selectSceneMap,
+  syncActiveMap,
+  snapPointToZoneBoundaries,
+  snapshotFog,
+} from "../app/lib/model.ts";
+
+test("une scène démarre avec un brouillard intact et un panneau à 25 %", () => {
+  const scene = createScene();
+  assert.equal(scene.panelWidth, DEFAULT_PANEL_WIDTH);
+  assert.deepEqual(scene.zones, []);
+  assert.deepEqual(scene.strokes, []);
+  assert.equal(scene.outsideRevealed, false);
+  assert.equal(scene.scenarioMarkdown, "");
+  assert.equal(scene.scenarioTheme, DEFAULT_SCENARIO_THEME);
+  assert.deepEqual(scene.viewport, { zoom: 1, x: 0, y: 0 });
+  assert.deepEqual(scene.imageViewports, {});
+});
+
+test("seules les palettes de scénario prises en charge sont acceptées", () => {
+  assert.equal(isScenarioTheme("cyberpunk"), true);
+  assert.equal(isScenarioTheme("occult"), true);
+  assert.equal(isScenarioTheme("fluo-inconnu"), false);
+});
+
+test("chaque illustration conserve un cadrage indépendant et borné", () => {
+  const scene = createScene();
+  scene.imageViewports = {
+    portrait: { zoom: 2.25, x: 0.3, y: -0.2 },
+    extreme: { zoom: 8, x: -4, y: 3 },
+  };
+
+  assert.deepEqual(getImageViewport(scene, "portrait"), {
+    zoom: 2.25,
+    x: 0.3,
+    y: -0.2,
+  });
+  assert.deepEqual(getImageViewport(scene, "extreme"), {
+    zoom: 4,
+    x: -1,
+    y: 1,
+  });
+  assert.deepEqual(getImageViewport(scene, "nouvelle-image"), {
+    zoom: 1,
+    x: 0,
+    y: 0,
+  });
+});
+
+test("l’état hors zones est inclus dans l’historique du brouillard", () => {
+  const scene = createScene();
+  scene.outsideRevealed = true;
+  assert.deepEqual(snapshotFog(scene), {
+    outsideRevealed: true,
+    zones: [],
+    strokes: [],
+  });
+});
+
+test("la largeur du panneau reste dans ses limites", () => {
+  assert.equal(clampPanelWidth(-8), 0);
+  assert.equal(clampPanelWidth(8), 8);
+  assert.equal(clampPanelWidth(34.6), 35);
+  assert.equal(clampPanelWidth(90), 90);
+  assert.equal(clampPanelWidth(108), 100);
+});
+
+test("les rectangles trop petits sont ignorés", () => {
+  assert.equal(
+    isUsableRect([
+      { x: 0.2, y: 0.2 },
+      { x: 0.205, y: 0.8 },
+    ]),
+    false,
+  );
+  assert.equal(
+    isUsableRect([
+      { x: 0.2, y: 0.2 },
+      { x: 0.8, y: 0.8 },
+    ]),
+    true,
+  );
+});
+
+test("le ciblage reconnaît l’intérieur et la frontière des zones", () => {
+  const polygon = {
+    id: "zone-1",
+    name: "Salle",
+    kind: "polygon" as const,
+    revealed: false,
+    points: [
+      { x: 0.1, y: 0.1 },
+      { x: 0.8, y: 0.1 },
+      { x: 0.5, y: 0.8 },
+    ],
+  };
+  const rectangle = {
+    id: "zone-2",
+    name: "Couloir",
+    kind: "rect" as const,
+    revealed: false,
+    points: [
+      { x: 0.2, y: 0.2 },
+      { x: 0.4, y: 0.4 },
+    ],
+  };
+
+  assert.equal(isPointInZone({ x: 0.5, y: 0.3 }, polygon), true);
+  assert.equal(isPointInZone({ x: 0.45, y: 0.1 }, polygon), true);
+  assert.equal(isPointInZone({ x: 0.95, y: 0.95 }, polygon), false);
+  assert.equal(isPointInZone({ x: 0.3, y: 0.3 }, rectangle), true);
+});
+
+test("la plus petite zone est ciblée lorsque des zones se chevauchent", () => {
+  const large = {
+    id: "large",
+    name: "Grande salle",
+    kind: "rect" as const,
+    revealed: false,
+    points: [
+      { x: 0.1, y: 0.1 },
+      { x: 0.9, y: 0.9 },
+    ],
+  };
+  const small = {
+    id: "small",
+    name: "Alcôve",
+    kind: "polygon" as const,
+    revealed: false,
+    points: [
+      { x: 0.4, y: 0.4 },
+      { x: 0.6, y: 0.4 },
+      { x: 0.5, y: 0.6 },
+    ],
+  };
+
+  assert.equal(
+    findZoneAtPoint({ x: 0.5, y: 0.5 }, [large, small])?.id,
+    "small",
+  );
+  assert.equal(findZoneAtPoint({ x: 0.95, y: 0.95 }, [large, small]), null);
+});
+
+test("un sommet de polygone peut être déplacé sans modifier les autres", () => {
+  const zone = {
+    id: "zone-1",
+    name: "Salle",
+    kind: "polygon" as const,
+    revealed: false,
+    points: [
+      { x: 0.1, y: 0.1 },
+      { x: 0.8, y: 0.1 },
+      { x: 0.5, y: 0.8 },
+    ],
+  };
+  const moved = movePolygonVertex(zone, 1, { x: 0.92, y: -0.2 });
+  assert.deepEqual(moved.points, [
+    { x: 0.1, y: 0.1 },
+    { x: 0.92, y: 0 },
+    { x: 0.5, y: 0.8 },
+  ]);
+  assert.notEqual(moved, zone);
+});
+
+test("un nouveau point s’accroche à l’arête d’une zone voisine", () => {
+  const zone = {
+    id: "zone-1",
+    name: "Salle",
+    kind: "polygon" as const,
+    revealed: false,
+    points: [
+      { x: 0.1, y: 0.1 },
+      { x: 0.5, y: 0.1 },
+      { x: 0.5, y: 0.8 },
+      { x: 0.1, y: 0.8 },
+    ],
+  };
+  const snapped = snapPointToZoneBoundaries(
+    { x: 0.51, y: 0.4 },
+    [zone],
+    2,
+    100,
+    100,
+  );
+  assert.equal(snapped.snapped, true);
+  assert.ok(Math.abs(snapped.point.x - 0.5) < 1e-9);
+  assert.ok(Math.abs(snapped.point.y - 0.4) < 1e-9);
+
+  const distant = snapPointToZoneBoundaries(
+    { x: 0.56, y: 0.4 },
+    [zone],
+    2,
+    100,
+    100,
+  );
+  assert.equal(distant.snapped, false);
+  assert.deepEqual(distant.point, { x: 0.56, y: 0.4 });
+});
+
+test("un nouveau polygone reprend les angles d’une frontière adjacente", () => {
+  const existing = {
+    id: "zone-1",
+    name: "Couloir",
+    kind: "polygon" as const,
+    revealed: false,
+    points: [
+      { x: 0.2, y: 0.2 },
+      { x: 0.5, y: 0.2 },
+      { x: 0.5, y: 0.5 },
+      { x: 0.8, y: 0.5 },
+      { x: 0.8, y: 0.8 },
+      { x: 0.2, y: 0.8 },
+    ],
+  };
+
+  const merged = mergePolygonBoundaries(
+    [
+      { x: 0.5, y: 0.2 },
+      { x: 0.8, y: 0.5 },
+      { x: 0.9, y: 0.2 },
+    ],
+    [existing],
+  );
+
+  assert.deepEqual(merged.points, [
+    { x: 0.5, y: 0.2 },
+    { x: 0.5, y: 0.5 },
+    { x: 0.8, y: 0.5 },
+    { x: 0.9, y: 0.2 },
+  ]);
+  assert.deepEqual(merged.mergedZoneIds, ["zone-1"]);
+});
+
+test("la fusion d’une frontière est visible pendant le tracé", () => {
+  const existing = {
+    id: "zone-1",
+    name: "Couloir",
+    kind: "polygon" as const,
+    revealed: false,
+    points: [
+      { x: 0.2, y: 0.2 },
+      { x: 0.5, y: 0.2 },
+      { x: 0.5, y: 0.5 },
+      { x: 0.8, y: 0.5 },
+      { x: 0.8, y: 0.8 },
+      { x: 0.2, y: 0.8 },
+    ],
+  };
+
+  const preview = mergePolygonDraftBoundaries(
+    [
+      { x: 0.5, y: 0.2 },
+      { x: 0.8, y: 0.5 },
+      { x: 0.9, y: 0.2 },
+    ],
+    [existing],
+  );
+
+  assert.deepEqual(preview, [
+    { x: 0.5, y: 0.2 },
+    { x: 0.5, y: 0.5 },
+    { x: 0.8, y: 0.5 },
+    { x: 0.9, y: 0.2 },
+  ]);
+});
+
+test("les points de jonction sont insérés dans les deux polygones", () => {
+  const existing = {
+    id: "zone-1",
+    name: "Salle",
+    kind: "polygon" as const,
+    revealed: false,
+    points: [
+      { x: 0.1, y: 0.1 },
+      { x: 0.5, y: 0.1 },
+      { x: 0.5, y: 0.9 },
+      { x: 0.1, y: 0.9 },
+    ],
+  };
+
+  const merged = mergePolygonBoundaries(
+    [
+      { x: 0.5, y: 0.3 },
+      { x: 0.5, y: 0.7 },
+      { x: 0.9, y: 0.7 },
+      { x: 0.9, y: 0.3 },
+    ],
+    [existing],
+  );
+
+  assert.deepEqual(merged.points, [
+    { x: 0.5, y: 0.3 },
+    { x: 0.5, y: 0.7 },
+    { x: 0.9, y: 0.7 },
+    { x: 0.9, y: 0.3 },
+  ]);
+  assert.deepEqual(merged.zones[0].points, [
+    { x: 0.1, y: 0.1 },
+    { x: 0.5, y: 0.1 },
+    { x: 0.5, y: 0.3 },
+    { x: 0.5, y: 0.7 },
+    { x: 0.5, y: 0.9 },
+    { x: 0.1, y: 0.9 },
+  ]);
+});
+
+test("les identifiants d’images exportés sont uniques", () => {
+  const first = createScene();
+  first.mapAssetId = "map-1";
+  first.galleryAssetIds = ["image-1", "image-1"];
+  const second = createScene();
+  second.mapAssetId = "map-1";
+  second.galleryAssetIds = ["image-2"];
+  assert.deepEqual(
+    collectAssetIds([first, second]).sort(),
+    ["image-1", "image-2", "map-1"],
+  );
+});
+
+test("une ancienne scène garde sa carte et son brouillard dans le nouveau modèle", () => {
+  const legacy = createScene();
+  legacy.mapAssetId = "ancienne-carte";
+  legacy.outsideRevealed = true;
+  const migrated = normalizeSceneMaps(legacy);
+  assert.equal(migrated.maps.length, 1);
+  assert.equal(migrated.maps[0].assetId, "ancienne-carte");
+  assert.equal(migrated.maps[0].outsideRevealed, true);
+  assert.ok(migrated.galleryAssetIds.includes("ancienne-carte"));
+});
+
+test("chaque carte retrouve ses zones et son cadrage après un changement", () => {
+  const scene = createScene();
+  scene.maps = [
+    { id: "a", name: "A", assetId: "image-a", outsideRevealed: false, zones: [], strokes: [], viewport: { zoom: 1, x: 0, y: 0 } },
+    { id: "b", name: "B", assetId: "image-b", outsideRevealed: true, zones: [], strokes: [], viewport: { zoom: 2, x: 0.2, y: 0 } },
+  ];
+  scene.activeMapId = "a";
+  scene.mapAssetId = "image-a";
+  scene.viewport = { zoom: 1.5, x: 0.1, y: 0 };
+  scene.zones = [{ id: "zone-a", name: "Entrée", kind: "rect", points: [{ x: 0, y: 0 }, { x: 0.5, y: 0.5 }], revealed: true }];
+  const second = selectSceneMap(scene, "b");
+  assert.equal(second.mapAssetId, "image-b");
+  assert.equal(second.outsideRevealed, true);
+  const first = selectSceneMap(syncActiveMap(second), "a");
+  assert.equal(first.zones[0].id, "zone-a");
+  assert.deepEqual(first.viewport, { zoom: 1.5, x: 0.1, y: 0 });
+  assert.deepEqual(collectAssetIds([first]).sort(), ["image-a", "image-b"]);
+});

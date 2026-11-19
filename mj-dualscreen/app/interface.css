@@ -1,0 +1,322 @@
+/* Interface Le carnet : tokens clair/sombre et composition du poste MJ. */
+.mj-interface {
+  --background: #191c1d;
+  --panel: #222627;
+  --panel-raised: #303537;
+  --panel-soft: #272b2c;
+  --line: #414746;
+  --line-soft: #303635;
+  --text: #eeeee8;
+  --muted: #a5afad;
+  --muted-strong: #ccd1cc;
+  --accent: #d6b483;
+  --accent-bright: #eaca9c;
+  --accent-soft: #3a342a;
+  --accent-ink: #211f1a;
+  --success: #a0c9ab;
+  --danger: #efaaa0;
+  --focus: #eaca9c;
+  --font-interface: "Aptos", "Trebuchet MS", sans-serif;
+  --font-editorial: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --radius-control: 5px;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-width: 0;
+  color: var(--text);
+  background: var(--background);
+  font-family: var(--font-interface);
+  color-scheme: dark;
+}
+
+.mj-interface[data-theme="light"] {
+  --background: #ded5c3;
+  --panel: #ece3d2;
+  --panel-raised: #ded1ba;
+  --panel-soft: #e5dbc7;
+  --line: #c3b498;
+  --line-soft: #d5c8af;
+  --text: #393126;
+  --muted: #6d604e;
+  --muted-strong: #554838;
+  --accent: #805a30;
+  --accent-bright: #65441f;
+  --accent-soft: #dfceb0;
+  --accent-ink: #fffaf2;
+  --success: #356c48;
+  --danger: #a03f35;
+  --focus: #805a30;
+  color-scheme: light;
+}
+
+/* Warm reading paper follows the light interface without replacing document styles. */
+.mj-interface[data-theme="light"] .scenario-workspace[data-scenario-theme="light"] {
+  --scenario-paper: #f2e8d5;
+  --scenario-border: #c3b498;
+  --scenario-text: #43392d;
+  --scenario-heading: #332a20;
+  --scenario-accent: #846b46;
+  --scenario-secondary: #785735;
+  --scenario-secondary-deep: #5d4228;
+  --scenario-muted: #6d5c47;
+  --scenario-surface: #e8dcc4;
+  --scenario-surface-strong: #dfceb0;
+  --scenario-rule: #cbbb9e;
+  --scenario-code-bg: #332e26;
+  --scenario-code-text: #f2e8d5;
+  --scenario-encounter-header: #6a5034;
+  --scenario-header-text: #faf0de;
+  --scenario-header-muted: #e9d8bc;
+  --scenario-header-kicker: #e9d8bc;
+  --scenario-rating-bg: rgb(40 29 16 / 22%);
+  --scenario-rating-border: #cbbb9e;
+}
+
+.controller-shell[data-interface="carnet"] {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 0;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.controller-shell[data-interface="carnet"] .app-header {
+  --text: inherit;
+  --muted: inherit;
+  --panel: inherit;
+  --panel-raised: inherit;
+  --line: inherit;
+  --accent: inherit;
+  --accent-bright: inherit;
+  --accent-ink: inherit;
+  --success: inherit;
+  --focus: inherit;
+  min-height: 70px;
+  padding: 12px 28px;
+  gap: 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line-soft);
+  grid-template-columns: minmax(160px, 1fr) auto minmax(220px, 1fr);
+}
+.controller-shell[data-interface="carnet"] .brand-name { font-family: var(--font-editorial); font-weight: 400; font-size: 25px; letter-spacing: -0.035em; }
+.hub-return { color: var(--muted-strong); font-size: 1rem; text-decoration: underline; text-underline-offset: 0.18em; }
+.hub-return:hover { color: var(--accent); }
+.controller-shell[data-interface="carnet"] .brand-kicker { display: none; }
+.controller-shell[data-interface="carnet"] .brand-symbol { color: var(--accent); }
+.controller-shell[data-interface="carnet"] .mode-switch button { min-width: auto; min-height: 42px; padding: 9px 20px; font-size: 14px; font-weight: 600; color: var(--muted); border-radius: 0; }
+.controller-shell[data-interface="carnet"] .mode-switch button:hover { background: var(--panel-raised); color: var(--text); }
+.controller-shell[data-interface="carnet"] .mode-switch button.is-active { background: transparent; color: var(--text); border-color: transparent; border-bottom: 2px solid var(--accent); }
+.controller-shell[data-interface="carnet"] .header-actions { gap: 10px; }
+.controller-shell[data-interface="carnet"] .connection-status { display: none; }
+.controller-shell[data-interface="carnet"] .primary-button { font-size: 14px; min-height: 40px; padding: 9px 14px; border-radius: var(--radius-control); }
+.controller-shell[data-interface="carnet"] .theme-switch { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-color: transparent; background: transparent; color: var(--muted-strong); }
+.controller-shell[data-interface="carnet"] .theme-switch:hover { background: var(--panel-raised); }
+.controller-shell[data-interface="carnet"] .scenario-library { padding: 10px 28px; gap: 12px 28px; background: var(--panel); border-bottom-color: var(--line-soft); }
+.controller-shell[data-interface="carnet"] .scenario-library-picker, .controller-shell[data-interface="carnet"] .chapter-picker { gap: 10px; }
+.controller-shell[data-interface="carnet"] .scenario-library select { min-height: 38px; background: var(--panel-soft); border-color: transparent; padding: 7px 10px; font-weight: 600; }
+.controller-shell[data-interface="carnet"] .scenario-library select:hover { border-color: var(--line); }
+.controller-shell[data-interface="carnet"] .scenario-library-picker label, .controller-shell[data-interface="carnet"] .chapter-picker label { font-size: 12px; }
+.controller-shell[data-interface="carnet"] .scenario-library-actions { gap: 6px; }
+.controller-shell[data-interface="carnet"] .scenario-library-actions > button { background: transparent; }
+.controller-shell[data-interface="carnet"] .scenario-library-menu-content { background: var(--panel); }
+.controller-shell[data-interface="carnet"] .control-panel { border: 0; background: var(--panel); }
+.controller-shell[data-interface="carnet"] .control-panel[hidden] { display: none; }
+.controller-shell[data-interface="carnet"] .control-panel-heading { padding: 24px 24px 20px; }
+.controller-shell[data-interface="carnet"] .control-panel-heading .section-eyebrow, .controller-shell[data-interface="carnet"] .control-panel-heading p { display: none; }
+.controller-shell[data-interface="carnet"] .control-panel-heading h1 { margin: 0; font: 23px/1.3 var(--font-editorial); letter-spacing: -0.025em; }
+.controller-shell[data-interface="carnet"] .control-section { padding: 24px; }
+.controller-shell[data-interface="carnet"] .control-section:last-child { border-bottom: 0; }
+.controller-shell[data-interface="carnet"] .section-title-row { margin-bottom: 12px; }
+.controller-shell[data-interface="carnet"] .section-title-row h3 { font-size: 14px; font-weight: 650; }
+.controller-shell[data-interface="carnet"] .prepare-navigation { padding: 0 14px 14px; }
+.controller-shell[data-interface="carnet"] .prepare-navigation button { font-size: 13px; min-height: 36px; }
+.controller-shell[data-interface="carnet"] .preview-area { padding: 20px 24px 14px; }
+.controller-shell[data-interface="carnet"] .preview-heading { gap: 12px; margin-bottom: 16px; align-items: center; }
+.controller-shell[data-interface="carnet"] .preview-heading h2 { font-family: var(--font-editorial); font-size: 28px; font-weight: 400; letter-spacing: -0.025em; margin-top: 4px; }
+.controller-shell[data-interface="carnet"] .preview-heading .section-eyebrow { font-size: 10px; letter-spacing: 0.08em; font-weight: 400; }
+.controller-shell[data-interface="carnet"] .preview-hints { max-width: 31ch; font-size: 12px; }
+.controller-shell[data-interface="carnet"] .preview-hints .autosave-label { display: none; }
+.controller-shell[data-interface="carnet"] .preview-bezel { border: 1px solid var(--line-soft); border-radius: 4px; }
+.controller-shell[data-interface="carnet"] .preview-footer { margin-top: 10px; }
+.controller-shell[data-interface="carnet"] .gallery-grid { gap: 10px; }
+.controller-shell[data-interface="carnet"] .gallery-tile { border-color: var(--line-soft); background: var(--panel-soft); border-radius: var(--radius-control); }
+.controller-shell[data-interface="carnet"] .gallery-tile.is-active { border-color: var(--accent); box-shadow: none; }
+.controller-shell[data-interface="carnet"] .gallery-tile.is-active .gallery-caption { color: var(--accent-bright); font-weight: 600; }
+.controller-shell[data-interface="carnet"] .gallery-select { background: var(--background); }
+.controller-shell[data-interface="carnet"] .gallery-caption { font-size: 13px; }
+.controller-shell[data-interface="carnet"] .gallery-none { grid-column: 1 / -1; flex-direction: row; justify-content: flex-start; min-height: 36px; padding: 8px 10px; border-color: transparent; background: transparent; }
+.controller-shell[data-interface="carnet"] .gallery-none.is-active { color: var(--muted-strong); background: var(--panel-soft); }
+.controller-shell[data-interface="carnet"] .gallery-none .interface-icon { width: 16px; height: 16px; }
+.controller-shell[data-interface="carnet"] .scenario-toolbar { min-height: 52px; padding: 6px 20px; gap: 10px; border-color: var(--line-soft); }
+.controller-shell[data-interface="carnet"] .scenario-stats { display: none; }
+.controller-shell[data-interface="carnet"] .scenario-theme-swatches { display: none; }
+.controller-shell[data-interface="carnet"] .reading-media { border-bottom-color: var(--line-soft); }
+.controller-shell[data-interface="carnet"] .reading-media summary { min-height: 42px; padding-block: 10px; font-size: 13px; font-weight: 500; }
+.controller-shell[data-interface="carnet"] .scenario-preview-panel { background: var(--background); }
+.controller-shell[data-interface="carnet"] .scenario-page { box-shadow: 0 1px 3px rgb(0 0 0 / 4%); border-radius: 2px; }
+.controller-shell[data-interface="carnet"] .scenario-outline-panel { border-color: var(--line-soft); background: var(--panel); }
+.controller-shell[data-interface="carnet"] .scenario-outline-heading { min-height: 58px; }
+.controller-shell[data-interface="carnet"] .scenario-outline-heading .section-eyebrow { display: none; }
+.controller-shell[data-interface="carnet"] .scenario-outline-nav a { color: var(--muted-strong); }
+.controller-shell[data-interface="carnet"] .scenario-outline-nav a[aria-current="location"] { color: var(--accent-bright); background: var(--accent-soft); }
+.controller-shell[data-interface="carnet"] .scenario-editor { color: var(--text); background: var(--panel); }
+.controller-shell[data-interface="carnet"] .reading-view-controls button { min-height: 36px; padding: 7px 10px; font-size: 13px; }
+
+/* Le carnet: editorial rhythm and generous tools, with a contained reading width. */
+.controller-shell[data-interface="carnet"] .brand-symbol { display: none; }
+.controller-shell[data-interface="carnet"] .control-panel { border-right: 1px solid var(--line-soft); }
+.controller-shell[data-interface="carnet"] .scenario-preview-panel { padding-block: 32px; }
+.controller-shell[data-interface="carnet"] .scenario-page { padding: clamp(24px, 4vw, 60px); }
+.controller-shell[data-interface="carnet"] .scenario-markdown { font-size: 18px; line-height: 1.75; }
+.controller-shell[data-interface="carnet"] .scenario-markdown h1 { font-size: clamp(30px, 2.8vw, 40px); letter-spacing: -.025em; border-bottom-width: 1px; padding-bottom: 20px; }
+.controller-shell[data-interface="carnet"] .scenario-markdown h3 { font-size: 13px; letter-spacing: .055em; font-weight: 650; }
+
+/* Shared controls: consistent surfaces, focus, and action hierarchy. */
+.mj-interface button, .mj-interface select, .mj-interface input[type="text"] { border-radius: var(--radius-control); }
+.mj-interface button:hover:not(:disabled) { border-color: var(--line); }
+.controller-shell[data-interface="carnet"] .primary-button:hover:not(:disabled) { border-color: var(--accent-bright); }
+.controller-shell[data-interface="carnet"] .button-grid button,
+.controller-shell[data-interface="carnet"] .tool-row button { min-height: 38px; border-color: var(--line-soft); background: var(--panel-soft); font-weight: 500; }
+.controller-shell[data-interface="carnet"] .button-grid button:hover:not(:disabled),
+.controller-shell[data-interface="carnet"] .tool-row button:hover:not(:disabled) { background: var(--panel-raised); border-color: var(--line); }
+.controller-shell[data-interface="carnet"] .tool-row button.is-selected { color: var(--accent-bright); border-color: var(--accent); background: var(--accent-soft); }
+.controller-shell[data-interface="carnet"] .upload-button { border: 1px solid var(--line); background: var(--panel-soft); min-height: 40px; font-weight: 500; }
+.controller-shell[data-interface="carnet"] .upload-button:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+.controller-shell[data-interface="carnet"] .control-panel :is(input[type="text"], select) { min-height: 40px; font-size: 13px; border-color: var(--line); }
+.controller-shell[data-interface="carnet"] .field-label { font-size: 12px; color: var(--muted); }
+.controller-shell[data-interface="carnet"] .small-toggle { min-height: 30px; padding: 5px 8px; border-color: var(--line-soft); font-size: 12px; }
+.controller-shell[data-interface="carnet"] .zone-live-row { border-color: var(--line-soft); padding: 10px 12px; }
+.controller-shell[data-interface="carnet"] .scenario-outline-heading h2 { font-size: 14px; font-weight: 600; }
+.controller-shell[data-interface="carnet"] .scenario-outline-nav a { padding: 9px 10px; font-size: 13px; line-height: 1.55; }
+.controller-shell[data-interface="carnet"] .scenario-outline-nav a[aria-current="location"] { border-left-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 55%, transparent); }
+.controller-shell[data-interface="carnet"] .scenario-outline-level-1 a { font-weight: 600; }
+.controller-shell[data-interface="carnet"] .scenario-outline-level-3 { margin-left: 16px; }
+.controller-shell[data-interface="carnet"] .scenario-library-count { font-size: 12px; font-variant-numeric: tabular-nums; }
+.controller-shell[data-interface="carnet"] .scenario-library-actions > button,
+.controller-shell[data-interface="carnet"] .scenario-library-menu > summary { min-height: 36px; padding: 7px 12px; font-size: 13px; }
+.controller-shell[data-interface="carnet"] .scenario-library-menu > summary { border: 1px solid transparent; border-radius: var(--radius-control); color: var(--muted-strong); }
+.controller-shell[data-interface="carnet"] .scenario-library-menu > summary:hover { background: var(--panel-soft); }
+.controller-shell[data-interface="carnet"] .scenario-library-menu-content { gap: 3px; padding: 10px; border-color: var(--line-soft); box-shadow: 0 8px 28px rgb(0 0 0 / 12%); }
+.controller-shell[data-interface="carnet"] .scenario-library-menu-content p { font-size: 12px; padding: 8px 10px 12px; }
+.controller-shell[data-interface="carnet"] .scenario-library-menu-content button { border-color: transparent; padding: 9px 10px; }
+.controller-shell[data-interface="carnet"] .scenario-library-menu-content .danger-button { border-top-color: var(--line-soft); margin-top: 5px; border-radius: 0 0 var(--radius-control) var(--radius-control); }
+.controller-shell[data-interface="carnet"] :is(.panel-scroll, .scenario-preview-panel, .scenario-outline-nav, .scenario-editor-panel) { scrollbar-color: var(--line) transparent; }
+
+/* Shared adaptations: controls stay available; the page scrolls on small screens. */
+@media (max-width: 1200px) {
+  .controller-shell[data-interface="carnet"] .app-header { grid-template-columns: auto 1fr auto; gap: 14px; padding-inline: 16px; }
+  .controller-shell[data-interface="carnet"] .mode-switch { justify-content: center; }
+  .controller-shell[data-interface="carnet"] .theme-switch span { display: none; }
+  .controller-shell[data-interface="carnet"] .preview-hints { display: none; }
+}
+@media (min-width: 721px) and (max-width: 1050px) {
+  .controller-shell[data-interface="carnet"] .scenario-library { flex-wrap: nowrap; gap: 14px; padding-inline: 16px; }
+  .controller-shell[data-interface="carnet"] .scenario-library-picker, .controller-shell[data-interface="carnet"] .chapter-picker { display: block; flex-basis: 0; flex-grow: 1; }
+  .controller-shell[data-interface="carnet"] .scenario-library-picker label, .controller-shell[data-interface="carnet"] .chapter-picker label { display: block; }
+  .controller-shell[data-interface="carnet"] .scenario-library-count { display: none; }
+  .controller-shell[data-interface="carnet"] .scenario-library-actions { flex-wrap: nowrap; }
+  .controller-shell[data-interface="carnet"] .workspace:not(.scenario-mode) { grid-template-columns: 280px minmax(0, 1fr); }
+  .controller-shell[data-interface="carnet"] .preview-area { padding-inline: 16px; }
+  .controller-shell[data-interface="carnet"] .mode-switch button { gap: 6px; padding-inline: 10px; }
+}
+@media (max-width: 720px) {
+  .mj-interface { height: auto; min-height: 100dvh; }
+  .controller-shell[data-interface="carnet"] { display: flex; flex: 0 0 auto; flex-direction: column; min-height: 0; }
+  .controller-shell[data-interface="carnet"] > .app-header,
+  .controller-shell[data-interface="carnet"] > .scenario-library,
+  .controller-shell[data-interface="carnet"] > .workspace,
+  .controller-shell[data-interface="carnet"] .preview-area,
+  .controller-shell[data-interface="carnet"] .control-panel { flex-shrink: 0; }
+  .controller-shell[data-interface="carnet"] .app-header { grid-template-columns: minmax(0, 1fr) auto; padding: 12px 16px 0; gap: 12px; }
+  .controller-shell[data-interface="carnet"] .brand-name { font-size: 18px; }
+  .controller-shell[data-interface="carnet"] .brand-symbol { display: none; }
+  .controller-shell[data-interface="carnet"] .header-actions { gap: 4px; }
+  .controller-shell[data-interface="carnet"] .header-actions .primary-button { padding: 8px; min-height: 40px; }
+  .controller-shell[data-interface="carnet"] .header-actions .primary-button svg { display: none; }
+  .controller-shell[data-interface="carnet"] .mode-switch { margin: 0; justify-content: stretch; gap: 4px; }
+  .controller-shell[data-interface="carnet"] .mode-switch button { min-height: 48px; padding: 9px 8px; font-size: 14px; border-radius: 3px 3px 0 0; }
+  .controller-shell[data-interface="carnet"] .scenario-library { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 12px 16px; }
+  .controller-shell[data-interface="carnet"] .scenario-library-picker, .controller-shell[data-interface="carnet"] .chapter-picker { grid-column: 1; flex-basis: auto; }
+  .controller-shell[data-interface="carnet"] .scenario-library-picker label, .controller-shell[data-interface="carnet"] .chapter-picker label { min-width: 60px; }
+  .controller-shell[data-interface="carnet"] .scenario-library-actions { grid-column: 1; justify-self: end; margin-top: 4px; }
+  .controller-shell[data-interface="carnet"] .preview-area { padding: 16px; }
+  .controller-shell[data-interface="carnet"] .preview-heading { gap: 10px; }
+  .controller-shell[data-interface="carnet"] .preview-heading h2 { font-size: 22px; }
+  .controller-shell[data-interface="carnet"] .preview-bezel { height: clamp(210px, 56vw, 400px); }
+  .controller-shell[data-interface="carnet"] .preview-footer { display: none; }
+  .controller-shell[data-interface="carnet"] .control-panel { border: 0; }
+  .controller-shell[data-interface="carnet"] .control-panel-heading { padding-top: 20px; }
+  .controller-shell[data-interface="carnet"] .control-section { padding: 20px; }
+  .controller-shell[data-interface="carnet"] .scenario-toolbar { padding-inline: 12px; }
+  .controller-shell[data-interface="carnet"] .scenario-theme-picker > span { display: none; }
+  .controller-shell[data-interface="carnet"] .scenario-preview-panel { padding: 12px; }
+  .controller-shell[data-interface="carnet"] .scenario-page { padding: 24px 20px; }
+  .controller-shell[data-interface="carnet"] .scenario-markdown { font-size: 17px; }
+  .controller-shell[data-interface="carnet"] .reading-view-controls button { padding-inline: 6px; font-size: 13px; }
+}
+@media print {
+  .mj-interface { display: block; height: auto; }
+  .controller-shell[data-interface="carnet"] { display: block; }
+}
+
+/* A compact corner preview leaves the whole workspace available. */
+.controller-shell[data-interface="carnet"] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+.controller-shell[data-interface="carnet"] > .app-header,
+.controller-shell[data-interface="carnet"] > .scenario-library { grid-column: 1 / -1; }
+.controller-shell[data-interface="carnet"] > .workspace { grid-column: 1; grid-row: 3; container: workspace / inline-size; }
+.controller-shell[data-interface="carnet"] .workspace:not(.scenario-mode) { grid-template-columns: minmax(280px, 320px) minmax(0, 1fr); }
+.controller-shell[data-interface="carnet"] .preview-area { padding: 24px; }
+.controller-shell[data-interface="carnet"] .preview-hints { display: none; }
+.controller-shell[data-interface="carnet"] .scenario-split:not(.has-editor).has-outline { grid-template-columns: minmax(0, 1fr) 224px; }
+.player-monitor {
+  position: fixed;
+  right: 20px;
+  bottom: 16px;
+  z-index: 20;
+  width: min(200px, calc(100vw - 32px));
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  box-shadow: 0 3px 16px rgb(0 0 0 / 18%);
+}
+.player-monitor-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 5px 5px 8px; }
+.player-monitor-heading strong { font-size: 12px; font-weight: 600; }
+.monitor-connection { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; }
+.monitor-connection.is-online { color: var(--success); }
+.monitor-connection .live-dot { width: 5px; height: 5px; box-shadow: none; }
+.monitor-thumbnail { position: relative; }
+.monitor-enlarge { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: flex-end; width: 100%; height: 100%; min-height: 0; border: 0; background: transparent; padding: 5px; }
+.monitor-enlarge svg { box-sizing: content-box; padding: 4px; color: #f1f3ef; background: rgb(10 13 15 / 80%); border-radius: 3px; }
+.monitor-enlarge:hover:not(:disabled) { background: rgb(255 255 255 / 6%); }
+.monitor-enlarge:focus-visible { outline-offset: -2px; }
+.controller-shell[data-interface="carnet"] .scenario-outline-nav { padding-bottom: 180px; }
+.player-mirror { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 3px; background: #07090b; }
+.player-mirror-surface { position: absolute; top: 50%; left: 50%; transform-origin: center; pointer-events: none; }
+.monitor-details { display: flex; justify-content: space-between; align-items: center; gap: 24px; min-width: 0; }
+.monitor-details > div { min-width: 0; }
+.monitor-caption { margin: 0 0 12px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.monitor-media { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 0; }
+.monitor-media > div { min-width: 0; }
+.monitor-media dt { margin-bottom: 5px; color: var(--muted); font-size: 12px; }
+.monitor-media dd { margin: 0; color: var(--text); font-size: 14px; overflow-wrap: anywhere; }
+.monitor-hide { display: flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-size: 13px; }
+.player-monitor-dialog { width: min(1200px, calc(100vw - 80px)); height: min(850px, calc(100dvh - 80px)); max-width: none; max-height: none; margin: auto; padding: 24px; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.player-monitor-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 20px; }
+.player-monitor-dialog::backdrop { background: rgb(5 8 10 / 75%); }
+.player-monitor-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.player-monitor-dialog h2 { margin: 0; font-size: 22px; }
+.player-monitor-dialog button { padding: 8px 14px; }
+.player-monitor-dialog .player-mirror { height: 100%; aspect-ratio: auto; }
+@container workspace (max-width: 1100px) {
+  .controller-shell[data-interface="carnet"] .scenario-split.has-editor.has-outline { grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .controller-shell[data-interface="carnet"] .scenario-split.has-editor.has-outline .scenario-outline-panel { grid-column: 1 / -1; grid-row: 2; max-height: 150px; border-top: 1px solid var(--line-soft); }
+  .controller-shell[data-interface="carnet"] .scenario-preview-panel { padding: 20px; }
+  .controller-shell[data-interface="carnet"] .scenario-page { padding: 30px; }
+}
+@media print {
+  .player-monitor { display: none; }
+}

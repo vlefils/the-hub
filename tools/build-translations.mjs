@@ -110,6 +110,8 @@ const protect = s => {
   return { text, restore: value => value.replace(/ZXQ\s*(\d+)\s*QXZ/gi, (_, id) => saved[+id] ?? '').replace(/\{\{\s*(\d+)\s*\}\}/g, '{{$1}}') };
 };
 const overrides = {
+  'MJ Dualscreen': 'MJ Dualscreen',
+  'Ouvrir un scénario de The Hub et montrer ses cartes et illustrations sur l’écran des joueurs.': 'Choose a scenario from The Hub and show maps and illustrations on the players’ screen.',
   'Règles': 'Rules', 'Regles': 'Rules', 'Personnage': 'Character', 'Outils': 'Tools', 'PNJ': 'NPCs', 'MJ': 'GM', 'PJ': 'PC',
   'PV': 'HP', 'CA': 'AC', 'DD': 'DC', 'Dextérité': 'Dexterity', 'Dexterite': 'Dexterity', 'Vigueur': 'Vigor', 'Sang-froid': 'Composure',
   'Fiche PJ': 'Character sheet', 'Force': 'Strength', 'Esprit': 'Mind', 'Aller à…': 'Jump to…', 'Bientôt': 'Coming soon', 'Bientot': 'Coming soon',
