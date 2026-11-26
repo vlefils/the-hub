@@ -2,7 +2,7 @@
 
 Depuis **Outils → MJ Dualscreen**, le MJ peut lire un chapitre, préparer ses plans et ouvrir la fenêtre **Écran joueurs** sur un second écran. Les deux fenêtres utilisent le même navigateur.
 
-Le menu **Scénario** contient **La Troisième Mi-Temps**, **Sortie de service** et **Tout le monde monte**. Sur une table neuve, la console ouvre La Troisième Mi-Temps. Chaque aventure se charge depuis le site à sa première ouverture. Les textes, images, modifications, brouillard et dernier chapitre restent ensuite dans IndexedDB sur cet appareil. Supprimer une copie locale permet de rouvrir l’original depuis le menu. **Importer** et **Gérer → Exporter ce scénario** permettent de transférer une partie entre navigateurs.
+Le menu **Scénario** contient **La Troisième Mi-Temps**, **Sortie de service**, **Tout le monde monte** et **Avant vingt-deux heures**. Sur une table neuve, la console ouvre La Troisième Mi-Temps. Chaque aventure se charge depuis le site à sa première ouverture. Les textes, images, modifications, brouillard et dernier chapitre restent ensuite dans IndexedDB sur cet appareil. Supprimer une copie locale permet de rouvrir l’original depuis le menu. **Importer** et **Gérer → Exporter ce scénario** permettent de transférer une partie entre navigateurs.
 
 ## Développement
 
