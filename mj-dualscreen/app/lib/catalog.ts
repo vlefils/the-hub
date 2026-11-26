@@ -6,7 +6,7 @@ export const hubScenarios = [
   { id: "la-troisieme-mi-temps", name: "La Troisième Mi-Temps" },
   { id: "sortie-de-service", name: "Sortie de service" },
   { id: "tout-le-monde-monte-meridien-3", name: "Tout le monde monte — Le siège de Méridien", file: "tout-le-monde-monte.mjscreen?edition=meridien-3" },
-  { id: "avant-vingt-deux-heures-hotel-v2", name: "Avant vingt-deux heures — L’hôtel Velvet (illustrations révisées)", file: "avant-vingt-deux-heures.mjscreen?edition=hotel-velvet-v2" },
+  { id: "avant-vingt-deux-heures-sous-couverture", name: "Avant vingt-deux heures — Sous couverture", file: "avant-vingt-deux-heures.mjscreen?edition=sous-couverture" },
 ];
 
 export async function openHubScenario(entry: typeof hubScenarios[number], existingScenarios: Scenario[]) {

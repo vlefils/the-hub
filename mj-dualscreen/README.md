@@ -4,7 +4,7 @@ Depuis **Outils → MJ Dualscreen**, le MJ peut lire un chapitre, préparer ses 
 
 Le menu **Scénario** contient **La Troisième Mi-Temps**, **Sortie de service**, **Tout le monde monte** et **Avant vingt-deux heures**. Sur une table neuve, la console ouvre La Troisième Mi-Temps. Chaque aventure se charge depuis le site à sa première ouverture. Les textes, images, modifications, brouillard et dernier chapitre restent ensuite dans IndexedDB sur cet appareil. Supprimer une copie locale permet de rouvrir l’original depuis le menu. **Importer** et **Gérer → Exporter ce scénario** permettent de transférer une partie entre navigateurs.
 
-**Avant vingt-deux heures — L’hôtel Velvet (illustrations révisées)** comporte trois rencontres illustrées, dans les étages, les cuisines et le vestibule des livraisons. Les copies des éditions précédentes sont accessibles dans **Mes scénarios**.
+**Avant vingt-deux heures — Sous couverture** met en scène trois crews du Hub déguisées en personnel de l’hôtel Velvet. La première interrompt l’entretien avec le général. Les copies des éditions précédentes sont accessibles dans **Mes scénarios**.
 
 ## Développement
 
