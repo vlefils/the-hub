@@ -4,8 +4,8 @@ import { basename, extname } from 'node:path';
 
 const root = new URL('./', import.meta.url);
 const book = readFileSync(new URL('seance-mj.md', root), 'utf8');
-const title = 'Avant vingt-deux heures — L’hôtel Velvet';
-const timestamp = '2026-11-26T12:00:00.000Z';
+const title = 'Avant vingt-deux heures — L’hôtel Velvet (illustrations révisées)';
+const timestamp = '2026-11-26T16:00:00.000Z';
 const viewport = { zoom: 1, x: 0, y: 0 };
 const assets = new Map();
 
