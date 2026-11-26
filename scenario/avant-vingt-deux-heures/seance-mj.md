@@ -48,7 +48,7 @@ Remettre l’adresse et l’avis sans jet. Si les PJ négocient, elle accepte un
 
 **Trois entrées jouables.** À l’accueil, demander une audience ou faire transmettre l’avis. Dans le foyer public, demander à une famille qui vient de parler à Vaudan de faciliter la présentation. Par un contact de Bastion ou du Syndicat, faire appeler Maret pour obtenir une entrevue. Une approche convaincante fonctionne directement. Pour hâter une entrée incertaine, utiliser CHA (Influence) DD 12 ou ESPRIT (Intuition) DD 12 pour trouver la bonne personne. Sur un échec, le message passe après un délai et Eva ou Maret accompagne les PJ sous son propre nom. Le salon reste accessible.
 
-**Indice facultatif.** Eva a reçu deux consignes successives pour la fin de la réception. La première prévoit une sortie des familles par le hall. La seconde les fait attendre sur la passerelle sans donner de motif. Sa copie porte le nom du prestataire fictif **Service Horizon**. Elle accepte de séparer les flux et de raccompagner les familles si les PJ lui donnent un avertissement concret. Dans ce cas, les civils du plan sont déjà à l’abri au premier round.
+**Indice facultatif.** Eva a reçu deux consignes successives pour la fin de la réception. La première prévoit une sortie des familles par le hall. La seconde réserve le couloir du salon Cèdre aux employés de trois services. Des valets, des cuisiniers et deux portiers figurent sur le même ordre signé par la direction de cet hôtel de Velvet. Eva raccompagne les familles si les PJ lui donnent un avertissement concret. Dans ce cas, elles sont déjà à l’abri quand les valets arrivent.
 
 ## 04 · Qui vous paie ?
 
@@ -74,68 +74,51 @@ Chaque raison concrète vaut un appui. Un PJ qui présente deux formulations du 
 
 **Une vérification annoncée.** CHA (Influence) DD 13 peut obtenir un appui si l’argument laisse le général décider et propose une vérification immédiate. Un échec fait choisir sa propre vérification à Vaudan. Les appuis établis par les actes restent acquis. Laisser les PJ prendre la parole à tour de rôle puis demander comment ils veulent repartir.
 
-## 05 · La passerelle
+## 05 · Le service des étages
 
-*Quelques minutes avant 22 h · 40 à 65 min.*
+*Vers 21 h 54 · 15 à 20 min.*
 
-**Déclenchement.** Des prestataires sans insigne s’avancent et présentent un faux ordre d’isolement. Une première décharge brise une cloison du salon. Les familles reculent vers le hall. Montrer la galerie, les sorties et la zone d’arrivée des assaillants. Si les PJ ont déjà fait partir Vaudan et transmis son ordre, les prestataires se révèlent en tentant de retenir Maret ou de récupérer l’avis. Les PJ peuvent choisir de partir avec leur objectif acquis. Si les PJ ont pris une autre issue avec Vaudan, adapter la rencontre au débouché et conserver leur avantage. N’imposer aucun retour sur la passerelle.
+**MJ uniquement.** Le directeur de l’hôtel a préparé trois groupes d’employés directement rattachés à Velvet. Il a dit aux uns que Vaudan était retenu par des mercenaires et aux autres qu’ils faisaient partie d’une reprise en charge officielle. La gouvernante d’étage, **Lise Marot**, sait que l’ordre vient de sa direction et veut remettre Vaudan vivant. Seuls le directeur et les commanditaires connaissent le sort prévu pour lui.
 
-> Les lampes ordinaires s’éteignent. À l’ouest, l’éclairage de secours du hall résiste. Deux silhouettes mécaniques débouchent à l’est de la galerie. Une femme en veste de service lève une main vers vous. « Restez où vous êtes. On vient chercher le général. »
+> Un valet pousse un chariot de linge en travers du couloir. Deux autres sortent de la lingerie, le gilet violet boutonné jusqu’au col. Une femme en tunique grise vous montre son badge d’une main. Vous voyez l’arme dans l’autre. « Monsieur Vaudan. On s’occupe de vous. »
 
-![La galerie au moment de l’attaque](images/passerelle.jpg)
+![Trois valets de chambre et une femme de ménage bloquent le couloir](images/etages.jpg)
 
-[plan-passerelle]: images/passerelle-plan.png "Passerelle de l’hôtel · 1 case = 1,5 m"
+[plan-etages]: images/etages-plan.png "Couloir des étages · 1 case = 1,5 m"
 
-### Départ sur le plan
+Vaudan part de B2 et Maret de C2, sauf placement déjà joué. Placer les **trois valets** en F3, G4 et H5. Marot, la **femme de ménage en tunique grise**, commence en K3. Le chariot en F5–G5 donne un demi-couvert (+2 CA et aux sauvegardes de DEX appropriées). Deux groupes de civils se trouvent dans le hall, en A6 et C7, sauf si Eva les a déjà accompagnés dehors. Les PJ prennent leurs positions établies ou entrent avec Vaudan depuis le salon.
 
-| Zone | Repères | Usage |
-|---|---|---|
-| A · Hall ouest | A3–D8 | Escalier public en A5–A6. Deux groupes de civils en B4 et C7 si Eva les accompagne encore. |
-| B · Salon Cèdre | E2–H5 | Vaudan commence en F3 et Maret en G4. Banquette en G2–H2. |
-| C · Galerie | E6–N8 | Axe ouvert. Deux îlots bas en H7–I7 et K6–L6 donnent un demi-couvert (+2 CA et aux sauvegardes de DEX appropriées). |
-| D · Coursive de service | I2–N5 | Liaison en J5–J6 avec la galerie. Poste de permanence en M3. Cloison pleine entre les deux espaces, sauf à cette liaison. |
-| E · Vestibule est | O3–R8 | Arrivée des drones en O6 et P7. La cheffe commence en Q5. Sortie vers la tour voisine en R5–R6. |
+**Choix de sortie.** La direction a fait fermer l’escalier public après le départ des derniers invités. Eva peut le rouvrir si les PJ ont gagné sa confiance. S’ils ont préparé ce détour ou trouvé une autre façon de rendre l’escalier praticable, ils peuvent y emmener Vaudan et passer directement au bilan. Par défaut, la sortie de service en K5–K6 reste ouverte et mène aux cuisines.
 
-Les PJ partent de leurs positions établies. Par défaut, ils se placent en A, B ou au bord ouest de C. Vaudan et Maret partagent l’initiative 10, après les PJ à égalité. Vaudan se déplace ou contacte Derval. Maret ouvre une issue, guide des civils ou aide à porter un blessé. Quand quelqu’un annonce une attaque contre Vaudan, un PJ adjacent peut dépenser sa réaction pour s’interposer. Lancer alors contre sa CA ou lui faire effectuer la sauvegarde.
+**Comportement.** Les deux premiers employés qui ont une ouverture attaquent. Les autres barrent la progression ou relaient des ordres. Le valet en F3 porte le bâton à impulsion. Les deux autres valets et Marot ont un pistolet à impulsion. Dès que deux employés ont été neutralisés, ont quitté leur position ou ont baissé leur arme, le reste du groupe laisse passer la crew. Si Vaudan leur dit de vive voix qu’il part de son plein gré ou qu’Eva confirme ses intentions, les valets peuvent reculer. Si le doute persiste, CHA (Influence) DD 12 fait sortir un valet de l’affrontement.
 
-**Faire sortir Vaudan.** L’escalier A ou le débouché E mène hors de portée immédiate. La zone D permet une attente protégée et l’appel à Derval. Un PJ adjacent peut déplacer un blessé stable avec une action et la moitié de sa vitesse. Une action par groupe guide les civils vers A s’il est accessible. Quand Vaudan atteint une sortie, terminer l’extraction s’il a un accompagnateur et qu’aucun adversaire ne lui barre le chemin.
+**Règles pour toute l’exfiltration.** Chaque groupe d’employés a une initiative commune (+1) et effectue au maximum deux attaques par round. Les groupes restent dans leur secteur dès que la crew a franchi leur issue, sauf si les joueurs choisissent de revenir. Garder les PV d’une scène à l’autre. À deux PJ, un employé hésitant dans chaque groupe consacre son premier tour à reculer et chaque groupe effectue au maximum une attaque par round. À quatre PJ, ajouter 3 PV à chaque employé. Les actions qui retardent vraiment la crew peuvent rapprocher l’annonce de 22 h. Les repères horaires donnent l’allure par défaut et laissent leurs gains de temps aux joueurs.
 
-**Faire entendre son ordre.** Vaudan a besoin d’une action et d’un échange intelligible avec Derval. Il peut appeler avant le combat, depuis le poste de permanence en M3 ou à l’abri après l’extraction. Un PJ ou Maret peut lui prêter un terminal. Derval rappelle Vaudan sur une liaison qu’elle a choisie. S’il est inconscient, Maret peut utiliser sa propre action pour signaler qu’il est vivant. Derval gèle alors l’intérim jusqu’à ce qu’un officier puisse le voir.
+Vaudan et Maret partagent l’initiative 10, après les PJ à égalité. Vaudan se déplace ou appelle Derval. Maret guide des civils, ouvre une issue ou aide à porter un blessé. Un PJ adjacent à Vaudan a une réaction pour s’interposer quand une attaque vise le général. Résoudre l’attaque sur le PJ à la place. Un PJ adjacent peut déplacer un blessé stable avec une action et la moitié de sa vitesse. Un groupe de civils a CA 10 et s’arrête s’il doit aider un blessé. Une action permet de l’accompagner vers une sortie dégagée.
 
-| Moment | Évolution | Fenêtre d’action |
-|---|---|---|
-| Round 1 | La cheffe demande la remise du général. Les drones tirent sur les personnes qui s’interposent. | En cas de parlementaire accepté, elle dépense son action à parler. Un PJ peut préparer une sortie ou accompagner les familles. |
-| Round 2 | La cheffe fait annoncer la fermeture du vestibule est au début du round suivant. | Une action en O5 maintient l’accès ouvert. Une personne passée de l’autre côté peut aussi le garder ouvert. Le hall ouest reste une sortie. |
-| Round 3 | Derval rappelle tout officier identifié ayant donné signe de vie. | Le PJ qui a prévenu Derval peut répondre et passer le terminal à Vaudan en interaction. |
-| Fin du round 4 | L’intérim est annoncé en l’absence de confirmation. Les hostiles cherchent alors à se dégager après leur prochain tour. | Une confirmation tardive donne à Vaudan des motifs de contester l’annonce. La scène continue tant qu’une personne est coincée ou blessée. |
+**Appeler Derval.** Une action et un échange intelligible permettent à Vaudan de s’authentifier et de transmettre son ordre. Il peut le faire au salon, depuis un espace à l’abri ou dès la sortie. Un PJ ou Maret peut prêter son terminal. Si Vaudan est inconscient, Derval accepte un signalement de Maret et gèle l’intérim jusqu’à ce qu’un officier voie le général.
 
-Si la crew prend la main rapidement, résoudre les dernières actions en narration. La cheffe se replie si les deux drones tombent. Les drones se replient si elle se rend ou quitte la scène. **À deux PJ**, retirer le drone en P7 et passer la cheffe à 22 PV. **À quatre PJ**, passer la cheffe à 34 PV et donner 18 PV à chaque drone. Pour toute table déjà éprouvée, Maret prend en charge les familles sans consommer d’action de PJ.
+### Valet de chambre
 
-### Cheffe du Service Horizon
+*Trois employés · Initiative commune +1*
 
-*Adversaire · Initiative +2*
-
-- **CA** 14
-- **PV** 28
+- **CA** 12
+- **PV** 8 chacun
 - **Vitesse** 9 m
-- **FOR** +1 · **DEX** +2 · **CON** +2 · **ESPRIT** +1 · **CHA** +2
+- **FOR** +1 · **DEX** +1 · **CON** +1 · **ESPRIT** +0 · **CHA** +0
 
-**Bâton à impulsion.** Attaque de mêlée +4, allonge 1,5 m, 1d6 + 2 dégâts contondants.
+**Bâton à impulsion.** Mêlée +3, allonge 1,5 m, 1d6 + 1 contondants. **Pistolet à impulsion.** Distance +3, portée 12 m, 1d6 électriques. Chaque valet emploie l’arme qu’il porte.
 
-**Arc de confinement.** Attaque à distance +4, portée 12 m, 1d6 + 2 dégâts électriques. Une cible touchée perd 3 m de vitesse jusqu’à la fin de son prochain tour. La cheffe choisit une seule attaque par action.
+### Lise Marot
 
-### Drone de confinement
-
-*Deux appareils · Initiative commune +1*
+*Femme de ménage et responsable d’étage · Initiative commune +1*
 
 - **CA** 13
-- **PV** 15 chacun
-- **Vitesse** 9 m en vol
-- **FOR** +0 · **DEX** +2 · **CON** +1 · **ESPRIT** +0 · **CHA** −2
+- **PV** 12
+- **Vitesse** 9 m
+- **FOR** +0 · **DEX** +2 · **CON** +1 · **ESPRIT** +1 · **CHA** +1
 
-**Impulsion.** Attaque à distance +4, portée 12 m, 1d6 + 1 dégâts électriques.
-
-**Mettre un drone en veille.** Un PJ équipé d’une interface peut employer une action de Techno DD 13 à 9 m. En cas de réussite, le drone perd son prochain tour. Une fois par drone par rencontre. Les capacités de classe fonctionnent selon la fiche du PJ.
+**Pistolet à impulsion.** Distance +4, portée 12 m, 1d6 + 1 électriques. Marot peut consacrer son action à demander leur version aux PJ si Vaudan prend la parole. Si elle est isolée, elle préfère négocier la sortie des siens.
 
 ### Général Idris Vaudan
 
@@ -146,9 +129,61 @@ Si la crew prend la main rapidement, résoudre les dernières actions en narrati
 - **Vitesse** 7,5 m
 - **FOR** +1 · **DEX** +1 · **CON** +2 · **ESPRIT** +2 · **CHA** +2
 
-À 0 PV, Vaudan est inconscient et stable. Les hostiles cherchent alors à l’isoler. Deux groupes de civils ont chacun CA 10. En cas de dégât, le groupe s’arrête pour soutenir un blessé stable et a besoin d’un accompagnateur. Maret a CA 13, 15 PV, vitesse 9 m et DEX +1. Il reste stable à 0 PV. La scène se joue avec ces objectifs et leurs conséquences.
+À 0 PV, Vaudan et Maret sont stables et inconscients. Maret a CA 13, 15 PV, vitesse 9 m et DEX +1. Si Vaudan et la crew ont déjà quitté l’hôtel, les employés essaient de retenir Maret ou de récupérer l’avis. Les PJ peuvent garder leur avance et partir.
 
-## 06 · Un ordre qui porte
+## 06 · Derrière le passe
+
+*Vers 21 h 57 · 15 à 25 min.*
+
+> Le passe est encore éclairé. Sous les lampes, trois assiettes refroidissent. Deux cuisiniers se tournent vers vous, les manches relevées. Le serveur à côté d’eux pose son plateau et fait jaillir une lumière violette d’un bâton court.
+
+![Deux cuisiniers et un serveur en armes dans la cuisine de Velvet](images/cuisines.jpg)
+
+[plan-cuisines]: images/cuisines-plan.png "Cuisines et passe · 1 case = 1,5 m"
+
+Les PJ entrent depuis le couloir en A4 avec Vaudan et Maret s’ils les accompagnent. **Deux cuisiniers** en G3 et I4 portent des pistolets à impulsion. **Un serveur** en H4 porte le bâton. Les plans de travail en E3–F3 et G5–H5 donnent un demi-couvert. La porte entre I4 et J4 mène au sas des livraisons. Un employé en I4 peut la bloquer en dépensant son action à la tenir. Un PJ qui l’écarte, obtient son départ ou passe derrière lui dégage l’issue.
+
+**Ce qui change ici.** Les cuisiniers ont entendu que des mercenaires retenaient Vaudan. Ils attaquent si la crew avance, pendant que le serveur protège le sas. Si des PJ se donnent le temps de laisser parler Vaudan, le serveur baisse son bâton et demande aux cuisiniers de l’écouter. Convaincre un cuisinier sans donner la parole au général demande CHA (Influence) DD 13 et un fait vérifiable. Dès qu’un cuisinier renonce ou tombe, le serveur ouvre le sas s’il est en état d’agir. La crew peut avancer avec Vaudan dès qu’une voie est libre.
+
+### Personnel de cuisine
+
+*Deux cuisiniers et un serveur · Initiative commune +1*
+
+- **CA** 12
+- **PV** 10 par cuisinier, 8 pour le serveur
+- **Vitesse** 9 m
+- **FOR** +1 · **DEX** +1 · **CON** +1 · **ESPRIT** +0 · **CHA** +0
+
+**Pistolet à impulsion des cuisiniers.** Distance +3, portée 12 m, 1d6 + 1 électriques. **Bâton du serveur.** Mêlée +3, allonge 1,5 m, 1d6 + 1 contondants. Le groupe garde la limite d’attaques de l’exfiltration.
+
+## 07 · Les portiers
+
+*Vers 21 h 59 · 10 à 15 min.*
+
+> De l’autre côté des portes vitrées, les lumières de Paradise défilent sous la rampe des livraisons. Dans le vestibule, deux portiers en manteaux taillés attendent devant un chariot à bagages. L’un d’eux a encore son ruban de deuil. Il vous demande de laisser Vaudan avec eux.
+
+![Deux portiers en uniforme Velvet tiennent la dernière sortie](images/sortie.jpg)
+
+[plan-sortie]: images/sortie-plan.png "Vestibule des livraisons · 1 case = 1,5 m"
+
+Les PJ arrivent de l’ouest en A4. Les portiers, **Amine Sorel** et **Mireille Vial**, commencent en H3 et I5. Le chariot D4–E4 donne un demi-couvert. La porte entre I4 et J4 débouche sur une rampe publique qui permet de sortir en L4. Mireille peut ouvrir la porte. En I3, un PJ peut dépenser une action au panneau pour l’ouvrir et la maintenir ouverte jusqu’à son prochain tour. Si un PJ a déjà trouvé une autre issue praticable, laisser la crew la prendre et sauter cette rencontre.
+
+**Choisir ce qui compte avant 22 h.** Derval rappelle Vaudan ou Maret si l’un d’eux l’a jointe. Passer le terminal est une interaction. Le général peut garder le chariot entre lui et les portiers et dépenser son action à donner l’ordre pendant que les PJ maintiennent le passage. L’intérim est annoncé si l’heure prévue est atteinte avant toute confirmation. Une confirmation tardive permet de le contester.
+
+**Le dernier groupe.** Les portiers suivent un ordre signé de la direction. Une fois leur demande formulée, ils attaquent si la crew avance vers la rampe. Amine laisse partir Vaudan si Eva ou un employé de l’hôtel lui confirme à voix haute que le général est libre de ses mouvements. Mireille cède si elle est isolée ou si les PJ ont déjà ouvert la rampe. Les négociations et les actions de couverture laissent du temps au général pour répondre à Derval.
+
+### Portier de Velvet
+
+*Deux employés · Initiative commune +1*
+
+- **CA** 13
+- **PV** 12 chacun
+- **Vitesse** 9 m
+- **FOR** +1 · **DEX** +2 · **CON** +1 · **ESPRIT** +0 · **CHA** +1
+
+**Pistolet à impulsion.** Distance +4, portée 12 m, 1d6 + 1 électriques. Un portier peut consacrer son action à demander confirmation de l’ordre à un collègue, ce qui donne aux PJ une fenêtre pour agir.
+
+## 08 · Un ordre qui porte
 
 *15 à 20 min · Terminer sur une conséquence que la crew peut constater.*
 
@@ -162,8 +197,8 @@ Si la crew prend la main rapidement, résoudre les dernières actions en narrati
 | Vaudan sauvé, ordre en retard | L’intérim est annoncé. Derval demande une confirmation en personne et partage les premières instructions de Vasseur. Killswitch accorde le délai si un officier a confirmé la survie. Sans confirmation, elle exige celle-ci avant la fin de la nuit. | Convoquer un officier neutre ou obtenir le retrait d’une unité devient la prochaine urgence. |
 | Intérim installé | Vasseur prend le commandement des unités concernées. Velvet parle d’une vengeance de ses anciens mercenaires si les Camtards ont été reconnus sur place. La commanditaire transmet les éléments promis au Cabinet si la crew refuse le contrat ou a délibérément abandonné Vaudan. Si elle a tenté le secours et échoué, elle donne jusqu’au matin pour que Derval obtienne un fait vérifiable. | Charlie transmet le premier effet vérifiable de la procédure. Une enquête s’ouvre. Les décisions des forces du Cabinet suivent leurs propres délais. |
 
-Sur un succès, laisser Vaudan leur demander ce qu’ils veulent que Bastion dise de leur intervention. Si des civils ont été aidés, Eva donne leur version à Derval. Si la cheffe a été capturée, elle peut confirmer l’heure et le point de remise du général à Service Horizon. L’identité du client reste un sujet d’enquête.
+Sur un succès, laisser Vaudan leur demander ce qu’ils veulent que Bastion dise de leur intervention. Si des civils ont été aidés, Eva donne leur version à Derval. Un employé qui accepte de parler connaît la consigne reçue et peut identifier la personne qui la lui a donnée. Marot peut confirmer que l’hôtel devait remettre le général à une équipe extérieure. Le lien entre cette équipe et la direction de Velvet reste un sujet d’enquête.
 
 **À la séance suivante.** Loona revient avec une liste de bâtiments sur lesquels l’intérim devait déployer Bastion. Accorder à sa joueuse le choix de la manière dont elle a obtenu le premier indice. Si Vaudan est disponible, il reconnaît les sites de l’ordre qu’il a refusé. Sinon, Derval confirme que leur liste correspond à ses instructions de la nuit. Les concessions concernent des sites précis. Les droits de préemption donnent à Velvet la priorité lors de leur mise en vente. La liste et l’ordre suffisent à ouvrir l’enquête sur les décisions du Cabinet. Michel demeure introuvable et Killswitch garde sa couverture.
 
-**Suivi à noter.** Heure et témoin de la confirmation, état de Vaudan, de Maret et des civils, personnes ayant reconnu la crew, sort de la cheffe, indice emporté, échéance du chantage.
+**Suivi à noter.** Heure et témoin de la confirmation, état de Vaudan, de Maret et des civils, employés prêts à témoigner, personnes ayant reconnu la crew, indice emporté, échéance du chantage.

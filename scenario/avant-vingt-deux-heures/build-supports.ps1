@@ -39,88 +39,111 @@ function Render($filename, $width, $height, $format, $draw) {
     }
 }
 
-Render 'passerelle-plan.png' 1492 990 ([System.Drawing.Imaging.ImageFormat]::Png) {
-    param($g)
-    Fill $g '#151c23' 0 0 1492 990
-    Label $g 'HÔTEL DES ARCADES' '#b6c4cf' 21 62 29 $true
-    Label $g 'Passerelle et salons' '#f3efdf' 46 59 56 $true
-    Label $g '1 case = 1,5 m' '#e3bd7a' 25 1190 73 $true
-    $left = 98
-    $top = 164
-    $cell = 72
-    $rooms = @(
-        @{ X=0; Y=2; W=4; H=6; Color='#344252' }
-        @{ X=4; Y=1; W=4; H=4; Color='#554756' }
-        @{ X=4; Y=5; W=10; H=3; Color='#3e4355' }
-        @{ X=8; Y=1; W=6; H=4; Color='#354953' }
-        @{ X=14; Y=2; W=4; H=6; Color='#554756' }
-    )
-    foreach ($room in $rooms) {
-        $x = $left + $room.X * $cell
-        $y = $top + $room.Y * $cell
-        $w = $room.W * $cell
-        $h = $room.H * $cell
-        Fill $g $room.Color $x $y $w $h
-        for ($i = 1; $i -lt $room.W; $i++) {
-            $a = $x + $i * $cell
-            Line $g '#778393' 1 $a $y $a ($y + $h)
+function Render-Plan($filename, $title, $rooms, $openings, $furniture, $control) {
+    Render $filename 1440 960 ([System.Drawing.Imaging.ImageFormat]::Png) {
+        param($g)
+        Fill $g '#151c23' 0 0 1440 960
+        Label $g 'HÔTEL DES ARCADES · VELVET' '#b6c4cf' 21 63 29 $true
+        Label $g $title '#f3efdf' 46 60 56 $true
+        Label $g '1 case = 1,5 m' '#e3bd7a' 25 1190 73 $true
+        $left = 156
+        $top = 164
+        $case = 94
+        foreach ($room in $rooms) {
+            $x = $left + $room.X * $case
+            $y = $top + $room.Y * $case
+            $w = $room.W * $case
+            $h = $room.H * $case
+            Fill $g $room.Color $x $y $w $h
+            for ($i = 1; $i -lt $room.W; $i++) {
+                $a = $x + $i * $case
+                Line $g '#778393' 1 $a $y $a ($y + $h)
+            }
+            for ($i = 1; $i -lt $room.H; $i++) {
+                $a = $y + $i * $case
+                Line $g '#778393' 1 $x $a ($x + $w) $a
+            }
+            Line $g '#d6c8a9' 4 $x $y ($x + $w) $y
+            Line $g '#d6c8a9' 4 $x ($y + $h) ($x + $w) ($y + $h)
+            Line $g '#d6c8a9' 4 $x $y $x ($y + $h)
+            Line $g '#d6c8a9' 4 ($x + $w) $y ($x + $w) ($y + $h)
         }
-        for ($i = 1; $i -lt $room.H; $i++) {
-            $a = $y + $i * $cell
-            Line $g '#778393' 1 $x $a ($x + $w) $a
+
+        foreach ($door in $openings) {
+            $x = $left + $door.X * $case
+            $y = $top + $door.Y * $case
+            if ($door.Horizontal) {
+                Fill $g '#dfbf84' ($x + 5) ($y - 4) ($case - 10) 8
+            } else {
+                Fill $g '#dfbf84' ($x - 4) ($y + 5) 8 ($case - 10)
+            }
         }
-        Line $g '#d6c8a9' 4 $x $y ($x + $w) $y
-        Line $g '#d6c8a9' 4 $x ($y + $h) ($x + $w) ($y + $h)
-        Line $g '#d6c8a9' 4 $x $y $x ($y + $h)
-        Line $g '#d6c8a9' 4 ($x + $w) $y ($x + $w) ($y + $h)
+
+        foreach ($cover in $furniture) {
+            $x = $left + $cover.X * $case + 10
+            $y = $top + $cover.Y * $case + 18
+            Fill $g '#a68372' $x $y (2 * $case - 20) 54
+        }
+
+        if ($control) {
+            $x = $left + $control.X * $case + 28
+            $y = $top + $control.Y * $case + 24
+            Fill $g '#82aa9b' $x $y 38 40
+        }
+
+        foreach ($room in $rooms) {
+            Label $g $room.Label '#fff0d4' 27 ($left + $room.X * $case + 16) ($top + $room.Y * $case + 12) $true
+        }
+        for ($i = 0; $i -lt 12; $i++) {
+            Label $g ([string][char](65 + $i)) '#c4ccd0' 23 ($left + $i * $case + 35) ($top - 32) $true
+        }
+        for ($i = 0; $i -lt 7; $i++) {
+            Label $g ([string]($i + 1)) '#c4ccd0' 23 ($left - 40) ($top + $i * $case + 34) $true
+        }
+        Fill $g '#a68372' 159 875 34 17
+        Label $g 'Mobilier et demi-couvert' '#ddded9' 23 208 866
+        Fill $g '#dfbf84' 560 879 42 8
+        Label $g 'Passage ou porte' '#ddded9' 23 614 866
+        if ($control) {
+            Fill $g '#82aa9b' 934 871 26 25
+            Label $g 'Commande de la porte' '#ddded9' 23 976 866
+        }
     }
-    # Les bandes claires interrompent les murs à l’emplacement des passages.
-    foreach ($opening in @(
-        @{ X=0; Y=4; W=8; H=144 }
-        @{ X=4; Y=3; W=8; H=72 }
-        @{ X=4; Y=5; W=8; H=144 }
-        @{ X=5; Y=5; W=72; H=8 }
-        @{ X=9; Y=5; W=72; H=8 }
-        @{ X=14; Y=5; W=8; H=144 }
-        @{ X=18; Y=4; W=8; H=144 }
-    )) {
-        $x = $left + $opening.X * $cell
-        $y = $top + $opening.Y * $cell
-        if ($opening.W -eq 8) { $x -= 4; $y += 4; $height = $opening.H - 8 }
-        else { $x += 4; $y -= 4; $height = $opening.H }
-        $width = if ($opening.W -eq 8) { $opening.W } else { $opening.W - 8 }
-        Fill $g '#dfbf84' $x $y $width $height
-    }
-    foreach ($cover in @(@{ X=6; Y=1 }, @{ X=7; Y=6 }, @{ X=10; Y=5 })) {
-        $x = $left + $cover.X * $cell + 8
-        $y = $top + $cover.Y * $cell + 14
-        Fill $g '#aa8270' $x $y 128 44
-    }
-    Fill $g '#71968d' 980 324 36 40
-    foreach ($roomLabel in @(
-        @{ T='A  Hall ouest'; X=122; Y=389 }
-        @{ T='B  Salon Cèdre'; X=409; Y=390 }
-        @{ T='C  Galerie'; X=409; Y=684 }
-        @{ T='D  Coursive de service'; X=704; Y=254 }
-        @{ T='E  Vestibule est'; X=1124; Y=342 }
-    )) {
-        Label $g $roomLabel.T '#fff0d4' 25 $roomLabel.X $roomLabel.Y $true
-    }
-    for ($i = 0; $i -lt 18; $i++) {
-        Label $g ([string][char](65 + $i)) '#c4ccd0' 22 ($left + $i * $cell + 26) ($top - 33) $true
-    }
-    for ($i = 0; $i -lt 8; $i++) {
-        Label $g ([string]($i + 1)) '#c4ccd0' 22 ($left - 40) ($top + $i * $cell + 24) $true
-    }
-    Label $g 'Escalier public' '#e3bd7a' 22 117 480 $true
-    Label $g 'Vers la tour voisine' '#e3bd7a' 22 1158 491 $true
-    Fill $g '#aa8270' 101 839 34 17
-    Label $g 'Mobilier et demi-couvert' '#ddded9' 23 148 831
-    Fill $g '#71968d' 512 836 27 25
-    Label $g 'Poste de permanence' '#ddded9' 23 553 831
-    Fill $g '#dfbf84' 941 843 38 8
-    Label $g 'Passage' '#ddded9' 23 993 831
 }
+
+Render-Plan 'etages-plan.png' 'Le couloir des étages' @(
+    @{ X=0; Y=0; W=4; H=2; Color='#554756'; Label='Salon Cèdre' }
+    @{ X=8; Y=0; W=4; H=2; Color='#354953'; Label='Lingerie' }
+    @{ X=0; Y=2; W=12; H=3; Color='#3e4355'; Label='Couloir des étages' }
+    @{ X=0; Y=5; W=4; H=2; Color='#344252'; Label='Hall public et escalier' }
+    @{ X=8; Y=5; W=4; H=2; Color='#354953'; Label='Descente vers les cuisines' }
+) @(
+    @{ X=1; Y=2; Horizontal=$true }
+    @{ X=10; Y=2; Horizontal=$true }
+    @{ X=1; Y=5; Horizontal=$true }
+    @{ X=10; Y=5; Horizontal=$true }
+    @{ X=0; Y=6; Horizontal=$false }
+) @(@{ X=5; Y=4 }) $null
+
+Render-Plan 'cuisines-plan.png' 'Les cuisines et le passe' @(
+    @{ X=0; Y=2; W=3; H=3; Color='#344252'; Label='Depuis les étages' }
+    @{ X=3; Y=1; W=6; H=5; Color='#53515a'; Label='Cuisine et passe' }
+    @{ X=9; Y=2; W=3; H=3; Color='#354953'; Label='Vers les livraisons' }
+) @(
+    @{ X=0; Y=3; Horizontal=$false }
+    @{ X=3; Y=3; Horizontal=$false }
+    @{ X=9; Y=3; Horizontal=$false }
+    @{ X=12; Y=3; Horizontal=$false }
+) @(@{ X=4; Y=2 }, @{ X=6; Y=4 }) $null
+
+Render-Plan 'sortie-plan.png' 'Le vestibule des livraisons' @(
+    @{ X=0; Y=1; W=9; H=5; Color='#554756'; Label='Vestibule' }
+    @{ X=9; Y=1; W=3; H=5; Color='#344252'; Label='Rampe publique' }
+) @(
+    @{ X=0; Y=3; Horizontal=$false }
+    @{ X=9; Y=3; Horizontal=$false }
+    @{ X=12; Y=3; Horizontal=$false }
+) @(@{ X=3; Y=3 }) @{ X=8; Y=2 }
 
 Render 'avis.jpg' 1440 900 ([System.Drawing.Imaging.ImageFormat]::Jpeg) {
     param($g)

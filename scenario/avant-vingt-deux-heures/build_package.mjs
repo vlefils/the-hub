@@ -4,8 +4,8 @@ import { basename, extname } from 'node:path';
 
 const root = new URL('./', import.meta.url);
 const book = readFileSync(new URL('seance-mj.md', root), 'utf8');
-const title = 'Avant vingt-deux heures';
-const timestamp = '2026-11-26T00:00:00.000Z';
+const title = 'Avant vingt-deux heures — L’hôtel Velvet';
+const timestamp = '2026-11-26T12:00:00.000Z';
 const viewport = { zoom: 1, x: 0, y: 0 };
 const assets = new Map();
 
@@ -65,9 +65,9 @@ const scenes = chapters.map((chapter, sortOrder) => {
   };
 });
 
-assert.equal(scenes.length, 6);
-assert.equal(assets.size, 7);
-assert.equal(scenes[4].maps.length, 1);
+assert.equal(scenes.length, 8);
+assert.equal(assets.size, 11);
+assert.deepEqual(scenes.filter(scene => scene.maps.length).map(scene => scene.sortOrder), [4, 5, 6]);
 const manifest = {
   format: 'ecran-du-mj', version: 1, exportedAt: timestamp,
   scenario: { name: title, lastSceneId: scenes[0].id }, scenes, assets: [...assets.values()],

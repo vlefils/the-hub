@@ -4,6 +4,8 @@ Depuis **Outils → MJ Dualscreen**, le MJ peut lire un chapitre, préparer ses 
 
 Le menu **Scénario** contient **La Troisième Mi-Temps**, **Sortie de service**, **Tout le monde monte** et **Avant vingt-deux heures**. Sur une table neuve, la console ouvre La Troisième Mi-Temps. Chaque aventure se charge depuis le site à sa première ouverture. Les textes, images, modifications, brouillard et dernier chapitre restent ensuite dans IndexedDB sur cet appareil. Supprimer une copie locale permet de rouvrir l’original depuis le menu. **Importer** et **Gérer → Exporter ce scénario** permettent de transférer une partie entre navigateurs.
 
+L’édition **Avant vingt-deux heures — L’hôtel Velvet** comporte trois rencontres illustrées, dans les étages, les cuisines et le vestibule des livraisons. Les tables qui avaient ouvert la première édition retrouvent cette copie dans **Mes scénarios**.
+
 ## Développement
 
 Les sources de la console, adaptées du projet Écran du MJ sous licence MIT, sont dans `app/`. Depuis ce dossier, avec Node.js 22.13 ou ultérieur, exécuter `npm ci`, `npm test`, puis `npm run build`. Versionner les fichiers produits dans `assets/` avec les sources. GitHub Pages sert directement `index.html`. Pour vérifier le site en local, lancer `node tools/serve.mjs` depuis la racine de The Hub.
